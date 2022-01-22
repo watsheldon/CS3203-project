@@ -17,3 +17,4 @@ No additional instructions required.
 Name | Mobile | Email | Development OS/Toolchain
 -:|:-:|:-|-|
 Kou Yong Kang | 88837448 | kou.yongkang@u.nus.edu | Linux/GCC 11.2.0
+Vanessa Tay | 92400993 | vanessa_tay@u.nus.edu | macOS/AppleClang 12.0.0
