@@ -16,7 +16,7 @@ No additional instructions required.
 
 Name | Mobile | Email | Development OS/Toolchain
 -:|:-:|:-|-|
-Chen Jiangwei | 87302583 | e0148760@u.nus.edu | Windows/MSVC 142
+Chen Jiangwei | 83702583 | e0148760@u.nus.edu | Windows/MSVC 142
 Gu Yichen | 88330799 | e0424658@u.nus.edu | macOS/AppleClang 12.0.0
 Kou Yong Kang | 88837448 | kou.yongkang@u.nus.edu | Linux/GCC 11.2.0
 Vanessa Tay | 92400993 | vanessa_tay@u.nus.edu | macOS/AppleClang 12.0.0
