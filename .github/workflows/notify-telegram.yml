@@ -1,0 +1,42 @@
+name: Telegram notify
+on:
+  push:
+    branches:
+      - master
+      - 'review/**'
+      - production
+    paths:
+      - 'Team31/Code31/**'
+
+  pull_request:
+
+jobs:
+  push_msg:
+    name: Send commit message
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: send update to channel on push
+        uses: appleboy/telegram-action@v0.1.1
+        with:
+          to: ${{ secrets.CHANNEL_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            *${{ github.actor }}* pushed to [${{ github.ref_name }}](https://github.com/nus-cs3203/21s2-cp-spa-team-31/commits/${{ github.ref_name }})
+            SHA1: `${{ github.sha }}`
+  pr_msg:
+    name: Send PR notifications
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: send PR alert
+        uses: appleboy/telegram-action@v0.1.1
+        with:
+          to: ${{ secrets.CHANNEL_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            *${{ github.actor }}* opened PR [#${{ github.event.number }}](${{ github.event.pull_request.html_url }})
+            
+            *${{ github.event.pull_request.title }}*
