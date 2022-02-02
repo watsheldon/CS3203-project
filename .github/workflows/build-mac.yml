@@ -1,0 +1,34 @@
+name: Build for MacOS
+
+on:
+  push:
+    branches-ignore:
+      - production
+    paths:
+      - 'Team31/Code31/**'
+
+env:
+    BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 3
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{runner.workspace}}/build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{runner.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE/Team31/Code31/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+      - name: Build Project
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        run: cmake --build . --config $BUILD_TYPE
