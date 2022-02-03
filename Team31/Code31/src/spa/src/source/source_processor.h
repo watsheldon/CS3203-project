@@ -10,7 +10,7 @@
 class SourceProcessor {
   public:
     explicit SourceProcessor(const std::string &filename);
-    std::shared_ptr<ProgramKnowledgeBase> parse();
+    std::shared_ptr<pkb::ProgramKnowledgeBase> parse();
   private:
     std::ifstream source_;
 };

@@ -3,6 +3,6 @@
 
 SourceProcessor::SourceProcessor(const std::string &filename) : source_(filename) {}
 
-std::shared_ptr<ProgramKnowledgeBase> SourceProcessor::parse() {
+std::shared_ptr<pkb::ProgramKnowledgeBase> SourceProcessor::parse() {
     return nullptr;
 }

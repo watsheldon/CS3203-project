@@ -5,10 +5,10 @@
 
 class QueryProcessingSubsystem {
   public:
-    void use(const std::shared_ptr<ProgramKnowledgeBase> &pkb_ptr);
+    void use(const std::shared_ptr<pkb::ProgramKnowledgeBase> &pkb_ptr);
     void evaluate(std::string_view query_string, std::list<std::string> &list);
   private:
-    std::shared_ptr<ProgramKnowledgeBase> pkb_;
+    std::shared_ptr<pkb::ProgramKnowledgeBase> pkb_;
 };
 
 #endif //SRC_SPA_SRC_QPS_QUERY_PROCESSING_SUBSYSTEM_H_

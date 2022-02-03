@@ -1,0 +1,8 @@
+#ifndef SRC_SPA_SRC_POLISH_NOTATION_H_
+#define SRC_SPA_SRC_POLISH_NOTATION_H_
+
+class PolishNotation {
+
+};
+
+#endif //SRC_SPA_SRC_POLISH_NOTATION_H_
