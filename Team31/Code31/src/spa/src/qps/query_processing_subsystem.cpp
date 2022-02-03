@@ -4,7 +4,7 @@
 #include "query_processing_subsystem.h"
 #include "pkb/program_knowledge_base.h"
 
-void QueryProcessingSubsystem::use(const std::shared_ptr<ProgramKnowledgeBase> &pkb_ptr) {
+void QueryProcessingSubsystem::use(const std::shared_ptr<pkb::ProgramKnowledgeBase> &pkb_ptr) {
     pkb_ = pkb_ptr;
 }
 
