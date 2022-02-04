@@ -1,5 +1,5 @@
 #include "program_knowledge_base.h"
-using namespace pkb;
+using namespace spa;
 
 ProgramKnowledgeBase::ProgramKnowledgeBase(std::vector<std::string> procedures,
                                            std::vector<std::string> variables,

@@ -15,7 +15,7 @@ using IF_STMT_NO = STMT_NO;
 using ASSIGN_STMT_NO = STMT_NO;
 using PN = PolishNotation;
 
-namespace pkb {
+namespace spa {
 
 class ProgramKnowledgeBase {
   public:
@@ -39,6 +39,9 @@ class ProgramKnowledgeBase {
                   std::vector<WHILE_STMT_NO> whiles, std::vector<IF_STMT_NO> ifs,
                   std::vector<ASSIGN_STMT_NO> assigns, std::vector<PN> notations);
 
+    //mark the end of source processor
+    void set_end();
+
 
 
   private:
@@ -55,6 +58,6 @@ class ProgramKnowledgeBase {
     std::vector<PN> notations;
 
 };
-}  // namespace pkb
+}  // namespace spa
 
 #endif //SRC_SPA_SRC_PKB_PROGRAM_KNOWLEDGE_BASE_H_
