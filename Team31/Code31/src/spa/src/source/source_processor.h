@@ -5,7 +5,7 @@
 #include <memory>
 #include <fstream>
 
-#include "pkb/program_knowledge_base.h"
+#include "../pkb/program_knowledge_base.h"
 
 class SourceProcessor {
   public:
