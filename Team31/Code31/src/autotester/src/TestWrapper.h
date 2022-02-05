@@ -8,8 +8,8 @@
 
 // include your other headers here
 #include "AbstractWrapper.h"
-#include "pkb/program_knowledge_base.h"
-#include "qps/query_processing_subsystem.h"
+#include "../../spa/src/pkb/program_knowledge_base.h"
+#include "../../spa/src/qps/query_processing_subsystem.h"
 
 class TestWrapper : public AbstractWrapper {
   public:

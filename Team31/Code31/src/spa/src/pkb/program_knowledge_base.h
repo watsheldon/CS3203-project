@@ -3,9 +3,6 @@
 
 #include "knowledge_base.h"
 
-#include <vector>
-#include <string>
-
 namespace spa {
 
 class ProgramKnowledgeBase : public KnowledgeBase {
@@ -41,7 +38,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::vector<STMTLST_NO> proc_stmtlst_;
     std::vector<STMTLST_NO> while_stmtlst_;
     std::vector<STMTLST_NO> if_stmtlst_;
-    std::vector<std::vector<STMTLST_NO>> stmtlsts_;
+    std::vector<std::vector<STMTLST_NO> > stmtlsts_;
 
     //vector to store the nesting relationships among containers
     std::vector<CN> containers_;

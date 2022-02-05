@@ -1,7 +1,7 @@
 #ifndef SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_
 #define SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_
 
-#include "polish_notation.h"
+#include "../polish_notation.h"
 #include "container_node.h"
 
 #include <vector>
