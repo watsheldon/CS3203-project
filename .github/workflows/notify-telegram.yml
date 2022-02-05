@@ -9,6 +9,11 @@ on:
       - 'Team31/Code31/**'
 
   pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - synchronize
 
 jobs:
   push_msg:
@@ -27,7 +32,9 @@ jobs:
             SHA1: `${{ github.sha }}`
   pr_msg:
     name: Send PR notifications
-    if: ${{ github.event_name == 'pull_request' }}
+    if: |
+      github.event_name == 'pull_request'
+        && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - name: send PR alert
@@ -37,6 +44,6 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
           message: |
-            *${{ github.actor }}* opened PR [#${{ github.event.number }}](${{ github.event.pull_request.html_url }})
+            *${{ github.actor }}* ${{ github.event.action }} PR [#${{ github.event.number }}](${{ github.event.pull_request.html_url }})
             
             *${{ github.event.pull_request.title }}*
