@@ -2,7 +2,7 @@
 using namespace spa;
 
 ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<Init> init)
-        : entities_ptr_(init) {
+        : entities_ptr_(init){
     proc_stmtlst_.resize(init->procedures.size());
     while_stmtlst_.resize(init->whiles.size());
     if_stmtlst_.resize(init->ifs.size() * 2);
