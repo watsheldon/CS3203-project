@@ -1,4 +1,4 @@
-name: Build for MacOS
+name: CMake Builds
 
 on:
   push:
@@ -6,16 +6,20 @@ on:
       - production
     paths:
       - 'Team31/Code31/**'
+  pull_request:
 
 env:
     BUILD_TYPE: Release
 
 jobs:
   build:
-    runs-on: macos-latest
+    name: CMake
     timeout-minutes: 3
     strategy:
       fail-fast: true
+      matrix:
+        os: [ macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
