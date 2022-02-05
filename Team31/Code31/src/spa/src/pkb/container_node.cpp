@@ -2,9 +2,9 @@
 using namespace spa;
 
 ContainerNode::ContainerNode() {
-    parent = -1;
-    first_child = -1;
-    first_sibling = -1;
+    parent = 0;
+    first_child = 0;
+    first_sibling = 0;
 }
 
 void ContainerNode::setParent(int p) {
