@@ -2,8 +2,12 @@
 #define SRC_SPA_SRC_PKB_PROGRAM_KNOWLEDGE_BASE_H_
 
 #include "knowledge_base.h"
+#include "../polish_notation.h"
+#include "container_node.h"
 
 #include <memory>
+#include <vector>
+#include <string>
 
 namespace spa {
 

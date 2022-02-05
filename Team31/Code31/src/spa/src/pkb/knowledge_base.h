@@ -50,6 +50,6 @@ class KnowledgeBase {
     virtual void set_end() = 0;
 };
 
-}  // namespace pkb
+}  // namespace spa
 
 #endif //SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_
