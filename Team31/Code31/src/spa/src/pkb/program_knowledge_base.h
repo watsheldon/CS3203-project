@@ -3,6 +3,8 @@
 
 #include "knowledge_base.h"
 
+#include <memory>
+
 namespace spa {
 
 class ProgramKnowledgeBase : public KnowledgeBase {

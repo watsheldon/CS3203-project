@@ -1,53 +1,53 @@
 #include "program_knowledge_base.h"
 using namespace spa;
 
-//ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<Init> init) {
-//    entities_ptr_ = init;
-//    proc_stmtlst_.resize(init->procedures.size());
-//    while_stmtlst_.resize(init->whiles.size());
-//    if_stmtlst_.resize(init->ifs.size() * 2);
-//    stmtlsts_.resize(init->procedures.size() + init->whiles.size() + init->ifs.size() * 2 - 3);
-//    containers_.resize(init->whiles.size() + init->ifs.size() - 1);
-//    int stmt_size = init->reads.size() + init->prints.size() + init->calls.size()
-//            + init->whiles.size()+ init->ifs.size() + init->assigns.size() - 5;
-//    map_no_index_.resize(stmt_size);
-//    map_no_type_.resize(stmt_size);
-//    map_no_lst_.resize(stmt_size);
-//
-//    //fill up vectors
-//    //map_no_index_
-//    //map_no_type_
-//    for ( int i = 1; i < init->reads.size(); ++i ) {
-//        int stmt_no = init->reads.at(i);
-//        map_no_index_.at(stmt_no) = i;
-//        map_no_type_.at(stmt_no) = kRead;
-//    }
-//    for ( int i = 1; i < init->prints.size(); ++i ) {
-//        int stmt_no = init->prints.at(i);
-//        map_no_index_.at(stmt_no) = i;
-//        map_no_type_.at(stmt_no) = kPrint;
-//    }
-//    for ( int i = 1; i < init->calls.size(); ++i ) {
-//        int stmt_no = init->calls.at(i);
-//        map_no_index_.at(stmt_no) = i;
-//        map_no_type_.at(stmt_no) = kCall;
-//    }
-//    for ( int i = 1; i < init->whiles.size(); ++i ) {
-//        int stmt_no = init->whiles.at(i);
-//        map_no_index_.at(stmt_no) = i;
-//        map_no_type_.at(stmt_no) = kWhile;
-//    }
-//    for ( int i = 1; i <init->ifs.size(); ++i ) {
-//        int stmt_no = init->ifs.at(i);
-//        map_no_index_.at(stmt_no) = i;
-//        map_no_type_.at(stmt_no) = kIf;
-//    }
-//    for ( int i = 1; i < init->assigns.size(); ++i ) {
-//        int stmt_no = init->assigns.at(i);
-//        map_no_index_.at(stmt_no) = i;
-//        map_no_type_.at(stmt_no) = kAssign;
-//    }
-//}
+ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<Init> init) {
+    entities_ptr_ = init;
+    proc_stmtlst_.resize(init->procedures.size());
+    while_stmtlst_.resize(init->whiles.size());
+    if_stmtlst_.resize(init->ifs.size() * 2);
+    stmtlsts_.resize(init->procedures.size() + init->whiles.size() + init->ifs.size() * 2 - 3);
+    containers_.resize(init->whiles.size() + init->ifs.size() - 1);
+    int stmt_size = init->reads.size() + init->prints.size() + init->calls.size()
+            + init->whiles.size()+ init->ifs.size() + init->assigns.size() - 5;
+    map_no_index_.resize(stmt_size);
+    map_no_type_.resize(stmt_size);
+    map_no_lst_.resize(stmt_size);
+
+    //fill up vectors
+    //map_no_index_
+    //map_no_type_
+    for ( int i = 1; i < init->reads.size(); ++i ) {
+        int stmt_no = init->reads.at(i);
+        map_no_index_.at(stmt_no) = i;
+        map_no_type_.at(stmt_no) = kRead;
+    }
+    for ( int i = 1; i < init->prints.size(); ++i ) {
+        int stmt_no = init->prints.at(i);
+        map_no_index_.at(stmt_no) = i;
+        map_no_type_.at(stmt_no) = kPrint;
+    }
+    for ( int i = 1; i < init->calls.size(); ++i ) {
+        int stmt_no = init->calls.at(i);
+        map_no_index_.at(stmt_no) = i;
+        map_no_type_.at(stmt_no) = kCall;
+    }
+    for ( int i = 1; i < init->whiles.size(); ++i ) {
+        int stmt_no = init->whiles.at(i);
+        map_no_index_.at(stmt_no) = i;
+        map_no_type_.at(stmt_no) = kWhile;
+    }
+    for ( int i = 1; i <init->ifs.size(); ++i ) {
+        int stmt_no = init->ifs.at(i);
+        map_no_index_.at(stmt_no) = i;
+        map_no_type_.at(stmt_no) = kIf;
+    }
+    for ( int i = 1; i < init->assigns.size(); ++i ) {
+        int stmt_no = init->assigns.at(i);
+        map_no_index_.at(stmt_no) = i;
+        map_no_type_.at(stmt_no) = kAssign;
+    }
+}
 
 void ProgramKnowledgeBase::set_index(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index) {
     proc_stmtlst_.at(proc_index.value) = stmtlst_index.value;
