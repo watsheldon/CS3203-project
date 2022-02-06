@@ -45,10 +45,12 @@ struct Index {
 
 class KnowledgeBase {
   public:
-    virtual ~KnowledgeBase() {};
+    virtual ~KnowledgeBase() = 0;
     virtual void set() = 0;
     virtual void set_end() = 0;
 };
+
+KnowledgeBase::~KnowledgeBase() {}
 
 }  // namespace spa
 
