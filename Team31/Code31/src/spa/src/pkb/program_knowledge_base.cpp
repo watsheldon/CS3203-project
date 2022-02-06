@@ -50,9 +50,6 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<Init> init)
         map_no_index_.at(stmt_no) = i;
         map_no_type_.at(stmt_no) = kAssign;
     }
-
-    //stmt_size_ = init->assigns.size() + init->ifs.size() + init->whiles.size() + init->calls.size() +
-    //    init->reads.size() + init->prints.size() - 6; // minus 6 to remove the index 0 for each entity
 }
 
 void ProgramKnowledgeBase::set_index(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index) {
