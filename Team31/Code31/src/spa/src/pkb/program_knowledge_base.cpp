@@ -13,7 +13,9 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<Init> init)
           map_no_type_(init->reads.size() + init->prints.size() + init->calls.size()
           + init->whiles.size()+ init->ifs.size() + init->assigns.size() - 5),
           map_no_lst_(init->reads.size() + init->prints.size() + init->calls.size()
-          + init->whiles.size()+ init->ifs.size() + init->assigns.size() - 5) {
+          + init->whiles.size()+ init->ifs.size() + init->assigns.size() - 5),
+          stmt_size_(init->assigns.size() + init->ifs.size() + init->whiles.size() 
+          + init->calls.size() + init->reads.size() + init->prints.size() - 6) {
 
     //fill up vectors
     //map_no_index_
@@ -49,8 +51,8 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<Init> init)
         map_no_type_.at(stmt_no) = kAssign;
     }
 
-    stmt_size_ = init->assigns.size() + init->ifs.size() + init->whiles.size() + init->calls.size() +
-        init->reads.size() + init->prints.size() - 6; // minus 6 to remove the index 0 for each entity
+    //stmt_size_ = init->assigns.size() + init->ifs.size() + init->whiles.size() + init->calls.size() +
+    //    init->reads.size() + init->prints.size() - 6; // minus 6 to remove the index 0 for each entity
 }
 
 void ProgramKnowledgeBase::set_index(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index) {
@@ -103,12 +105,14 @@ std::vector<std::string> ProgramKnowledgeBase::get_all_string_entities(EntityTyp
         results = entities_ptr_->constants;
         break;
     default:
-        results = { "-1" }; // invalid value
+        results = { }; // invalid value
         break;
     }
     
-    if(results.size() >= 2) {
-        results.erase(results.begin()); // remove index 0
+    if (results.size() >= 2) {
+        // remove index 0
+        std::copy(results.begin() + 1, results.end(), results.begin());
+        results.pop_back();
     }
 
     return results;
@@ -137,16 +141,18 @@ std::vector<int> ProgramKnowledgeBase::get_all_stmt_entities(EntityType et) {
         break;
     case kStmt:
         for (int i = 0; i <= stmt_size_; i++) {
-            intResults.push_back(i); // initialise vector for stmt
+            intResults.emplace_back(i); // initialise vector for stmt
         }
         break;
     default:
-        intResults = { -1 }; // invalid value
+        intResults = { }; // invalid value
         break;
     }
 
     if (intResults.size() >= 2) {
-        intResults.erase(intResults.begin()); // remove index 0
+        // remove index 0
+        std::copy(intResults.begin()+1, intResults.end(), intResults.begin());
+        intResults.pop_back();
     }
 
     return intResults;
@@ -157,22 +163,22 @@ std::vector<std::string> ProgramKnowledgeBase::to_name(std::vector<int> index_li
     switch (et) {
     case kProc:
         for (int i : index_list) {
-            results.push_back(entities_ptr_->procedures[i]);
+            results.emplace_back(entities_ptr_->procedures[i]);
         }
         break;
     case kVar:
         for (int i : index_list) {
-            results.push_back(entities_ptr_->variables[i]);
+            results.emplace_back(entities_ptr_->variables[i]);
         }
         break;
     case kConst:
         for (int i : index_list) {
-            results.push_back(entities_ptr_->constants[i]);
+            results.emplace_back(entities_ptr_->constants[i]);
         }
         break;
     default:
         for (int i = 0; i < index_list.size(); i++) {
-            results.push_back(std::to_string(index_list[i])); // convert vector<int> to vector<str>
+            results.emplace_back(std::to_string(index_list[i])); // convert vector<int> to vector<str>
         }
         break;
     }

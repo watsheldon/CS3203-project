@@ -50,7 +50,7 @@ class KnowledgeBase {
     virtual void set_end() = 0;
 };
 
-KnowledgeBase::~KnowledgeBase() {}
+inline KnowledgeBase::~KnowledgeBase() {}
 
 }  // namespace spa
 
