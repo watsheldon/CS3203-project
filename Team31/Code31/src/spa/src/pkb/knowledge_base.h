@@ -45,7 +45,7 @@ struct Index {
 
 class KnowledgeBase {
   public:
-    virtual ~KnowledgeBase() = 0;
+    virtual ~KnowledgeBase() {};
     virtual void set() = 0;
     virtual void set_end() = 0;
 };

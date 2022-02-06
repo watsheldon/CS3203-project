@@ -90,6 +90,10 @@ void ProgramKnowledgeBase::set_end() {
 
 }
 
+void ProgramKnowledgeBase::set() {
+
+}
+
 std::vector<std::string> ProgramKnowledgeBase::getAll(EntityType et) {
     std::vector<std::string> results;
     std::vector<int> intResults;
@@ -134,3 +138,4 @@ std::vector<std::string> ProgramKnowledgeBase::getAll(EntityType et) {
 
     return results;
 }
+

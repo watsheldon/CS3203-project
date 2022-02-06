@@ -31,6 +31,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     //set direct Uses and Modifies relationships
     void set_rel(Index<kPrint> stmt_no, Index<kVar> var_index);
 
+    void set();
     //mark the end of source processor -> construct necessary data structures
     void set_end();
 
