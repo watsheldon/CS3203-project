@@ -49,12 +49,8 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<Init> init)
         map_no_type_.at(stmt_no) = kAssign;
     }
 
-    int stmt_size = init->assigns.size() + init->ifs.size() + init->whiles.size() + init->calls.size() +
+    stmt_size_ = init->assigns.size() + init->ifs.size() + init->whiles.size() + init->calls.size() +
         init->reads.size() + init->prints.size() - 6; // minus 6 to remove the index 0 for each entity
-
-    for( int i = 0; i <= stmt_size; i++ ){
-        all_stmt.push_back(i); // initialise vector for stmt
-    }
 }
 
 void ProgramKnowledgeBase::set_index(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index) {
@@ -94,9 +90,8 @@ void ProgramKnowledgeBase::set() {
 
 }
 
-std::vector<std::string> ProgramKnowledgeBase::getAll(EntityType et) {
+std::vector<std::string> ProgramKnowledgeBase::get_all_string_entities(EntityType et) {
     std::vector<std::string> results;
-    std::vector<int> intResults;
     switch(et) {
     case kProc:
         results = entities_ptr_->procedures;
@@ -107,6 +102,16 @@ std::vector<std::string> ProgramKnowledgeBase::getAll(EntityType et) {
     case kConst:
         results = entities_ptr_->constants;
         break;
+    }
+
+    results.erase(results.begin()); // remove index 0
+
+    return results;
+}
+
+std::vector<int> ProgramKnowledgeBase::get_all_stmt_entities(EntityType et) {
+    std::vector<int> intResults;
+    switch (et) {
     case kRead:
         intResults = entities_ptr_->reads;
         break;
@@ -119,23 +124,47 @@ std::vector<std::string> ProgramKnowledgeBase::getAll(EntityType et) {
     case kWhile:
         intResults = entities_ptr_->whiles;
         break;
-     case kIf:
+    case kIf:
         intResults = entities_ptr_->ifs;
         break;
     case kAssign:
         intResults = entities_ptr_->assigns;
         break;
     case kStmt:
-        intResults = all_stmt;
+        for (int i = 0; i <= stmt_size_; i++) {
+            intResults.push_back(i); // initialise vector for stmt
+        }
         break;
     }
 
-    for (int i = 0; i < intResults.size(); i++) {
-        results.push_back(std::to_string(intResults[i])); // convert vector<int> to vector<str>
-    }
+    intResults.erase(intResults.begin()); // remove index 0
 
-    results.erase(results.begin()); // remove index 0
-
-    return results;
+    return intResults;
 }
 
+std::vector<std::string> ProgramKnowledgeBase::to_name(std::vector<int> index_list, EntityType et) {
+    std::vector<std::string> results;
+    switch (et) {
+    case kProc:
+        for (int i : index_list) {
+            results.push_back(entities_ptr_->procedures[i]);
+        }
+        break;
+    case kVar:
+        for (int i : index_list) {
+            results.push_back(entities_ptr_->variables[i]);
+        }
+        break;
+    case kConst:
+        for (int i : index_list) {
+            results.push_back(entities_ptr_->constants[i]);
+        }
+        break;
+    default:
+        for (int i = 0; i < index_list.size(); i++) {
+            results.push_back(std::to_string(index_list[i])); // convert vector<int> to vector<str>
+        }
+        break;
+    }
+    return results;
+}

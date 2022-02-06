@@ -35,7 +35,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     //mark the end of source processor -> construct necessary data structures
     void set_end();
 
-    std::vector<std::string> getAll(EntityType);
+    std::vector<std::string> get_all_string_entities(EntityType et); // For procedures,variables,constants
+    std::vector<int> get_all_stmt_entities(EntityType et); // For stmt
+    std::vector<std::string> to_name(std::vector<int> index_list, EntityType et); // convert index to string
 
 
   private:
@@ -49,7 +51,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::vector<STMTLST_NO> while_stmtlst_;
     std::vector<STMTLST_NO> if_stmtlst_;
     std::vector<std::vector<STMTLST_NO> > stmtlsts_;
-    std::vector<STMT_NO> all_stmt; // store list of all statements
+    int stmt_size_; // store list of all statements
 
     //vector to store the nesting relationships among containers
     std::vector<CN> containers_;
