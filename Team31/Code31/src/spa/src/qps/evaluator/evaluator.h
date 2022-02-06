@@ -8,10 +8,10 @@
 
 #include <list>
 #include <string>
-#include "Retriever.h"
-#include "PQLEnums.h"
+#include "retriever.h"
+#include "pql_enums.h"
 
-class Evaluator {
+class evaluator {
 
   public:
 

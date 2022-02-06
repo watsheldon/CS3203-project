@@ -3,16 +3,16 @@
 //
 
 #include <vector>
-#include "ResultTable.h"
-#include "PQLEnums.h"
+#include "result_table.h"
+#include "pql_enums.h"
 
-ResultTable::ResultTable(std::vector<std::string> headers) {
+result_table::result_table(std::vector<std::string> headers) {
 
     this->tableHeader = headers;
 
 }
 
-void ResultTable::merge(std::string result, PQLEnums::TargetType target) {
+void result_table::merge(std::string result, PQLEnums::TargetType target) {
 
     for (int i = 0; i < this->tableHeader.size(); i++) {
         if (result.contains(tableHeader[i])) {  // if result type exists in table header
@@ -23,7 +23,7 @@ void ResultTable::merge(std::string result, PQLEnums::TargetType target) {
     }
 }
 
-std::vector<std::vector<std::string> > ResultTable::getTableContents() {
+std::vector<std::vector<std::string> > result_table::getTableContents() {
     return this->tableContents;
 }
 

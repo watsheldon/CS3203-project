@@ -7,20 +7,20 @@
 
 
 #include <string>
-#include "ResultTable.h"
+#include "result_table.h"
 #include <array>
-#include "PQLEnums.h"
-#include "Evaluator.h"
+#include "pql_enums.h"
+#include "evaluator.h"
 
-class Retriever {
+class retriever {
 
 public:
     std::vector<std::string> getSimpleQuery(PQLEnums::TargetType target);
-    std::vector<std::vector<std::string>> retrieve(Evaluator::EvalList evalList, PQLEnums::TargetType target);
+    std::vector<std::vector<std::string>> retrieve(evaluator::EvalList evalList, PQLEnums::TargetType target);
 
   private:
 
-    std::string callPKB(ResultTable rt, std::string queryType, std::string params);
+    std::string callPKB(result_table rt, std::string queryType, std::string params);
 
 };
 

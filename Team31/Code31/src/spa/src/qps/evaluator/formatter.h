@@ -5,9 +5,9 @@
 #ifndef INC_21S2_CP_SPA_TEAM_31_FORMATTER_H
 #define INC_21S2_CP_SPA_TEAM_31_FORMATTER_H
 
-#include "ResultTable.h"
+#include "result_table.h"
 
-class Formatter {
+class formatter {
 
 public:
 

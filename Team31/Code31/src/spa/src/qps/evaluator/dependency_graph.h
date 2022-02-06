@@ -8,7 +8,7 @@
 #include <list>
 #include <map>
 
-class DependencyGraph {
+class dependency_graph {
 
 
 public:
@@ -18,7 +18,7 @@ public:
     std::vector<std::vector<int> > getConnectedNodes();
 
 
-    explicit DependencyGraph(int numNodes);
+    explicit dependency_graph(int numNodes);
 
 
 private:

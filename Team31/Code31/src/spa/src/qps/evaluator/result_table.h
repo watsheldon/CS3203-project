@@ -5,16 +5,16 @@
 #ifndef INC_21S2_CP_SPA_TEAM_31_RESULTTABLE_H
 #define INC_21S2_CP_SPA_TEAM_31_RESULTTABLE_H
 
-#include "PQLEnums.h"
+#include "pql_enums.h"
 #include <string>
 #include <map>
 
-class ResultTable {
+class result_table {
 
 public:
 
 
-    explicit ResultTable(std::vector<std::string> headers);
+    explicit result_table(std::vector<std::string> headers);
 
     std::vector<std::vector<std::string> > getTableContents();
 

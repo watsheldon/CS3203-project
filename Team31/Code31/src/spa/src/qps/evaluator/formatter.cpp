@@ -3,11 +3,11 @@
 //
 
 #include <vector>
-#include "Formatter.h"
+#include "formatter.h"
 #include <iostream>
-#include "PQLEnums.h"
+#include "pql_enums.h"
 
-std::string Formatter::formatResult(std::vector<std::vector<std::string> > rt, PQLEnums::TargetType targetType) {
+std::string formatter::formatResult(std::vector<std::vector<std::string> > rt, PQLEnums::TargetType targetType) {
 
     std::string result;
     //match column header
@@ -16,7 +16,7 @@ std::string Formatter::formatResult(std::vector<std::vector<std::string> > rt, P
 }
 
 // for minimal iteration only
-void Formatter::project(std::vector<std::string> result) {
+void formatter::project(std::vector<std::string> result) {
 
     std::cout << '[';
     for (int i = 0; i < result.size(); i++) {

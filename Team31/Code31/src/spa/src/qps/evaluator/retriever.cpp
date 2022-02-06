@@ -2,13 +2,13 @@
 // Created by vanessa on 1/2/22.
 //
 
-#include "Retriever.h"
-#include "ResultTable.h"
+#include "retriever.h"
+#include "result_table.h"
 #include <vector>
-#include "PQLEnums.h"
-#include "Evaluator.h"
+#include "pql_enums.h"
+#include "evaluator.h"
 
-std::vector<std::vector<std::string> > Retriever::retrieve(Evaluator::EvalList evalList, PQLEnums::TargetType target) {
+std::vector<std::vector<std::string> > retriever::retrieve(evaluator::EvalList evalList, PQLEnums::TargetType target) {
 
     bool terminate;
 
@@ -25,7 +25,7 @@ std::vector<std::vector<std::string> > Retriever::retrieve(Evaluator::EvalList e
     // but queries with synonyms will probably take more time than those without
     if (!terminate) {
         for (int i = 0; i < evalList.noTarget.size(); i++) {
-            ResultTable rt = (const ResultTable &) new ResultTable(evalList.withTargetSyn[i]);
+            result_table rt = (const result_table &) new result_table(evalList.withTargetSyn[i]);
             for (int j = 0; j < evalList.noTarget.size(); j++) {
                 std::string queryType = evalList.noTarget[i].getQueryType(); // Follows, Modifies, Pattern
                 std::string params = evalList.noTarget[i].getParams();
@@ -44,7 +44,7 @@ std::vector<std::vector<std::string> > Retriever::retrieve(Evaluator::EvalList e
         // handle queries with synonyms and with targets
         if (!terminate) {
             for (int i = 0; i < evalList.withTarget.size(); i++) {
-                ResultTable rt = (const ResultTable &) new ResultTable(evalList.withTargetSyn[i]);
+                result_table rt = (const result_table &) new result_table(evalList.withTargetSyn[i]);
                 for (int j = 0; j < evalList.withTarget[i].size(); j++) {
 
                     std::string queryType = evalList.withTarget[i][j].getQueryType(); // Follows, Modifies, Pattern
@@ -67,7 +67,7 @@ std::vector<std::vector<std::string> > Retriever::retrieve(Evaluator::EvalList e
 
 }
 
-bool Retriever::getBool(std::string queryType, std::string argType) {
+bool retriever::getBool(std::string queryType, std::string argType) {
 
     bool result;
 
@@ -76,7 +76,7 @@ bool Retriever::getBool(std::string queryType, std::string argType) {
     return result;
 }
 
-std::string Retriever::callPKB(ResultTable rt, std::string queryType, std::string params) {
+std::string retriever::callPKB(result_table rt, std::string queryType, std::string params) {
 
     Result result;
 
@@ -87,7 +87,7 @@ std::string Retriever::callPKB(ResultTable rt, std::string queryType, std::strin
 }
 
 // for minimal iteration only
-std::vector<std::string> Retriever::getSimpleQuery(PQLEnums::TargetType targetType) {
+std::vector<std::string> retriever::getSimpleQuery(PQLEnums::TargetType targetType) {
 
     std::vector<std::string> result;
 

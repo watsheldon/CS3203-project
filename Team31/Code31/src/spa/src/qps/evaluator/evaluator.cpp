@@ -5,19 +5,19 @@
 //
 
 #include <set>
-#include "Evaluator.h"
-#include "Retriever.h"
-#include "ResultTable.h"
-#include "Formatter.h"
-#include "DependencyGraph.h"
+#include "evaluator.h"
+#include "retriever.h"
+#include "result_table.h"
+#include "formatter.h"
+#include "dependency_graph.h"
 #include <vector>
 #include <map>
-#include "PQLEnums.h"
+#include "pql_enums.h"
 
-void Evaluator::evaluateQuery(QueryObject queryObject) {
+void evaluator::evaluateQuery(QueryObject queryObject) {
 
-    Retriever r;
-    Formatter f;
+    retriever r;
+    formatter f;
 
     // put TargetType attribute in QueryObject class
     PQLEnums::TargetType target = queryObject.getTarget(); // implement getTarget() in QueryObject class
@@ -53,7 +53,7 @@ void Evaluator::evaluateQuery(QueryObject queryObject) {
 
 }
 
-std::pair<Evaluator::EvalList, Evaluator::ProcList> Evaluator::sortBySynonyms(QueryObject queryObject, EvalList evalList, ProcList procList) {
+std::pair<evaluator::EvalList, evaluator::ProcList> evaluator::sortBySynonyms(QueryObject queryObject, EvalList evalList, ProcList procList) {
 
     // get all queries in a vector
     std::vector<Query> allQueries = queryObject.getAllQueries(); // implemented in QueryObject class
@@ -70,9 +70,9 @@ std::pair<Evaluator::EvalList, Evaluator::ProcList> Evaluator::sortBySynonyms(Qu
     return std::make_pair(evalList, procList);
 }
 
-Evaluator::ProcList Evaluator::groupBySyn(Evaluator::ProcList procList) {
+evaluator::ProcList evaluator::groupBySyn(evaluator::ProcList procList) {
 
-    DependencyGraph *g = new DependencyGraph(procList.withSynonyms.size());
+    dependency_graph *g = new dependency_graph(procList.withSynonyms.size());
     std::vector<Query> queriesCopy = procList.withSynonyms;
 
     // optimize
@@ -100,7 +100,7 @@ Evaluator::ProcList Evaluator::groupBySyn(Evaluator::ProcList procList) {
     return procList;
 }
 
-Evaluator::EvalList Evaluator::sortByTarget(EvalList evalList, ProcList procList, PQLEnums::TargetType target) {
+evaluator::EvalList evaluator::sortByTarget(EvalList evalList, ProcList procList, PQLEnums::TargetType target) {
 
     for (int i = 0; i < procList.grouped.size(); i++) {
         if (procList.grouped[i].containsTarget(target)) {
@@ -114,7 +114,7 @@ Evaluator::EvalList Evaluator::sortByTarget(EvalList evalList, ProcList procList
 
 
 // returns vector of shared synonyms corresponding to each query group
-Evaluator::EvalList Evaluator::getCommonSynonyms(Evaluator::EvalList evalList) {
+evaluator::EvalList evaluator::getCommonSynonyms(evaluator::EvalList evalList) {
 
     for (int i = 0; i < evalList.noTarget.size(); i++) {
         std::vector<std::string> synonyms;

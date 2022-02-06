@@ -2,26 +2,26 @@
 // Created by vanessa on 3/2/22.
 //
 
-#include "DependencyGraph.h"
+#include "dependency_graph.h"
 #include <list>
 #include <map>
 #include <vector>
 
-DependencyGraph::DependencyGraph(int numNodes) {
+dependency_graph::dependency_graph(int numNodes) {
 
     this->numVert = numNodes;
     nodeList = new std::list<int>[numNodes];
 
 }
 
-void DependencyGraph::addConnection(int v1, int v2) {
+void dependency_graph::addConnection(int v1, int v2) {
 
     nodeList[v1].push_back(v2);
     nodeList[v2].push_back(v1);
 
 }
 
-std::vector<int> DependencyGraph::runDfs(int i, bool visited[], std::vector<int> group) {
+std::vector<int> dependency_graph::runDfs(int i, bool visited[], std::vector<int> group) {
 
     visited[i] = true;
     group.push_back(i);
@@ -37,7 +37,7 @@ std::vector<int> DependencyGraph::runDfs(int i, bool visited[], std::vector<int>
 
 }
 
-std::vector<std::vector<int> > DependencyGraph::getConnectedNodes() {
+std::vector<std::vector<int> > dependency_graph::getConnectedNodes() {
 
     int numNodes = this->numVert;
 
