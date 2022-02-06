@@ -51,7 +51,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::vector<STMTLST_NO> while_stmtlst_;
     std::vector<STMTLST_NO> if_stmtlst_;
     std::vector<std::vector<STMTLST_NO> > stmtlsts_;
-    int stmt_size_; // store list of all statements
+    int stmt_size_; // store number of stmt
 
     //vector to store the nesting relationships among containers
     std::vector<CN> containers_;
