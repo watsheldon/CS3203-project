@@ -9,7 +9,7 @@
 
 DependencyGraph::DependencyGraph(int numNodes) {
 
-    this->numNodes = numNodes;
+    this->numVert = numNodes;
     nodeList = new std::list<int>[numNodes];
 
 }
@@ -37,16 +37,18 @@ std::vector<int> DependencyGraph::runDfs(int i, bool visited[], std::vector<int>
 
 }
 
-std::vector<std::vector<int> > DependencyGraph::getConnectedNodes(int nodes) {
+std::vector<std::vector<int> > DependencyGraph::getConnectedNodes() {
 
-    bool *visited = new bool[nodes];
+    int numNodes = this->numVert;
+
+    bool *visited = new bool[numNodes];
     std::vector<std::vector<int> > allGroups;
 
-    for (int i = 0; i < nodes; i++) {
+    for (int i = 0; i < numNodes; i++) {
         visited[i] = false;
     }
 
-    for (int i = 0; i < nodes; i++) {
+    for (int i = 0; i < numNodes; i++) {
         if (!visited[i]) {
             std::vector<int> group;
             group = runDfs(i, visited, group);

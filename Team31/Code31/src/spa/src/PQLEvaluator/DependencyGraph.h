@@ -15,13 +15,15 @@ public:
 
     void addConnection(int v1, int v2);
 
-    std::vector<std::vector<int> > getConnectedNodes(int nodes);
+    std::vector<std::vector<int> > getConnectedNodes();
 
 
-    DependencyGraph(int numNodes);
+    explicit DependencyGraph(int numNodes);
 
 
 private:
+
+    int numVert;
 
     std::list<int>* nodeList;
 
