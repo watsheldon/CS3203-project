@@ -102,9 +102,14 @@ std::vector<std::string> ProgramKnowledgeBase::get_all_string_entities(EntityTyp
     case kConst:
         results = entities_ptr_->constants;
         break;
+    default:
+        results = { "-1" }; // invalid value
+        break;
     }
-
-    results.erase(results.begin()); // remove index 0
+    
+    if(results.size() >= 2) {
+        results.erase(results.begin()); // remove index 0
+    }
 
     return results;
 }
@@ -135,9 +140,14 @@ std::vector<int> ProgramKnowledgeBase::get_all_stmt_entities(EntityType et) {
             intResults.push_back(i); // initialise vector for stmt
         }
         break;
+    default:
+        intResults = { -1 }; // invalid value
+        break;
     }
 
-    intResults.erase(intResults.begin()); // remove index 0
+    if (intResults.size() >= 2) {
+        intResults.erase(intResults.begin()); // remove index 0
+    }
 
     return intResults;
 }
