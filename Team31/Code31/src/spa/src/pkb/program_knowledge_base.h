@@ -34,6 +34,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     //mark the end of source processor -> construct necessary data structures
     void set_end();
 
+    std::vector<std::string> getAll(EntityType);
+
+
   private:
     //leaving index 0 empty for all vectors to preserve consistency
 
@@ -45,6 +48,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::vector<STMTLST_NO> while_stmtlst_;
     std::vector<STMTLST_NO> if_stmtlst_;
     std::vector<std::vector<STMTLST_NO> > stmtlsts_;
+    std::vector<STMT_NO> all_stmt; // store list of all statements
 
     //vector to store the nesting relationships among containers
     std::vector<CN> containers_;
