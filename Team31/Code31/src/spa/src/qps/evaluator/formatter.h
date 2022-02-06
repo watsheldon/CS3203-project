@@ -13,7 +13,7 @@ public:
 
     void project(std::vector<std::string> result); // for minimal iteration
 
-    std::string formatResult(std::vector<std::vector<std::string>> rt, PQLEnums::TargetType targetType);
+    std::string formatResult(std::vector<std::string> rawResult);
 };
 
 

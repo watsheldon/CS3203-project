@@ -12,7 +12,7 @@ result_table::result_table(std::vector<std::string> headers) {
 
 }
 
-void result_table::merge(std::string result, PQLEnums::TargetType target) {
+void result_table::merge(std::vector<std::string> result, PQLEnums::TargetType target) {
 
     for (int i = 0; i < this->tableHeader.size(); i++) {
         if (result.contains(tableHeader[i])) {  // if result type exists in table header
@@ -25,6 +25,9 @@ void result_table::merge(std::string result, PQLEnums::TargetType target) {
 
 std::vector<std::vector<std::string> > result_table::getTableContents() {
     return this->tableContents;
+}
+std::vector<std::string> result_table::getHeaders() {
+    return this->tableHeader;
 }
 
 

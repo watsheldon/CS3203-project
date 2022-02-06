@@ -8,77 +8,103 @@
 #include "pql_enums.h"
 #include "evaluator.h"
 
-std::vector<std::vector<std::string> > retriever::retrieve(evaluator::EvalList evalList, PQLEnums::TargetType target) {
+retriever::retriever(PQLEnums::TargetType tg) {
 
+    this->target = tg;
+
+}
+
+bool retriever::retrieve(evaluator::EvaluationList evalList) {
+
+    // handle queries with no synonyms
+    bool terminate = handleNoSynonyms(evalList.noSynonyms);
+
+    // handle queries with no targets in their parameters
+    if (!terminate) {
+        terminate = handleNoTargets(evalList.noTarget, evalList.noTargetSyn, this->target);
+    }
+    return terminate;
+}
+
+bool retriever::handleNoSynonyms(std::vector<Query> queryList) {
     bool terminate;
 
-    // handle queries with no synonyms first as they'll evaluate to true/false
-    std::vector<std::vector<std::string> > result;
-    for (int i = 0; i < evalList.noSynonyms.size(); i++) {
-        bool result = getBool(evalList.noSynonyms[i].getQueryType(), evalList.noSynonyms[i].getParams());
+    for (int i = 0; i < queryList.size(); i++) {
+        bool result = getBool(queryList[i].getQueryType(), queryList[i].getParams());
         if (!result) {
             terminate = true;
         }
     }
-
-    // handle queries with no targets next as they'll also evaluate to true/false
-    // but queries with synonyms will probably take more time than those without
-    if (!terminate) {
-        for (int i = 0; i < evalList.noTarget.size(); i++) {
-            result_table rt = (const result_table &) new result_table(evalList.withTargetSyn[i]);
-            for (int j = 0; j < evalList.noTarget.size(); j++) {
-                std::string queryType = evalList.noTarget[i].getQueryType(); // Follows, Modifies, Pattern
-                std::string params = evalList.noTarget[i].getParams();
-                std::string result = callPKB(rt, queryType, params);
-                rt.merge(result, target);
-            }
-            result = rt.getTableContents();
-            if (result.empty()) {
-                terminate = true;
-            }
-        }
-    }
-
-    if (evalList.withTarget.size() > 0) {
-
-        // handle queries with synonyms and with targets
-        if (!terminate) {
-            for (int i = 0; i < evalList.withTarget.size(); i++) {
-                result_table rt = (const result_table &) new result_table(evalList.withTargetSyn[i]);
-                for (int j = 0; j < evalList.withTarget[i].size(); j++) {
-
-                    std::string queryType = evalList.withTarget[i][j].getQueryType(); // Follows, Modifies, Pattern
-                    std::string params = evalList.withTarget[i][j].getParams();
-
-                    std::string result = callPKB(rt, queryType, params);
-                    rt.merge(result, target);
-                }
-                result = rt.getTableContents();
-            }
-
-        }
-        return result;
-    } else {
-        std::vector<std::string> result = r.getSimpleQuery(target);
-        f.project(result);
-    }
-
-
-
+    return terminate;
 }
 
-bool retriever::getBool(std::string queryType, std::string argType) {
+bool retriever::handleNoTargets(std::vector<Query> queryList, std::vector<std::vector<std::string> > headers) {
 
-    bool result;
+    bool terminate;
+    std::vector<std::string> result;
 
-    // call PKB methods
+    for (int i = 0; i < queryList.size(); i++) {
+        auto rt = new result_table(headers[i]);
+        for (int j = 0; j < queryList.size(); j++) {
+            std::string queryType = queryList[i].getQueryType(); // Follows, Modifies, Pattern
+            std::string params = queryList[i].getParams();
+            result = callPKB(rt, queryType, params);
+            rt->merge(result, this->target);
+        }
+        result = getResult(*rt);
+        if (result.empty()) {
+            terminate = true;
+        }
+    }
+    return terminate;
+}
+
+std::vector<std::string> retriever::retrieve2(std::vector<Query> queryList, std::vector<std::vector<std::string> > headers) {
+
+    std::vector<std::string> result;
+
+    for (int i = 0; i < queryList.size(); i++) {
+        auto rt = new result_table(headers[i]);
+        for (int j = 0; j < queryList[i].size(); j++) {
+            std::string queryType = queryList[i][j].getQueryType(); // Follows, Modifies, Pattern
+            std::string params = queryList[i][j].getParams();
+
+            result = callPKB(rt, queryType, params);
+            rt->merge(result, target);
+        }
+        result = getResult(*rt);
+    }
 
     return result;
 }
 
-std::string retriever::callPKB(result_table rt, std::string queryType, std::string params) {
+std::vector<std::string> retriever::getResult(result_table rt) {
 
-    Result result;
+    std::vector<std::string> result;
+
+    for (int i = 0; i < rt.getHeaders().size(); i ++) {
+        if (this->target == rt.getHeaders()[i]) {
+            result = rt.getTableContents()[i];
+        }
+    }
+
+    return result;
+}
+
+// can change types to wrapper
+bool retriever::getBool(std::string queryType, std::string params) {
+
+    bool result;
+
+    // call PKB methods
+    // most likely the 'exists' methods
+
+    return result;
+}
+
+std::vector<std::string> retriever::callPKB(result_table *rt, std::string queryType, std::string params) {
+
+    std::vector<std::string> result;
 
     // call PKB methods
 
@@ -87,11 +113,11 @@ std::string retriever::callPKB(result_table rt, std::string queryType, std::stri
 }
 
 // for minimal iteration only
-std::vector<std::string> retriever::getSimpleQuery(PQLEnums::TargetType targetType) {
+std::vector<std::string> retriever::getSimpleQuery() {
 
     std::vector<std::string> result;
 
-    switch (targetType) {
+    switch (this->target) {
         case PQLEnums::ALL:
             result = PKB.getAll(STATEMENT);
         case PQLEnums::ASSIGN:

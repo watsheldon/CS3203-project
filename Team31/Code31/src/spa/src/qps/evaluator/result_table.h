@@ -8,6 +8,7 @@
 #include "pql_enums.h"
 #include <string>
 #include <map>
+#include <vector>
 
 class result_table {
 
@@ -17,8 +18,9 @@ public:
     explicit result_table(std::vector<std::string> headers);
 
     std::vector<std::vector<std::string> > getTableContents();
+    std::vector<std::string> getHeaders();
 
-    void merge(std::string result, PQLEnums::TargetType target);
+    void merge(std::vector<std::string> result, PQLEnums::TargetType target);
 
 private:
 

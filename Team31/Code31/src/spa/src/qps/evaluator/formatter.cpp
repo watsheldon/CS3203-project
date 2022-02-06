@@ -5,14 +5,22 @@
 #include <vector>
 #include "formatter.h"
 #include <iostream>
-#include "pql_enums.h"
 
-std::string formatter::formatResult(std::vector<std::vector<std::string> > rt, PQLEnums::TargetType targetType) {
+std::string formatter::formatResult(std::vector<std::string> rawResult) {
 
-    std::string result;
-    //match column header
-    //retur values
-    return result;
+    std::string formattedResult;
+
+    if (rawResult.empty()) {
+        return "";
+    }
+
+    formattedResult.push_back('[');
+    for (int i = 0; i < rawResult.size(); i++) {
+        std::cout << rawResult[i] << ', ';
+    }
+    formattedResult.push_back(']');
+
+    return formattedResult;
 }
 
 // for minimal iteration only

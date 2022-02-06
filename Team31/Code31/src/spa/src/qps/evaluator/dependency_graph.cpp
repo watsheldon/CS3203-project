@@ -4,7 +4,6 @@
 
 #include "dependency_graph.h"
 #include <list>
-#include <map>
 #include <vector>
 
 dependency_graph::dependency_graph(int numNodes) {

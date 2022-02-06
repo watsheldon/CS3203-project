@@ -5,20 +5,19 @@
 #ifndef INC_21S2_CP_SPA_TEAM_31_EVALUATOR_H
 #define INC_21S2_CP_SPA_TEAM_31_EVALUATOR_H
 
-
-#include <list>
+#include <vector>
 #include <string>
 #include "retriever.h"
 #include "pql_enums.h"
 
 class evaluator {
 
-  public:
+public:
 
     void evaluateQuery(QueryObject queryObject);
 
     // evaluation list to be passed on to the retriever
-    struct EvalList {
+    struct EvaluationList {
         std::vector<Query> noSynonyms;
         std::vector<std::vector<Query> > noTarget;
         std::vector<std::vector<std::string> > noTargetSyn;
@@ -27,16 +26,17 @@ class evaluator {
     };
 
     // for processing purposes
-    struct ProcList {
+    struct ProcessingList {
         std::vector<std::vector<Query> > grouped;
         std::vector<Query> withSynonyms;
     };
 
-  private:
-    std::pair<EvalList, ProcList> sortBySynonyms(QueryObject queryObject, EvalList evalList, ProcList procList);
-    ProcList groupBySyn(ProcList procList);
-    EvalList sortByTarget(EvalList evalList, ProcList procList, PQLEnums::TargetType target);
-    EvalList getCommonSynonyms(EvalList evalList);
+private:
+    std::pair<EvaluationList, ProcessingList> sortBySynonyms(QueryObject queryObject,
+                                                             EvaluationList evalList, ProcessingList procList);
+    ProcessingList groupBySyn(ProcessingList procList);
+    EvaluationList sortByTarget(EvaluationList evalList, ProcessingList procList, PQLEnums::TargetType target);
+    EvaluationList getCommonSynonyms(EvaluationList evalList);
 };
 
 
