@@ -6,10 +6,10 @@
 #define INC_21S2_CP_SPA_TEAM_31_RETRIEVER_H
 
 #include <string>
-#include "result_table.h"
+#include "../result_table.h"
 #include <array>
-#include "pql_enums.h"
-#include "evaluator.h"
+#include "../pql_enums.h"
+#include "../evaluator.h"
 
 namespace spa {
 

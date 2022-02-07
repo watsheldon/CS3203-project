@@ -8,29 +8,29 @@
 
 using namespace spa;
 
-dependency_graph::dependency_graph(int numNodes) {
+dependency_graph::dependency_graph(int num_nodes) {
 
-    this->numVert = numNodes;
-    nodeList = new std::list<int>[numNodes];
-
-}
-
-void dependency_graph::addConnection(int v1, int v2) {
-
-    nodeList[v1].push_back(v2);
-    nodeList[v2].push_back(v1);
+    this->num_vert = num_nodes;
+    node_list = new std::list<int>[num_nodes];
 
 }
 
-std::vector<int> dependency_graph::runDfs(int i, bool visited[], std::vector<int> group) {
+void dependency_graph::AddConnection(int v1, int v2) {
+
+    node_list[v1].push_back(v2);
+    node_list[v2].push_back(v1);
+
+}
+
+std::vector<int> dependency_graph::RunDfs(int i, bool visited[], std::vector<int> group) {
 
     visited[i] = true;
     group.push_back(i);
 
     std::list<int>::iterator j;
-    for (j = nodeList[i].begin(); j != nodeList[i].end(); j++) {
+    for (j = node_list[i].begin(); j != node_list[i].end(); j++) {
         if (!visited[*j]) {
-            runDfs(*j, visited, group);
+            RunDfs(*j, visited, group);
         }
     }
 
@@ -38,9 +38,9 @@ std::vector<int> dependency_graph::runDfs(int i, bool visited[], std::vector<int
 
 }
 
-std::vector<std::vector<int> > dependency_graph::getConnectedNodes() {
+std::vector<std::vector<int> > dependency_graph::GetConnectedNodes() {
 
-    int numNodes = this->numVert;
+    int numNodes = this->num_vert;
 
     bool *visited = new bool[numNodes];
     std::vector<std::vector<int> > allGroups;
@@ -52,7 +52,7 @@ std::vector<std::vector<int> > dependency_graph::getConnectedNodes() {
     for (int i = 0; i < numNodes; i++) {
         if (!visited[i]) {
             std::vector<int> group;
-            group = runDfs(i, visited, group);
+            group = RunDfs(i, visited, group);
             allGroups.push_back(group);
         }
     }

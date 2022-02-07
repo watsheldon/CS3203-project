@@ -13,9 +13,9 @@ class formatter {
 
   public:
 
-    void project(std::vector<std::string> result); // for minimal iteration
+    void Project(std::vector<std::string> result); // for minimal iteration
 
-    std::string formatResult(std::vector<std::string> rawResult);
+    std::string FormatResult(std::vector<std::string> raw_result);
 };
 
 }

@@ -14,10 +14,11 @@ result_table::result_table(std::vector<std::string> headers) {
 
 }
 
+// change this to iterate through the list of connected queries by pairs
 void result_table::Merge(std::vector<std::string> result, spa::TargetType target) {
 
     for (int i = 0; i < this->table_header.size(); i++) {
-        if (result.contains(table_header[i])) {  // if result type exists in table header
+        if (result.contains(table_header[i])) {  // match result type to table header
             for (int j = 0; j < result.size(); j++) {
                 table_contents[i].push_back(result.getResult[j]);
             }

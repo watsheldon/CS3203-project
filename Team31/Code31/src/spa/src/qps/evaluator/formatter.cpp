@@ -8,17 +8,17 @@
 
 using namespace spa;
 
-std::string formatter::formatResult(std::vector<std::string> rawResult) {
+std::string formatter::FormatResult(std::vector<std::string> raw_result) {
 
     std::string formattedResult;
 
-    if (rawResult.empty()) {
+    if (raw_result.empty()) {
         return "";
     }
 
     formattedResult.push_back('[');
-    for (int i = 0; i < rawResult.size(); i++) {
-        std::cout << rawResult[i] << ', ';
+    for (int i = 0; i < raw_result.size(); i++) {
+        std::cout << raw_result[i] << ', ';
     }
     formattedResult.push_back(']');
 
@@ -26,7 +26,7 @@ std::string formatter::formatResult(std::vector<std::string> rawResult) {
 }
 
 // for minimal iteration only
-void formatter::project(std::vector<std::string> result) {
+void formatter::Project(std::vector<std::string> result) {
 
     std::cout << '[';
     for (int i = 0; i < result.size(); i++) {

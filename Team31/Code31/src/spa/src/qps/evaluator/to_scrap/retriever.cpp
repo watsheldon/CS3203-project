@@ -3,11 +3,11 @@
 //
 
 #include "retriever.h"
-#include "result_table.h"
+#include "../result_table.h"
 #include <vector>
-#include "pql_enums.h"
-#include "evaluator.h"
-#include "../../pkb/program_knowledge_base.h"
+#include "../pql_enums.h"
+#include "../evaluator.h"
+#include "../../../pkb/program_knowledge_base.h"
 
 using namespace spa;
 

@@ -6,7 +6,7 @@
 
 #include <set>
 #include "evaluator.h"
-#include "retriever.h"
+#include "to_scrap/retriever.h"
 #include "result_table.h"
 #include "formatter.h"
 #include "dependency_graph.h"
@@ -24,22 +24,21 @@ void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &
 
     formatter f;
     auto r = new retriever(target);
-    data_retriever d_r;
+    data_retriever dr;
 
     auto sorted = SortBySynonyms(query_object);
     auto no_synonyms = sorted.first;
     auto with_synonyms = sorted.second;
 
-    if (!sorted.empty()) {
+    if (!no_synonyms.empty() && !with_synonyms.empty()) {
         std::vector<EvalList> groups = GetConnectedQueries(with_synonyms);
-        //std::vector<std::string> result = rt->GetResult(no_synonyms, groups, pkb_ptr);
-        std::vector<std::string> result = r->GetSimpleQuery(no_synonyms, groups, pkb_ptr);
-        f.project(result);
+        std::vector<std::string> result = GetResult(no_synonyms, groups, pkb_ptr);
+        f.Project(result);
 
     } else {
-        // for minimal iteration only
-        std::vector<std::string> result = GetSimpleQuery(pkb_ptr, target);
-        f.project(result);
+        // for minimal iteration only; fit this in w the rest of the query results
+        std::vector<std::string> result = dr.GetSimpleQuery(pkb_ptr, target);
+        f.Project(result);
     }
 }
 

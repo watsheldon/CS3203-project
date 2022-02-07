@@ -14,17 +14,17 @@ class dependency_graph {
 
   public:
 
-    explicit dependency_graph(int numNodes);
-    void addConnection(int v1, int v2);
+    explicit dependency_graph(int num_nodes);
+    void AddConnection(int v1, int v2);
 
-    std::vector<std::vector<int> > getConnectedNodes();
+    std::vector<std::vector<int> > GetConnectedNodes();
 
   private:
 
-    int numVert;
-    std::list<int> *nodeList;
+    int num_vert;
+    std::list<int> *node_list;
 
-    std::vector<int> runDfs(int i, bool visited[], std::vector<int> group);
+    std::vector<int> RunDfs(int i, bool visited[], std::vector<int> group);
 
 };
 
