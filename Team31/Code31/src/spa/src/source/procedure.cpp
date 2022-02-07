@@ -4,7 +4,6 @@ namespace spa {
 
 Procedure::Procedure(std::shared_ptr<StmtLst> stmtLst) {
 	stmtLst = stmtLst;
-	index = count++;
 }
 
 bool Procedure::setStmtLst(std::shared_ptr<StmtLst> stmtLst) {
@@ -16,8 +15,7 @@ bool Procedure::setStmtLst(std::shared_ptr<StmtLst> stmtLst) {
 	}
 }
 
-std::shared_ptr<StmtLst> Procedure::getStmtLst()
-{
+std::shared_ptr<StmtLst> Procedure::getStmtLst() {
 	return stmtLst;
 }
 
