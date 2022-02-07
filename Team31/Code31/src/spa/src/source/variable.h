@@ -10,7 +10,7 @@ namespace spa {
 
 class Variable : public IndexedAstNode<Variable> {
 	public:
-	void setName(std::string name);
+	bool setName(std::string name);
 	std::string getName();
 
 	private:

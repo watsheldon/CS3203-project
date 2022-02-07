@@ -2,8 +2,9 @@
 
 namespace spa {
 
-void Constant::setName(std::string name) {
+bool Constant::setName(std::string name) {
 	name = name;
+	return true;
 }
 
 std::string Constant::getName() {
