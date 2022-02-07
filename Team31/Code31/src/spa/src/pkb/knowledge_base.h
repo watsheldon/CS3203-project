@@ -1,11 +1,11 @@
 #ifndef SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_
 #define SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_
 
-#include "../polish_notation.h"
-#include "container_node.h"
-
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "container_node.h"
+#include "polish_notation.h"
 
 namespace spa {
 
@@ -54,7 +54,7 @@ class KnowledgeBase {
 
 };
 
-inline KnowledgeBase::~KnowledgeBase() {}
+inline KnowledgeBase::~KnowledgeBase() = default;
 
 }  // namespace spa
 
