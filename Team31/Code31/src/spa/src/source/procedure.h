@@ -9,13 +9,13 @@
 namespace spa {
 
 class Procedure : public IndexedAstNode<Procedure> {
-	public:
+  public:
 	Procedure(std::shared_ptr<StmtLst> stmtLst);
 	bool setStmtLst(std::shared_ptr<StmtLst> stmtLst);
 	std::shared_ptr<StmtLst> getStmtLst();
 
-	private:
-	std::shared_ptr<StmtLst> stmtLst;
+  private:
+	std::shared_ptr<StmtLst> stmtLst_;
 };
 
 } // namespace spa

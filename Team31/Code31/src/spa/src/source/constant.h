@@ -9,12 +9,12 @@
 namespace spa {
 
 class Constant : public IndexedAstNode<Constant> {
-	public:
-	bool setName(std::string name);
-	std::string getName();
+  public:
+	bool setValue(std::string value);
+	std::string getValue();
 
-	private:
-	std::string name;
+  private:
+	std::string value_;
 };
 
 } // namespace spa

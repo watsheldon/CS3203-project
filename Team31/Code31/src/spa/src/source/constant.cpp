@@ -2,13 +2,13 @@
 
 namespace spa {
 
-bool Constant::setName(std::string name) {
-	name = name;
+bool Constant::setValue(std::string value) {
+	value_ = value;
 	return true;
 }
 
-std::string Constant::getName() {
-	return name;
+std::string Constant::getValue() {
+	return value_;
 }
 
 } // namespace spa

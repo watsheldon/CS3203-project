@@ -9,12 +9,12 @@
 namespace spa {
 
 class Call : public Statement {
-	public:
+  public:
 	bool setProcedure(std::shared_ptr<Procedure> procedure);
-	std::shared_ptr<Procedure> getPocedure();
+	std::shared_ptr<Procedure> getProcedure();
 
-	private:
-	std::shared_ptr<Procedure> procedure;
+  private:
+	std::shared_ptr<Procedure> procedure_;
 };
 
 } // namespace spa

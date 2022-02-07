@@ -10,13 +10,13 @@
 namespace spa {
 
 class Assign : public Statement {
-	public:
+  public:
 	void setLhs(std::shared_ptr<Variable> variable);
 	std::shared_ptr<Variable> getLhs();
 	bool addAstNode(std::shared_ptr<AstNode> node);
 	SharedPtrVec<AstNode> getRhs();
 
-	private:
+  private:
 	std::shared_ptr<Variable> lhs;
 	SharedPtrVec<AstNode> rhs;
 };

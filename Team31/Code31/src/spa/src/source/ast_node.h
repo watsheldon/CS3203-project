@@ -10,7 +10,7 @@ template <typename T>
 using SharedPtrVec = std::vector<std::shared_ptr<T>>;
 
 class AstNode {
-    public:
+  public:
     virtual ~AstNode() = 0;
 };
 

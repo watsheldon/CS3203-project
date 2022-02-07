@@ -8,11 +8,11 @@
 namespace spa {
 
 class Program : public AstNode {
-	public: 
+  public: 
 	bool addProcedure(std::shared_ptr<Procedure> procedure);
 	SharedPtrVec<Procedure> getProcedures();
 
-	private:
+  private:
 	SharedPtrVec<Procedure> procedures;
 };
 

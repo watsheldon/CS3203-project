@@ -7,11 +7,11 @@ namespace spa {
 
 template <typename T>
 class IndexedAstNode : public AstNode {
-    public:
+  public:
     IndexedAstNode();
     int getIndex() const;
 
-    protected:
+  protected:
     static int count;
     int index;	
 };

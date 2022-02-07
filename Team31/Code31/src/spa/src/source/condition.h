@@ -11,13 +11,13 @@
 namespace spa {
 
 class Condition : public IndexedAstNode<Condition> {
-	public: 
+  public: 
 	bool addVariable(std::shared_ptr<Variable> variable);
 	bool addConstant(std::shared_ptr<Constant> constant);
 	SharedPtrVec<Variable> getVariables();
 	SharedPtrVec<Constant> getConstants();
 
-	private:
+  private:
 	SharedPtrVec<Variable> variables;
 	SharedPtrVec<Constant> constants;
 };

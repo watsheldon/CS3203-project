@@ -2,30 +2,14 @@
 
 namespace spa {
 
-void StmtLst::setName(std::string name) {
-	name = name;
-}
-
-std::string StmtLst::getName() {
-	return name;
-}
-
 bool StmtLst::setStmtLst(std::shared_ptr<StmtLst> stmtLst) {
-	if (stmtLst != nullptr) {
-		stmtLst = stmtLst;
-		return true;
-	} else {
-		return false;
-	}
+	stmtLst_ = stmtLst;
+	return true;
 }
 
 bool StmtLst::addStatement(std::shared_ptr<Statement> statement) {
-	if (statement != nullptr) {
-		statements.push_back(statement);
-		return true;
-	} else {
-		return false;
-	}
+	statements.push_back(statement);
+	return true;
 }
 
 SharedPtrVec<Statement> StmtLst::getStatements() {

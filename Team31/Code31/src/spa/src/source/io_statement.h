@@ -9,12 +9,13 @@
 namespace spa {
 
 class IoStatement : public Statement {
-	public: 
+  public: 
+    virtual ~IoStatement() = 0;
 	bool setVariable(std::shared_ptr<Variable> variable);
 	int getVariableIndex() const;
 
-	private:
-	std::shared_ptr<Variable> variable;
+  private:
+	std::shared_ptr<Variable> variable_;
 };
 
 } // namespace spa

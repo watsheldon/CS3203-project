@@ -3,12 +3,12 @@
 namespace spa {
 
 bool Call::setProcedure(std::shared_ptr<Procedure> procedure) {
-	procedure = procedure;
+	procedure_ = procedure;
 	return true;
 }
 
-std::shared_ptr<Procedure> Call::getPocedure() {
-	return procedure;
+std::shared_ptr<Procedure> Call::getProcedure() {
+	return procedure_;
 }
 
 } // namespace spa

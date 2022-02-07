@@ -11,16 +11,13 @@
 namespace spa {
 
 class StmtLst : public IndexedAstNode<StmtLst> {
-	public:
-	void setName(std::string name);
-	std::string getName();
+  public:
 	bool setStmtLst(std::shared_ptr<StmtLst> stmtLst);
 	bool addStatement(std::shared_ptr<Statement> statement);
 	SharedPtrVec<Statement> getStatements();
 
-	private:
-	std::string name;
-	std::shared_ptr<StmtLst> stmtLst;
+  private:
+	std::shared_ptr<StmtLst> stmtLst_;
 	SharedPtrVec<Statement> statements;
 };
 

@@ -2,13 +2,15 @@
 
 namespace spa {
 
+IoStatement::~IoStatement() {}
+
 bool IoStatement::setVariable(std::shared_ptr<Variable> variable) {
-	variable = variable;
+	variable_ = variable;
 	return true;
 }
 
 int IoStatement::getVariableIndex() const {
-	return variable->getIndex();
+	return variable_->getIndex();
 }
 
 } // namespace spa
