@@ -3,6 +3,7 @@
 //
 
 #include "retriever_logic.h"
+#include "follows_retriever.h"
 
 using namespace spa;
 
@@ -17,7 +18,7 @@ std::string retriever_logic::GetData(const std::shared_ptr<spa::ProgramKnowledge
 
     switch (filter_type) {
         case FilterType::FOLLOWS:
-            //result = follows_retriever::GetData(pkb_ptr, params_type, params);
+            result = follows_retriever::GetData(pkb_ptr, params_type, params);
             break;
         case FilterType::FOLLOWS_T:
         case FilterType::PARENT:
@@ -34,8 +35,7 @@ std::string retriever_logic::GetData(const std::shared_ptr<spa::ProgramKnowledge
 }
 
 // for minimal iteration; rename it; fix type
-std::pair<std::vector<int>,
-std::vector<std::string> >
+std::pair<std::vector<int>, std::vector<std::string> >
 spa::retriever_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
                                      spa::TargetType target) {
 

@@ -30,8 +30,12 @@ void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &
     auto with_synonyms = sorted.second;
 
     if (!no_synonyms.empty() && !with_synonyms.empty()) {
-        std::vector<EvalList> groups = GetConnectedQueries(with_synonyms);
-        std::vector<std::string> result = GetResult(no_synonyms, groups, pkb_ptr);
+        // use undirected graphs to get queries connected by the same synonyms
+        std::vector<std::vector<Query> > connected_groups = GetConnectedQueries(with_synonyms);
+
+        // transform into evaluation groups  (find a better data structure)
+        std::vector<EvalList> eval_groups = GetEvaluationGroups(connected_groups);
+        std::vector<std::string> result = GetResult(no_synonyms, eval_groups, pkb_ptr);
         //f.Project(result);
 
     } else {
@@ -73,39 +77,36 @@ std::pair<evaluator::EvalList, std::vector<Query> > evaluator::SortBySynonyms(Qu
     return std::make_pair(no_synonyms, with_synonyms);
 }
 
-/**
- evaluator::ProcessingList evaluator::groupBySyn(evaluator::ProcessingList procList) {
+std::vector<Query> evaluator::GetConnectedQueries(std::vector<Query> with_synonyms) {
 
-    dependency_graph *g = new dependency_graph(procList.withSynonyms.size());
-    std::vector<Query> withSynonymsCopy = procList.withSynonyms;
+    dependency_graph *g = new dependency_graph(with_synonyms.size());
+    std::vector<Query> withSynonymsCopy = with_synonyms;
 
     // optimize
-    for (int i = 0; i < procList.withSynonyms.size(); i++) {
+    for (int i = 0; i < with_synonyms.size(); i++) {
         withSynonymsCopy.erase(withSynonymsCopy.begin() + i);
         for (int j = 0; j < withSynonymsCopy.size(); j++) {
-            if (procList.withSynonyms[i].sharesSynonym(withSynonymsCopy[j])) {     // implement sharesSynonym in Query class
+            if (with_synonyms[i].sharesSynonym(withSynonymsCopy[j])) {     // implement sharesSynonym in Query class
                 g->addConnection(i, j + i + 1);
             }
         }
     }
 
-    std::vector<std::vector<int> > connectedGroupsIndex = g->getConnectedNodes();
+    std::vector<std::vector<int> > connected_groups_index = g->GetConnectedNodes();
+    std::vector<std::vector<Query> > connected_groups;
 
     // map back from Index to Query
-    for (int i = 0; i < connectedGroupsIndex.size(); i++) {
-        for (int j = 0; j < connectedGroupsIndex[i].size(); j++) {
-            int index = connectedGroupsIndex[i][j];
-            procList.grouped[i][j] = procList.withSynonyms[index];
+    for (int i = 0; i < connected_groups_index.size(); i++) {
+        for (int j = 0; j < connected_groups_index[i].size(); j++) {
+            int index = connected_groups_index[i][j];
+            connected_groups.grouped[i][j] = with_synonyms[index];
         }
     }
 
-    procList.withSynonyms.clear();
-
-    return procList;
+    return connected_groups;
 }
- */
 
-evaluator::EvalList evaluator::GetConnectedQueries(std::vector<Query> &query_group) {
+evaluator::EvalList evaluator::GetEvaluationGroups(std::vector<Query> &query_group) {
 
     evaluator::EvalList connected_queries;
 

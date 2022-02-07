@@ -23,13 +23,15 @@ class evaluator {
 
     struct EvalList {
         bool has_target;
-        std::unordered_map<spa::ParamsType, std::vector<std::string> > params_map;
-        std::unordered_map<spa::FilterType, spa::ParamsType> filter_map;
+        // convert params and filter types to int?
+        std::unordered_map<ParamsType, std::vector<std::string> > params_map;
+        std::unordered_map<FilterType, spa::ParamsType> filter_map;
         std::vector<std::string> all_synonyms;
     };
 
     std::pair<evaluator::EvalList, std::vector<Query> > SortBySynonyms(QueryObject query_object);
-    evaluator::EvalList GetConnectedQueries(std::vector<Query> &query_group);
+    std::vector<Query> GetConnectedQueries(std::vector<Query> with_synonyms);
+    evaluator::EvalList GetEvaluationGroups(std::vector<Query> &query_group);
 
 
 
