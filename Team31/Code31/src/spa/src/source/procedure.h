@@ -10,6 +10,7 @@ namespace spa {
 
 class Procedure : public IndexedAstNode<Procedure> {
 	public:
+	Procedure(std::shared_ptr<StmtLst> stmtLst);
 	bool setStmtLst(std::shared_ptr<StmtLst> stmtLst);
 	std::shared_ptr<StmtLst> getStmtLst();
 

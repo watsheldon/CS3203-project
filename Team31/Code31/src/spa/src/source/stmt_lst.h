@@ -3,11 +3,7 @@
 
 namespace spa {
 
-class StmtLst{
-	public:
-	int x;
-	int getX();
-};
+class StmtLst{};
 
 } // namespace spa
 
