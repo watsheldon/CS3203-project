@@ -15,7 +15,7 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<Init> init)
           map_no_lst_(init->reads.size() + init->prints.size() + init->calls.size()
           + init->whiles.size()+ init->ifs.size() + init->assigns.size() - 5),
           stmt_size_(init->assigns.size() + init->ifs.size() + init->whiles.size() 
-          + init->calls.size() + init->reads.size() + init->prints.size() - 6) {
+          + init->calls.size() + init->reads.size() + init->prints.size() - REMOVE_INDEX_0_FOR_STMT_ENTITY) {
 
     //fill up vectors
     //map_no_index_
@@ -93,85 +93,78 @@ std::vector<std::string> ProgramKnowledgeBase::get_all_string_entities(EntityTyp
     std::vector<std::string> results;
     switch(et) {
     case kProc:
-        results = entities_ptr_->procedures;
+        results.resize((entities_ptr_->procedures.size()) - 1);
+        std::copy(entities_ptr_->procedures.begin() + 1, entities_ptr_->procedures.end(), results.begin());
         break;
     case kVar:
-        results = entities_ptr_->variables;
+        results.resize((entities_ptr_->variables.size()) - 1);
+        std::copy(entities_ptr_->variables.begin() + 1, entities_ptr_->variables.end(), results.begin());
         break;
     case kConst:
-        results = entities_ptr_->constants;
+        results.resize((entities_ptr_->constants.size()) - 1);
+        std::copy(entities_ptr_->constants.begin() + 1, entities_ptr_->constants.end(), results.begin());
         break;
     default:
-        results = { }; // invalid value
         break;
-    }
-    
-    if (results.size() >= 2) {
-        // remove index 0
-        std::copy(results.begin() + 1, results.end(), results.begin());
-        results.pop_back();
     }
 
     return results;
 }
 
 std::vector<int> ProgramKnowledgeBase::get_all_stmt_entities(EntityType et) {
-    std::vector<int> intResults;
+    std::vector<int> results;
     switch (et) {
     case kRead:
-        intResults = entities_ptr_->reads;
+        results.resize((entities_ptr_->reads.size()) - 1);
+        std::copy(entities_ptr_->reads.begin() + 1, entities_ptr_->reads.end(), results.begin());
         break;
     case kPrint:
-        intResults = entities_ptr_->prints;
+        results.resize((entities_ptr_->prints.size()) - 1);
+        std::copy(entities_ptr_->prints.begin() + 1, entities_ptr_->prints.end(), results.begin());
         break;
     case kCall:
-        intResults = entities_ptr_->calls;
+        results.resize((entities_ptr_->calls.size()) - 1);
+        std::copy(entities_ptr_->calls.begin() + 1, entities_ptr_->calls.end(), results.begin());
         break;
     case kWhile:
-        intResults = entities_ptr_->whiles;
+        results.resize((entities_ptr_->whiles.size()) - 1);
+        std::copy(entities_ptr_->whiles.begin() + 1, entities_ptr_->whiles.end(), results.begin());
         break;
     case kIf:
-        intResults = entities_ptr_->ifs;
+        results.resize((entities_ptr_->ifs.size()) - 1);
+        std::copy(entities_ptr_->ifs.begin() + 1, entities_ptr_->ifs.end(), results.begin());
         break;
     case kAssign:
-        intResults = entities_ptr_->assigns;
+        results.resize((entities_ptr_->assigns.size()) - 1);
+        std::copy(entities_ptr_->assigns.begin() + 1, entities_ptr_->assigns.end(), results.begin());
         break;
     case kStmt:
-        for (int i = 0; i <= stmt_size_; i++) {
-            intResults.emplace_back(i); // initialise vector for stmt
+        results.reserve(stmt_size_);
+        for (int i = 1; i <= stmt_size_; i++) {
+            results.emplace_back(i); // initialise vector for stmt
         }
         break;
     default:
-        intResults = { }; // invalid value
         break;
     }
 
-    if (intResults.size() >= 2) {
-        // remove index 0
-        std::copy(intResults.begin()+1, intResults.end(), intResults.begin());
-        intResults.pop_back();
-    }
-
-    return intResults;
+    return results;
 }
 
 std::vector<std::string> ProgramKnowledgeBase::to_name(std::vector<int> index_list, EntityType et) {
     std::vector<std::string> results;
+    results.reserve(index_list.size());
     switch (et) {
     case kProc:
-        for (int i : index_list) {
-            results.emplace_back(entities_ptr_->procedures[i]);
-        }
+        results.reserve(index_list.size());
+        std::transform(index_list.begin(), index_list.end(), std::back_inserter(results), [this](int i) { return entities_ptr_->procedures[i]; });
         break;
     case kVar:
-        for (int i : index_list) {
-            results.emplace_back(entities_ptr_->variables[i]);
-        }
+        results.reserve(index_list.size());
+        std::transform(index_list.begin(), index_list.end(), std::back_inserter(results), [this](int i) { return entities_ptr_->variables[i]; });
         break;
     case kConst:
-        for (int i : index_list) {
-            results.emplace_back(entities_ptr_->constants[i]);
-        }
+        std::transform(index_list.begin(), index_list.end(), std::back_inserter(results), [this](int i) { return entities_ptr_->constants[i]; });
         break;
     default:
         for (int i = 0; i < index_list.size(); i++) {

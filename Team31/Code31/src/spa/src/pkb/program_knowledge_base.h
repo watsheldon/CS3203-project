@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 namespace spa {
 
@@ -39,6 +41,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::vector<int> get_all_stmt_entities(EntityType et); // For stmt
     std::vector<std::string> to_name(std::vector<int> index_list, EntityType et); // convert index to string
 
+    const int REMOVE_INDEX_0_FOR_STMT_ENTITY = 6;
 
   private:
     //leaving index 0 empty for all vectors to preserve consistency
