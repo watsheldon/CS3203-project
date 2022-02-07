@@ -2,7 +2,7 @@
 #include <string_view>
 #include <list>
 #include "query_processing_subsystem.h"
-#include "../pkb/program_knowledge_base.h"
+#include "pkb/program_knowledge_base.h"
 
 void QueryProcessingSubsystem::use(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr) {
     pkb_ = pkb_ptr;

@@ -1,7 +1,7 @@
 #ifndef SRC_SPA_SRC_QPS_QUERY_PROCESSING_SUBSYSTEM_H_
 #define SRC_SPA_SRC_QPS_QUERY_PROCESSING_SUBSYSTEM_H_
 
-#include "../pkb/program_knowledge_base.h"
+#include "pkb/program_knowledge_base.h"
 
 class QueryProcessingSubsystem {
   public:
