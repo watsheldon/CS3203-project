@@ -1,4 +1,12 @@
-//
-// Created by 张广泽生 on 2/2/22.
-//
+#include "query_object.h"
+
+using namespace spa;
+
+std::vector<Declaration> QueryObject::getDeclarations(){
+    return declarations;
+}
+std::vector<Select> QueryObject::getSelects(){
+    return selects;
+}
+
 
