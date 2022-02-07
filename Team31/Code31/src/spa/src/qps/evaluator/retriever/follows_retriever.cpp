@@ -18,7 +18,7 @@ std::string follows_retriever::GetData(const std::shared_ptr<spa::ProgramKnowled
         case ParamsType::DOUBLE_ARG:
             // call PKB API
         default:
-            throw std::runtime_error("something!");
+            break;
     }
 
     return result;
