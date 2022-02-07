@@ -7,16 +7,16 @@
 #include <filesystem>
 
 #include "pkb/program_knowledge_base.h"
+#include "pkb/knowledge_base.h"
 #include "tokenizer.h"
 
 namespace spa {
 class SourceProcessor {
   public:
     explicit SourceProcessor(const std::string &filename);
-    std::shared_ptr<spa::ProgramKnowledgeBase> Parse();
+    std::shared_ptr<spa::KnowledgeBase> Parse();
   private:
     std::filesystem::path source_path_;
-    Tokenizer tokenizer_;
 };
 }
 

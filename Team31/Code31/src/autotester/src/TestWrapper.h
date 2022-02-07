@@ -8,8 +8,8 @@
 
 // include your other headers here
 #include "AbstractWrapper.h"
-#include "../../spa/src/pkb/program_knowledge_base.h"
-#include "../../spa/src/qps/query_processing_subsystem.h"
+#include "pkb/program_knowledge_base.h"
+#include "qps/query_processing_subsystem.h"
 
 class TestWrapper : public AbstractWrapper {
   public:
@@ -26,7 +26,7 @@ class TestWrapper : public AbstractWrapper {
     virtual void evaluate(std::string query, std::list<std::string> &results);
 
   private:
-    QueryProcessingSubsystem qps_;
+    spa::QueryProcessingSubsystem qps_;
 };
 
 #endif

@@ -1,5 +1,5 @@
 #include "TestWrapper.h"
-#include "../../spa/src/source/source_processor.h"
+#include "source/source_processor.h"
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
 AbstractWrapper *WrapperFactory::wrapper = 0;
