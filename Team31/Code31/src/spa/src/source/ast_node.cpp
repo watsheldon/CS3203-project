@@ -1,4 +1,7 @@
 #include "ast_node.h"
-using namespace spa;
+
+namespace spa {
 
 AstNode::~AstNode() {}
+
+} // namespace spa
