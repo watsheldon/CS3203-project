@@ -15,7 +15,7 @@ using PN = spa::PolishNotation;
 using INDEX = int;
 using CN = spa::ContainerNode;
 
-struct Init {
+struct BasicEntities {
     std::vector<std::string> procedures;
     std::vector<std::string> variables;
     std::vector<std::string> constants;
@@ -45,9 +45,13 @@ struct Index {
 
 class KnowledgeBase {
   public:
+    /**
+     * Prevents any further updates to the KnowledgeBase and compile all
+     * indirect relationships for faster lookup.
+     */
+    virtual void Compile() = 0;
     virtual ~KnowledgeBase() = 0;
-    virtual void Set() = 0;
-    virtual void SetEnd() = 0;
+
 };
 
 inline KnowledgeBase::~KnowledgeBase() {}
