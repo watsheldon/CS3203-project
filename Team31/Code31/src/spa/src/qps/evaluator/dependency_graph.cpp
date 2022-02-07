@@ -6,6 +6,8 @@
 #include <list>
 #include <vector>
 
+using namespace spa;
+
 dependency_graph::dependency_graph(int numNodes) {
 
     this->numVert = numNodes;

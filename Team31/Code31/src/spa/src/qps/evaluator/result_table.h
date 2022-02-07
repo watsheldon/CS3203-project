@@ -10,24 +10,26 @@
 #include <map>
 #include <vector>
 
+namespace spa {
+
 class result_table {
 
-public:
-
+  public:
 
     explicit result_table(std::vector<std::string> headers);
 
-    std::vector<std::vector<std::string> > getTableContents();
-    std::vector<std::string> getHeaders();
+    std::vector<std::vector<std::string> > GetTableContents();
+    std::vector<std::string> GetHeaders();
 
-    void merge(std::vector<std::string> result, PQLEnums::TargetType target);
+    void Merge(std::vector<std::string> result, spa::TargetType target);
 
-private:
+  private:
 
-    std::vector<std::string> tableHeader;
-    std::vector<std::vector<std::string> > tableContents;
+    std::vector<std::string> table_header;
+    std::vector<std::vector<std::string> > table_contents;
 
 };
 
+}
 
 #endif //INC_21S2_CP_SPA_TEAM_31_RESULTTABLE_H

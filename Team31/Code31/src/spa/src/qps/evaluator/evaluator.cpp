@@ -13,149 +13,104 @@
 #include <vector>
 #include <map>
 #include "pql_enums.h"
+#include "../../pkb/program_knowledge_base.h"
+#include "data_retriever/data_retriever.h"
 
-void evaluator::evaluateQuery(QueryObject queryObject) {
+using namespace spa;
 
-    // put TargetType attribute in QueryObject class
-    PQLEnums::TargetType target = queryObject.getTarget(); // implement getTarget() in QueryObject class
+void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, QueryObject query_object) {
+
+    spa::TargetType target = query_object.getTarget(); // implement getTarget() in QueryObject class
 
     formatter f;
-    bool terminate;
     auto r = new retriever(target);
-    std::vector<std::string> rawResult;
+    data_retriever d_r;
 
-    if (queryObject.hasPattern() || queryObject.hasSuchThat()) {  // simplify to .hasQueries() in QueryObject class
+    auto sorted = SortBySynonyms(query_object);
+    auto no_synonyms = sorted.first;
+    auto with_synonyms = sorted.second;
 
-        EvaluationList evalList;
-        ProcessingList procList;
+    if (!sorted.empty()) {
+        std::vector<EvalList> groups = GetConnectedQueries(with_synonyms);
+        //std::vector<std::string> result = rt->GetResult(no_synonyms, groups, pkb_ptr);
+        std::vector<std::string> result = r->GetSimpleQuery(no_synonyms, groups, pkb_ptr);
+        f.project(result);
 
-        // extract queries without synonyms
-        std::pair<EvaluationList, ProcessingList> sortedBySyns = sortBySynonyms(queryObject, evalList, procList);
-
-        // group queries according to common synonyms
-        ProcessingList grouped = groupBySyn(sortedBySyns.second);
-
-        // sort query groups according to their possession of the query target in their parameters
-        EvaluationList sortedByTarget = sortByTarget(sortedBySyns.first, grouped, target);
-
-        // get common synonyms corresponding to the different query groups
-        EvaluationList finalQueryList = getCommonSynonyms(sortedByTarget);
-
-        // get results (true/false) for queries without synonyms and queries with no targets
-        // if this returns false, terminate early
-        terminate = r->retrieve(finalQueryList);
-
-        if (!terminate && evalList.withTarget.size() > 0) {
-
-            rawResult = r->retrieve2(finalQueryList.withTarget, finalQueryList.withTargetSyn);
-            std::string result = f.formatResult(rawResult);
-
-        } else if (!terminate && evalList.noTarget.size() == 0) {
-
-            std::vector<std::string> result = r->getSimpleQuery();
-            f.project(result);
-        }
-
-    // for minimal iteration only
     } else {
-        std::vector<std::string> result = r->getSimpleQuery();
+        // for minimal iteration only
+        std::vector<std::string> result = GetSimpleQuery(pkb_ptr, target);
         f.project(result);
     }
-
 }
 
-std::pair<evaluator::EvaluationList,
-evaluator::ProcessingList> evaluator::sortBySynonyms(QueryObject queryObject,
-                                                     EvaluationList evalList, ProcessingList procList) {
+std::pair<evaluator::EvalList, std::vector<Query> > evaluator::SortBySynonyms(QueryObject query_object) {
 
-    // get all queries in a vector
-    std::vector<Query> allQueries = queryObject.getAllQueries(); // implemented in QueryObject class
+    evaluator::EvalList no_synonyms;
+    std::vector<Query> with_synonyms;
 
-    // separate into queries with synonyms and without
-    for (int i = 0; i < allQueries.size(); i++) {
-        if (allQueries[i].hasSynonyms()) {             // implement hasSynonyms() in Query class
-            procList.withSynonyms.push_back(allQueries[i]);
+    for (const auto& query : query_object.getPattern()) {
+        if (!query.hasSynonym()) {
+            spa::FilterType filter_type = PATTERN;
+            std::string params = getParams(query);
+
+            no_synonyms.params_map[DOUBLE_ARG].push_back(params);
+            no_synonyms.filter_map[filter_type].push_back(DOUBLE_ARG);
         } else {
-            evalList.noSynonyms.push_back(allQueries[i]);
+            with_synonyms.push_back(query);
         }
     }
 
-    return std::make_pair(evalList, procList);
-}
+    for (const auto& query : query_object.getSuchThat()) {
+        if (!query.hasSynonym()) {
+            spa::FilterType filter_type = getFilterType(query);
+            std::string params = getParams(query);
 
-evaluator::ProcessingList evaluator::groupBySyn(evaluator::ProcessingList procList) {
-
-    dependency_graph *g = new dependency_graph(procList.withSynonyms.size());
-    std::vector<Query> withSynonymsCopy = procList.withSynonyms;
-
-    // optimize
-    for (int i = 0; i < procList.withSynonyms.size(); i++) {
-        withSynonymsCopy.erase(withSynonymsCopy.begin() + i);
-        for (int j = 0; j < withSynonymsCopy.size(); j++) {
-            if (procList.withSynonyms[i].sharesSynonym(withSynonymsCopy[j])) {     // implement sharesSynonym in Query class
-                g->addConnection(i, j + i + 1);
-            }
-        }
-    }
-
-    std::vector<std::vector<int> > connectedGroupsIndex = g->getConnectedNodes();
-
-    // map back from Index to Query
-    for (int i = 0; i < connectedGroupsIndex.size(); i++) {
-        for (int j = 0; j < connectedGroupsIndex[i].size(); j++) {
-            int index = connectedGroupsIndex[i][j];
-            procList.grouped[i][j] = procList.withSynonyms[index];
-        }
-    }
-
-    procList.withSynonyms.clear();
-
-    return procList;
-}
-
-evaluator::EvaluationList evaluator::sortByTarget(EvaluationList evalList, ProcessingList procList, PQLEnums::TargetType target) {
-
-    for (int i = 0; i < procList.grouped.size(); i++) {
-        if (procList.grouped[i].containsTarget(target)) {       // implement containsTarget in Query
-            evalList.withTarget.push_back(procList.grouped[i]);
+            no_synonyms.params_map[DOUBLE_ARG].push_back(params);
+            no_synonyms.filter_map[filter_type].push_back(DOUBLE_ARG);
         } else {
-            evalList.noTarget.push_back(procList.grouped[i]);
+            with_synonyms.push_back(query);
         }
     }
-    return evalList;
+
+    return std::make_pair(no_synonyms, with_synonyms);
 }
 
+evaluator::EvalList evaluator::GetConnectedQueries(std::vector<Query> &query_group) {
 
-// returns vector of shared synonyms corresponding to each query group
-evaluator::EvaluationList evaluator::getCommonSynonyms(evaluator::EvaluationList evalList) {
+    evaluator::EvalList connected_queries;
 
-    for (int i = 0; i < evalList.noTarget.size(); i++) {
-        std::vector<std::string> synonyms;
-        for (int j = 0; j < evalList.noTarget[i].size(); j++) {
-            std::string params = evalList.noTarget[i][j].getParams();
-            std::string synonym = params.getSynonym();
-            if (std::find(synonyms.begin(), synonyms.end(), synonym) == synonyms.end()) {
-                synonyms.push_back(synonym);
-            }
+    for (const auto& query : query_group) {
+        spa::FilterType filter_type = getFilterType(query);
+        std::string params = getParams(query);
+        std::string synonyms = getSynonyms(params);
+        spa::ParamsType params_type = getParamsType(params);
+
+        if (params.containsTarget()) {
+            connected_queries.has_target = true;
         }
-        evalList.noTargetSyn.push_back(synonyms);
-        synonyms.clear();
-    }
 
-    for (int i = 0; i < evalList.withTarget.size(); i++) {
-        std::vector<std::string> synonyms;
-        for (int j = 0; j < evalList.withTarget[i].size(); j++) {
-            std::string params = evalList.withTarget[i][j].getParams();
-            std::string synonym = params.getSynonym();
-            if (std::find(synonyms.begin(), synonyms.end(), synonym) == synonyms.end()) {
-                synonyms.push_back(synonym);
-            }
-        }
-        evalList.withTargetSyn.push_back(synonyms);
-        synonyms.clear();
-    }
+        connected_queries.all_synonyms.push_back(synonyms);
 
-    return evalList;
+        connected_queries.params_map[params_type].push_back(params);
+        connected_queries.filter_map[filter_type].push_back(params_type);
+    }
+    return connected_queries;
 }
+
+std::vector<std::string> evaluator::GetResult(const evaluator::EvalList& no_synonyms,
+                                              const std::vector<evaluator::EvalList>& groups,
+                                   const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr) {
+
+    data_retriever dr;
+
+    auto rt = new result_table(no_synonyms.all_synonyms);
+
+    for (const auto& filter : no_synonyms.filter_map) {
+        auto params = filter.params_map[DOUBLE_ARG];
+        auto result = dr.GetData(pkb_ptr, filter, DOUBLE_ARG, params);
+        rt->Merge(result);
+    }
+}
+
 
 

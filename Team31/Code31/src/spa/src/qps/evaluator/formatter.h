@@ -7,14 +7,17 @@
 
 #include "result_table.h"
 
+namespace spa {
+
 class formatter {
 
-public:
+  public:
 
     void project(std::vector<std::string> result); // for minimal iteration
 
     std::string formatResult(std::vector<std::string> rawResult);
 };
 
+}
 
 #endif //INC_21S2_CP_SPA_TEAM_31_FORMATTER_H

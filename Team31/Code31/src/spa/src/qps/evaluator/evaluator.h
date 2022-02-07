@@ -10,34 +10,30 @@
 #include "retriever.h"
 #include "pql_enums.h"
 
+namespace spa {
+
 class evaluator {
 
-public:
+  public:
 
-    void evaluateQuery(QueryObject queryObject);
+    void EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, QueryObject query_object);
 
-    // evaluation list to be passed on to the retriever
-    struct EvaluationList {
-        std::vector<Query> noSynonyms;
-        std::vector<std::vector<Query> > noTarget;
-        std::vector<std::vector<std::string> > noTargetSyn;
-        std::vector<std::vector<Query> > withTarget;
-        std::vector<std::vector<std::string> > withTargetSyn;
+  private:
+    std::pair<evaluator::EvalList, std::vector<Query> > SortBySynonyms(QueryObject query_object);
+    evaluator::EvalList GetConnectedQueries(std::vector<Query> &query_group);
+
+    struct EvalList {
+        bool has_target;
+        std::unordered_map<spa::ParamsType, std::vector<std::string> > params_map;
+        std::unordered_map<spa::FilterType, spa::ParamsType> filter_map;
+        std::vector<std::string> all_synonyms;
     };
 
-    // for processing purposes
-    struct ProcessingList {
-        std::vector<std::vector<Query> > grouped;
-        std::vector<Query> withSynonyms;
-    };
-
-private:
-    std::pair<EvaluationList, ProcessingList> sortBySynonyms(QueryObject queryObject,
-                                                             EvaluationList evalList, ProcessingList procList);
-    ProcessingList groupBySyn(ProcessingList procList);
-    EvaluationList sortByTarget(EvaluationList evalList, ProcessingList procList, PQLEnums::TargetType target);
-    EvaluationList getCommonSynonyms(EvaluationList evalList);
+    std::vector<std::string> GetResult(const EvalList &no_synonyms,
+                                       const std::vector<evaluator::EvalList> &groups,
+                                       const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr);
 };
 
+}
 
 #endif //INC_21S2_CP_SPA_TEAM_31_EVALUATOR_H

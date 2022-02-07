@@ -6,6 +6,8 @@
 #include "formatter.h"
 #include <iostream>
 
+using namespace spa;
+
 std::string formatter::formatResult(std::vector<std::string> rawResult) {
 
     std::string formattedResult;
@@ -31,5 +33,6 @@ void formatter::project(std::vector<std::string> result) {
         std::cout << result[i] << ', ';
     }
     std::cout << ']';
-}
+};
+
 

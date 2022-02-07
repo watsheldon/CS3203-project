@@ -6,28 +6,30 @@
 #include "result_table.h"
 #include "pql_enums.h"
 
+using namespace spa;
+
 result_table::result_table(std::vector<std::string> headers) {
 
-    this->tableHeader = headers;
+    this->table_header = headers;
 
 }
 
-void result_table::merge(std::vector<std::string> result, PQLEnums::TargetType target) {
+void result_table::Merge(std::vector<std::string> result, spa::TargetType target) {
 
-    for (int i = 0; i < this->tableHeader.size(); i++) {
-        if (result.contains(tableHeader[i])) {  // if result type exists in table header
+    for (int i = 0; i < this->table_header.size(); i++) {
+        if (result.contains(table_header[i])) {  // if result type exists in table header
             for (int j = 0; j < result.size(); j++) {
-                tableContents[i].push_back(result.getResult[j]);
+                table_contents[i].push_back(result.getResult[j]);
             }
         }
     }
 }
 
-std::vector<std::vector<std::string> > result_table::getTableContents() {
-    return this->tableContents;
+std::vector<std::vector<std::string> > result_table::GetTableContents() {
+    return this->table_contents;
 }
-std::vector<std::string> result_table::getHeaders() {
-    return this->tableHeader;
+std::vector<std::string> result_table::GetHeaders() {
+    return this->table_header;
 }
 
 

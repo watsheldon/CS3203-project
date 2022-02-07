@@ -8,28 +8,26 @@
 #include <list>
 #include <map>
 
+namespace spa {
+
 class dependency_graph {
 
+  public:
 
-public:
-
+    explicit dependency_graph(int numNodes);
     void addConnection(int v1, int v2);
 
     std::vector<std::vector<int> > getConnectedNodes();
 
-
-    explicit dependency_graph(int numNodes);
-
-
-private:
+  private:
 
     int numVert;
-
-    std::list<int>* nodeList;
+    std::list<int> *nodeList;
 
     std::vector<int> runDfs(int i, bool visited[], std::vector<int> group);
 
 };
 
+}
 
 #endif //INC_21S2_CP_SPA_TEAM_31_DEPENDENCYGRAPH_H

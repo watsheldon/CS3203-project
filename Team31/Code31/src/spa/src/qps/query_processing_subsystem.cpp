@@ -10,5 +10,5 @@ void QueryProcessingSubsystem::use(const std::shared_ptr<spa::ProgramKnowledgeBa
 }
 
 void QueryProcessingSubsystem::evaluate(std::string_view query_string, std::list<std::string> &list) {
-    evaluator::evaluateQuery();
+    //evaluator::evaluateQuery();
 }
