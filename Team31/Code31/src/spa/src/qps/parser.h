@@ -1,5 +1,5 @@
-#ifndef SPA_TEAM31_CODE31_SRC_SPA_SRC_QPS_PARSER_H_
-#define SPA_TEAM31_CODE31_SRC_SPA_SRC_QPS_PARSER_H_
+#ifndef SRC_SPA_SRC_QPS_PARSER_H_
+#define SRC_SPA_SRC_QPS_PARSER_H_
 #include "query_object.h"
 #include "PQL_tokenizer.h"
 #include "token.h"
