@@ -1,14 +1,14 @@
+#include "query_processing_subsystem.h"
+#include <list>
 #include <memory>
 #include <string_view>
-#include <list>
-#include "query_processing_subsystem.h"
-#include "../pkb/program_knowledge_base.h"
-#include "evaluator/evaluator.h"
+#include <utility>
 
-void QueryProcessingSubsystem::use(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr) {
-    pkb_ = pkb_ptr;
+namespace spa {
+void QueryProcessingSubsystem::use(std::shared_ptr<KnowledgeBase> pkb_ptr) {
+    pkb_ = std::move(pkb_ptr);
 }
 
-void QueryProcessingSubsystem::evaluate(std::string_view query_string, std::list<std::string> &list) {
-    //evaluator::evaluateQuery();
+void QueryProcessingSubsystem::evaluate(std::string_view query_string,
+                                        std::list<std::string> &list) {}
 }

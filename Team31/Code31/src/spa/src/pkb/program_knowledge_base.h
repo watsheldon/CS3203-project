@@ -40,7 +40,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     const int STMT_TYPE_COUNT = 6;
   
     //mark the end of source processor -> construct necessary data structures
-    void Compile();
+    void Compile() override;
 
   private:
     //leaving index 0 empty for all vectors to preserve consistency
@@ -53,7 +53,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::vector<STMTLST_NO> while_stmtlst_;
     std::vector<STMTLST_NO> if_stmtlst_;
     std::vector<std::vector<STMTLST_NO> > stmtlsts_;
-    int stmt_size_; // store number of stmt
+    size_t stmt_size_; // store number of stmt
 
     //vector to store the nesting relationships among containers
     std::vector<CN> containers_;
