@@ -4,8 +4,10 @@
 #include <string>
 #include <memory>
 #include <fstream>
+#include <filesystem>
 
 #include "pkb/program_knowledge_base.h"
+#include "tokenizer.h"
 
 namespace spa {
 class SourceProcessor {
@@ -13,7 +15,8 @@ class SourceProcessor {
     explicit SourceProcessor(const std::string &filename);
     std::shared_ptr<spa::ProgramKnowledgeBase> parse();
   private:
-    std::ifstream source_;
+    std::filesystem::path source_path_;
+    Tokenizer tokenizer_;
 };
 }
 

@@ -3,7 +3,7 @@
 
 namespace spa {
 SourceProcessor::SourceProcessor(const std::string &filename)
-        : source_(filename) {}
+        : source_path_(filename), tokenizer_(source_path_) {}
 
 std::shared_ptr<spa::ProgramKnowledgeBase> SourceProcessor::parse() {
     return nullptr;
