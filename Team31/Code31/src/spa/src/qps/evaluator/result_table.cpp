@@ -13,7 +13,7 @@ result_table::result_table(std::vector<std::string> headers) {
     this->table_header = headers;
 
 }
-
+/**
 // change this to iterate through the list of connected queries by pairs
 void result_table::Merge(std::vector<std::string> result, spa::TargetType target) {
 
@@ -25,7 +25,7 @@ void result_table::Merge(std::vector<std::string> result, spa::TargetType target
         }
     }
 }
-
+*/
 std::vector<std::vector<std::string> > result_table::GetTableContents() {
     return this->table_contents;
 }

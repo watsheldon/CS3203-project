@@ -33,11 +33,11 @@ void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &
     //if (!no_synonyms.empty() && !with_synonyms.empty()) { // comment out for minimal iteration
     if (1 == 0) {
         // use undirected graphs to get queries connected by the same synonyms
-        std::vector<std::vector<Query> > connected_groups = GetConnectedQueries(with_synonyms);
+        //std::vector<std::vector<Query> > connected_groups = GetConnectedQueries(with_synonyms);
 
         // transform into evaluation groups // can use a class to represent the different groups + attributes
-        std::vector<EvalList> eval_groups = GetEvaluationGroups(connected_groups);
-        std::vector<std::string> result = GetResult(no_synonyms, eval_groups, pkb_ptr);
+        //std::vector<EvalList> eval_groups = GetEvaluationGroups(connected_groups);
+        //std::vector<std::string> result = GetResult(no_synonyms, eval_groups, pkb_ptr);
         //f.Project(result);
 
     } else {
@@ -47,6 +47,7 @@ void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &
     }
 }
 
+/**
 std::pair<evaluator::EvalList, std::vector<Query> > evaluator::SortBySynonyms(QueryObject query_object) {
 
     evaluator::EvalList no_synonyms;
@@ -144,6 +145,6 @@ std::vector<std::string> evaluator::GetResult(const evaluator::EvalList& no_syno
         rt->Merge(result);
     }
 }
-
+*/
 
 

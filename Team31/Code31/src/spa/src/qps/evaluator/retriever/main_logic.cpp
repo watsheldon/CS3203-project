@@ -9,7 +9,8 @@ using namespace spa;
 
 // handle both arguments w synonyms differently!!
 // implement early termination
-std::string retriever_logic::GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
+/**
+std::string main_logic::GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
                                      spa::FilterType filter_type,
                                      spa::ParamsType params_type,
                                      std::vector<std::string> params) {
@@ -32,11 +33,11 @@ std::string retriever_logic::GetData(const std::shared_ptr<spa::ProgramKnowledge
 
     // consider the cases where we have to return GetSimpleQuery even if other clauses are present
 
-}
+}*/
 
 // for minimal iteration; rename it; fix type
 std::pair<std::vector<int>, std::vector<std::string> >
-spa::retriever_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
+spa::main_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
                                      spa::DeclarationType target) {
 
     std::vector<int> result_int;

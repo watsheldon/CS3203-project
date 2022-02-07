@@ -20,7 +20,7 @@ class evaluator {
     void EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, QueryObject query_object);
 
   private:
-
+    /**
     struct EvalList {
         bool has_target;
         // convert params and filter types to int?
@@ -37,6 +37,7 @@ class evaluator {
     std::vector<std::string> GetResult(const EvalList &no_synonyms,
                                        const std::vector<evaluator::EvalList> &groups,
                                        const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr);
+    */
 };
 
 }
