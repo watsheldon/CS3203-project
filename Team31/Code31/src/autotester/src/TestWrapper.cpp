@@ -19,7 +19,7 @@ TestWrapper::TestWrapper() {
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
     spa::SourceProcessor processor(filename);
-    auto pkb = processor.parse();
+    auto pkb = processor.Parse();
     if (pkb)
         qps_.use(pkb);
 }

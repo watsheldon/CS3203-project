@@ -13,7 +13,7 @@ namespace spa {
 class SourceProcessor {
   public:
     explicit SourceProcessor(const std::string &filename);
-    std::shared_ptr<spa::ProgramKnowledgeBase> parse();
+    std::shared_ptr<spa::ProgramKnowledgeBase> Parse();
   private:
     std::filesystem::path source_path_;
     Tokenizer tokenizer_;
