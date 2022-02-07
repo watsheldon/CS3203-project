@@ -8,9 +8,9 @@
 // relocate if necessary
 namespace spa {
 
-    enum TargetType {
+    /**enum TargetType {
         ALL, ASSIGN, IF, WHILE, PROCEDURE, READ, CALL, CONTAINER, PRINT, VARIABLE, CONSTANT
-    };
+    };*/
 
     enum FilterType {
         FOLLOWS, FOLLOWS_T, PARENT, PARENT_T, MODIFIES, USES, PATTERN

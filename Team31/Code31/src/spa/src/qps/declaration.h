@@ -3,7 +3,7 @@
 #include<string>
 
 namespace spa {
-    enum class DeclarationType{
+    enum DeclarationType{
         STMT,
         READ,
         PRINT,

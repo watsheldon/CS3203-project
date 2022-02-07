@@ -14,6 +14,7 @@
 #include "pql_enums.h"
 #include "../../pkb/program_knowledge_base.h"
 #include "retriever/main_logic.h"
+#include "../query_object.h"
 
 using namespace spa;
 

@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include "pql_enums.h"
 #include "../../pkb/program_knowledge_base.h"
+#include "../query_object.h"
 
 namespace spa {
 
