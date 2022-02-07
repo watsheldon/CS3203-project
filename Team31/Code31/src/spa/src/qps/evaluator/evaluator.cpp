@@ -30,7 +30,6 @@ void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &
     auto with_synonyms = sorted.second;
 
     if (!no_synonyms.empty() && !with_synonyms.empty()) {
-        // using undirected graphs, get queries that share synonyms
         std::vector<EvalList> groups = GetConnectedQueries(with_synonyms);
         std::vector<std::string> result = GetResult(no_synonyms, groups, pkb_ptr);
         //f.Project(result);
@@ -73,6 +72,38 @@ std::pair<evaluator::EvalList, std::vector<Query> > evaluator::SortBySynonyms(Qu
 
     return std::make_pair(no_synonyms, with_synonyms);
 }
+
+/**
+ evaluator::ProcessingList evaluator::groupBySyn(evaluator::ProcessingList procList) {
+
+    dependency_graph *g = new dependency_graph(procList.withSynonyms.size());
+    std::vector<Query> withSynonymsCopy = procList.withSynonyms;
+
+    // optimize
+    for (int i = 0; i < procList.withSynonyms.size(); i++) {
+        withSynonymsCopy.erase(withSynonymsCopy.begin() + i);
+        for (int j = 0; j < withSynonymsCopy.size(); j++) {
+            if (procList.withSynonyms[i].sharesSynonym(withSynonymsCopy[j])) {     // implement sharesSynonym in Query class
+                g->addConnection(i, j + i + 1);
+            }
+        }
+    }
+
+    std::vector<std::vector<int> > connectedGroupsIndex = g->getConnectedNodes();
+
+    // map back from Index to Query
+    for (int i = 0; i < connectedGroupsIndex.size(); i++) {
+        for (int j = 0; j < connectedGroupsIndex[i].size(); j++) {
+            int index = connectedGroupsIndex[i][j];
+            procList.grouped[i][j] = procList.withSynonyms[index];
+        }
+    }
+
+    procList.withSynonyms.clear();
+
+    return procList;
+}
+ */
 
 evaluator::EvalList evaluator::GetConnectedQueries(std::vector<Query> &query_group) {
 
