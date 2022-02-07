@@ -3,7 +3,7 @@
 #include <string>
 
 namespace spa{
-    enum class TokenType{
+    enum class QueryTokenType{
       SEMICOLON, // ;
       COMMA,     // ,
       UNDERSCORE,  // _
@@ -13,12 +13,12 @@ namespace spa{
 
     class Token{
       private:
-        TokenType type;
+        QueryTokenType type;
         std::string string;
       public:
-        Token(TokenType type, std::string string);
+        Token(QueryTokenType type, std::string string);
         std::string getString();
-        TokenType getTokenType();
+        QueryTokenType getTokenType();
     };
 }
 

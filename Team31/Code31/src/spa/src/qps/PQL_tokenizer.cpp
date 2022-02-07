@@ -32,12 +32,12 @@ Token PQLTokenizer::getNextToken() {
     str.push_back(currChar);
     if (str == ",") {
         currentPosition++;
-        return Token(TokenType::COMMA, ",");
+        return Token(QueryTokenType::COMMA, ",");
     } else if (str == ";") {
         currentPosition++;
-        return Token(TokenType::SEMICOLON, ";");
+        return Token(QueryTokenType::SEMICOLON, ";");
     } else if (str == "_") {
-        return Token(TokenType::UNDERSCORE, "_");
+        return Token(QueryTokenType::UNDERSCORE, "_");
     } else if (!isalnum(currChar)) {
         throw std::invalid_argument("Invalid character in query!");
     } else {
@@ -48,7 +48,7 @@ Token PQLTokenizer::getNextToken() {
             word.push_back(nextChar);
             currentPosition++;
         }
-        return Token(TokenType::WORD, word);
+        return Token(QueryTokenType::WORD, word);
     }
 }
 

@@ -1,10 +1,10 @@
 #include "token.h"
 
 namespace spa{
-Token::Token(TokenType type, std::string string) : type(type), string(string){}
+Token::Token(QueryTokenType type, std::string string) : type(type), string(string){}
 
 
-TokenType Token::getTokenType(){
+QueryTokenType Token::getTokenType(){
     return type;
 }
 
