@@ -2,7 +2,7 @@
 // Created by vanessa on 7/2/22.
 //
 
-#include "retriever_logic.h"
+#include "main_logic.h"
 #include "follows_retriever.h"
 
 using namespace spa;

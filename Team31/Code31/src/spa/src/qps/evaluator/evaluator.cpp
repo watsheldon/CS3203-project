@@ -13,7 +13,7 @@
 #include <map>
 #include "pql_enums.h"
 #include "../../pkb/program_knowledge_base.h"
-#include "retriever/retriever_logic.h"
+#include "retriever/main_logic.h"
 
 using namespace spa;
 
@@ -22,7 +22,7 @@ void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &
     spa::TargetType target = query_object.getTarget();
 
     formatter f;
-    retriever_logic re;
+    main_logic re;
 
     // sort queries by their possession of synonyms
     auto sorted = SortBySynonyms(query_object);
@@ -33,7 +33,7 @@ void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &
         // use undirected graphs to get queries connected by the same synonyms
         std::vector<std::vector<Query> > connected_groups = GetConnectedQueries(with_synonyms);
 
-        // transform into evaluation groups  (find a better data structure)
+        // transform into evaluation groups // can use a class to represent the different groups + attributes
         std::vector<EvalList> eval_groups = GetEvaluationGroups(connected_groups);
         std::vector<std::string> result = GetResult(no_synonyms, eval_groups, pkb_ptr);
         //f.Project(result);
@@ -132,7 +132,7 @@ std::vector<std::string> evaluator::GetResult(const evaluator::EvalList& no_syno
                                               const std::vector<evaluator::EvalList>& groups,
                                    const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr) {
 
-    retriever_logic re;
+    main_logic re;
 
     auto rt = new result_table(no_synonyms.all_synonyms);
 

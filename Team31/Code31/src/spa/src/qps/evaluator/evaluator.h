@@ -34,7 +34,6 @@ class evaluator {
     evaluator::EvalList GetEvaluationGroups(std::vector<Query> &query_group);
 
 
-
     std::vector<std::string> GetResult(const EvalList &no_synonyms,
                                        const std::vector<evaluator::EvalList> &groups,
                                        const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr);

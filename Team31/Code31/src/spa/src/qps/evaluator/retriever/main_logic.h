@@ -11,7 +11,7 @@
 
 namespace spa {
 
-class retriever_logic {
+class main_logic {
 
   public:
     std::string GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
