@@ -2,7 +2,7 @@
 
 namespace spa {
 
-bool addProcedure(std::shared_ptr<Procedure> procedure) {
+bool Program::addProcedure(std::shared_ptr<Procedure> procedure) {
 	if (procedure != nullptr) {
 		procedures.push_back(procedure);
 		return true;
@@ -11,7 +11,7 @@ bool addProcedure(std::shared_ptr<Procedure> procedure) {
 	}
 }
 
-SharedPtrVec<Procedure> getProcedures() const {
+SharedPtrVec<Procedure> Program::getProcedures() {
 	return procedures;
 }
 

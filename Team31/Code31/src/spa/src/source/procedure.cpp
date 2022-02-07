@@ -11,7 +11,8 @@ bool Procedure::setStmtLst(std::shared_ptr<StmtLst> stmtLst) {
 	}
 }
 
-std::shared_ptr<StmtLst> getStmtLst() const {
+std::shared_ptr<StmtLst> Procedure::getStmtLst()
+{
 	return stmtLst;
 }
 

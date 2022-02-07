@@ -1,6 +1,8 @@
 #ifndef SRC_SPA_SRC_SOURCE_PROGRAM_H_
 #define SRC_SPA_SRC_SOURCE_PROGRAM_H_
 
+#include "procedure.h"
+
 #include <memory>
 
 namespace spa {
@@ -8,7 +10,7 @@ namespace spa {
 class Program : public AstNode {
 	public: 
 	bool addProcedure(std::shared_ptr<Procedure> procedure);
-	SharedPtrVec<Procedure> getProcedures() const;
+	SharedPtrVec<Procedure> getProcedures();
 
 	private:
 	SharedPtrVec<Procedure> procedures;

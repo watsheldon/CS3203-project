@@ -1,11 +1,13 @@
 #ifndef SRC_SPA_SRC_SOURCE_STMT_LST_H_
 #define SRC_SPA_SRC_SOURCE_STMT_LST_H_
 
-#include "indexed_ast_node.h"
-
 namespace spa {
 
-class StmtLst{};
+class StmtLst{
+	public:
+	int x;
+	int getX();
+};
 
 } // namespace spa
 
