@@ -51,7 +51,10 @@ class KnowledgeBase {
      */
     virtual void Compile() = 0;
     virtual ~KnowledgeBase() = 0;
+
 };
+
+inline KnowledgeBase::~KnowledgeBase() {}
 
 }  // namespace spa
 

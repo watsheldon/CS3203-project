@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 namespace spa {
 
@@ -23,14 +25,20 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     explicit ProgramKnowledgeBase(std::shared_ptr<BasicEntities> init);
 
     //set stmtLst: useful for Parent and Follows relationships
-    void set_index(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index);
-    void set_index(Index<kWhile> stmt_no, Index<kStmtLst> stmtlst_index);
-    void set_index(Index<kIf> stmt_no, Index<kStmtLst> stmtlst_index1, Index<kStmtLst> stmtlst_index2);
-    void set_lst(Index<kStmtLst> stmtlst_index, std::vector<STMT_NO> stmtlst);
+    void SetIndex(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index);
+    void SetIndex(Index<kWhile> stmt_no, Index<kStmtLst> stmtlst_index);
+    void SetIndex(Index<kIf> stmt_no, Index<kStmtLst> stmtlst_index1, Index<kStmtLst> stmtlst_index2);
+    void SetLst(Index<kStmtLst> stmtlst_index, std::vector<STMT_NO> stmtlst);
 
     //set direct Uses and Modifies relationships
-    void set_rel(Index<kPrint> stmt_no, Index<kVar> var_index);
+    void SetRel(Index<kPrint> stmt_no, Index<kVar> var_index);
 
+    std::vector<std::string> GetAllStringEntities(EntityType et); // For procedures,variables,constants
+    std::vector<int> GetAllStmtEntities(EntityType et); // For stmt
+    std::vector<std::string> IndexToName(std::vector<int> index_list, EntityType et); // convert index to string
+
+    const int STMT_TYPE_COUNT = 6;
+  
     //mark the end of source processor -> construct necessary data structures
     void Compile();
 
@@ -45,6 +53,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::vector<STMTLST_NO> while_stmtlst_;
     std::vector<STMTLST_NO> if_stmtlst_;
     std::vector<std::vector<STMTLST_NO> > stmtlsts_;
+    int stmt_size_; // store number of stmt
 
     //vector to store the nesting relationships among containers
     std::vector<CN> containers_;
