@@ -21,7 +21,7 @@ class result_table {
     std::vector<std::vector<std::string> > GetTableContents();
     std::vector<std::string> GetHeaders();
 
-    void Merge(std::vector<std::string> result, spa::TargetType target);
+    //void Merge(std::vector<std::string> result, spa::TargetType target);
 
   private:
 
