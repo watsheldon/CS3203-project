@@ -17,7 +17,7 @@ enum TokenType {
     kBracketR,
     kBraceL,
     kBraceR,
-    kEqual,
+    kAssignEqual,
     kOperatorPlus,
     kOperatorMinus,
     kOperatorTimes,
@@ -26,24 +26,59 @@ enum TokenType {
     kCondNot,
     kCondAnd,
     kCondOr,
-    kRelGt,
-    kRelGeq,
     kRelLt,
     kRelLeq,
     kRelEq,
     kRelNeq,
+    kRelGt,
+    kRelGeq,
+    kSemicolon,
     kName,
     kInteger,
-    kSemicolon,
 };
+
+constexpr std::string_view Keyword(TokenType token_type) {
+    switch (token_type) {
+        case kKeywordProcedure:return "procedure";
+        case kKeywordRead:return "read";
+        case kKeywordPrint:return "print";
+        case kKeywordCall:return "call";
+        case kKeywordWhile:return "while";
+        case kKeywordIf:return "if";
+        case kKeywordThen:return "then";
+        case kKeywordElse:return "else";
+        case kBracketL:return "(";
+        case kBracketR:return ")";
+        case kBraceL:return "{";
+        case kBraceR:return "}";
+        case kAssignEqual:return "=";
+        case kOperatorPlus:return "+";
+        case kOperatorMinus:return "-";
+        case kOperatorTimes:return "*";
+        case kOperatorDivide:return "/";
+        case kOperatorModulo:return "%";
+        case kCondNot:return "!";
+        case kCondAnd:return "&&";
+        case kCondOr:return "||";
+        case kRelLt:return "<";
+        case kRelLeq:return "<=";
+        case kRelEq:return "==";
+        case kRelNeq:return "!=";
+        case kRelGt:return ">";
+        case kRelGeq:return ">=";
+        case kSemicolon:return ";";
+        case kName:
+        case kInteger:return "";
+    }
+}
 
 struct Token {
     const TokenType type;
     const std::string value;
     bool operator==(const Token &other) {
-        if (type == other.type)
-            return type < kName || value == other.value;
-        return false;
+        if (type != other.type)
+            return false;
+        return type < kName || value == other.value;
     }
 };
 }
