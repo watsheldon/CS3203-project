@@ -13,7 +13,7 @@ class formatter {
 
   public:
 
-    void Project(std::vector<std::string> result); // for minimal iteration
+    void Project(std::pair<std::vector<int>, std::vector<std::string> > result); // for minimal iteration
 
     std::string FormatResult(std::vector<std::string> raw_result);
 };

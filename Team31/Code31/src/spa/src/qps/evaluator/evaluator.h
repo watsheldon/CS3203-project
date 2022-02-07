@@ -7,8 +7,9 @@
 
 #include <vector>
 #include <string>
-#include "to_scrap/retriever.h"
+#include <unordered_map>
 #include "pql_enums.h"
+#include "../../pkb/program_knowledge_base.h"
 
 namespace spa {
 
@@ -19,8 +20,6 @@ class evaluator {
     void EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, QueryObject query_object);
 
   private:
-    std::pair<evaluator::EvalList, std::vector<Query> > SortBySynonyms(QueryObject query_object);
-    evaluator::EvalList GetConnectedQueries(std::vector<Query> &query_group);
 
     struct EvalList {
         bool has_target;
@@ -28,6 +27,11 @@ class evaluator {
         std::unordered_map<spa::FilterType, spa::ParamsType> filter_map;
         std::vector<std::string> all_synonyms;
     };
+
+    std::pair<evaluator::EvalList, std::vector<Query> > SortBySynonyms(QueryObject query_object);
+    evaluator::EvalList GetConnectedQueries(std::vector<Query> &query_group);
+
+
 
     std::vector<std::string> GetResult(const EvalList &no_synonyms,
                                        const std::vector<evaluator::EvalList> &groups,

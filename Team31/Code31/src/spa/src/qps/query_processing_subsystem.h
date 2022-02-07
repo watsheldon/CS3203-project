@@ -1,7 +1,10 @@
 #ifndef SRC_SPA_SRC_QPS_QUERY_PROCESSING_SUBSYSTEM_H_
 #define SRC_SPA_SRC_QPS_QUERY_PROCESSING_SUBSYSTEM_H_
 
+#include <string_view>
+#include <list>
 #include "../pkb/program_knowledge_base.h"
+#include "evaluator/evaluator.h"
 
 class QueryProcessingSubsystem {
   public:

@@ -6,7 +6,6 @@
 
 #include <set>
 #include "evaluator.h"
-#include "to_scrap/retriever.h"
 #include "result_table.h"
 #include "formatter.h"
 #include "dependency_graph.h"
@@ -14,30 +13,31 @@
 #include <map>
 #include "pql_enums.h"
 #include "../../pkb/program_knowledge_base.h"
-#include "data_retriever/data_retriever.h"
+#include "retriever/retriever_logic.h"
 
 using namespace spa;
 
 void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, QueryObject query_object) {
 
-    spa::TargetType target = query_object.getTarget(); // implement getTarget() in QueryObject class
+    spa::TargetType target = query_object.getTarget();
 
     formatter f;
-    auto r = new retriever(target);
-    data_retriever dr;
+    retriever_logic re;
 
+    // sort queries by their possession of synonyms
     auto sorted = SortBySynonyms(query_object);
     auto no_synonyms = sorted.first;
     auto with_synonyms = sorted.second;
 
     if (!no_synonyms.empty() && !with_synonyms.empty()) {
+        // using undirected graphs, get queries that share synonyms
         std::vector<EvalList> groups = GetConnectedQueries(with_synonyms);
         std::vector<std::string> result = GetResult(no_synonyms, groups, pkb_ptr);
-        f.Project(result);
+        //f.Project(result);
 
     } else {
-        // for minimal iteration only; fit this in w the rest of the query results
-        std::vector<std::string> result = dr.GetSimpleQuery(pkb_ptr, target);
+        // MINIMAL ITERATION
+        std::pair<std::vector<int>, std::vector<std::string> > result = re.GetSimpleQuery(pkb_ptr, target);
         f.Project(result);
     }
 }
@@ -100,13 +100,13 @@ std::vector<std::string> evaluator::GetResult(const evaluator::EvalList& no_syno
                                               const std::vector<evaluator::EvalList>& groups,
                                    const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr) {
 
-    data_retriever dr;
+    retriever_logic re;
 
     auto rt = new result_table(no_synonyms.all_synonyms);
 
     for (const auto& filter : no_synonyms.filter_map) {
         auto params = filter.params_map[DOUBLE_ARG];
-        auto result = dr.GetData(pkb_ptr, filter, DOUBLE_ARG, params);
+        auto result = re.GetData(pkb_ptr, filter, DOUBLE_ARG, params);
         rt->Merge(result);
     }
 }

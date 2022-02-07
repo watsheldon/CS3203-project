@@ -3,8 +3,6 @@
 //
 
 #include "retriever_logic.h"
-#include "follows_retriever.h"
-#include "../../../pkb/program_knowledge_base.h"
 
 using namespace spa;
 
@@ -19,7 +17,7 @@ std::string retriever_logic::GetData(const std::shared_ptr<spa::ProgramKnowledge
 
     switch (filter_type) {
         case FilterType::FOLLOWS:
-            result = follows_retriever::GetData(pkb_ptr, params_type, params);
+            //result = follows_retriever::GetData(pkb_ptr, params_type, params);
             break;
         case FilterType::FOLLOWS_T:
         case FilterType::PARENT:
@@ -35,49 +33,52 @@ std::string retriever_logic::GetData(const std::shared_ptr<spa::ProgramKnowledge
 
 }
 
-// for minimal iteration; rename it
-std::vector<std::string> spa::retriever_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
-                                                              spa::TargetType target) {
+// for minimal iteration; rename it; fix type
+std::pair<std::vector<int>,
+std::vector<std::string> >
+spa::retriever_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
+                                     spa::TargetType target) {
 
-    std::vector<std::string> result;
+    std::vector<int> result_int;
+    std::vector<std::string> result_string;
 
     switch (target) {
         case spa::ALL:
-            result = pkb_ptr->getAll(ALL);
+            result_int = pkb_ptr->GetAllStmtEntities(kStmt);
             break;
         case spa::ASSIGN:
-            result = pkb_ptr->getAll(ASSIGN);
+            result_int = pkb_ptr->GetAllStmtEntities(kAssign);
             break;
         case spa::WHILE:
-            result = pkb_ptr->getAll(WHILE);
+            result_int = pkb_ptr->GetAllStmtEntities(kWhile);
             break;
         case spa::IF:
-            result = pkb_ptr->getAll(IF);
+            result_int = pkb_ptr->GetAllStmtEntities(kIf);
             break;
         case spa::READ:
-            result = pkb_ptr->getAll(READ);
+            result_int = pkb_ptr->GetAllStmtEntities(kRead);
             break;
         case spa::CONTAINER:
-            result = pkb_ptr->getAll(CONTAINER);
+            result_int = pkb_ptr->GetAllStmtEntities(kStmtLst);
             break;
         case spa::PRINT:
-            result = pkb_ptr->getAll(PRINT);
+            result_int = pkb_ptr->GetAllStmtEntities(kPrint);
             break;
         case spa::CALL:
-            result = pkb_ptr->getAll(CALL);
+            result_int = pkb_ptr->GetAllStmtEntities(kCall);
             break;
         case spa::PROCEDURE:
-            result = pkb_ptr->toName(pkb_ptr->getAll(PROCEDURE), PROCEDURE);
+            result_string = pkb_ptr->GetAllStringEntities(kProc);
             break;
         case spa::VARIABLE:
-            result = pkb_ptr->toName(pkb_ptr->getAll(VARIABLE), VARIABLE);
+            result_string = pkb_ptr->GetAllStringEntities(kVar);
             break;
         case spa::CONSTANT:
-            result = pkb_ptr->toName(pkb_ptr->getAll(CONSTANT), CONSTANT);
+            result_string = pkb_ptr->GetAllStringEntities(kConst);
             break;
         default:
             throw std::runtime_error("Target type is invalid!");
     }
-    return result;
+    return std::make_pair(result_int, result_string);
 }
 

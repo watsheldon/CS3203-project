@@ -16,14 +16,9 @@ namespace spa {
         FOLLOWS, FOLLOWS_T, PARENT, PARENT_T, MODIFIES, USES, PATTERN
     };
 
-    static const FilterType all_filter_type[] = {FOLLOWS, FOLLOWS_T, PARENT, PARENT_T, MODIFIES,
-                                                 USES, PATTERN};
-
     enum ParamsType {
         NO_ARG, SINGLE_ARG, DOUBLE_ARG
     };
-
-    static const ParamsType all_params_type[] = {SINGLE_ARG, DOUBLE_ARG};
 
 };
 
