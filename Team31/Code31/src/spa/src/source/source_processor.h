@@ -7,6 +7,7 @@
 
 #include "pkb/program_knowledge_base.h"
 
+namespace spa {
 class SourceProcessor {
   public:
     explicit SourceProcessor(const std::string &filename);
@@ -14,5 +15,6 @@ class SourceProcessor {
   private:
     std::ifstream source_;
 };
+}
 
 #endif //SRC_SPA_SRC_SOURCE_SOURCE_PROCESSOR_H_
