@@ -11,10 +11,12 @@
 
 namespace spa {
 
+class follows_retriever {
+
+  public:
     std::string GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
                         spa::ParamsType params_type,
                         std::vector<std::string> params);
-
 };
 
 }

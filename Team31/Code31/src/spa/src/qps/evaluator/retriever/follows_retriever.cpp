@@ -3,11 +3,15 @@
 //
 
 #include "follows_retriever.h"
+#include <vector>
 
 using namespace spa;
 
-std::string GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, spa::ParamsType params_type,
-                    std::vector<std::string> params) {
+std::string follows_retriever::GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
+                                       spa::ParamsType params_type,
+                                       std::vector<std::string> params) {
+    std::string result;
+
     switch (params_type) {
         case ParamsType::SINGLE_ARG:
             // call PKB API
@@ -16,4 +20,6 @@ std::string GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, s
         default:
             throw std::runtime_error("something!");
     }
+
+    return result;
 }

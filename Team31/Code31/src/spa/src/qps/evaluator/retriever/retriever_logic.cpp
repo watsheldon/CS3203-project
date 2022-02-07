@@ -2,23 +2,24 @@
 // Created by vanessa on 7/2/22.
 //
 
-#include "data_retriever.h"
+#include "retriever_logic.h"
 #include "follows_retriever.h"
 #include "../../../pkb/program_knowledge_base.h"
 
+using namespace spa;
 
 // handle both arguments w synonyms differently!!
 // implement early termination
-std::string spa::data_retriever::GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
-                                         spa::FilterType filter_type,
-                                         spa::ParamsType params_type,
-                                         std::vector<std::string> params) {
+std::string retriever_logic::GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
+                                     spa::FilterType filter_type,
+                                     spa::ParamsType params_type,
+                                     std::vector<std::string> params) {
 
     std::string result;
 
     switch (filter_type) {
         case FilterType::FOLLOWS:
-            result = spa::GetData(pkb_ptr, params_type, params);
+            result = follows_retriever::GetData(pkb_ptr, params_type, params);
             break;
         case FilterType::FOLLOWS_T:
         case FilterType::PARENT:
@@ -35,8 +36,8 @@ std::string spa::data_retriever::GetData(const std::shared_ptr<spa::ProgramKnowl
 }
 
 // for minimal iteration; rename it
-std::vector<std::string> spa::data_retriever::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
-                                                             spa::TargetType target) {
+std::vector<std::string> spa::retriever_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
+                                                              spa::TargetType target) {
 
     std::vector<std::string> result;
 

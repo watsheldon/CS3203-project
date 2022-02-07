@@ -11,13 +11,15 @@
 
 namespace spa {
 
-class data_retriever {
+class retriever_logic {
 
   public:
     std::string GetData(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
                                              spa::FilterType filter_type,
                                              spa::ParamsType params_type,
                                              std::vector<std::string> params);
+    std::vector<std::string> GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
+                                            TargetType target);
 };
 
 }
