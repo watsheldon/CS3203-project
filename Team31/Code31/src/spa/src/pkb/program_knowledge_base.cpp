@@ -96,18 +96,15 @@ std::vector<std::string> ProgramKnowledgeBase::GetAllStringEntities(EntityType e
     switch(et) {
     case kProc:
         results.reserve((entities_ptr_->procedures.size()) - 1);
-        std::transform(entities_ptr_->procedures.begin() + 1, entities_ptr_->procedures.end(), std::back_inserter(results), 
-            [this](std::string s) { return s; });
+        std::copy(entities_ptr_->procedures.begin() + 1, entities_ptr_->procedures.end(), std::back_inserter(results));
         break;
     case kVar:
         results.reserve((entities_ptr_->variables.size()) - 1);
-        std::transform(entities_ptr_->variables.begin() + 1, entities_ptr_->variables.end(), std::back_inserter(results), 
-            [this](std::string s) { return s; });
+        std::copy(entities_ptr_->variables.begin() + 1, entities_ptr_->variables.end(), std::back_inserter(results));
         break;
     case kConst:
         results.reserve((entities_ptr_->constants.size()) - 1);
-        std::transform(entities_ptr_->constants.begin() + 1, entities_ptr_->constants.end(), std::back_inserter(results), 
-            [this](std::string s) { return s; });
+        std::copy(entities_ptr_->constants.begin() + 1, entities_ptr_->constants.end(), std::back_inserter(results));
         break;
     default:
         break;
@@ -121,33 +118,27 @@ std::vector<int> ProgramKnowledgeBase::GetAllStmtEntities(EntityType et) {
     switch (et) {
     case kRead:
         results.reserve((entities_ptr_->reads.size()) - 1);
-        std::transform(entities_ptr_->reads.begin() + 1, entities_ptr_->reads.end(), std::back_inserter(results), 
-            [this](int i) { return i; });
+        std::copy(entities_ptr_->reads.begin() + 1, entities_ptr_->reads.end(), std::back_inserter(results));
         break;
     case kPrint:
         results.reserve((entities_ptr_->prints.size()) - 1);
-        std::transform(entities_ptr_->prints.begin() + 1, entities_ptr_->prints.end(), std::back_inserter(results),
-            [this](int i) { return i; });
+        std::copy(entities_ptr_->prints.begin() + 1, entities_ptr_->prints.end(), std::back_inserter(results));
         break;
     case kCall:
         results.reserve((entities_ptr_->calls.size()) - 1);
-        std::transform(entities_ptr_->calls.begin() + 1, entities_ptr_->calls.end(), std::back_inserter(results),
-            [this](int i) { return i; });
+        std::copy(entities_ptr_->calls.begin() + 1, entities_ptr_->calls.end(), std::back_inserter(results));
         break;
     case kWhile:
         results.reserve((entities_ptr_->whiles.size()) - 1);
-        std::transform(entities_ptr_->whiles.begin() + 1, entities_ptr_->whiles.end(), std::back_inserter(results),
-            [this](int i) { return i; });
+        std::copy(entities_ptr_->whiles.begin() + 1, entities_ptr_->whiles.end(), std::back_inserter(results));
         break;
     case kIf:
         results.reserve((entities_ptr_->ifs.size()) - 1);
-        std::transform(entities_ptr_->ifs.begin() + 1, entities_ptr_->ifs.end(), std::back_inserter(results),
-            [this](int i) { return i; });
+        std::copy(entities_ptr_->ifs.begin() + 1, entities_ptr_->ifs.end(), std::back_inserter(results));
         break;
     case kAssign:
         results.reserve((entities_ptr_->assigns.size()) - 1);
-        std::transform(entities_ptr_->assigns.begin() + 1, entities_ptr_->assigns.end(), std::back_inserter(results),
-            [this](int i) { return i; });
+        std::copy(entities_ptr_->assigns.begin() + 1, entities_ptr_->assigns.end(), std::back_inserter(results));
         break;
     case kStmt:
         results.reserve(stmt_size_);
