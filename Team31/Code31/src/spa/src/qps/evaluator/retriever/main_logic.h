@@ -19,7 +19,7 @@ class main_logic {
                                              spa::ParamsType params_type,
                                              std::vector<std::string> params);
     std::pair<std::vector<int>, std::vector<std::string> >
-    GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, spa::TargetType target);
+    GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, std::string target);
 };
 
 }

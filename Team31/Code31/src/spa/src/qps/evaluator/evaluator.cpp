@@ -19,17 +19,19 @@ using namespace spa;
 
 void evaluator::EvaluateQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr, QueryObject query_object) {
 
-    spa::TargetType target = query_object.getTarget();
+    //spa::TargetType target = query_object.getTarget(); // comment out for minimal iteration
+    spa::DeclarationType target = query_object.getSelect().getSelectType();
 
     formatter f;
     main_logic re;
 
     // sort queries by their possession of synonyms
-    auto sorted = SortBySynonyms(query_object);
-    auto no_synonyms = sorted.first;
-    auto with_synonyms = sorted.second;
+    //auto sorted = SortBySynonyms(query_object); // comment out for minimal iteration
+    //auto no_synonyms = sorted.first; // comment out for minimal iteration
+    //auto with_synonyms = sorted.second; // comment out for minimal iteration
 
-    if (!no_synonyms.empty() && !with_synonyms.empty()) {
+    //if (!no_synonyms.empty() && !with_synonyms.empty()) { // comment out for minimal iteration
+    if (1 == 0) {
         // use undirected graphs to get queries connected by the same synonyms
         std::vector<std::vector<Query> > connected_groups = GetConnectedQueries(with_synonyms);
 

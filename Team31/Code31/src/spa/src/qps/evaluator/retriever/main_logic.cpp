@@ -37,13 +37,13 @@ std::string retriever_logic::GetData(const std::shared_ptr<spa::ProgramKnowledge
 // for minimal iteration; rename it; fix type
 std::pair<std::vector<int>, std::vector<std::string> >
 spa::retriever_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase> &pkb_ptr,
-                                     spa::TargetType target) {
+                                     spa::DeclarationType target) {
 
     std::vector<int> result_int;
     std::vector<std::string> result_string;
 
     switch (target) {
-        case spa::ALL:
+        case spa::STMT:
             result_int = pkb_ptr->GetAllStmtEntities(kStmt);
             break;
         case spa::ASSIGN:
@@ -58,9 +58,9 @@ spa::retriever_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledge
         case spa::READ:
             result_int = pkb_ptr->GetAllStmtEntities(kRead);
             break;
-        case spa::CONTAINER:
-            result_int = pkb_ptr->GetAllStmtEntities(kStmtLst);
-            break;
+        //case spa::CONTAINER:
+        //    result_int = pkb_ptr->GetAllStmtEntities(kStmtLst);
+        //    break;
         case spa::PRINT:
             result_int = pkb_ptr->GetAllStmtEntities(kPrint);
             break;
