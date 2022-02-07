@@ -20,7 +20,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     ProgramKnowledgeBase(const ProgramKnowledgeBase &) = delete;
 
     // the only valid constructor is one that has all the init parameters
-    explicit ProgramKnowledgeBase(std::shared_ptr<Init> init);
+    explicit ProgramKnowledgeBase(std::shared_ptr<BasicEntities> init);
 
     //set stmtLst: useful for Parent and Follows relationships
     void set_index(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index);
@@ -32,13 +32,13 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void set_rel(Index<kPrint> stmt_no, Index<kVar> var_index);
 
     //mark the end of source processor -> construct necessary data structures
-    void set_end();
+    void Compile();
 
   private:
     //leaving index 0 empty for all vectors to preserve consistency
 
     //a pointer to store all the vectors of entities - as the parameter of class constructor
-    std::shared_ptr<Init> entities_ptr_;
+    std::shared_ptr<BasicEntities> entities_ptr_;
 
     //vectors resized by constructor
     std::vector<STMTLST_NO> proc_stmtlst_;
