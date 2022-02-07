@@ -4,19 +4,6 @@
 #include "declaration.h"
 
 namespace spa {
-//enum class SelectType{
-//    STMT,
-//    READ,
-//    PRINT,
-//    CALL,
-//    WHILE,
-//    IF,
-//    ASSIGN,
-//    VARIABLE,
-//    CONSTANT,
-//    PROCEDURE,
-//};
-
 class Select{
   private:
     DeclarationType type;

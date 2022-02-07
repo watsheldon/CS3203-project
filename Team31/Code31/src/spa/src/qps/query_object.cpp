@@ -1,9 +1,8 @@
 #include "query_object.h"
 
-using namespace spa;
-
+namespace spa{
 QueryObject::QueryObject(std::vector<Declaration> decls, Select sel) : select(sel),
-declarations(decls) {}
+                                                                       declarations(decls) {}
 
 
 std::vector<Declaration> QueryObject::getDeclarations(){
@@ -12,6 +11,4 @@ std::vector<Declaration> QueryObject::getDeclarations(){
 Select QueryObject::getSelect(){
     return select;
 }
-
-
-
+}

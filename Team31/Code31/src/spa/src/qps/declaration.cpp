@@ -1,7 +1,6 @@
 #include "declaration.h"
 
-using namespace spa;
-
+namespace spa{
 Declaration::Declaration(DeclarationType d_type, std::string d_synonym) {
     type = d_type;
     synonym = d_synonym;
@@ -14,3 +13,5 @@ DeclarationType Declaration::getDeclarationType() {
 std::string Declaration::getDeclarationSynonym(){
     return synonym;
 }
+}
+

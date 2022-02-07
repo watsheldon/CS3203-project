@@ -1,6 +1,6 @@
 #include "token.h"
-using namespace spa;
 
+namespace spa{
 Token::Token(TokenType type, std::string string) : type(type), string(string){}
 
 
@@ -11,6 +11,9 @@ TokenType Token::getTokenType(){
 std::string Token::getString(){
     return string;
 }
+}
+
+
 
 
 

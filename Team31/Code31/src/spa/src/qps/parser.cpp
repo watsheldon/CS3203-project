@@ -6,8 +6,7 @@
 #include <stdexcept>
 #include <ctype.h>
 
-using namespace spa;
-
+namespace spa{
 QueryObject parser::parseQuery(const std::string& inputFile){
     std::string str = inputFile;
     PQLTokenizer tokenizer(str);
@@ -108,7 +107,7 @@ bool parser::checkIdent(std::string s){
     }
     return true;
 }
-
+}
 
 
 
