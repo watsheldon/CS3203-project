@@ -2,9 +2,10 @@
 #define SRC_SPA_SRC_SOURCE_TOKEN_H_
 
 #include <string>
+#include <utility>
 
 namespace spa {
-enum TokenType {
+enum SourceTokenType {
     kKeywordProcedure,
     kKeywordRead,
     kKeywordPrint,
@@ -37,7 +38,7 @@ enum TokenType {
     kInteger,
 };
 
-constexpr std::string_view Keyword(TokenType token_type) {
+constexpr std::string_view Keyword(SourceTokenType token_type) {
     switch (token_type) {
         case kKeywordProcedure:return "procedure";
         case kKeywordRead:return "read";
@@ -73,8 +74,12 @@ constexpr std::string_view Keyword(TokenType token_type) {
 }
 
 struct Token {
-    const TokenType type;
+    const SourceTokenType type;
     const std::string value;
+
+    explicit Token(const SourceTokenType &t) : type(t) {}
+    Token(const SourceTokenType &t, std::string v)
+            : type(t), value(std::move(v)) {}
     bool operator==(const Token &other) {
         if (type != other.type)
             return false;
