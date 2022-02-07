@@ -25,23 +25,23 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     explicit ProgramKnowledgeBase(std::shared_ptr<Init> init);
 
     //set stmtLst: useful for Parent and Follows relationships
-    void set_index(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index);
-    void set_index(Index<kWhile> stmt_no, Index<kStmtLst> stmtlst_index);
-    void set_index(Index<kIf> stmt_no, Index<kStmtLst> stmtlst_index1, Index<kStmtLst> stmtlst_index2);
-    void set_lst(Index<kStmtLst> stmtlst_index, std::vector<STMT_NO> stmtlst);
+    void SetIndex(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index);
+    void SetIndex(Index<kWhile> stmt_no, Index<kStmtLst> stmtlst_index);
+    void SetIndex(Index<kIf> stmt_no, Index<kStmtLst> stmtlst_index1, Index<kStmtLst> stmtlst_index2);
+    void SetLst(Index<kStmtLst> stmtlst_index, std::vector<STMT_NO> stmtlst);
 
     //set direct Uses and Modifies relationships
-    void set_rel(Index<kPrint> stmt_no, Index<kVar> var_index);
+    void SetRel(Index<kPrint> stmt_no, Index<kVar> var_index);
 
-    void set();
+    void Set();
     //mark the end of source processor -> construct necessary data structures
-    void set_end();
+    void SetEnd();
 
-    std::vector<std::string> get_all_string_entities(EntityType et); // For procedures,variables,constants
-    std::vector<int> get_all_stmt_entities(EntityType et); // For stmt
-    std::vector<std::string> to_name(std::vector<int> index_list, EntityType et); // convert index to string
+    std::vector<std::string> GetAllStringEntities(EntityType et); // For procedures,variables,constants
+    std::vector<int> GetAllStmtEntities(EntityType et); // For stmt
+    std::vector<std::string> IndexToName(std::vector<int> index_list, EntityType et); // convert index to string
 
-    const int REMOVE_INDEX_0_FOR_STMT_ENTITY = 6;
+    const int STMT_TYPE_COUNT = 6;
 
   private:
     //leaving index 0 empty for all vectors to preserve consistency

@@ -46,8 +46,8 @@ struct Index {
 class KnowledgeBase {
   public:
     virtual ~KnowledgeBase() = 0;
-    virtual void set() = 0;
-    virtual void set_end() = 0;
+    virtual void Set() = 0;
+    virtual void SetEnd() = 0;
 };
 
 inline KnowledgeBase::~KnowledgeBase() {}
