@@ -28,7 +28,6 @@ std::string main_logic::GetData(const std::shared_ptr<spa::ProgramKnowledgeBase>
         case FilterType::MODIFIES:
         case FilterType::PATTERN:
         default:
-            throw std::runtime_error("Something!");
     }
 
     // consider the cases where we have to return GetSimpleQuery even if other clauses are present
@@ -78,7 +77,7 @@ spa::main_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase>
             result_string = pkb_ptr->GetAllStringEntities(kConst);
             break;
         default:
-            throw std::runtime_error("Target type is invalid!");
+            break;
     }
     return std::make_pair(result_int, result_string);
 }

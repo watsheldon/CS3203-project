@@ -7,7 +7,7 @@
 #include <vector>
 
 using namespace spa;
-
+/**
 dependency_graph::dependency_graph(int num_nodes) {
 
     this->num_vert = num_nodes;
@@ -60,3 +60,4 @@ std::vector<std::vector<int> > dependency_graph::GetConnectedNodes() {
     delete[] visited;
     return allGroups;
 }
+*/

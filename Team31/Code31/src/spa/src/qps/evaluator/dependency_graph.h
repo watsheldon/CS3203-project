@@ -7,9 +7,10 @@
 
 #include <list>
 #include <map>
+#include <vector>
 
 namespace spa {
-
+/**
 class dependency_graph {
 
   public:
@@ -27,7 +28,7 @@ class dependency_graph {
     std::vector<int> RunDfs(int i, bool visited[], std::vector<int> group);
 
 };
-
+*/
 }
 
 #endif //INC_21S2_CP_SPA_TEAM_31_DEPENDENCYGRAPH_H
