@@ -8,12 +8,11 @@
 namespace spa {
 
     class parser{
-        QueryObject parseQuery(const std::string &inputFile);
-        bool validate(std::vector<Token> tokenList);
-        expect comma
-        expect semicolon
-        expect declaration
-        expect "select"
+        QueryObject parseQuery(const std::string& inputFile);
+        std::vector<Declaration> parseDeclarations(std::vector<Token> tokenList, int endPos);
+        Select parseSelect(std::vector<Token> tokenList, int startPos, std::vector<Declaration>);
+        bool checkIdent(std::string s);
+        DeclarationType getType(Token token);
     };
 }
 

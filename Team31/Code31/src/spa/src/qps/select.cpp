@@ -2,7 +2,11 @@
 
 using namespace spa;
 
-SelectType Select::getSelectType(){
+Select::Select(DeclarationType s_type, std::string s_synonym) {
+    type = s_type;
+    synonym = s_synonym;
+}
+DeclarationType Select::getSelectType(){
     return type;
 }
 std::string Select::getSelectSynonym(){

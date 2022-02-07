@@ -8,7 +8,7 @@ namespace spa {
         PARENT,
         PARENT_T,
         USES_S,
-        USES_P,w
+        USES_P,
         MODIFIES_S,
         MODIFIES_P,
     };
