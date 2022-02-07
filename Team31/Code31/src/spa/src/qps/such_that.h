@@ -1,0 +1,16 @@
+#ifndef SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_SUCHTHAT_H_
+#define SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_SUCHTHAT_H_
+
+namespace spa {
+    enum class SuchThat{
+        FOLLOWS,
+        FOLLOWS_T,
+        PARENT,
+        PARENT_T,
+        USES_S,
+        USES_P,
+        MODIFIES_S,
+        MODIFIES_P,
+    };
+}
+#endif //SPA_TEAM31_CODE31_SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_SUCHTHAT_H_
