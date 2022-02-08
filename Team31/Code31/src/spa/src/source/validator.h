@@ -1,7 +1,7 @@
 #ifndef SRC_SPA_SRC_SOURCE_VALIDATOR_H_
 #define SRC_SPA_SRC_SOURCE_VALIDATOR_H_
 
-#include "tokenizer.h"
+#include "common/tokenizer.h"
 
 #include <filesystem>
 #include <memory>

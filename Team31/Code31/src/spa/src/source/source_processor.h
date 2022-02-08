@@ -1,14 +1,12 @@
 #ifndef SRC_SPA_SRC_SOURCE_SOURCE_PROCESSOR_H_
 #define SRC_SPA_SRC_SOURCE_SOURCE_PROCESSOR_H_
 
-#include <string>
-#include <memory>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
+#include <memory>
+#include <string>
 
-#include "pkb/program_knowledge_base.h"
 #include "pkb/knowledge_base.h"
-#include "tokenizer.h"
 
 namespace spa {
 class SourceProcessor {

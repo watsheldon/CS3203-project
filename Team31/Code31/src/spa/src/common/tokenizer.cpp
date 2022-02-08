@@ -7,11 +7,19 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <string_view>
 
 namespace spa {
 Tokenizer::Tokenizer(const std::filesystem::path &filepath) {
     std::ifstream source(filepath);
     buffer_ << source.rdbuf();
+}
+Tokenizer::Tokenizer(std::string_view str) {
+    buffer_.str(str.data());
+}
+Tokenizer &Tokenizer::operator()(std::string_view str) {
+    buffer_.str(str.data());
+    return *this;
 }
 std::string Tokenizer::Next() {
     if (!buffer_)
