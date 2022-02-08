@@ -6,11 +6,10 @@
 #include <set>
 
 #include "constant_node.h"
-#include "indexed_node.h"
 #include "variable_node.h"
 
 namespace spa {
-class ConditionNode : public IndexedNode<ConditionNode> {
+class ConditionNode : public AbstractSyntaxTreeNode {
   public:
     template<typename T>
     using SharedPtrSet = std::set<std::shared_ptr<T>>;

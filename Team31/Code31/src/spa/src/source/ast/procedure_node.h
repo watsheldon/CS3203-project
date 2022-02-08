@@ -4,14 +4,17 @@
 #include <memory>
 
 #include "indexed_node.h"
-#include "stmt_lst_node.h"
+#include "visitable.h"
+#include "visitor.h"
 
 namespace spa {
 class StmtLstNode;
-class ProcedureNode : public IndexedNode<ProcedureNode> {
+class ProcedureNode : public IndexedNode<ProcedureNode>, public Visitable {
   public:
     void set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst);
-    std::shared_ptr<StmtLstNode> get_stmtlst() const;
+    [[nodiscard]] std::shared_ptr<StmtLstNode> get_stmtlst() const;
+  private:
+    void Accept(AstVisitor &visitor) const override;
 
   private:
     std::shared_ptr<StmtLstNode> stmt_lst_;

@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "stmt_lst_node.h"
+#include "visitor.h"
 
 namespace spa {
 void ProcedureNode::set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst) {
@@ -11,5 +12,8 @@ void ProcedureNode::set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst) {
 }
 std::shared_ptr<StmtLstNode> ProcedureNode::get_stmtlst() const {
     return stmt_lst_;
+}
+void ProcedureNode::Accept(AstVisitor &visitor) const {
+    visitor.Visit(*this);
 }
 } // namespace spa

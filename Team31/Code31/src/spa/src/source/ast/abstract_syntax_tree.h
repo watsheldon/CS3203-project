@@ -5,8 +5,8 @@
 #include <vector>
 #include <set>
 
-#include "source/token.h"
 #include "pkb/knowledge_base.h"
+#include "source/token.h"
 
 namespace spa {
 class AbstractSyntaxTree {
