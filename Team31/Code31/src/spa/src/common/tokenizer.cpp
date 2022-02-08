@@ -1,9 +1,9 @@
 #include "tokenizer.h"
 
+#include <algorithm>
+#include <cassert>
 #include <cctype>
 #include <cstring>
-
-#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -16,83 +16,78 @@ Tokenizer::Tokenizer(const std::filesystem::path &filepath) {
 }
 Tokenizer::Tokenizer(std::string_view str) {
     buffer_.str(str.data());
+    error = false;
 }
 Tokenizer &Tokenizer::operator()(std::string_view str) {
     buffer_.str(str.data());
+    error = false;
     return *this;
 }
 std::string Tokenizer::Next() {
-    if (!buffer_)
-        return {};
-
     std::string token;
-    // token might contain extraneous characters caused by optional whitespace
-    buffer_ >> token;
+    ExtractInto(token);
+    return token;
+}
+void Tokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
+    auto last = std::find_if_not(token.begin() + 1, token.end(), pred);
+    if (last == token.end()) return;
+    KeepFirstOf(token, last - token.begin());
+}
+void Tokenizer::KeepFirstOf(std::string &token, long len) {
+    assert(len <= token.length());
+    if (token.length() == len) return;
+
+    buffer_.seekg(len - (long)token.length(), std::ios_base::cur);
+    token.resize(len);
+}
+void Tokenizer::ExtractInto(std::string &token) {
+    if (!(buffer_ >> token)) error = true;
+    if (error) {
+        token.resize(0);
+        return;
+    }
 
     // identifiers / keywords
     if (std::isalpha(token[0])) {
-        auto last = std::find_if_not(token.begin() + 1, token.end(), isalnum);
-        if (last == token.end())
-            return token;
-
-        // reverse the stream
-        buffer_.seekg(last - token.end(), std::ios_base::cur);
-        return token.substr(0, last - token.begin());
+        return KeepWhile(token, std::isalnum);
     }
-
     // constants
     if (std::isdigit(token[0])) {
-        auto last = std::find_if_not(token.begin() + 1, token.end(), isdigit);
-        if (last == token.end())
-            return token;
-
-        // reverse the stream
-        buffer_.seekg(last - token.end(), std::ios_base::cur);
-        return token.substr(0, last - token.begin());
+        return KeepWhile(token, std::isdigit);
     }
-
     if (std::strchr(kSpecialSingle, token[0])) {
-        // either len 1 or followed by alnum
-        if (token.length() == 1)
-            return token;
-
-        // reverse the stream
-        buffer_.seekg(1 - (long) token.length(), std::ios_base::cur);
-        return token.substr(0, 1);
+        return KeepFirstOf(token, 1);
     }
-
+    // For && and ||
     if (std::strchr(kSpecialPaired, token[0])) {
-        if (token.length() == 1)
-            return {};
-
-        if (token[0] == token[1]) {
-            if (token.length() == 2)
-                return token;
-
-            // reverse the stream
-            buffer_.seekg(2 - (long) token.length(), std::ios_base::cur);
-            return token.substr(0, 2);
+        if (token.length() == 1 || token[0] != token[1]) {
+            token.resize(0);
+            error = true;
+            return;
         }
-        return {};
+        return KeepFirstOf(token, 2);
     }
-
+    // for ==, !=, <=, >=
     if (std::strchr(kSpecialMaybePaired, token[0])) {
-        if (token.length() == 1 || std::isalnum(token[1]))
-            return token.substr(0, 1);
-
-        if (token[1] != '=')
-            return {};
-
-        if (token.length() == 2)
-            return token;
-
-        // reverse the stream
-        buffer_.seekg(2 - (long) token.length(), std::ios_base::cur);
-        return token.substr(0, 2);
+        if (token.length() == 1) {
+            return;
+        }
+        if (std::isalnum(token[1])) {
+            return KeepFirstOf(token, 1);
+        }
+        if (token[1] != '=') {
+            token.resize(0);
+            error = true;
+            return;
+        }
+        return KeepFirstOf(token, 2);
     }
 
     // this should not be reached unless an illegal character is present
-    return {};
+    error = true;
 }
+Tokenizer &Tokenizer::operator>>(std::string &token) {
+    ExtractInto(token);
+    return *this;
 }
-
+}  // namespace spa

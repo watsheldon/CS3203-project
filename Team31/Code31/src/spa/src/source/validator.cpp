@@ -34,8 +34,8 @@ void Validator::Program() {
     while (curr_token_.length())
         Procedure();
 }
-void Validator::fetchToken() {
-    curr_token_ = tokenizer_.Next();
+inline void Validator::fetchToken() {
+    tokenizer_ >> curr_token_;
 }
 bool Validator::accept(SourceTokenType type) {
     if (curr_token_.empty())

@@ -21,7 +21,7 @@ class Tokenizer {
      */
     explicit Tokenizer(std::string_view str);
     /**
-     * Updates the internal content of the Tokenizer.
+     * Updates the internal content of the Tokenizer and clears any error.
      * @param str The new content of the Tokenizer
      * @return The current instance of the Tokenizer
      */
@@ -29,17 +29,28 @@ class Tokenizer {
     Tokenizer(Tokenizer &&tokenizer) = delete;
 
     /**
-     * Retrieves the Next token if available.
-     * @return the Next valid token if success, empty string otherwise
+     * Retrieves the next token if available.
+     * @return the next valid token if success, empty string otherwise
      */
     std::string Next();
+
+    /**
+     * The stream operator to retrieve the next token.
+     * @param token to store the extracted token.
+     */
+    Tokenizer &operator>>(std::string &token);
 
   private:
     static constexpr char kSpecialSingle[] = "%()*+-/;{}";
     static constexpr char kSpecialMaybePaired[] = "!<=>";
     static constexpr char kSpecialPaired[] = "&|";
     std::stringstream buffer_;
-};
-}
+    bool error = false;  // triggered by either EOF or unrecognized token
 
-#endif //SRC_SPA_SRC_COMMON_TOKENIZER_H_
+    void KeepWhile(std::string &token, int (*pred)(int));
+    void KeepFirstOf(std::string &token, long len);
+    void ExtractInto(std::string &token);
+};
+}  // namespace spa
+
+#endif  // SRC_SPA_SRC_COMMON_TOKENIZER_H_
