@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "abstract_syntax_tree.h"
+#include "ast/abstract_syntax_tree.h"
 #include "design_abstraction_extractor.h"
 #include "pkb/knowledge_base.h"
 #include "validator.h"
