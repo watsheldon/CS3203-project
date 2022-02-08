@@ -29,32 +29,32 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<BasicEntities> init)
     for (int i = 1; i < init->reads.size(); ++i) {
         int stmt_no = init->reads.at(i);
         map_no_index_.at(stmt_no) = i;
-        map_no_type_.at(stmt_no) = kRead;
+        map_no_type_.at(stmt_no) = kReadStmt;
     }
     for (int i = 1; i < init->prints.size(); ++i) {
         int stmt_no = init->prints.at(i);
         map_no_index_.at(stmt_no) = i;
-        map_no_type_.at(stmt_no) = kPrint;
+        map_no_type_.at(stmt_no) = kPrintStmt;
     }
     for (int i = 1; i < init->calls.size(); ++i) {
         int stmt_no = init->calls.at(i);
         map_no_index_.at(stmt_no) = i;
-        map_no_type_.at(stmt_no) = kCall;
+        map_no_type_.at(stmt_no) = kCallStmt;
     }
     for (int i = 1; i < init->whiles.size(); ++i) {
         int stmt_no = init->whiles.at(i);
         map_no_index_.at(stmt_no) = i;
-        map_no_type_.at(stmt_no) = kWhile;
+        map_no_type_.at(stmt_no) = kWhileStmt;
     }
     for (int i = 1; i < init->ifs.size(); ++i) {
         int stmt_no = init->ifs.at(i);
         map_no_index_.at(stmt_no) = i;
-        map_no_type_.at(stmt_no) = kIf;
+        map_no_type_.at(stmt_no) = kIfStmt;
     }
     for (int i = 1; i < init->assigns.size(); ++i) {
         int stmt_no = init->assigns.at(i);
         map_no_index_.at(stmt_no) = i;
-        map_no_type_.at(stmt_no) = kAssign;
+        map_no_type_.at(stmt_no) = kAssignStmt;
     }
 }
 
@@ -62,12 +62,12 @@ void ProgramKnowledgeBase::SetIndex(Index<kProc> proc_index,
                                     Index<kStmtLst> stmtlst_index) {
     proc_stmtlst_.at(proc_index.value) = stmtlst_index.value;
 }
-void ProgramKnowledgeBase::SetIndex(Index<kWhile> stmt_no,
+void ProgramKnowledgeBase::SetIndex(Index<kWhileStmt> stmt_no,
                                     Index<kStmtLst> stmtlst_index) {
     int index = map_no_index_.at(stmt_no.value);
     while_stmtlst_.at(index) = stmtlst_index.value;
 }
-void ProgramKnowledgeBase::SetIndex(Index<kIf> stmt_no,
+void ProgramKnowledgeBase::SetIndex(Index<kIfStmt> stmt_no,
                                     Index<kStmtLst> stmtlst_index1,
                                     Index<kStmtLst> stmtlst_index2) {
     int index = map_no_index_.at(stmt_no.value);
@@ -80,7 +80,7 @@ void ProgramKnowledgeBase::SetLst(Index<kStmtLst> stmtlst_index,
     stmtlsts_.at(stmtlst_index.value) = stmtlst;
 }
 
-void ProgramKnowledgeBase::SetRel(Index<kPrint> stmt_no,
+void ProgramKnowledgeBase::SetRel(Index<kPrintStmt> stmt_no,
                                   Index<kVar> var_index) {
 
 }
@@ -98,7 +98,7 @@ void ProgramKnowledgeBase::Compile() {
 }
 
 std::vector<std::string> ProgramKnowledgeBase::GetAllStringEntities(
-        EntityType et) {
+        PKBEntityType et) {
     std::vector<std::string> results;
     switch (et) {
         case kProc:results.reserve((entities_ptr_->procedures.size()) - 1);
@@ -122,35 +122,35 @@ std::vector<std::string> ProgramKnowledgeBase::GetAllStringEntities(
     return results;
 }
 
-std::vector<int> ProgramKnowledgeBase::GetAllStmtEntities(EntityType et) {
+std::vector<int> ProgramKnowledgeBase::GetAllStmtEntities(PKBEntityType et) {
     std::vector<int> results;
     switch (et) {
-        case kRead:results.reserve((entities_ptr_->reads.size()) - 1);
+        case kReadStmt:results.reserve((entities_ptr_->reads.size()) - 1);
             std::copy(entities_ptr_->reads.begin() + 1,
                       entities_ptr_->reads.end(),
                       std::back_inserter(results));
             break;
-        case kPrint:results.reserve((entities_ptr_->prints.size()) - 1);
+        case kPrintStmt:results.reserve((entities_ptr_->prints.size()) - 1);
             std::copy(entities_ptr_->prints.begin() + 1,
                       entities_ptr_->prints.end(),
                       std::back_inserter(results));
             break;
-        case kCall:results.reserve((entities_ptr_->calls.size()) - 1);
+        case kCallStmt:results.reserve((entities_ptr_->calls.size()) - 1);
             std::copy(entities_ptr_->calls.begin() + 1,
                       entities_ptr_->calls.end(),
                       std::back_inserter(results));
             break;
-        case kWhile:results.reserve((entities_ptr_->whiles.size()) - 1);
+        case kWhileStmt:results.reserve((entities_ptr_->whiles.size()) - 1);
             std::copy(entities_ptr_->whiles.begin() + 1,
                       entities_ptr_->whiles.end(),
                       std::back_inserter(results));
             break;
-        case kIf:results.reserve((entities_ptr_->ifs.size()) - 1);
+        case kIfStmt:results.reserve((entities_ptr_->ifs.size()) - 1);
             std::copy(entities_ptr_->ifs.begin() + 1,
                       entities_ptr_->ifs.end(),
                       std::back_inserter(results));
             break;
-        case kAssign:results.reserve((entities_ptr_->assigns.size()) - 1);
+        case kAssignStmt:results.reserve((entities_ptr_->assigns.size()) - 1);
             std::copy(entities_ptr_->assigns.begin() + 1,
                       entities_ptr_->assigns.end(),
                       std::back_inserter(results));
@@ -167,7 +167,7 @@ std::vector<int> ProgramKnowledgeBase::GetAllStmtEntities(EntityType et) {
 }
 
 std::vector<std::string> ProgramKnowledgeBase::IndexToName(std::vector<int> index_list,
-                                                           EntityType et) {
+                                                           PKBEntityType et) {
     std::vector<std::string> results;
     results.reserve(index_list.size());
     switch (et) {

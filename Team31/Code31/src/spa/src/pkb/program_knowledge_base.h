@@ -25,17 +25,17 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     explicit ProgramKnowledgeBase(std::shared_ptr<BasicEntities> init);
 
     //set stmtLst: useful for Parent and Follows relationships
-    void SetIndex(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index);
-    void SetIndex(Index<kWhile> stmt_no, Index<kStmtLst> stmtlst_index);
-    void SetIndex(Index<kIf> stmt_no, Index<kStmtLst> stmtlst_index1, Index<kStmtLst> stmtlst_index2);
-    void SetLst(Index<kStmtLst> stmtlst_index, std::vector<STMT_NO> stmtlst);
+    void SetIndex(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index) override;
+    void SetIndex(Index<kWhileStmt> stmt_no, Index<kStmtLst> stmtlst_index) override;
+    void SetIndex(Index<kIfStmt> stmt_no, Index<kStmtLst> stmtlst_index1, Index<kStmtLst> stmtlst_index2) override;
+    void SetLst(Index<kStmtLst> stmtlst_index, std::vector<STMT_NO> stmtlst) override;
 
     //set direct Uses and Modifies relationships
-    void SetRel(Index<kPrint> stmt_no, Index<kVar> var_index);
+    void SetRel(Index<kPrintStmt> stmt_no, Index<kVar> var_index) override;
 
-    std::vector<std::string> GetAllStringEntities(EntityType et); // For procedures,variables,constants
-    std::vector<int> GetAllStmtEntities(EntityType et); // For stmt
-    std::vector<std::string> IndexToName(std::vector<int> index_list, EntityType et); // convert index to string
+    std::vector<std::string> GetAllStringEntities(PKBEntityType et) override; // For procedures,variables,constants
+    std::vector<int> GetAllStmtEntities(PKBEntityType et) override; // For stmt
+    std::vector<std::string> IndexToName(std::vector<int> index_list, PKBEntityType et) override; // convert index to string
 
     const int STMT_TYPE_COUNT = 6;
   
@@ -61,7 +61,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     //vector to map from stmt_no to internal index of different stmt types
     std::vector<INDEX> map_no_index_;
     //vector to map from stmt_no to its stmt type
-    std::vector<EntityType> map_no_type_;
+    std::vector<PKBEntityType> map_no_type_;
     //vector to map from stmt_no to its stmtlst's index
     std::vector<STMTLST_NO> map_no_lst_;
 

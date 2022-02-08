@@ -47,25 +47,25 @@ spa::main_logic::GetSimpleQuery(const std::shared_ptr<spa::ProgramKnowledgeBase>
             result_int = pkb_ptr->GetAllStmtEntities(kStmt);
             break;
         case spa::ASSIGN:
-            result_int = pkb_ptr->GetAllStmtEntities(kAssign);
+            result_int = pkb_ptr->GetAllStmtEntities(kAssignStmt);
             break;
         case spa::WHILE:
-            result_int = pkb_ptr->GetAllStmtEntities(kWhile);
+            result_int = pkb_ptr->GetAllStmtEntities(kWhileStmt);
             break;
         case spa::IF:
-            result_int = pkb_ptr->GetAllStmtEntities(kIf);
+            result_int = pkb_ptr->GetAllStmtEntities(kIfStmt);
             break;
         case spa::READ:
-            result_int = pkb_ptr->GetAllStmtEntities(kRead);
+            result_int = pkb_ptr->GetAllStmtEntities(kReadStmt);
             break;
         //case spa::CONTAINER:
         //    result_int = pkb_ptr->GetAllStmtEntities(kStmtLst);
         //    break;
         case spa::PRINT:
-            result_int = pkb_ptr->GetAllStmtEntities(kPrint);
+            result_int = pkb_ptr->GetAllStmtEntities(kPrintStmt);
             break;
         case spa::CALL:
-            result_int = pkb_ptr->GetAllStmtEntities(kCall);
+            result_int = pkb_ptr->GetAllStmtEntities(kCallStmt);
             break;
         case spa::PROCEDURE:
             result_string = pkb_ptr->GetAllStringEntities(kProc);
