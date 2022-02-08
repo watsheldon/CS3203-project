@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "abstract_syntax_tree.h"
+#include "ast/abstract_syntax_tree.h"
 #include "pkb/knowledge_base.h"
 
 namespace spa {
