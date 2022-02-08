@@ -10,7 +10,7 @@
 
 namespace spa {
 Tokenizer::Tokenizer(const std::filesystem::path &filepath) {
-    std::ifstream source;
+    std::ifstream source(filepath);
     buffer_ << source.rdbuf();
 }
 std::string Tokenizer::Next() {
@@ -28,7 +28,7 @@ std::string Tokenizer::Next() {
             return token;
 
         // reverse the stream
-        buffer_.seekp(last - token.end(), std::ios_base::cur);
+        buffer_.seekg(last - token.end(), std::ios_base::cur);
         return token.substr(0, last - token.begin());
     }
 
@@ -39,7 +39,7 @@ std::string Tokenizer::Next() {
             return token;
 
         // reverse the stream
-        buffer_.seekp(last - token.end(), std::ios_base::cur);
+        buffer_.seekg(last - token.end(), std::ios_base::cur);
         return token.substr(0, last - token.begin());
     }
 
@@ -49,7 +49,7 @@ std::string Tokenizer::Next() {
             return token;
 
         // reverse the stream
-        buffer_.seekp(1 - (long) token.length(), std::ios_base::cur);
+        buffer_.seekg(1 - (long) token.length(), std::ios_base::cur);
         return token.substr(0, 1);
     }
 
@@ -62,7 +62,7 @@ std::string Tokenizer::Next() {
                 return token;
 
             // reverse the stream
-            buffer_.seekp(2 - (long) token.length(), std::ios_base::cur);
+            buffer_.seekg(2 - (long) token.length(), std::ios_base::cur);
             return token.substr(0, 2);
         }
         return {};
@@ -79,7 +79,7 @@ std::string Tokenizer::Next() {
             return token;
 
         // reverse the stream
-        buffer_.seekp(2 - (long) token.length(), std::ios_base::cur);
+        buffer_.seekg(2 - (long) token.length(), std::ios_base::cur);
         return token.substr(0, 2);
     }
 

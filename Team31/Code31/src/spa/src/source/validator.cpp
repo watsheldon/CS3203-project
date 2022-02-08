@@ -6,7 +6,8 @@
 
 namespace spa {
 Validator::Validator(const std::filesystem::path &filepath)
-        : tokenizer_(filepath) {}
+        : tokenizer_(filepath),
+          tokens_(std::make_shared<std::vector<Token>>()) {}
 std::shared_ptr<std::vector<Token>> Validator::Validate() {
     Program();
     if (has_error_)
@@ -29,6 +30,7 @@ bool Validator::expect(SourceTokenType type) {
     return false;
 }
 void Validator::Program() {
+    fetchToken();
     while (curr_token_.length())
         Procedure();
 }
@@ -39,7 +41,8 @@ bool Validator::accept(SourceTokenType type) {
     if (curr_token_.empty())
         return false;
     if (type < kName) {
-        if (curr_token_ != Keyword(type))
+        auto target = Keyword(type);
+        if (curr_token_ != target)
             return false;
         tokens_->emplace_back(type);
         fetchToken();
