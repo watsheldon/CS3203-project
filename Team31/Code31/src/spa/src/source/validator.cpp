@@ -2,12 +2,182 @@
 
 #include <memory>
 
-namespace spa {
-Validator::Validator(const std::filesystem::path &filepath) : tokenizer_(
-        filepath) {
+#include "token.h"
 
+namespace spa {
+Validator::Validator(const std::filesystem::path &filepath)
+        : tokenizer_(filepath) {}
+std::shared_ptr<std::vector<Token>> Validator::Validate() {
+    Program();
+    if (has_error_)
+        return {};
+
+    return tokens_;
 }
-std::shared_ptr<std::vector<Token>> spa::Validator::Validate() {
-    return {};
+void Validator::Procedure() {
+    expect(kKeywordProcedure);
+    expect(kName); // proc_name
+    expect(kBraceL);
+    StmtLst();
+    expect(kBraceR);
+}
+bool Validator::expect(SourceTokenType type) {
+    if (accept(type))
+        return true;
+
+    has_error_ = true;
+    return false;
+}
+void Validator::Program() {
+    while (curr_token_.length())
+        Procedure();
+}
+void Validator::fetchToken() {
+    curr_token_ = tokenizer_.Next();
+}
+bool Validator::accept(SourceTokenType type) {
+    if (curr_token_.empty())
+        return false;
+    if (type < kName) {
+        if (curr_token_ != Keyword(type))
+            return false;
+        tokens_->emplace_back(type);
+        fetchToken();
+        return true;
+    }
+    if (type == kName) {
+        if (!std::isalpha(curr_token_[0]))
+            return false;
+        tokens_->emplace_back(type, curr_token_);
+        fetchToken();
+        return true;
+    }
+    if (IsConstant()) {
+        tokens_->emplace_back(type, curr_token_);
+        fetchToken();
+        return true;
+    }
+    return false;
+}
+bool Validator::IsConstant() const {
+    if (!std::isdigit(curr_token_[0]))
+        return false;
+    return curr_token_.length() == 1 || curr_token_[0] != kZero;
+}
+void Validator::StmtLst() {
+    Stmt(true);
+}
+void Validator::Stmt(bool first) {
+    if (accept(kKeywordRead)) {
+        Read();
+    } else if (accept(kKeywordPrint)) {
+        Print();
+    } else if (accept(kKeywordCall)) {
+        Call();
+    } else if (accept(kKeywordWhile)) {
+        While();
+    } else if (accept(kKeywordIf)) {
+        If();
+    } else if (accept(kName)) {
+        Assign();
+    } else if (first) {
+        has_error_ = true;
+        return;
+    } else {
+        return;
+    }
+    Stmt();
+}
+void Validator::Read() {
+    expect(kName);
+    expect(kSemicolon);
+}
+void Validator::Print() {
+    expect(kName);
+    expect(kSemicolon);
+}
+void Validator::Call() {
+    expect(kName);
+    expect(kSemicolon);
+}
+void Validator::While() {
+    expect(kBracketL);
+    CondExpr();
+    expect(kBracketR);
+    expect(kBraceL);
+    StmtLst();
+    expect(kBraceR);
+}
+void Validator::If() {
+    expect(kBracketL);
+    CondExpr();
+    expect(kBracketR);
+    expect(kKeywordThen);
+    expect(kBraceL);
+    StmtLst();
+    expect(kBraceR);
+    expect(kKeywordElse);
+    expect(kBraceL);
+    StmtLst();
+    expect(kBraceR);
+}
+void Validator::Assign() {
+    expect(kAssignEqual);
+    Expr();
+    expect(kSemicolon);
+}
+void Validator::CondExpr() {
+    if (accept(kCondNot)) {
+        expect(kBracketL);
+        CondExpr();
+        expect(kBracketR);
+    } else if (accept(kBracketL)) {
+        CondExpr();
+        expect(kBracketR);
+        if (accept(kCondAnd) || accept(kCondOr)) {
+            expect(kBracketL);
+            CondExpr();
+            expect(kBracketR);
+        } else {
+            has_error_ = true;
+            return;
+        }
+    } else {
+        RelExpr();
+    }
+}
+void Validator::RelExpr() {
+    Expr();
+    if (!(accept(kRelGt) || accept(kRelGeq) ||
+            accept(kRelLt) || accept(kRelLeq) ||
+            accept(kRelEq) || accept(kRelNeq))) {
+        has_error_ = true;
+        return;
+    }
+    Expr();
+}
+void Validator::Factor() {
+    if (accept(kName) || accept(kInteger)) {
+        // pass
+    } else if (accept(kBracketL)) {
+        Expr();
+        expect(kBracketR);
+    } else {
+        has_error_ = true;
+        return;
+    }
+}
+void Validator::Term() {
+    Factor();
+    while (accept(kOperatorTimes) || accept(kOperatorDivide) ||
+            accept(kOperatorModulo)) {
+        Factor();
+    }
+}
+void Validator::Expr() {
+    Term();
+    while (accept(kOperatorPlus) || accept(kOperatorMinus)) {
+        Term();
+    }
 }
 }

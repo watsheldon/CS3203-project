@@ -1,8 +1,11 @@
 #include "source_processor.h"
-#include "pkb/knowledge_base.h"
-#include "validator.h"
+
+#include <memory>
+
 #include "abstract_syntax_tree.h"
 #include "design_abstraction_extractor.h"
+#include "pkb/knowledge_base.h"
+#include "validator.h"
 
 namespace spa {
 SourceProcessor::SourceProcessor(const std::string &filename)
@@ -12,7 +15,6 @@ std::shared_ptr<KnowledgeBase> SourceProcessor::Parse() {
     auto tokens = validator.Validate();
     auto ast = std::make_shared<AbstractSyntaxTree>(tokens);
     DesignAbstractionExtractor dae(ast);
-    auto pkb = dae.Extract();
-    return pkb;
+    return dae.Extract();
 }
 }

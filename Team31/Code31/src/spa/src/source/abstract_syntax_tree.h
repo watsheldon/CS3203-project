@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <set>
 
 #include "token.h"
 #include "pkb/knowledge_base.h"
@@ -15,6 +16,14 @@ class AbstractSyntaxTree {
     std::shared_ptr<BasicEntities> getInitEntities() const;
   private:
     SharedVecToken tokens_;
+    std::shared_ptr<BasicEntities> basic_entities_;
+    std::set<std::string> variables_;
+    std::set<std::string> procedures_;
+    std::set<std::string> constants_;
+
+    void AddProcedure(const std::string &name);
+    void AddVariable(const std::string &name);
+    void AddConstant(const std::string &value);
 };
 }
 
