@@ -53,11 +53,11 @@ void WhileNode::set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst) {
 std::shared_ptr<StmtLstNode> WhileNode::get_stmtlst() const {
     return stmt_lst_;
 }
-void ReadWriteNode::set_variable(std::shared_ptr<VariableNode> variable) {
+void ReadPrintNode::set_variable(std::shared_ptr<VariableNode> variable) {
     variable_ = std::move(variable);
 }
-std::shared_ptr<VariableNode> ReadWriteNode::get_variable() const {
+std::shared_ptr<VariableNode> ReadPrintNode::get_variable() const {
     return variable_;
 }
-ReadWriteNode::~ReadWriteNode() = default;
+ReadPrintNode::~ReadPrintNode() = default;
 } // namespace spa

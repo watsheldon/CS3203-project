@@ -63,17 +63,17 @@ class WhileNode : public ContainerNode {
   private:
     std::shared_ptr<StmtLstNode> stmt_lst_;
 };
-class ReadWriteNode : public StatementNode {
+class ReadPrintNode : public StatementNode {
   public:
     void set_variable(std::shared_ptr<VariableNode> variable);
     [[nodiscard]] std::shared_ptr<VariableNode> get_variable() const;
-    virtual ~ReadWriteNode() = 0;
+    virtual ~ReadPrintNode() = 0;
 
   private:
     std::shared_ptr<VariableNode> variable_;
 };
-class ReadNode : public ReadWriteNode {};
-class WriteNode : public ReadWriteNode {};
+class ReadNode : public ReadPrintNode {};
+class PrintNode : public ReadPrintNode {};
 } // namespace spa
 
 #endif // SRC_SPA_SRC_SOURCE_AST_STATEMENT_NODE_H_
