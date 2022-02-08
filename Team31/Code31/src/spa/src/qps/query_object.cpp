@@ -1,12 +1,11 @@
 #include "query_object.h"
 
 namespace spa{
-QueryObject::QueryObject(std::vector<Declaration> decls, Select sel) : select(sel),
-                                                                       declarations(decls) {}
+QueryObject::QueryObject(Declaration decl, Select sel) : select(sel), declaration(decl) {}
 
 
-std::vector<Declaration> QueryObject::getDeclarations(){
-    return declarations;
+Declaration QueryObject::getDeclaration(){
+    return declaration;
 }
 Select QueryObject::getSelect(){
     return select;

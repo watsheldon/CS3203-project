@@ -8,13 +8,12 @@ namespace spa {
 
     class QueryObject{
       private:
-        std::vector<Declaration> declarations;
+        Declaration declaration;
         Select select;
       public:
-        QueryObject(std::vector<Declaration> decls, Select sel, Select select);
-        std::vector<Declaration> getDeclarations();
+        QueryObject(Declaration decl, Select sel);
+        Declaration getDeclaration();
         Select getSelect();
-        QueryObject(std::vector<Declaration> vector_1, Select select);
     };
 }
 

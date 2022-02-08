@@ -4,7 +4,7 @@
 #include "select.h"
 #include "declaration.h"
 #include <stdexcept>
-#include <ctype.h>
+#include <cctype>
 
 namespace spa{
 QueryObject parser::parseQuery(const std::string& inputFile){
@@ -23,16 +23,17 @@ QueryObject parser::parseQuery(const std::string& inputFile){
     if (pos == 0) {
         throw std::invalid_argument("There must be a Select clause after Declaration!");
     }
-    std::vector<Declaration> declarations = parseDeclarations(tokenList, pos);
-    Select select = parseSelect(tokenList, pos, declarations);
-    QueryObject query_object(declarations, select);
+    Declaration declaration = parseDeclaration(tokenList);
+    Select select = parseSelect(tokenList, pos, declaration);
+    QueryObject query_object(declaration, select);
     return query_object;
 }
 
 
-std::vector<Declaration> parser::parseDeclarations(std::vector<Token> tokenList, int endPos){
-    std::vector<Declaration> declarations;
-    DeclarationType currType = getType(tokenList[0]);
+Declaration parser::parseDeclaration(std::vector<Token> tokenList){
+    //std::vector<Declaration> declarations;
+    Token token = tokenList[0];
+    DeclarationType currType = parser::getType(token);
     std::string synonym = tokenList[1].getString();
     if(!checkIdent(synonym)) {
         throw std::invalid_argument("Synonym must be an alphanumeric string starting with a letter!");
@@ -40,12 +41,14 @@ std::vector<Declaration> parser::parseDeclarations(std::vector<Token> tokenList,
     if(tokenList[2].getString() != ";") {
         throw std::invalid_argument("Declaration clause must end with a semicolon!");
     }
-    declarations.push_back(Declaration(currType, synonym));
+    Declaration declaration(currType, synonym);
+    //declarations.push_back(Declaration(currType, synonym));
+    return declaration;
 }
 
 DeclarationType parser::getType(Token token){
     std::string str = token.getString();
-    if (str =="stmt") {
+    if (str == "stmt") {
         return DeclarationType::STMT;
     }
     if (str == "read") {
@@ -78,18 +81,18 @@ DeclarationType parser::getType(Token token){
     throw std::invalid_argument("Wrong design entity in declaration!");
 }
 
-Select parser::parseSelect(std::vector<Token> tokenList, int startPos, std::vector<Declaration> declarations){
+Select parser::parseSelect(std::vector<Token> tokenList, int startPos, Declaration declaration){
     if (startPos >= tokenList.size() - 1) {
         throw std::out_of_range("There must be a synonym in Select clause!");
     }
     int synPos = startPos + 1;
     Token synToken = tokenList[synPos];
-    Declaration firstDeclaration = declarations[0];
-    if (synToken.getString() == firstDeclaration.getDeclarationSynonym()) {
-        Select select(firstDeclaration.getDeclarationType(), firstDeclaration.getDeclarationSynonym());
-    } else {
+    //Declaration firstDeclaration = declarations[0];
+    if (synToken.getString() != declaration.getDeclarationSynonym()) {
         throw std::invalid_argument("Select synonym must be consistent with declarations!");
     }
+    Select select(declaration.getDeclarationType(), declaration.getDeclarationSynonym());
+    return select;
 }
 
 bool parser::checkIdent(std::string s){

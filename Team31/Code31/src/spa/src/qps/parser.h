@@ -9,8 +9,8 @@ namespace spa {
 
     class parser{
         QueryObject parseQuery(const std::string& inputFile);
-        std::vector<Declaration> parseDeclarations(std::vector<Token> tokenList, int endPos);
-        Select parseSelect(std::vector<Token> tokenList, int startPos, std::vector<Declaration>);
+        Declaration parseDeclaration(std::vector<Token> tokenList);
+        Select parseSelect(std::vector<Token> tokenList, int startPos, Declaration declaration);
         bool checkIdent(std::string s);
         DeclarationType getType(Token token);
     };
