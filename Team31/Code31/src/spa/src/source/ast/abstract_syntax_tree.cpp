@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "source/token.h"
+
 namespace spa {
 AbstractSyntaxTree::AbstractSyntaxTree(SharedVecToken tokens)
         : tokens_(std::move(tokens)),
@@ -19,32 +21,32 @@ AbstractSyntaxTree::AbstractSyntaxTree(SharedVecToken tokens)
     int i = 0;
     while (i < tokens_->size()) {
         switch (tokens_->at(i).type) {
-            case kKeywordProcedure:
+            case SourceTokenType::kKeywordProcedure:
                 AddProcedure(tokens_->at(i + 1).value);
                 i += 3;
                 break;
-            case kKeywordRead:
+            case SourceTokenType::kKeywordRead:
                 basic_entities_->reads.emplace_back(line_number++);
                 AddVariable(tokens_->at(i + 1).value);
                 i += 3;
                 break;
-            case kKeywordPrint:
+            case SourceTokenType::kKeywordPrint:
                 basic_entities_->prints.emplace_back(line_number++);
                 AddVariable(tokens_->at(i + 1).value);
                 i += 3;
                 break;
-            case kKeywordCall:
+            case SourceTokenType::kKeywordCall:
                 basic_entities_->calls.emplace_back(line_number++);
                 i += 3;
                 break;
-            case kKeywordWhile:
+            case SourceTokenType::kKeywordWhile:
                 basic_entities_->whiles.emplace_back(line_number++);
-                while (tokens_->at(++i).type != kBraceL) {
+                while (tokens_->at(++i).type != SourceTokenType::kBraceL) {
                     switch (tokens_->at(i).type) {
-                        case kName:
+                        case SourceTokenType::kName:
                             AddVariable(tokens_->at(i).value);
                             break;
-                        case kInteger:
+                        case SourceTokenType::kInteger:
                             AddConstant(tokens_->at(i).value);
                             break;
                         default:
@@ -53,14 +55,14 @@ AbstractSyntaxTree::AbstractSyntaxTree(SharedVecToken tokens)
                 }
                 ++i;
                 break;
-            case kKeywordIf:
+            case SourceTokenType::kKeywordIf:
                 basic_entities_->ifs.emplace_back(line_number++);
-                while (tokens_->at(++i).type != kBraceL) {
+                while (tokens_->at(++i).type != SourceTokenType::kBraceL) {
                     switch (tokens_->at(i).type) {
-                        case kName:
+                        case SourceTokenType::kName:
                             AddVariable(tokens_->at(i).value);
                             break;
-                        case kInteger:
+                        case SourceTokenType::kInteger:
                             AddConstant(tokens_->at(i).value);
                             break;
                         default:
@@ -69,15 +71,15 @@ AbstractSyntaxTree::AbstractSyntaxTree(SharedVecToken tokens)
                 }
                 ++i;
                 break;
-            case kAssignEqual:
+            case SourceTokenType::kAssignEqual:
                 AddVariable(tokens_->at(i - 1).value);
                 basic_entities_->assigns.emplace_back(line_number++);
-                while (tokens_->at(++i).type != kSemicolon) {
+                while (tokens_->at(++i).type != SourceTokenType::kSemicolon) {
                     switch (tokens_->at(i).type) {
-                        case kName:
+                        case SourceTokenType::kName:
                             AddVariable(tokens_->at(i).value);
                             break;
-                        case kInteger:
+                        case SourceTokenType::kInteger:
                             AddConstant(tokens_->at(i).value);
                             break;
                         default:
@@ -86,29 +88,29 @@ AbstractSyntaxTree::AbstractSyntaxTree(SharedVecToken tokens)
                 }
                 ++i;
                 break;
-            case kKeywordThen:
-            case kKeywordElse:
-            case kBracketL:
-            case kBracketR:
-            case kBraceL:
-            case kBraceR:
-            case kOperatorPlus:
-            case kOperatorMinus:
-            case kOperatorTimes:
-            case kOperatorDivide:
-            case kOperatorModulo:
-            case kCondNot:
-            case kCondAnd:
-            case kCondOr:
-            case kRelLt:
-            case kRelLeq:
-            case kRelEq:
-            case kRelNeq:
-            case kRelGt:
-            case kRelGeq:
-            case kSemicolon:
-            case kName:
-            case kInteger:
+            case SourceTokenType::kKeywordThen:
+            case SourceTokenType::kKeywordElse:
+            case SourceTokenType::kBracketL:
+            case SourceTokenType::kBracketR:
+            case SourceTokenType::kBraceL:
+            case SourceTokenType::kBraceR:
+            case SourceTokenType::kOperatorPlus:
+            case SourceTokenType::kOperatorMinus:
+            case SourceTokenType::kOperatorTimes:
+            case SourceTokenType::kOperatorDivide:
+            case SourceTokenType::kOperatorModulo:
+            case SourceTokenType::kCondNot:
+            case SourceTokenType::kCondAnd:
+            case SourceTokenType::kCondOr:
+            case SourceTokenType::kRelLt:
+            case SourceTokenType::kRelLeq:
+            case SourceTokenType::kRelEq:
+            case SourceTokenType::kRelNeq:
+            case SourceTokenType::kRelGt:
+            case SourceTokenType::kRelGeq:
+            case SourceTokenType::kSemicolon:
+            case SourceTokenType::kName:
+            case SourceTokenType::kInteger:
                 ++i;
                 break;
         }
