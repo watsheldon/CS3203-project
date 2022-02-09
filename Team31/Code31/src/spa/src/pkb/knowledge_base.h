@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "container_node.h"
-#include "polish_notation.h"
+#include "common/polish_notation.h"
 
 namespace spa {
 

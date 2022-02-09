@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
+#include "common/polish_notation.h"
 #include "container_node.h"
 #include "knowledge_base.h"
-#include "polish_notation.h"
 
 namespace spa {
 
