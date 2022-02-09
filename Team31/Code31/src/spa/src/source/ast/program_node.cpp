@@ -10,10 +10,9 @@ bool ProgramNode::AddProcedure(std::shared_ptr<ProcedureNode> procedure) {
     procedures_.emplace_back(std::move(procedure));
     return true;
 }
-AbstractSyntaxTreeNode::SharedPtrVec<ProcedureNode> ProgramNode::get_procedures() const {
+AbstractSyntaxTreeNode::SharedPtrVec<ProcedureNode>
+ProgramNode::get_procedures() const {
     return procedures_;
 }
-void ProgramNode::Accept(AstVisitor &visitor) const {
-    visitor.Visit(*this);
-}
-} // namespace spa
+void ProgramNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
+}  // namespace spa

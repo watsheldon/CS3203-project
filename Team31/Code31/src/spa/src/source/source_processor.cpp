@@ -17,4 +17,4 @@ std::shared_ptr<KnowledgeBase> SourceProcessor::Parse() {
     DesignAbstractionExtractor dae(ast);
     return dae.Extract();
 }
-}
+}  // namespace spa

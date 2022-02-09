@@ -2,4 +2,4 @@
 
 namespace spa {
 AbstractSyntaxTreeNode::~AbstractSyntaxTreeNode() = default;
-} // namespace spa
+}  // namespace spa

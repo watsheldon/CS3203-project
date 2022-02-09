@@ -7,6 +7,6 @@ class Visitable {
   public:
     virtual void Accept(AstVisitor &visitor) const = 0;
 };
-}
+}  // namespace spa
 
-#endif //SRC_SPA_SRC_SOURCE_AST_VISITABLE_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_VISITABLE_H_

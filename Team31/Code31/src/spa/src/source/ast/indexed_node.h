@@ -4,7 +4,7 @@
 #include "abstract_syntax_tree_node.h"
 
 namespace spa {
-template<typename T>
+template <typename T>
 class IndexedNode : public AbstractSyntaxTreeNode {
   public:
     IndexedNode();
@@ -14,6 +14,6 @@ class IndexedNode : public AbstractSyntaxTreeNode {
     inline static int count_ = 0;
     const int index;
 };
-} // namespace spa
+}  // namespace spa
 
-#endif // SRC_SPA_SRC_SOURCE_AST_INDEXED_NODE_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_INDEXED_NODE_H_

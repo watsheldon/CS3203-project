@@ -23,18 +23,19 @@ class AssignNode : public StatementNode {
     void set_lhs(std::shared_ptr<VariableNode> variable);
     void AddRhsNode(std::shared_ptr<AbstractSyntaxTreeNode> node);
     [[nodiscard]] std::shared_ptr<VariableNode> get_lhs() const;
-    [[nodiscard]] SharedPtrVec <AbstractSyntaxTreeNode> get_rhs() const;
+    [[nodiscard]] SharedPtrVec<AbstractSyntaxTreeNode> get_rhs() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
     std::shared_ptr<VariableNode> lhs_;
-    SharedPtrVec <AbstractSyntaxTreeNode> rhs_;
+    SharedPtrVec<AbstractSyntaxTreeNode> rhs_;
 };
 class CallNode : public StatementNode {
   public:
     void setProcedure(std::shared_ptr<ProcedureNode> proc);
     [[nodiscard]] std::shared_ptr<ProcedureNode> get_procedure() const;
     void Accept(AstVisitor &visitor) const override;
+
   private:
     std::shared_ptr<ProcedureNode> procedure_;
 };
@@ -85,6 +86,6 @@ class PrintNode : public ReadPrintNode {
   public:
     void Accept(AstVisitor &visitor) const override;
 };
-} // namespace spa
+}  // namespace spa
 
-#endif // SRC_SPA_SRC_SOURCE_AST_STATEMENT_NODE_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_STATEMENT_NODE_H_

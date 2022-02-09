@@ -40,36 +40,65 @@ enum SourceTokenType {
 
 constexpr std::string_view Keyword(SourceTokenType token_type) {
     switch (token_type) {
-        case kKeywordProcedure:return "procedure";
-        case kKeywordRead:return "read";
-        case kKeywordPrint:return "print";
-        case kKeywordCall:return "call";
-        case kKeywordWhile:return "while";
-        case kKeywordIf:return "if";
-        case kKeywordThen:return "then";
-        case kKeywordElse:return "else";
-        case kBracketL:return "(";
-        case kBracketR:return ")";
-        case kBraceL:return "{";
-        case kBraceR:return "}";
-        case kAssignEqual:return "=";
-        case kOperatorPlus:return "+";
-        case kOperatorMinus:return "-";
-        case kOperatorTimes:return "*";
-        case kOperatorDivide:return "/";
-        case kOperatorModulo:return "%";
-        case kCondNot:return "!";
-        case kCondAnd:return "&&";
-        case kCondOr:return "||";
-        case kRelLt:return "<";
-        case kRelLeq:return "<=";
-        case kRelEq:return "==";
-        case kRelNeq:return "!=";
-        case kRelGt:return ">";
-        case kRelGeq:return ">=";
-        case kSemicolon:return ";";
+        case kKeywordProcedure:
+            return "procedure";
+        case kKeywordRead:
+            return "read";
+        case kKeywordPrint:
+            return "print";
+        case kKeywordCall:
+            return "call";
+        case kKeywordWhile:
+            return "while";
+        case kKeywordIf:
+            return "if";
+        case kKeywordThen:
+            return "then";
+        case kKeywordElse:
+            return "else";
+        case kBracketL:
+            return "(";
+        case kBracketR:
+            return ")";
+        case kBraceL:
+            return "{";
+        case kBraceR:
+            return "}";
+        case kAssignEqual:
+            return "=";
+        case kOperatorPlus:
+            return "+";
+        case kOperatorMinus:
+            return "-";
+        case kOperatorTimes:
+            return "*";
+        case kOperatorDivide:
+            return "/";
+        case kOperatorModulo:
+            return "%";
+        case kCondNot:
+            return "!";
+        case kCondAnd:
+            return "&&";
+        case kCondOr:
+            return "||";
+        case kRelLt:
+            return "<";
+        case kRelLeq:
+            return "<=";
+        case kRelEq:
+            return "==";
+        case kRelNeq:
+            return "!=";
+        case kRelGt:
+            return ">";
+        case kRelGeq:
+            return ">=";
+        case kSemicolon:
+            return ";";
         case kName:
-        case kInteger:return "";
+        case kInteger:
+            return "";
     }
 }
 
@@ -81,11 +110,10 @@ struct Token {
     Token(const SourceTokenType &t, std::string v)
             : type(t), value(std::move(v)) {}
     bool operator==(const Token &other) {
-        if (type != other.type)
-            return false;
+        if (type != other.type) return false;
         return type < kName || value == other.value;
     }
 };
-}
+}  // namespace spa
 
-#endif //SRC_SPA_SRC_SOURCE_TOKEN_H_
+#endif  // SRC_SPA_SRC_SOURCE_TOKEN_H_

@@ -13,7 +13,5 @@ void ProcedureNode::set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst) {
 std::shared_ptr<StmtLstNode> ProcedureNode::get_stmtlst() const {
     return stmt_lst_;
 }
-void ProcedureNode::Accept(AstVisitor &visitor) const {
-    visitor.Visit(*this);
-}
-} // namespace spa
+void ProcedureNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
+}  // namespace spa

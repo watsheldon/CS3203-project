@@ -15,6 +15,6 @@ class VariableNode : public IndexedNode<VariableNode> {
   private:
     const std::string name_;
 };
-} // namespace spa
+}  // namespace spa
 
-#endif // SRC_SPA_SRC_SOURCE_AST_VARIABLE_NODE_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_VARIABLE_NODE_H_

@@ -10,47 +10,42 @@ Validator::Validator(const std::filesystem::path &filepath)
           tokens_(std::make_shared<std::vector<Token>>()) {}
 std::shared_ptr<std::vector<Token>> Validator::Validate() {
     Program();
-    if (has_error_)
-        return {};
+    if (has_error_) return {};
 
     return tokens_;
 }
 void Validator::Procedure() {
     expect(kKeywordProcedure);
-    expect(kName); // proc_name
+    expect(kName);  // proc_name
     expect(kBraceL);
     StmtLst();
     expect(kBraceR);
 }
 bool Validator::expect(SourceTokenType type) {
-    if (accept(type))
+    if (!accept(type)) {
+        has_error_ = true;
+        return false;
+    } else
         return true;
-
-    has_error_ = true;
-    return false;
 }
 void Validator::Program() {
     fetchToken();
-    while (curr_token_.length())
+    while (curr_token_.length()) {
         Procedure();
+    }
 }
-inline void Validator::fetchToken() {
-    tokenizer_ >> curr_token_;
-}
+inline void Validator::fetchToken() { tokenizer_ >> curr_token_; }
 bool Validator::accept(SourceTokenType type) {
-    if (curr_token_.empty())
-        return false;
+    if (curr_token_.empty()) return false;
     if (type < kName) {
         auto target = Keyword(type);
-        if (curr_token_ != target)
-            return false;
+        if (curr_token_ != target) return false;
         tokens_->emplace_back(type);
         fetchToken();
         return true;
     }
     if (type == kName) {
-        if (!std::isalpha(curr_token_[0]))
-            return false;
+        if (!std::isalpha(curr_token_[0])) return false;
         tokens_->emplace_back(type, curr_token_);
         fetchToken();
         return true;
@@ -63,13 +58,10 @@ bool Validator::accept(SourceTokenType type) {
     return false;
 }
 bool Validator::IsConstant() const {
-    if (!std::isdigit(curr_token_[0]))
-        return false;
+    if (!std::isdigit(curr_token_[0])) return false;
     return curr_token_.length() == 1 || curr_token_[0] != kZero;
 }
-void Validator::StmtLst() {
-    Stmt(true);
-}
+void Validator::StmtLst() { Stmt(true); }
 void Validator::Stmt(bool first) {
     if (accept(kKeywordRead)) {
         Read();
@@ -151,9 +143,8 @@ void Validator::CondExpr() {
 }
 void Validator::RelExpr() {
     Expr();
-    if (!(accept(kRelGt) || accept(kRelGeq) ||
-            accept(kRelLt) || accept(kRelLeq) ||
-            accept(kRelEq) || accept(kRelNeq))) {
+    if (!(accept(kRelGt) || accept(kRelGeq) || accept(kRelLt) ||
+          accept(kRelLeq) || accept(kRelEq) || accept(kRelNeq))) {
         has_error_ = true;
         return;
     }
@@ -173,7 +164,7 @@ void Validator::Factor() {
 void Validator::Term() {
     Factor();
     while (accept(kOperatorTimes) || accept(kOperatorDivide) ||
-            accept(kOperatorModulo)) {
+           accept(kOperatorModulo)) {
         Factor();
     }
 }
@@ -183,4 +174,4 @@ void Validator::Expr() {
         Term();
     }
 }
-}
+}  // namespace spa

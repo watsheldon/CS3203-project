@@ -1,12 +1,11 @@
 #ifndef SRC_SPA_SRC_SOURCE_VALIDATOR_H_
 #define SRC_SPA_SRC_SOURCE_VALIDATOR_H_
 
-#include "common/tokenizer.h"
-
 #include <filesystem>
 #include <memory>
 #include <vector>
 
+#include "common/tokenizer.h"
 #include "token.h"
 
 namespace spa {
@@ -48,6 +47,6 @@ class Validator {
     bool expect(SourceTokenType type);
     void fetchToken();
 };
-}
+}  // namespace spa
 
-#endif //SRC_SPA_SRC_SOURCE_VALIDATOR_H_
+#endif  // SRC_SPA_SRC_SOURCE_VALIDATOR_H_

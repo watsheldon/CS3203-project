@@ -25,6 +25,6 @@ class AstVisitor {
     virtual ~AstVisitor() = 0;
 };
 inline AstVisitor::~AstVisitor() = default;
-}
+}  // namespace spa
 
-#endif //SRC_SPA_SRC_SOURCE_AST_VISITOR_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_VISITOR_H_

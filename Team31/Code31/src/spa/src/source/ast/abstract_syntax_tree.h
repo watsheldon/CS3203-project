@@ -2,8 +2,8 @@
 #define SRC_SPA_SRC_SOURCE_AST_ABSTRACT_SYNTAX_TREE_H_
 
 #include <memory>
-#include <vector>
 #include <set>
+#include <vector>
 
 #include "pkb/knowledge_base.h"
 #include "source/token.h"
@@ -14,6 +14,7 @@ class AbstractSyntaxTree {
     using SharedVecToken = std::shared_ptr<std::vector<Token>>;
     explicit AbstractSyntaxTree(SharedVecToken tokens);
     [[nodiscard]] std::shared_ptr<BasicEntities> getInitEntities() const;
+
   private:
     SharedVecToken tokens_;
     std::shared_ptr<BasicEntities> basic_entities_;
@@ -25,6 +26,6 @@ class AbstractSyntaxTree {
     void AddVariable(const std::string &name);
     void AddConstant(const std::string &value);
 };
-}
+}  // namespace spa
 
-#endif //SRC_SPA_SRC_SOURCE_AST_ABSTRACT_SYNTAX_TREE_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_ABSTRACT_SYNTAX_TREE_H_

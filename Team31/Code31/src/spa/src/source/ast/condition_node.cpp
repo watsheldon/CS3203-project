@@ -19,4 +19,4 @@ ConditionNode::SharedPtrSet<VariableNode> ConditionNode::get_variables() const {
 ConditionNode::SharedPtrSet<ConstantNode> ConditionNode::get_constants() const {
     return constants_;
 }
-} // namespace spa
+}  // namespace spa

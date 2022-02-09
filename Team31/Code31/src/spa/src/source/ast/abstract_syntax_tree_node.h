@@ -7,10 +7,10 @@
 namespace spa {
 class AbstractSyntaxTreeNode {
   public:
-    template<typename T>
+    template <typename T>
     using SharedPtrVec = std::vector<std::shared_ptr<T>>;
     virtual ~AbstractSyntaxTreeNode() = 0;
 };
-} // namespace spa
+}  // namespace spa
 
-#endif // SRC_SPA_SRC_SOURCE_AST_ABSTRACT_SYNTAX_TREE_NODE_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_ABSTRACT_SYNTAX_TREE_NODE_H_

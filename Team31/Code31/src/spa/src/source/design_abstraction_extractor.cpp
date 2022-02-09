@@ -13,4 +13,4 @@ std::shared_ptr<KnowledgeBase> DesignAbstractionExtractor::Extract() {
     pkb->Compile();
     return pkb;
 }
-}
+}  // namespace spa
