@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "condition_node.h"
+#include "stmt_lst_parent.h"
 #include "indexed_node.h"
 #include "procedure_node.h"
 #include "stmt_lst_node.h"
@@ -39,35 +40,36 @@ class CallNode : public StatementNode {
   private:
     std::shared_ptr<ProcedureNode> procedure_;
 };
-class ContainerNode : public StatementNode {
+class IfWhileNode : public StatementNode, public StmtLstParent {
   public:
     void set_condition(std::shared_ptr<ConditionNode> condition);
     [[nodiscard]] std::shared_ptr<ConditionNode> get_condition() const;
-    ~ContainerNode() override = 0;
+    ~IfWhileNode() override = 0;
 
-  protected:
-    std::shared_ptr<ConditionNode> condition_;
+  private:
+    const ConditionNode *condition_;
 };
-class IfNode : public ContainerNode {
+class IfNode : public IfWhileNode {
   public:
-    void set_then(std::shared_ptr<StmtLstNode> thenLst);
-    void set_else(std::shared_ptr<StmtLstNode> elseLst);
-    [[nodiscard]] std::shared_ptr<StmtLstNode> get_then() const;
-    [[nodiscard]] std::shared_ptr<StmtLstNode> get_else() const;
+    struct IfStmtLst {
+        const StmtLstNode *then_lst;
+        const StmtLstNode *else_lst;
+    };
+    void AddStmtLst(const StmtLstNode *node) override;
+    [[nodiscard]] const IfStmtLst &GetStmtLsts() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    std::shared_ptr<StmtLstNode> then_;
-    std::shared_ptr<StmtLstNode> else_;
+    IfStmtLst if_stmt_lst_;
 };
-class WhileNode : public ContainerNode {
+class WhileNode : public IfWhileNode {
   public:
-    void set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst);
-    [[nodiscard]] std::shared_ptr<StmtLstNode> get_stmtlst() const;
+    void AddStmtLst(const StmtLstNode *node) override;
+    [[nodiscard]] const StmtLstNode *GetStmtlst() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    std::shared_ptr<StmtLstNode> stmt_lst_;
+    const StmtLstNode *stmt_lst_;
 };
 class ReadPrintNode : public StatementNode {
   public:

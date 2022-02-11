@@ -1,5 +1,6 @@
 #include "statement_node.h"
 
+#include <cassert>
 #include <memory>
 #include <utility>
 
@@ -30,28 +31,28 @@ std::shared_ptr<ProcedureNode> CallNode::get_procedure() const {
     return procedure_;
 }
 void CallNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
-void ContainerNode::set_condition(std::shared_ptr<ConditionNode> condition) {
+void IfWhileNode::set_condition(std::shared_ptr<ConditionNode> condition) {
     condition_ = std::move(condition);
 }
-std::shared_ptr<ConditionNode> ContainerNode::get_condition() const {
+std::shared_ptr<ConditionNode> IfWhileNode::get_condition() const {
     return condition_;
 }
-ContainerNode::~ContainerNode() = default;
-void IfNode::set_then(std::shared_ptr<StmtLstNode> thenLst) {
-    then_ = std::move(thenLst);
+IfWhileNode::~IfWhileNode() = default;
+void IfNode::AddStmtLst(const StmtLstNode *node) {
+    if (if_stmt_lst_.then_lst == nullptr) {
+        if_stmt_lst_.then_lst = node;
+        return;
+    }
+    assert(if_stmt_lst_.else_stmt_lst == nullptr);
+    if_stmt_lst_.else_stmt_lst = node;
 }
-void IfNode::set_else(std::shared_ptr<StmtLstNode> elseLst) {
-    else_ = std::move(elseLst);
-}
-std::shared_ptr<StmtLstNode> IfNode::get_then() const { return then_; }
-std::shared_ptr<StmtLstNode> IfNode::get_else() const { return else_; }
+const IfNode::IfStmtLst &IfNode::GetStmtLsts() const { return if_stmt_lst_; }
 void IfNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
-void WhileNode::set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst) {
-    stmt_lst_ = std::move(stmtLst);
+void WhileNode::AddStmtLst(const StmtLstNode *node) {
+    assert(stmt_lst_ == nullptr);
+    stmt_lst_ = node;
 }
-std::shared_ptr<StmtLstNode> WhileNode::get_stmtlst() const {
-    return stmt_lst_;
-}
+const StmtLstNode *WhileNode::GetStmtlst() const { return stmt_lst_; }
 void WhileNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
 void ReadPrintNode::set_variable(std::shared_ptr<VariableNode> variable) {
     variable_ = std::move(variable);
