@@ -71,12 +71,11 @@ class KnowledgeBase {
 
     /**
      * Links stmt# of if statement with its two statement lists' indices
-     * containing stmt# (only stmt at the outermost same level) inside if clause
-     * and else clause respectively.
+     * containing stmt# (only stmt at the outermost same level) inside then
+     * clause and else clause respectively.
      */
-    virtual void SetIndex(Index<kIfStmt> stmt_no,
-                          Index<kStmtLst> stmtlst_index1,
-                          Index<kStmtLst> stmtlst_index2) = 0;
+    virtual void SetIndex(Index<kIfStmt> stmt_no, Index<kStmtLst> then_index,
+                          Index<kStmtLst> else_index) = 0;
 
     /**
      * Stores each statement list to its respective index.

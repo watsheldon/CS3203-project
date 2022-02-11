@@ -8,8 +8,14 @@
 #include <vector>
 
 #include "container_node.h"
+#include "if_stmtlst_store.h"
 #include "knowledge_base.h"
 #include "polish_notation.h"
+#include "polish_notation_store.h"
+#include "procedure_name_store.h"
+#include "procedure_stmtlst_store.h"
+#include "variable_name_store.h"
+#include "while_stmtlst_store.h"
 
 namespace spa {
 
@@ -21,7 +27,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     ProgramKnowledgeBase(const ProgramKnowledgeBase &) = delete;
 
-    // the only valid constructor is one that has all the init parameters
     explicit ProgramKnowledgeBase(std::shared_ptr<BasicEntities> init);
 
     // set stmtLst: useful for Parent and Follows relationships
@@ -29,8 +34,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                   Index<kStmtLst> stmtlst_index) override;
     void SetIndex(Index<kWhileStmt> stmt_no,
                   Index<kStmtLst> stmtlst_index) override;
-    void SetIndex(Index<kIfStmt> stmt_no, Index<kStmtLst> stmtlst_index1,
-                  Index<kStmtLst> stmtlst_index2) override;
+    void SetIndex(Index<kIfStmt> stmt_no, Index<kStmtLst> then_index,
+                  Index<kStmtLst> else_index) override;
     void SetLst(Index<kStmtLst> stmtlst_index,
                 std::vector<STMT_NO> stmtlst) override;
 
@@ -44,34 +49,29 @@ class ProgramKnowledgeBase : public KnowledgeBase {
             std::vector<int> index_list,
             PKBEntityType et) override;  // convert index to string
 
-    const int STMT_TYPE_COUNT = 6;
-
-    // mark the end of source processor -> construct necessary data structures
+    // mark the end of source processor
     void Compile() override;
 
   private:
-    // leaving index 0 empty for all vectors to preserve consistency
+    const int STMT_TYPE_COUNT = 6;
 
-    // a pointer to store all the vectors of entities - as the parameter of
-    // class constructor
-    std::shared_ptr<BasicEntities> entities_ptr_;
+    std::shared_ptr<BasicEntities>
+            entities_ptr_;  // initial vectors of entities
 
-    // vectors resized by constructor
-    std::vector<STMTLST_NO> proc_stmtlst_;
-    std::vector<STMTLST_NO> while_stmtlst_;
-    std::vector<STMTLST_NO> if_stmtlst_;
     std::vector<std::vector<STMTLST_NO> > stmtlsts_;
+    std::vector<CN> containers_;  // store relationships among containers
+    std::vector<PKBEntityType> map_no_type_;  // map from stmt_no to stmt type
+    std::vector<STMTLST_NO> map_no_lst_;  // map from stmt_no to stmtlst's index
+
     size_t stmt_size_;  // store number of stmt
 
-    // vector to store the nesting relationships among containers
-    std::vector<CN> containers_;
+    ProcedureNameStore proc_name_;
+    VariableNameStore var_name_;
+    // PolishNotationStore polish_notation_;
 
-    // vector to map from stmt_no to internal index of different stmt types
-    std::vector<INDEX> map_no_index_;
-    // vector to map from stmt_no to its stmt type
-    std::vector<PKBEntityType> map_no_type_;
-    // vector to map from stmt_no to its stmtlst's index
-    std::vector<STMTLST_NO> map_no_lst_;
+    ProcedureStmtlstStore proc_stmtlst_;
+    WhileStmtlstStore while_stmtlst_;
+    IfStmtlstStore if_stmtlst_;
 };
 
 }  // namespace spa

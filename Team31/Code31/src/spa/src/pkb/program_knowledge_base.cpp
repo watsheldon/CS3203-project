@@ -3,21 +3,23 @@
 namespace spa {
 ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<BasicEntities> init)
         : entities_ptr_(init),
-          proc_stmtlst_(init->procedures.size()),
-          while_stmtlst_(init->whiles.size()),
-          if_stmtlst_(init->ifs.size() * 2),
+          proc_name_(ProcedureNameStore(init->procedures)),
+          var_name_(VariableNameStore(init->variables)),
+          // polish_notation_(PolishNotationStore(init->notations)),
+          proc_stmtlst_(ProcedureStmtlstStore(init->procedures.size())),
+          while_stmtlst_(WhileStmtlstStore()),
+          if_stmtlst_(IfStmtlstStore()),
           stmtlsts_(init->procedures.size() + init->whiles.size() +
                     init->ifs.size() * 2 - 3),
           containers_(init->whiles.size() + init->ifs.size() - 1),
-          map_no_index_(init->reads.size() + init->prints.size() +
-                        init->calls.size() + init->whiles.size() +
-                        init->ifs.size() + init->assigns.size() - 5),
           map_no_type_(init->reads.size() + init->prints.size() +
                        init->calls.size() + init->whiles.size() +
-                       init->ifs.size() + init->assigns.size() - 5),
+                       init->ifs.size() + init->assigns.size() -
+                       STMT_TYPE_COUNT + 1),
           map_no_lst_(init->reads.size() + init->prints.size() +
                       init->calls.size() + init->whiles.size() +
-                      init->ifs.size() + init->assigns.size() - 5),
+                      init->ifs.size() + init->assigns.size() -
+                      STMT_TYPE_COUNT + 1),
           stmt_size_(init->assigns.size() + init->ifs.size() +
                      init->whiles.size() + init->calls.size() +
                      init->reads.size() + init->prints.size() -
@@ -27,51 +29,42 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(std::shared_ptr<BasicEntities> init)
     // map_no_type_
     for (int i = 1; i < init->reads.size(); ++i) {
         int stmt_no = init->reads.at(i);
-        map_no_index_.at(stmt_no) = i;
         map_no_type_.at(stmt_no) = kReadStmt;
     }
     for (int i = 1; i < init->prints.size(); ++i) {
         int stmt_no = init->prints.at(i);
-        map_no_index_.at(stmt_no) = i;
         map_no_type_.at(stmt_no) = kPrintStmt;
     }
     for (int i = 1; i < init->calls.size(); ++i) {
         int stmt_no = init->calls.at(i);
-        map_no_index_.at(stmt_no) = i;
         map_no_type_.at(stmt_no) = kCallStmt;
     }
     for (int i = 1; i < init->whiles.size(); ++i) {
         int stmt_no = init->whiles.at(i);
-        map_no_index_.at(stmt_no) = i;
         map_no_type_.at(stmt_no) = kWhileStmt;
     }
     for (int i = 1; i < init->ifs.size(); ++i) {
         int stmt_no = init->ifs.at(i);
-        map_no_index_.at(stmt_no) = i;
         map_no_type_.at(stmt_no) = kIfStmt;
     }
     for (int i = 1; i < init->assigns.size(); ++i) {
         int stmt_no = init->assigns.at(i);
-        map_no_index_.at(stmt_no) = i;
         map_no_type_.at(stmt_no) = kAssignStmt;
     }
 }
 
 void ProgramKnowledgeBase::SetIndex(Index<kProc> proc_index,
                                     Index<kStmtLst> stmtlst_index) {
-    proc_stmtlst_.at(proc_index.value) = stmtlst_index.value;
+    proc_stmtlst_.Set(proc_index.value, stmtlst_index.value);
 }
 void ProgramKnowledgeBase::SetIndex(Index<kWhileStmt> stmt_no,
                                     Index<kStmtLst> stmtlst_index) {
-    int index = map_no_index_.at(stmt_no.value);
-    while_stmtlst_.at(index) = stmtlst_index.value;
+    while_stmtlst_.Set(stmt_no.value, stmtlst_index.value);
 }
 void ProgramKnowledgeBase::SetIndex(Index<kIfStmt> stmt_no,
-                                    Index<kStmtLst> stmtlst_index1,
-                                    Index<kStmtLst> stmtlst_index2) {
-    int index = map_no_index_.at(stmt_no.value);
-    if_stmtlst_.at(index * 2) = stmtlst_index1.value;
-    if_stmtlst_.at(index * 2 + 1) = stmtlst_index2.value;
+                                    Index<kStmtLst> then_index,
+                                    Index<kStmtLst> else_index) {
+    if_stmtlst_.Set(stmt_no.value, then_index.value, else_index.value);
 }
 
 void ProgramKnowledgeBase::SetLst(Index<kStmtLst> stmtlst_index,
@@ -82,16 +75,7 @@ void ProgramKnowledgeBase::SetLst(Index<kStmtLst> stmtlst_index,
 void ProgramKnowledgeBase::SetRel(Index<kPrintStmt> stmt_no,
                                   Index<kVar> var_index) {}
 
-void ProgramKnowledgeBase::Compile() {
-    // container vector <node> while +if  --> container index to construct
-    // curr parent whiles_[i] {stmtlst}
-    // whiles_ -->  -->
-    for (int i = 1; i < stmtlsts_.size(); ++i) {
-        // assume each stmtlst starts from index 1 as well
-        for (int j = 1; j < stmtlsts_.at(i).size(); ++j) {
-        }
-    }
-}
+void ProgramKnowledgeBase::Compile() {}
 
 std::vector<std::string> ProgramKnowledgeBase::GetAllStringEntities(
         PKBEntityType et) {
