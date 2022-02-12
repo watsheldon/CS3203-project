@@ -10,11 +10,11 @@
 namespace spa {
 SourceProcessor::SourceProcessor(const std::string &filename)
         : source_path_(filename) {}
-std::shared_ptr<KnowledgeBase> SourceProcessor::Parse() {
+std::unique_ptr<KnowledgeBase> SourceProcessor::Parse() {
     Validator validator(source_path_);
     auto tokens = validator.Validate();
-    auto ast = std::make_shared<AbstractSyntaxTree>(tokens);
-    DesignAbstractionExtractor dae(ast);
-    return dae.Extract();
+    auto ast = std::make_unique<AbstractSyntaxTree>(std::move(tokens));
+    DesignAbstractionExtractor dae;
+    return dae.Extract(std::move(ast));
 }
 }  // namespace spa

@@ -8,14 +8,10 @@
 
 namespace spa {
 class DesignAbstractionExtractor {
-    using AST = std::shared_ptr<AbstractSyntaxTree>;
+    using AST = std::unique_ptr<AbstractSyntaxTree>;
 
   public:
-    explicit DesignAbstractionExtractor(AST ast);
-    std::shared_ptr<KnowledgeBase> Extract();
-
-  private:
-    AST ast_;
+    std::unique_ptr<KnowledgeBase> Extract(AST ast);
 };
 }  // namespace spa
 

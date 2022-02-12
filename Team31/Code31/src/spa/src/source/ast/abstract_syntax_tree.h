@@ -11,8 +11,11 @@
 namespace spa {
 class AbstractSyntaxTree {
   public:
-    using SharedVecToken = std::shared_ptr<std::vector<Token>>;
-    explicit AbstractSyntaxTree(SharedVecToken tokens);
+    using UniquePtrTokens = std::unique_ptr<std::vector<Token>>;
+    template <typename T, typename = std::enable_if_t<
+                                  std::is_base_of_v<AbstractSyntaxTreeNode, T>>>
+    using NamePtrMap = std::map<std::string, std::unique_ptr<T>>;
+    explicit AbstractSyntaxTree(UniquePtrTokens tokens);
     [[nodiscard]] std::shared_ptr<BasicEntities> getInitEntities() const;
 
   private:

@@ -6,12 +6,12 @@
 
 namespace spa {
 Validator::Validator(const std::filesystem::path &filepath)
-        : tokenizer_(filepath),
-          tokens_(std::make_shared<std::vector<Token>>()) {}
-std::shared_ptr<std::vector<Token>> Validator::Validate() {
+        : tokenizer_(filepath) {}
+std::unique_ptr<std::vector<Token>> Validator::Validate() {
+    tokens_ = std::make_unique<std::vector<Token>>();
     fetchToken();
     bool valid_program = Program();
-    return valid_program ? tokens_ : nullptr;
+    return valid_program ? std::move(tokens_) : nullptr;
 }
 bool Validator::Procedure() {
     return expect(SourceTokenType::kName) &&    // proc_name

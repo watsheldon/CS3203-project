@@ -5,7 +5,7 @@
 #include "source/token.h"
 
 namespace spa {
-AbstractSyntaxTree::AbstractSyntaxTree(SharedVecToken tokens)
+AbstractSyntaxTree::AbstractSyntaxTree(UniquePtrTokens tokens)
         : tokens_(std::move(tokens)),
           basic_entities_(std::make_shared<BasicEntities>()) {
     basic_entities_->procedures.emplace_back();

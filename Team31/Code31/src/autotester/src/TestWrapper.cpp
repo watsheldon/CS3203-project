@@ -21,7 +21,7 @@ void TestWrapper::parse(std::string filename) {
     spa::SourceProcessor processor(filename);
     auto pkb = processor.Parse();
     if (pkb)
-        qps_.use(pkb);
+        qps_.use(std::move(pkb));
 }
 
 // method to evaluating a query
