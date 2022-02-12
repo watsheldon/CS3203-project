@@ -7,12 +7,12 @@ namespace spa {
 template <typename T>
 class IndexedNode : public AbstractSyntaxTreeNode {
   public:
-    IndexedNode();
-    [[nodiscard]] int get_index() const;
+    IndexedNode() : index_(++count_) {}
+    [[nodiscard]] int GetIndex() const { return index_; }
 
   private:
-    inline static int count_ = 0;
-    const int index;
+    static inline int count_ = 0;
+    const int index_;
 };
 }  // namespace spa
 
