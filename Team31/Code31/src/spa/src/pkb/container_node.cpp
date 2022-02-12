@@ -7,26 +7,14 @@ ContainerNode::ContainerNode() {
     first_sibling = 0;
 }
 
-void ContainerNode::setParent(int p) {
-    parent = p;
-}
+void ContainerNode::setParent(int p) { parent = p; }
 
-void ContainerNode::setChild(int c) {
-    first_child = c;
-}
+void ContainerNode::setChild(int c) { first_child = c; }
 
-void ContainerNode::setSibling(int s) {
-    first_sibling = s;
-}
+void ContainerNode::setSibling(int s) { first_sibling = s; }
 
-int ContainerNode::getParent() {
-    return parent;
-}
+int ContainerNode::getParent() { return parent; }
 
-int ContainerNode::getChild() {
-    return first_child;
-}
+int ContainerNode::getChild() { return first_child; }
 
-int ContainerNode::getSibling() {
-    return first_sibling;
-}
+int ContainerNode::getSibling() { return first_sibling; }

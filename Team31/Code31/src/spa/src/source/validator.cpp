@@ -9,30 +9,28 @@ Validator::Validator(const std::filesystem::path &filepath)
         : tokenizer_(filepath),
           tokens_(std::make_shared<std::vector<Token>>()) {}
 std::shared_ptr<std::vector<Token>> Validator::Validate() {
-    Program();
-    if (has_error_) return {};
-
-    return tokens_;
+    fetchToken();
+    bool valid_program = Program();
+    return valid_program ? tokens_ : nullptr;
 }
-void Validator::Procedure() {
-    expect(kKeywordProcedure);
-    expect(kName);  // proc_name
-    expect(kBraceL);
-    StmtLst();
-    expect(kBraceR);
+bool Validator::Procedure() {
+    return expect(kName) &&    // proc_name
+           expect(kBraceL) &&  // {
+           StmtLst() &&        //
+           expect(kBraceR);    // }
 }
 bool Validator::expect(SourceTokenType type) {
     if (!accept(type)) {
-        has_error_ = true;
         return false;
-    } else
-        return true;
-}
-void Validator::Program() {
-    fetchToken();
-    while (curr_token_.length()) {
-        Procedure();
     }
+    return true;
+}
+bool Validator::Program() {
+    bool valid = false;
+    while (accept(kKeywordProcedure)) {
+        valid = Procedure();
+    }
+    return valid;
 }
 inline void Validator::fetchToken() { tokenizer_ >> curr_token_; }
 bool Validator::accept(SourceTokenType type) {
@@ -61,117 +59,124 @@ bool Validator::IsConstant() const {
     if (!std::isdigit(curr_token_[0])) return false;
     return curr_token_.length() == 1 || curr_token_[0] != kZero;
 }
-void Validator::StmtLst() { Stmt(true); }
-void Validator::Stmt(bool first) {
+bool Validator::StmtLst() {
+    bool valid = false;
+    while (Stmt()) {
+        valid = true;
+    }
+    return valid;
+}
+bool Validator::Stmt() {
     if (accept(kKeywordRead)) {
-        Read();
-    } else if (accept(kKeywordPrint)) {
-        Print();
-    } else if (accept(kKeywordCall)) {
-        Call();
-    } else if (accept(kKeywordWhile)) {
-        While();
-    } else if (accept(kKeywordIf)) {
-        If();
-    } else if (accept(kName)) {
-        Assign();
-    } else if (first) {
-        has_error_ = true;
-        return;
-    } else {
-        return;
+        return Read();
     }
-    Stmt();
+    if (accept(kKeywordPrint)) {
+        return Print();
+    }
+    if (accept(kKeywordCall)) {
+        return Call();
+    }
+    if (accept(kKeywordWhile)) {
+        return While();
+    }
+    if (accept(kKeywordIf)) {
+        return If();
+    }
+    if (accept(kName)) {
+        return Assign();
+    }
+    return false;
 }
-void Validator::Read() {
-    expect(kName);
-    expect(kSemicolon);
+bool Validator::Read() {
+    return expect(kName)  // var_name
+           && expect(kSemicolon);
 }
-void Validator::Print() {
-    expect(kName);
-    expect(kSemicolon);
+bool Validator::Print() {
+    return expect(kName)  // var_name
+           && expect(kSemicolon);
 }
-void Validator::Call() {
-    expect(kName);
-    expect(kSemicolon);
+bool Validator::Call() {
+    return expect(kName)  // proc_name
+           && expect(kSemicolon);
 }
-void Validator::While() {
-    expect(kBracketL);
-    CondExpr();
-    expect(kBracketR);
-    expect(kBraceL);
-    StmtLst();
-    expect(kBraceR);
+bool Validator::While() {
+    return expect(kBracketL) &&  // (
+           CondExpr() &&         // cond_expr
+           expect(kBracketR) &&  // )
+           expect(kBraceL) &&    // {
+           StmtLst() &&          // stmtLst
+           expect(kBraceR);      // }
 }
-void Validator::If() {
-    expect(kBracketL);
-    CondExpr();
-    expect(kBracketR);
-    expect(kKeywordThen);
-    expect(kBraceL);
-    StmtLst();
-    expect(kBraceR);
-    expect(kKeywordElse);
-    expect(kBraceL);
-    StmtLst();
-    expect(kBraceR);
+bool Validator::If() {
+    return expect(kBracketL) &&     // (
+           CondExpr() &&            // cond_expr
+           expect(kBracketR) &&     // )
+           expect(kKeywordThen) &&  // then
+           expect(kBraceL) &&       // {
+           StmtLst() &&             // stmtLst
+           expect(kBraceR) &&       // }
+           expect(kKeywordElse) &&  // else
+           expect(kBraceL) &&       // {
+           StmtLst() &&             // stmtLst
+           expect(kBraceR);         // }
 }
-void Validator::Assign() {
-    expect(kAssignEqual);
-    Expr();
-    expect(kSemicolon);
+bool Validator::Assign() {
+    return expect(kAssignEqual) &&  // =
+           Expr() &&                // expr
+           expect(kSemicolon);      // ;
 }
-void Validator::CondExpr() {
+bool Validator::CondExpr() {
     if (accept(kCondNot)) {
-        expect(kBracketL);
-        CondExpr();
-        expect(kBracketR);
-    } else if (accept(kBracketL)) {
-        CondExpr();
-        expect(kBracketR);
-        if (accept(kCondAnd) || accept(kCondOr)) {
-            expect(kBracketL);
-            CondExpr();
-            expect(kBracketR);
-        } else {
-            has_error_ = true;
-            return;
+        return expect(kBracketL) &&  // (
+               CondExpr() &&         // cond_expr
+               expect(kBracketR);    // )
+    }
+    if (accept(kBracketL)) {
+        if (!(CondExpr() &&  // cond_expr
+              expect(kBracketR))) {
+            return false;
         }
-    } else {
-        RelExpr();
+        if (accept(kCondAnd) || accept(kCondOr)) {
+            return expect(kBracketL) &&  // (
+                   CondExpr() &&         // cond_expr
+                   expect(kBracketR);    // )
+        }
+        return false;
     }
+    return RelExpr();
 }
-void Validator::RelExpr() {
-    Expr();
-    if (!(accept(kRelGt) || accept(kRelGeq) || accept(kRelLt) ||
-          accept(kRelLeq) || accept(kRelEq) || accept(kRelNeq))) {
-        has_error_ = true;
-        return;
-    }
-    Expr();
+bool Validator::RelExpr() {
+    return Expr() &&             // rel_factor
+           (accept(kRelGt) ||    // >
+            accept(kRelGeq) ||   // >=
+            accept(kRelLt) ||    // <
+            accept(kRelLeq) ||   // <=
+            accept(kRelEq) ||    // ==
+            accept(kRelNeq)) &&  // !=
+           Expr();               // rel_factor
 }
-void Validator::Factor() {
+bool Validator::Factor() {
     if (accept(kName) || accept(kInteger)) {
-        // pass
-    } else if (accept(kBracketL)) {
-        Expr();
-        expect(kBracketR);
-    } else {
-        has_error_ = true;
-        return;
+        return true;
     }
+    if (accept(kBracketL)) {
+        return Expr() && expect(kBracketR);
+    }
+    return false;
 }
-void Validator::Term() {
-    Factor();
+bool Validator::Term() {
+    if (!Factor()) return false;
     while (accept(kOperatorTimes) || accept(kOperatorDivide) ||
            accept(kOperatorModulo)) {
         Factor();
     }
+    return true;
 }
-void Validator::Expr() {
-    Term();
+bool Validator::Expr() {
+    if (!Term()) return false;
     while (accept(kOperatorPlus) || accept(kOperatorMinus)) {
         Term();
     }
+    return true;
 }
 }  // namespace spa

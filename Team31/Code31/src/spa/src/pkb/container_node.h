@@ -22,4 +22,4 @@ class ContainerNode {
 
 }  // namespace spa
 
-#endif //SRC_SPA_SRC_PKB_CONTAINER_NODE_H_
+#endif  // SRC_SPA_SRC_PKB_CONTAINER_NODE_H_
