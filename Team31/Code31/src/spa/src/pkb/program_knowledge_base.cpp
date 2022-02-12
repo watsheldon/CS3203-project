@@ -19,7 +19,6 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(
           proc_name_(ProcedureNameStore(std::move(init->procedures))),
           var_name_(VariableNameStore(std::move(init->variables))),
           const_value_(ConstantValueStore(std::move(init->constants))),
-          // polish_notation_(PolishNotationStore(init->notations)),
           type_stmt_(stmt_size_, std::move(init->reads),
                      std::move(init->prints), std::move(init->calls),
                      std::move(init->whiles), std::move(init->ifs),

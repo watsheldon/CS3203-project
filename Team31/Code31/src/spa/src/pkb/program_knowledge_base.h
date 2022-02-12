@@ -12,7 +12,6 @@
 #include "if_stmtlst_store.h"
 #include "knowledge_base.h"
 #include "polish_notation.h"
-#include "polish_notation_store.h"
 #include "procedure_name_store.h"
 #include "procedure_stmtlst_store.h"
 #include "stmtlst_statements_store.h"
@@ -74,7 +73,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     ProcedureNameStore proc_name_;
     VariableNameStore var_name_;
     ConstantValueStore const_value_;
-    // PolishNotationStore polish_notation_;
 
     ProcedureStmtlstStore proc_stmtlst_;
     WhileStmtlstStore while_stmtlst_;
