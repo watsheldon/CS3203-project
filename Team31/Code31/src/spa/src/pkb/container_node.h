@@ -10,9 +10,9 @@ class ContainerNode {
     void setParent(int p);
     void setChild(int c);
     void setSibling(int s);
-    int getParent();
-    int getChild();
-    int getSibling();
+    [[nodiscard]] int getParent() const;
+    [[nodiscard]] int getChild() const;
+    [[nodiscard]] int getSibling() const;
 
   private:
     int parent;

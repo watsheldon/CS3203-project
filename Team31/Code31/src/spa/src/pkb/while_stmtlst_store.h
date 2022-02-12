@@ -1,19 +1,19 @@
 #ifndef SPA_SRC_SPA_SRC_PKB_WHILE_STMTLST_STORE_H_
 #define SPA_SRC_SPA_SRC_PKB_WHILE_STMTLST_STORE_H_
 
-#include <unordered_map>
+#include "knowledge_base.h"
 
 namespace spa {
 class WhileStmtlstStore {
   public:
-    WhileStmtlstStore();
-    void Set(int stmt_no, int stmtlst_index);
-    int GetStmtNo(int stmtlst_index);
-    int GetStmtlst(int stmt_no);
+    WhileStmtlstStore(size_t stmt, size_t stmtlst);
+    void Set(Index<kStmt> stmt_no, Index<kStmtLst> stmtlst_index);
+    [[nodiscard]] Index<kStmt> GetStmtNo(Index<kStmtLst> stmtlst_index) const;
+    [[nodiscard]] Index<kStmtLst> GetStmtlst(Index<kStmt> stmt_no) const;
 
   private:
-    std::unordered_map<int, int> while_to_stmtlst;
-    std::unordered_map<int, int> stmtlst_to_while;
+    std::vector<int> while_to_stmtlst;
+    std::vector<int> stmtlst_to_while;
 };
 }  // namespace spa
 

@@ -4,17 +4,20 @@
 #include <unordered_map>
 #include <vector>
 
+#include "knowledge_base.h"
+
 namespace spa {
 class ProcedureStmtlstStore {
   public:
-    explicit ProcedureStmtlstStore(size_t size);
-    void Set(int proc_index, int stmtlst_index);
-    int GetProcIndex(int stmtlst_index);
-    int GetStmtlst(int proc_index);
+    explicit ProcedureStmtlstStore(size_t proc, size_t stmtlst);
+    void Set(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index);
+    [[nodiscard]] Index<kProc> GetProcIndex(
+            Index<kStmtLst> stmtlst_index) const;
+    [[nodiscard]] Index<kStmtLst> GetStmtlst(Index<kProc> proc_index) const;
 
   private:
     std::vector<int> proc_to_stmtlst;
-    std::unordered_map<int, int> stmtlst_to_proc;
+    std::vector<int> stmtlst_to_proc;
 };
 }  // namespace spa
 

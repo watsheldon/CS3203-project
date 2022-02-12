@@ -1,27 +1,38 @@
 #include "if_stmtlst_store.h"
 
-using namespace spa;
+#include "knowledge_base.h"
 
-spa::IfStmtlstStore::IfStmtlstStore() {}
+namespace spa {
+spa::IfStmtlstStore::IfStmtlstStore(size_t stmt, size_t stmtlst)
+        : if_to_stmtlst(stmt, IfPairs()), stmtlst_to_if(stmtlst, 0) {}
 
-void spa::IfStmtlstStore::Set(int stmt_no, int then_index, int else_index) {
-    if_to_stmtlst[stmt_no] = {then_index, else_index};
-    stmtlst_to_if[then_index] = stmt_no;
-    stmtlst_to_if[else_index] = stmt_no;
+void spa::IfStmtlstStore::Set(Index<kStmt> stmt_no, Index<kStmtLst> then_index,
+                              Index<kStmtLst> else_index) {
+    if_to_stmtlst[stmt_no.value].then_index = then_index.value;
+    if_to_stmtlst[stmt_no.value].else_index = else_index.value;
+    stmtlst_to_if[then_index.value] = stmt_no.value;
+    stmtlst_to_if[else_index.value] = stmt_no.value;
 }
 
-int spa::IfStmtlstStore::GetStmtNo(int stmtlst_index) {
-    if (stmtlst_to_if.find(stmtlst_index) == stmtlst_to_if.end()) {
-        return -1;
-    } else {
-        return stmtlst_to_if.at(stmtlst_index);
-    }
+Index<kStmt> spa::IfStmtlstStore::GetStmtNo(
+        Index<kStmtLst> stmtlst_index) const {
+    return Index<kStmt>(stmtlst_to_if.at(stmtlst_index.value));
 }
 
-std::pair<int, int> spa::IfStmtlstStore::GetStmtlstPair(int stmt_no) {
-    if (if_to_stmtlst.find(stmt_no) == if_to_stmtlst.end()) {
-        return {-1, -1};
-    } else {
-        return if_to_stmtlst.at(stmt_no);
-    }
+Index<kStmtLst> spa::IfStmtlstStore::GetThenStmtlst(
+        Index<kStmt> stmt_no) const {
+    return Index<kStmtLst>(if_to_stmtlst.at(stmt_no.value).then_index);
 }
+Index<kStmtLst> spa::IfStmtlstStore::GetElseStmtlst(
+        Index<kStmt> stmt_no) const {
+    return Index<kStmtLst>(if_to_stmtlst.at(stmt_no.value).else_index);
+}
+IfIndices IfStmtlstStore::GetBothStmtlst(Index<kStmt> stmt_no) const {
+    IfIndices indices;
+    indices.then_index =
+            Index<kStmtLst>(if_to_stmtlst.at(stmt_no.value).then_index);
+    indices.else_index =
+            Index<kStmtLst>(if_to_stmtlst.at(stmt_no.value).else_index);
+    return indices;
+}
+}  // namespace spa

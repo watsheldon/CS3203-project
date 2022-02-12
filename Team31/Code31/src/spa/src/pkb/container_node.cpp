@@ -1,6 +1,6 @@
 #include "container_node.h"
-using namespace spa;
 
+namespace spa {
 ContainerNode::ContainerNode() {
     parent = 0;
     first_child = 0;
@@ -13,8 +13,9 @@ void ContainerNode::setChild(int c) { first_child = c; }
 
 void ContainerNode::setSibling(int s) { first_sibling = s; }
 
-int ContainerNode::getParent() { return parent; }
+int ContainerNode::getParent() const { return parent; }
 
-int ContainerNode::getChild() { return first_child; }
+int ContainerNode::getChild() const { return first_child; }
 
-int ContainerNode::getSibling() { return first_sibling; }
+int ContainerNode::getSibling() const { return first_sibling; }
+}  // namespace spa

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "constant_value_store.h"
 #include "container_node.h"
 #include "if_stmtlst_store.h"
 #include "knowledge_base.h"
@@ -14,6 +15,8 @@
 #include "polish_notation_store.h"
 #include "procedure_name_store.h"
 #include "procedure_stmtlst_store.h"
+#include "stmtlst_statements_store.h"
+#include "type_statements_store.h"
 #include "variable_name_store.h"
 #include "while_stmtlst_store.h"
 
@@ -27,51 +30,57 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     ProgramKnowledgeBase(const ProgramKnowledgeBase &) = delete;
 
-    explicit ProgramKnowledgeBase(std::shared_ptr<BasicEntities> init);
+    explicit ProgramKnowledgeBase(const std::shared_ptr<BasicEntities> &init);
 
     // set stmtLst: useful for Parent and Follows relationships
     void SetIndex(Index<kProc> proc_index,
                   Index<kStmtLst> stmtlst_index) override;
-    void SetIndex(Index<kWhileStmt> stmt_no,
-                  Index<kStmtLst> stmtlst_index) override;
-    void SetIndex(Index<kIfStmt> stmt_no, Index<kStmtLst> then_index,
+    void SetIndex(Index<kStmt> stmt_no, Index<kStmtLst> stmtlst_index) override;
+    void SetIndex(Index<kStmt> stmt_no, Index<kStmtLst> then_index,
                   Index<kStmtLst> else_index) override;
     void SetLst(Index<kStmtLst> stmtlst_index,
-                std::vector<STMT_NO> stmtlst) override;
+                std::vector<Index<kStmt>> stmtlst) override;
 
     // set direct Uses and Modifies relationships
-    void SetRel(Index<kPrintStmt> stmt_no, Index<kVar> var_index) override;
+    void SetRel(Index<kStmt> stmt_no, Index<kVar> var_index) override;
 
     std::vector<std::string> GetAllStringEntities(
             PKBEntityType et) override;  // For procedures,variables,constants
-    std::vector<int> GetAllStmtEntities(PKBEntityType et) override;  // For stmt
+    std::vector<Index<kStmt>> GetAllStmtEntities(
+            PKBEntityType et) override;  // For stmt
+
+    std::vector<std::string> GetProcName(
+            const std::vector<Index<kProc>> &index_list) override;
+    std::vector<std::string> GetVarName(
+            const std::vector<Index<kVar>> &index_list) override;
+    std::vector<std::string> GetConstValue(
+            const std::vector<Index<kConst>> &index_list) override;
+    template <PKBEntityType T>
     std::vector<std::string> IndexToName(
-            std::vector<int> index_list,
-            PKBEntityType et) override;  // convert index to string
+            const std::vector<Index<T>> &index_list);
 
     // mark the end of source processor
     void Compile() override;
 
   private:
+    bool compiled = false;
     const int STMT_TYPE_COUNT = 6;
 
-    std::shared_ptr<BasicEntities>
-            entities_ptr_;  // initial vectors of entities
-
-    std::vector<std::vector<STMTLST_NO> > stmtlsts_;
     std::vector<CN> containers_;  // store relationships among containers
-    std::vector<PKBEntityType> map_no_type_;  // map from stmt_no to stmt type
-    std::vector<STMTLST_NO> map_no_lst_;  // map from stmt_no to stmtlst's index
 
-    size_t stmt_size_;  // store number of stmt
+    size_t stmt_size_;     // store number of stmt
+    size_t stmtlst_size_;  // store number of stmtlst
 
     ProcedureNameStore proc_name_;
     VariableNameStore var_name_;
+    ConstantValueStore const_value_;
     // PolishNotationStore polish_notation_;
 
     ProcedureStmtlstStore proc_stmtlst_;
     WhileStmtlstStore while_stmtlst_;
     IfStmtlstStore if_stmtlst_;
+    StmtlstStatementsStore stmtlst_stmt_;
+    TypeStatementsStore type_stmt_;
 };
 
 }  // namespace spa

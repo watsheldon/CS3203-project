@@ -9,26 +9,8 @@
 
 namespace spa {
 
-using STMT_NO = int;
-using STMTLST_NO = int;
 using PN = spa::PolishNotation;
-using INDEX = int;
 using CN = spa::ContainerNode;
-
-struct BasicEntities {
-    std::vector<std::string> procedures;
-    std::vector<std::string> variables;
-    std::vector<std::string> constants;
-    std::vector<STMT_NO> reads;
-    std::vector<STMT_NO> prints;
-    std::vector<STMT_NO> calls;
-    std::vector<STMT_NO> whiles;
-    std::vector<STMT_NO> ifs;
-    std::vector<STMT_NO> assigns;
-    // each notation is unique
-    // notations may not have the same size as assigns
-    std::vector<PN> notations;
-};
 
 enum PKBEntityType {
     kProc,
@@ -49,6 +31,23 @@ enum PKBEntityType {
 template <PKBEntityType e>
 struct Index {
     int value;
+    Index() = default;
+    explicit Index(int i) : value(i){};
+};
+
+struct BasicEntities {
+    std::vector<std::string> procedures;
+    std::vector<std::string> variables;
+    std::vector<std::string> constants;
+    std::vector<Index<kStmt>> reads;
+    std::vector<Index<kStmt>> prints;
+    std::vector<Index<kStmt>> calls;
+    std::vector<Index<kStmt>> whiles;
+    std::vector<Index<kStmt>> ifs;
+    std::vector<Index<kStmt>> assigns;
+    // each notation is unique
+    // notations may not have the same size as assigns
+    std::vector<PN> notations;
 };
 
 class KnowledgeBase {
@@ -66,7 +65,7 @@ class KnowledgeBase {
      * containing stmt# (only stmt at the outermost same level) inside while
      * loop.
      */
-    virtual void SetIndex(Index<kWhileStmt> stmt_no,
+    virtual void SetIndex(Index<kStmt> while_stmt,
                           Index<kStmtLst> stmtlst_index) = 0;
 
     /**
@@ -74,20 +73,20 @@ class KnowledgeBase {
      * containing stmt# (only stmt at the outermost same level) inside then
      * clause and else clause respectively.
      */
-    virtual void SetIndex(Index<kIfStmt> stmt_no, Index<kStmtLst> then_index,
+    virtual void SetIndex(Index<kStmt> if_stmt, Index<kStmtLst> then_index,
                           Index<kStmtLst> else_index) = 0;
 
     /**
      * Stores each statement list to its respective index.
      */
     virtual void SetLst(Index<kStmtLst> stmtlst_index,
-                        std::vector<STMT_NO> stmtlst) = 0;
+                        std::vector<Index<kStmt>> stmtlst) = 0;
 
     /**
      * Sets direct Uses relationships between print stmt# and its variable's
      * index
      */
-    virtual void SetRel(Index<kPrintStmt> stmt_no, Index<kVar> var_index) = 0;
+    virtual void SetRel(Index<kStmt> stmt_no, Index<kVar> var_index) = 0;
 
     /**
      * Gets all strings of procedures, variables or constants.
@@ -98,7 +97,7 @@ class KnowledgeBase {
     /**
      * Gets all stmt# of the given statement type
      */
-    virtual std::vector<int> GetAllStmtEntities(PKBEntityType et) = 0;
+    virtual std::vector<Index<kStmt>> GetAllStmtEntities(PKBEntityType et) = 0;
 
     /**
      * Converts the entities to string according to their respective indices.
@@ -106,8 +105,14 @@ class KnowledgeBase {
      * internal data structure. The statement types are using stmt# directly as
      * their indices.
      */
-    virtual std::vector<std::string> IndexToName(std::vector<int> index_list,
-                                                 PKBEntityType et) = 0;
+    virtual std::vector<std::string> GetProcName(
+            const std::vector<Index<kProc>> &index_list) = 0;
+    virtual std::vector<std::string> GetVarName(
+            const std::vector<Index<kVar>> &index_list) = 0;
+    virtual std::vector<std::string> GetConstValue(
+            const std::vector<Index<kConst>> &index_list) = 0;
+    template <PKBEntityType T>
+    std::vector<std::string> IndexToName(std::vector<Index<T>> index_list);
 
     /**
      * Prevents any further updates to the KnowledgeBase and compile all
