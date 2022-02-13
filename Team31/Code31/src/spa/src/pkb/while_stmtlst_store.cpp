@@ -1,20 +1,20 @@
 #include "while_stmtlst_store.h"
 namespace spa {
-spa::WhileStmtlstStore::WhileStmtlstStore(size_t stmt, size_t stmtlst)
-        : while_to_stmtlst(stmt, 0), stmtlst_to_while(stmtlst, 0) {}
+spa::WhileStmtlstStore::WhileStmtlstStore(size_t stmt_count,
+                                          size_t stmtlst_count)
+        : while_to_stmtlst_(stmt_count + 1),
+          stmtlst_to_while_(stmtlst_count + 1) {}
 
-void spa::WhileStmtlstStore::Set(Index<kStmt> stmt_no,
-                                 Index<kStmtLst> stmtlst_index) {
-    while_to_stmtlst[stmt_no.value] = stmtlst_index.value;
-    stmtlst_to_while[stmtlst_index.value] = stmt_no.value;
+void spa::WhileStmtlstStore::Set(int stmt_no, int stmtlst_index) {
+    while_to_stmtlst_[stmt_no] = stmtlst_index;
+    stmtlst_to_while_[stmtlst_index] = stmt_no;
 }
 
-Index<kStmt> spa::WhileStmtlstStore::GetStmtNo(
-        Index<kStmtLst> stmtlst_index) const {
-    return Index<kStmt>(stmtlst_to_while.at(stmtlst_index.value));
+int spa::WhileStmtlstStore::GetStmtNo(int stmtlst_index) const {
+    return stmtlst_to_while_.at(stmtlst_index);
 }
 
-Index<kStmtLst> spa::WhileStmtlstStore::GetStmtlst(Index<kStmt> stmt_no) const {
-    return Index<kStmtLst>(while_to_stmtlst.at(stmt_no.value));
+int spa::WhileStmtlstStore::GetStmtlst(int stmt_no) const {
+    return while_to_stmtlst_.at(stmt_no);
 }
 }  // namespace spa

@@ -10,14 +10,13 @@ namespace spa {
 class ProcedureStmtlstStore {
   public:
     explicit ProcedureStmtlstStore(size_t proc, size_t stmtlst);
-    void Set(Index<kProc> proc_index, Index<kStmtLst> stmtlst_index);
-    [[nodiscard]] Index<kProc> GetProcIndex(
-            Index<kStmtLst> stmtlst_index) const;
-    [[nodiscard]] Index<kStmtLst> GetStmtlst(Index<kProc> proc_index) const;
+    void Set(int proc_index, int stmtlst_index);
+    [[nodiscard]] int GetProcIndex(int stmtlst_index) const;
+    [[nodiscard]] int GetStmtlst(int proc_index) const;
 
   private:
-    std::vector<int> proc_to_stmtlst;
-    std::vector<int> stmtlst_to_proc;
+    std::vector<int> proc_to_stmtlst_;
+    std::vector<int> stmtlst_to_proc_;
 };
 }  // namespace spa
 

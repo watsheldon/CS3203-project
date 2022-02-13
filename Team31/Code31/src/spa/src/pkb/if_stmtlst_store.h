@@ -8,23 +8,18 @@ struct IfPairs {
     int then_index = 0;
     int else_index = 0;
 };
-struct IfIndices {
-    Index<kStmtLst> then_index = Index<kStmtLst>(0);
-    Index<kStmtLst> else_index = Index<kStmtLst>(0);
-};
 class IfStmtlstStore {
   public:
     IfStmtlstStore(size_t stmt, size_t stmtlst);
-    void Set(Index<kStmt> stmt_no, Index<kStmtLst> then_index,
-             Index<kStmtLst> else_index);
-    [[nodiscard]] Index<kStmt> GetStmtNo(Index<kStmtLst> stmtlst_index) const;
-    [[nodiscard]] Index<kStmtLst> GetThenStmtlst(Index<kStmt> stmt_no) const;
-    [[nodiscard]] Index<kStmtLst> GetElseStmtlst(Index<kStmt> stmt_no) const;
-    [[nodiscard]] IfIndices GetBothStmtlst(Index<kStmt> stmt_no) const;
+    void Set(int stmt_no, int then_index, int else_index);
+    [[nodiscard]] int GetStmtNo(int stmtlst_index) const;
+    [[nodiscard]] int GetThenStmtlst(int stmt_no) const;
+    [[nodiscard]] int GetElseStmtlst(int stmt_no) const;
+    [[nodiscard]] IfPairs GetBothStmtlst(int stmt_no) const;
 
   private:
-    std::vector<IfPairs> if_to_stmtlst;
-    std::vector<int> stmtlst_to_if;
+    std::vector<IfPairs> if_to_stmtlst_;
+    std::vector<int> stmtlst_to_if_;
 };
 }  // namespace spa
 

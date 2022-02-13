@@ -3,31 +3,23 @@
 #include "knowledge_base.h"
 
 namespace spa {
-spa::StmtlstStatementsStore::StmtlstStatementsStore(size_t stmtlst, size_t stmt)
-        : stmtlst_to_statements(stmtlst), statement_to_stmtlst(stmt, 0) {}
-void spa::StmtlstStatementsStore::Set(Index<kStmtLst> stmtlst_index,
-                                      std::vector<Index<kStmt>> &&stmtlst) {
-    std::transform(stmtlst.begin(), stmtlst.end(),
-                   stmtlst_to_statements[stmtlst_index.value].begin(),
-                   [](Index<kStmt> i) { return i.value; });
+spa::StmtlstStatementsStore::StmtlstStatementsStore(size_t stmtlst_count,
+                                                    size_t stmt_count)
+        : stmtlst_to_statements_(stmtlst_count + 1),
+          statement_to_stmtlst_(stmt_count + 1, 0) {}
+void spa::StmtlstStatementsStore::Set(int stmtlst_index,
+                                      std::vector<int> &&stmtlst) {
+    stmtlst_to_statements_[stmtlst_index] = stmtlst;
     for (auto &i : stmtlst) {
-        statement_to_stmtlst[i.value] = stmtlst_index.value;
+        statement_to_stmtlst_[i] = stmtlst_index;
     }
 }
 
-Index<kStmtLst> spa::StmtlstStatementsStore::GetStmtlst(
-        Index<kStmt> stmt_no) const {
-    return Index<kStmtLst>(statement_to_stmtlst[stmt_no.value]);
+int spa::StmtlstStatementsStore::GetStmtlst(int stmt_no) const {
+    return statement_to_stmtlst_[stmt_no];
 }
-std::vector<Index<kStmt>> spa::StmtlstStatementsStore::GetStatements(
-        Index<kStmtLst> stmtlst_index) {
-    std::vector<Index<kStmt>> statements;
-    statements.reserve(stmtlst_to_statements[stmtlst_index.value].size());
-
-    std::transform(stmtlst_to_statements[stmtlst_index.value].begin(),
-                   stmtlst_to_statements[stmtlst_index.value].begin(),
-                   std::back_inserter(statements),
-                   [](int i) { return Index<kStmt>(i); });
+std::vector<int> spa::StmtlstStatementsStore::GetStatements(int stmtlst_index) {
+    std::vector<int> statements(stmtlst_to_statements_[stmtlst_index]);
     return statements;
 }
 }  // namespace spa

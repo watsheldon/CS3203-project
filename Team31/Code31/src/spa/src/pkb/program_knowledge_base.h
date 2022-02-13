@@ -3,10 +3,13 @@
 
 #include <algorithm>
 #include <iterator>
+#include <list>
 #include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
 
+#include "common/entity_type_enum.h"
 #include "constant_value_store.h"
 #include "container_node.h"
 #include "if_stmtlst_store.h"
@@ -32,32 +35,19 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     explicit ProgramKnowledgeBase(const std::shared_ptr<BasicEntities> &init);
 
     // set stmtLst: useful for Parent and Follows relationships
-    void SetIndex(Index<kProc> proc_index,
-                  Index<kStmtLst> stmtlst_index) override;
-    void SetIndex(Index<kStmt> stmt_no, Index<kStmtLst> stmtlst_index) override;
-    void SetIndex(Index<kStmt> stmt_no, Index<kStmtLst> then_index,
-                  Index<kStmtLst> else_index) override;
-    void SetLst(Index<kStmtLst> stmtlst_index,
-                std::vector<Index<kStmt>> stmtlst) override;
+    void SetIndex(int proc_index, int stmtlst_index, EntityType et) override;
+    void SetIndex(int stmt_no, int stmtlst_index, StmtType st) override;
+    void SetIndex(int stmt_no, int then_index, int else_index) override;
+    void SetLst(int stmtlst_index, std::vector<int> stmtlst) override;
 
     // set direct Uses and Modifies relationships
-    void SetRel(Index<kStmt> stmt_no, Index<kVar> var_index) override;
+    void SetRel(int stmt_no, int var_index) override;
 
-    std::vector<std::string> GetAllStringEntities(
-            PKBEntityType et) override;  // For procedures,variables,constants
-    std::vector<Index<kStmt>> GetAllStmtEntities(
-            PKBEntityType et) override;  // For stmt
+    std::vector<int> GetAllEntityIndices(EntityType et) override;
+    std::vector<int> GetAllEntityIndices(StmtType st) override;
 
-    std::vector<std::string> GetProcName(
-            const std::vector<Index<kProc>> &index_list) override;
-    std::vector<std::string> GetVarName(
-            const std::vector<Index<kVar>> &index_list) override;
-    std::vector<std::string> GetConstValue(
-            const std::vector<Index<kConst>> &index_list) override;
-    template <PKBEntityType T>
-    std::vector<std::string> IndexToName(
-            const std::vector<Index<T>> &index_list);
-
+    void IndexToName(EntityType et, const std::vector<int> &index_list,
+                     std::list<std::string> &names) override;
     // mark the end of source processor
     void Compile() override;
 
@@ -67,8 +57,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::vector<CN> containers_;  // store relationships among containers
 
-    size_t stmt_size_;     // store number of stmt
-    size_t stmtlst_size_;  // store number of stmtlst
+    size_t stmt_count_;     // store number of stmt
+    size_t stmtlst_count_;  // store number of stmtlst
 
     ProcedureNameStore proc_name_;
     VariableNameStore var_name_;

@@ -3,22 +3,20 @@
 #include "knowledge_base.h"
 
 namespace spa {
-spa::ProcedureStmtlstStore::ProcedureStmtlstStore(size_t proc, size_t stmtlst)
-        : proc_to_stmtlst(proc, 0), stmtlst_to_proc(stmtlst, 0) {}
+spa::ProcedureStmtlstStore::ProcedureStmtlstStore(size_t proc_count,
+                                                  size_t stmtlst_count)
+        : proc_to_stmtlst_(proc_count), stmtlst_to_proc_(stmtlst_count + 1) {}
 
-void spa::ProcedureStmtlstStore::Set(Index<kProc> stmt_no,
-                                     Index<kStmtLst> stmtlst_index) {
-    proc_to_stmtlst[stmt_no.value] = stmtlst_index.value;
-    stmtlst_to_proc[stmtlst_index.value] = stmt_no.value;
+void spa::ProcedureStmtlstStore::Set(int stmt_no, int stmtlst_index) {
+    proc_to_stmtlst_[stmt_no] = stmtlst_index;
+    stmtlst_to_proc_[stmtlst_index] = stmt_no;
 }
 
-Index<kProc> spa::ProcedureStmtlstStore::GetProcIndex(
-        Index<kStmtLst> stmtlst_index) const {
-    return Index<kProc>(stmtlst_to_proc.at(stmtlst_index.value));
+int spa::ProcedureStmtlstStore::GetProcIndex(int stmtlst_index) const {
+    return stmtlst_to_proc_.at(stmtlst_index);
 }
 
-Index<kStmtLst> spa::ProcedureStmtlstStore::GetStmtlst(
-        Index<kProc> proc_index) const {
-    return Index<kStmtLst>(proc_to_stmtlst.at(proc_index.value));
+int spa::ProcedureStmtlstStore::GetStmtlst(int proc_index) const {
+    return proc_to_stmtlst_.at(proc_index);
 }
 }  // namespace spa

@@ -11,13 +11,14 @@ namespace spa {
 class ConstantValueStore {
   public:
     explicit ConstantValueStore(std::vector<std::string> &&values);
-    [[nodiscard]] const std::string &GetValue(Index<kConst> index) const;
-    [[nodiscard]] Index<kConst> GetIndex(const std::string &value) const;
+    [[nodiscard]] const std::string &GetValue(int index) const;
+    [[nodiscard]] int GetIndex(const std::string &value) const;
     [[nodiscard]] const std::vector<std::string> &GetAllValue() const;
+    [[nodiscard]] size_t GetCount() const;
 
   private:
-    std::vector<std::string> index_to_value;
-    std::map<std::string, int> value_to_index;
+    std::vector<std::string> index_to_value_;
+    std::map<std::string, int> value_to_index_;
 };
 }  // namespace spa
 

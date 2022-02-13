@@ -9,15 +9,13 @@ namespace spa {
 class StmtlstStatementsStore {
   public:
     StmtlstStatementsStore(size_t stmtlst, size_t stmt);
-    void Set(Index<kStmtLst> stmtlst_index,
-             std::vector<Index<kStmt>> &&stmtlst);
-    [[nodiscard]] Index<kStmtLst> GetStmtlst(Index<kStmt> stmt_no) const;
-    [[nodiscard]] std::vector<Index<kStmt>> GetStatements(
-            Index<kStmtLst> stmtlst_index);
+    void Set(int stmtlst_index, std::vector<int> &&stmtlst);
+    [[nodiscard]] int GetStmtlst(int stmt_no) const;
+    [[nodiscard]] std::vector<int> GetStatements(int stmtlst_index);
 
   private:
-    std::vector<std::vector<int>> stmtlst_to_statements;
-    std::vector<int> statement_to_stmtlst;
+    std::vector<std::vector<int>> stmtlst_to_statements_;
+    std::vector<int> statement_to_stmtlst_;
 };
 }  // namespace spa
 #endif  // SPA_SRC_SPA_SRC_PKB_STMTLST_STATEMENTS_STORE_H_

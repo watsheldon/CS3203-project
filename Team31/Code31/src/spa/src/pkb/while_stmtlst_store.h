@@ -7,13 +7,13 @@ namespace spa {
 class WhileStmtlstStore {
   public:
     WhileStmtlstStore(size_t stmt, size_t stmtlst);
-    void Set(Index<kStmt> stmt_no, Index<kStmtLst> stmtlst_index);
-    [[nodiscard]] Index<kStmt> GetStmtNo(Index<kStmtLst> stmtlst_index) const;
-    [[nodiscard]] Index<kStmtLst> GetStmtlst(Index<kStmt> stmt_no) const;
+    void Set(int stmt_no, int stmtlst_index);
+    [[nodiscard]] int GetStmtNo(int stmtlst_index) const;
+    [[nodiscard]] int GetStmtlst(int stmt_no) const;
 
   private:
-    std::vector<int> while_to_stmtlst;
-    std::vector<int> stmtlst_to_while;
+    std::vector<int> while_to_stmtlst_;
+    std::vector<int> stmtlst_to_while_;
 };
 }  // namespace spa
 

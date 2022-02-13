@@ -11,13 +11,14 @@ namespace spa {
 class VariableNameStore {
   public:
     explicit VariableNameStore(std::vector<std::string> &&names);
-    [[nodiscard]] const std::string &GetName(Index<kVar> index) const;
-    [[nodiscard]] Index<kVar> GetIndex(const std::string &name) const;
+    [[nodiscard]] const std::string &GetName(int index) const;
+    [[nodiscard]] int GetIndex(const std::string &name) const;
     [[nodiscard]] const std::vector<std::string> &GetAllName() const;
+    [[nodiscard]] size_t GetCount() const;
 
   private:
-    std::vector<std::string> index_to_name;
-    std::map<std::string, int> name_to_index;
+    std::vector<std::string> index_to_name_;
+    std::map<std::string, int> name_to_index_;
 };
 }  // namespace spa
 
