@@ -46,6 +46,7 @@ class Declaration{
     DeclarationType type;
     std::string synonym;
   public:
+    explicit Declaration();
     Declaration(DeclarationType type, std::string synonym)
             :type(type), synonym(std::move(synonym)) {}
     DeclarationType getDeclarationType() {
