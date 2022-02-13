@@ -1,64 +1,62 @@
 #include "PQL_tokenizer.h"
 
-#include <string>
-#include <cctype>
-#include <stdexcept>
+#include <algorithm>
+#include <fstream>
 
 namespace spa {
-PQLTokenizer::PQLTokenizer(const std::string &inputFile) : currentPosition(0), queryString(inputFile) {}
-
-int PQLTokenizer::getCurrChar() {
-    if (currentPosition >= queryString.length()) {
-        throw std::out_of_range("Out of string boundary");
-    }
-    return queryString[currentPosition];
+PQLTokenizer::PQLTokenizer(const std::filesystem::path &inputFile) {
+    std::ifstream query(inputFile);
+    buffer_ << query.rdbuf();
 }
 
-int PQLTokenizer::getNextChar() {
-    int nextPos = currentPosition + 1;
-    if (nextPos >= queryString.length()) {
-        throw std::out_of_range("Out of string boundary");
-    }
-    return queryString[nextPos];
+// keep chars of token until pred is not met
+void PQLTokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
+    auto last = std::find_if_not(token.begin() + 1, token.end(), pred);
+    if (last == token.end()) return;
+    KeepFirstOf(token, last - token.begin());
 }
 
-Token PQLTokenizer::getNextToken() {
-    int currChar = getCurrChar();
-    while (isspace(currChar)) {
-        currentPosition++;
-        currChar = getCurrChar();
-    }
-    std::string str;
-    str.push_back(currChar);
-    if (str == ",") {
-        currentPosition++;
-        return Token(QueryTokenType::COMMA, ",");
-    } else if (str == ";") {
-        currentPosition++;
-        return Token(QueryTokenType::SEMICOLON, ";");
-    } else if (str == "_") {
-        return Token(QueryTokenType::UNDERSCORE, "_");
-    } else if (!isalnum(currChar)) {
-        throw std::invalid_argument("Invalid character in query!");
-    } else {
-        std::string word;
-        word.push_back(currChar);
-        int nextChar = getNextChar();
-        while (isalnum(nextChar)) {
-            word.push_back(nextChar);
-            currentPosition++;
-        }
-        return Token(QueryTokenType::WORD, word);
-    }
+// keep first size len chars of the token
+void PQLTokenizer::KeepFirstOf(std::string &token, long len) {
+    assert(len <= token.length());
+    if (token.length() == len) return;
+
+    buffer_.seekg(len - (long)token.length(), std::ios_base::cur);
+    token.resize(len);
 }
 
-std::vector<Token> PQLTokenizer::tokenize(const std::string &inputFile) {
-
-    std::vector<Token> tokenList;
-    while (currentPosition < queryString.length()) {
-        Token nextToken = getNextToken();
-        tokenList.push_back(nextToken);
+void PQLTokenizer::ExtractInto(std::string &token) {
+    buffer_ >> token;
+    if (!buffer_) error = true;
+    if (error) {
+        token.resize(0);
+        return;
     }
-    return tokenList;
+    // identifiers / keywords
+    if (std::isalpha(token[0])) {
+        return KeepWhile(token, std::isalnum);
+    }
+    // constants
+    if (std::isdigit(token[0])) {
+        return KeepWhile(token, std::isdigit);
+    }
+    // operators
+    if (std::strchr(kSpecialSingle, token[0])) {
+        return KeepFirstOf(token, 1);
+    }
+
+    // this should not be reached unless an illegal character is present
+    error = true;
 }
+
+PQLTokenizer &PQLTokenizer::operator>>(std::string &token) {
+    ExtractInto(token);
+    return *this;
+}
+PQLTokenizer &PQLTokenizer::operator()(std::string_view str) {
+    buffer_.str(str.data());
+    error = false;
+    return *this;
+}
+
 }
