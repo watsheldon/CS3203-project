@@ -53,6 +53,13 @@ void ProgramKnowledgeBase::SetLst(Index<EntityType::kStmtLst> stmtlst_index,
 void ProgramKnowledgeBase::SetRel(Index<EntityType::kStmt> stmt_no,
                                   Index<EntityType::kVar> var_index) {
     assert(!compiled);
+    modifies_rel_.Set(stmt_no.value, var_index.value);
+}
+
+void ProgramKnowledgeBase::SetRel(Index<EntityType::kStmt> stmt_no,
+                                  std::vector<int> var_indices) {
+    assert(!compiled);
+    uses_rel_.Set(stmt_no.value, std::move(var_indices));
 }
 
 void ProgramKnowledgeBase::Compile() {
