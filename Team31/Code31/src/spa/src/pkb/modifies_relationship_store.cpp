@@ -1,7 +1,5 @@
 #include "modifies_relationship_store.h"
 
-#include "knowledge_base.h"
-
 namespace spa {
 spa::ModifiesRelationshipStore::ModifiesRelationshipStore(size_t stmtSize,
                                                           size_t varSize)

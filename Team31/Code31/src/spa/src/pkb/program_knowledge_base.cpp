@@ -1,5 +1,7 @@
 #include "program_knowledge_base.h"
 
+#include <cassert>
+
 namespace spa {
 ProgramKnowledgeBase::ProgramKnowledgeBase(
         const std::shared_ptr<BasicEntities> &init)
@@ -22,8 +24,8 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(
                      std::move(init->prints), std::move(init->calls),
                      std::move(init->whiles), std::move(init->ifs),
                      std::move(init->assigns)),
-          modifies_rel_(stmt_count_,init->variables.size()),
-          uses_rel_(stmt_count_,init->variables.size()) {}
+          modifies_rel_(stmt_count_, init->variables.size() - 1),
+          uses_rel_(stmt_count_, init->variables.size() - 1) {}
 
 void ProgramKnowledgeBase::SetIndex(Index<EntityType::kProc> proc_index,
                                     Index<EntityType::kStmtLst> stmtlst_index) {
