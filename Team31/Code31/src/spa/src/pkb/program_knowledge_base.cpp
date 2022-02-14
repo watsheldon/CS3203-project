@@ -78,12 +78,16 @@ bool ProgramKnowledgeBase::existUses(Index<QueryEntityType::kStmt> stmt_no,
 int ProgramKnowledgeBase::getModifies(Index<QueryEntityType::kStmt> stmt_no,
                                       std::vector<int> filtered_var) {
     assert(!compiled);
-    if (binarySearch(filtered_var,
-        0,
-        filtered_var.size() - 1,
-        modifies_rel_.GetVarIndex(stmt_no.value))) {
+    if (filtered_var.size() == 0) {
         return modifies_rel_.GetVarIndex(stmt_no.value);
+    } else {
+        if (binarySearch(filtered_var,
+                         0, 
+                         filtered_var.size() - 1,
+                         modifies_rel_.GetVarIndex(stmt_no.value))) {
+            return modifies_rel_.GetVarIndex(stmt_no.value);
         }
+    }
 
     return 0;
 }
@@ -93,11 +97,14 @@ std::vector<int> ProgramKnowledgeBase::getModifies(Index<QueryEntityType::kVar> 
     assert(!compiled);
     std::vector<int> results;
 
-    std::set_intersection(modifies_rel_.GetStmtNo(var_index.value).begin(),
-                          modifies_rel_.GetStmtNo(var_index.value).end(),
-                          filtered_stmt.begin(), 
-                          filtered_stmt.end(),
-                          std::back_inserter(results));
+    if (filtered_stmt.size() == 0) {
+        return modifies_rel_.GetStmtNo(var_index.value);
+    } else {
+        std::set_intersection(modifies_rel_.GetStmtNo(var_index.value).begin(),
+                              modifies_rel_.GetStmtNo(var_index.value).end(),
+                              filtered_stmt.begin(), filtered_stmt.end(),
+                              std::back_inserter(results));
+    }
     
     return results;
 }
@@ -107,11 +114,14 @@ std::vector<int> ProgramKnowledgeBase::getUses(Index<QueryEntityType::kStmt> stm
     assert(!compiled);
     std::vector<int> results;
 
-    std::set_intersection(uses_rel_.GetVarIndex(stmt_no.value).begin(),
-                          uses_rel_.GetVarIndex(stmt_no.value).end(),
-                          filtered_var.begin(),
-                          filtered_var.end(),
-                          std::back_inserter(results));
+    if (filtered_var.size() == 0) {
+        return uses_rel_.GetVarIndex(stmt_no.value);
+    } else {
+        std::set_intersection(uses_rel_.GetVarIndex(stmt_no.value).begin(),
+                              uses_rel_.GetVarIndex(stmt_no.value).end(),
+                              filtered_var.begin(), filtered_var.end(),
+                              std::back_inserter(results));
+    }
     return results;
 }
 
@@ -120,11 +130,14 @@ std::vector<int> ProgramKnowledgeBase::getUses(Index<QueryEntityType::kVar> var_
     assert(!compiled);
     std::vector<int> results;
 
-    std::set_intersection(uses_rel_.GetStmtNo(var_index.value).begin(),
-                          uses_rel_.GetStmtNo(var_index.value).end(),
-                          filtered_stmt.begin(),
-                          filtered_stmt.end(),
-                          std::back_inserter(results));
+    if (filtered_stmt.size() == 0) {
+        return uses_rel_.GetStmtNo(var_index.value);
+    } else {
+        std::set_intersection(uses_rel_.GetStmtNo(var_index.value).begin(),
+                              uses_rel_.GetStmtNo(var_index.value).end(),
+                              filtered_stmt.begin(), filtered_stmt.end(),
+                              std::back_inserter(results));
+    }
 
     return results;
 }
