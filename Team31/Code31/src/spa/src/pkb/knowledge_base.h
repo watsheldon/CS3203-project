@@ -84,6 +84,39 @@ class KnowledgeBase {
                         std::vector<int> var_indices) = 0;
 
     /**
+     * Check if Follows or Follows* relationships between two stmt# exist
+     */
+    virtual bool ExistFollows(bool transitive, int first_stmt,
+                              int second_stmt) = 0;
+
+    /**
+     * Check if Parent or Parents* relationships between container stmt# and
+     * another stmt# exist
+     */
+    virtual bool ExistParent(bool transitive, int parent_stmt,
+                             int child_stmt) = 0;
+
+    /**
+     * Gets stmt# that is directly followed
+     * by given stmt# if get_pos is kLeft,
+     * or directly follow the given stmt# if get_pos is kRight.
+     */
+    virtual std::vector<int> GetFollows(
+            bool transitive, GetPos get_pos, int stmt_no,
+            const std::vector<int> &filtered_stmt) = 0;
+
+    /**
+     * Gets a list of stmt# that
+     * are direct or indirect parents of (contain)
+     * the given stmt# if get_pos is kLeft,
+     * or are direct or indirect children of (are nested in)
+     * the given stmt# if get_pos is kRight.
+     */
+    virtual std::vector<int> GetParent(
+            bool transitive, GetPos get_pos, int stmt_no,
+            const std::vector<int> &filtered_stmt) = 0;
+
+    /**
      * Check if modifies relationships between stmt# and its variable
      * exist
      */

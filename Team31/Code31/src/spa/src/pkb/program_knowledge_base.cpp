@@ -72,6 +72,80 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
     uses_rel_.Set(stmt_no.value, std::move(var_indices));
 }
 
+bool ProgramKnowledgeBase::ExistFollows(bool transitive, int first_stmt,
+                                        int second_stmt) {
+    assert(compiled);
+    return (first_stmt < second_stmt) &&
+           (stmtlst_stmt_.GetIndex(first_stmt) ==
+            stmtlst_stmt_.GetIndex(second_stmt)) &&
+           (transitive || stmtlst_stmt_.GetPos(first_stmt) ==
+                                  stmtlst_stmt_.GetPos(second_stmt) - 1);
+}
+
+// implement after store for Parent nodes is ready
+bool ProgramKnowledgeBase::ExistParent(bool transitive, int parent_stmt,
+                                       int child_stmt) {
+    assert(compiled);
+    return false;
+}
+
+std::vector<int> ProgramKnowledgeBase::GetFollows(
+        bool transitive, GetPos get_pos, int stmt_no,
+        const std::vector<int> &filtered_stmts) {
+    assert(compiled);
+    std::vector<int> results;
+    int result;
+
+    int index = stmtlst_stmt_.GetIndex(stmt_no);
+    const std::vector<int> &stmts = stmtlst_stmt_.GetStatements(index);
+    int start = 0;
+    int end = stmts.size() - 1;
+    int pos = stmtlst_stmt_.GetPos(stmt_no);
+
+    switch (get_pos) {
+        case GetPos::kLeft:
+            if (pos == 0) {
+                return results;
+            }
+            end = pos - 1;
+            result = stmtlst_stmt_.GetStatements(index)[end];
+        case GetPos::kRight:
+            if (pos == end) {
+                return results;
+            }
+            start = pos + 1;
+            result = stmtlst_stmt_.GetStatements(index)[start];
+    }
+
+    if (!transitive && (filtered_stmts.empty() ||
+                        std::binary_search(filtered_stmts.begin(),
+                                           filtered_stmts.end(), result))) {
+        results.emplace_back(result);
+        return results;
+    }
+
+    auto first = stmts.begin() + start;
+    auto last = stmts.begin() + end + 1;
+    std::vector<int> sub_stmts(first, last);
+    if (filtered_stmts.empty()) {
+        return sub_stmts;
+    }
+
+    std::set_intersection(sub_stmts.begin(), sub_stmts.end(),
+                          filtered_stmts.begin(), filtered_stmts.end(),
+                          std::back_inserter(results));
+    return results;
+}
+
+// implement after store for Parent nodes is ready
+std::vector<int> ProgramKnowledgeBase::GetParent(
+        bool transitive, GetPos get_pos, int stmt_no,
+        const std::vector<int> &filtered_stmts) {
+    assert(compiled);
+    std::vector<int> results;
+    return results;
+}
+
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
     assert(compiled);
     return modifies_rel_.GetVarIndex(stmt_no) == var_index;
