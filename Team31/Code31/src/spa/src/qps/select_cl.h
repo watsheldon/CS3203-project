@@ -1,17 +1,20 @@
 #ifndef SRC_SPA_SRC_QPS_SELECT_H_
 #define SRC_SPA_SRC_QPS_SELECT_H_
 #include <string>
-#include "declaration.h"
+#include "declaration_cl.h"
 
 namespace spa {
-class Select{
+class SelectClause{
   private:
     DeclarationType type;
     std::string synonym;
   public:
-    Select(DeclarationType d_type, std::string s_synonym)
-            : type(d_type), synonym(s_synonym) {}
-
+    void setSelectType(DeclarationType t) {
+        type = t;
+    }
+    void setSynonym(std::string string) {
+        synonym = string;
+    }
     DeclarationType getSelectType() {
         return this->type;
     }

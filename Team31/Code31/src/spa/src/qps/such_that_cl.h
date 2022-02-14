@@ -14,14 +14,24 @@ enum class SuchThatType{
     MODIFIES_S,
     MODIFIES_P,
 };
-class SuchThat{
+class SuchThatClause{
   private:
     SuchThatType type;
     std::string ref1;
     std::string ref2;
   public :
-    SuchThat(SuchThatType type, std::string ref1, std::string ref2)
-        : type(type), ref1(ref1), ref2(ref2) {}
+
+    void setType(SuchThatType t) {
+        type = t;
+    }
+
+    void setRef1(std::string ref) {
+        ref1 = ref;
+    }
+
+    void setRef2(std::string ref) {
+        ref2 = ref;
+    }
 
     SuchThatType getType() {
         return this->type;

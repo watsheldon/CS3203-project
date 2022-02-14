@@ -42,13 +42,17 @@ std::string_view keyword(DeclarationType type) {
     }
 }
 
-class Declaration{
+class DeclarationClause{
+  private:
     DeclarationType type;
     std::string synonym;
   public:
-    explicit Declaration();
-    Declaration(DeclarationType type, std::string synonym)
-            :type(type), synonym(std::move(synonym)) {}
+    void setDeclarationType(DeclarationType t) {
+        type = t;
+    }
+    void setSynonym(std::string string) {
+        synonym = string;
+    }
     DeclarationType getDeclarationType() {
         return this->type;
     }
