@@ -1,6 +1,7 @@
 #ifndef SRC_SPA_SRC_SOURCE_AST_ABSTRACT_SYNTAX_TREE_H_
 #define SRC_SPA_SRC_SOURCE_AST_ABSTRACT_SYNTAX_TREE_H_
 
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <set>
@@ -26,8 +27,10 @@ class AbstractSyntaxTree {
     template <typename T, typename = std::enable_if_t<
                                   std::is_base_of_v<AbstractSyntaxTreeNode, T>>>
     using NamePtrMap = std::map<std::string, std::unique_ptr<T>>;
+    template <typename T>
+    using UniquePtrVec = std::vector<std::unique_ptr<T>>;
     explicit AbstractSyntaxTree(UniquePtrTokens tokens);
-    [[nodiscard]] std::shared_ptr<BasicEntities> getInitEntities() const;
+    [[nodiscard]] BasicEntities getInitEntities() const;
     [[nodiscard]] const ProgramNode *GetRoot() const;
 
   private:
@@ -45,14 +48,18 @@ class AbstractSyntaxTree {
         kAssign,
     };
     UniquePtrTokens tokens_;
-    std::shared_ptr<BasicEntities> entities_;
     NamePtrMap<VariableNode> variables_;
     NamePtrMap<ProcedureNode> procedures_;
     NamePtrMap<ConstantNode> constants_;
-    std::vector<std::unique_ptr<StatementNode>> statements_;
-    std::vector<std::unique_ptr<StmtLstNode>> stmt_lsts_;
-    std::vector<std::unique_ptr<PolishNotation>> expressions_;
-    std::vector<std::unique_ptr<ConditionNode>> conditions_;
+    UniquePtrVec<ReadNode> read_stmts_;
+    UniquePtrVec<PrintNode> print_stmts_;
+    UniquePtrVec<CallNode> call_stmts_;
+    UniquePtrVec<AssignNode> assign_stmts_;
+    UniquePtrVec<IfNode> if_stmts_;
+    UniquePtrVec<WhileNode> while_stmts_;
+    UniquePtrVec<StmtLstNode> stmt_lsts_;
+    UniquePtrVec<PolishNotation> expressions_;
+    UniquePtrVec<ConditionNode> conditions_;
     std::unique_ptr<ProgramNode> root_;
     std::vector<std::set<int>> call_edges_;
     bool tree_valid_ = false;
@@ -61,6 +68,23 @@ class AbstractSyntaxTree {
     ProcedureNode *CreateProcedure(std::string name);
     void check_tree();
     bool Cyclic(int curr, std::vector<bool> visited);
+    template <typename T,
+              typename = std::enable_if_t<std::is_base_of_v<StatementNode, T>>>
+    static void ExtractStmtIndex(const UniquePtrVec<T> &src,
+                                 std::vector<int> &dst) {
+        dst.reserve(src.size() + 1);
+        dst.emplace_back();
+        std::for_each(src.begin(), src.end(),
+                      [&dst](auto &p) { dst.emplace_back(p->GetIndex()); });
+    }
+    template <typename T>
+    static void ExtractNames(const NamePtrMap<T> &src,
+                             std::vector<std::string> &dst) {
+        dst.resize(src.size() + 1);
+        std::for_each(src.begin(), src.end(), [&dst](auto &pair) {
+            dst[pair.second->GetIndex()] = pair.first;
+        });
+    }
 };
 }  // namespace spa
 

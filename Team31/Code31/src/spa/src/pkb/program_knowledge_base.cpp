@@ -3,29 +3,25 @@
 #include <cassert>
 
 namespace spa {
-ProgramKnowledgeBase::ProgramKnowledgeBase(
-        const std::shared_ptr<BasicEntities> &init)
-        : stmt_count_(init->assigns.size() + init->ifs.size() +
-                      init->whiles.size() + init->calls.size() +
-                      init->reads.size() + init->prints.size() -
-                      STMT_TYPE_COUNT),
-          stmtlst_count_(init->procedures.size() + init->whiles.size() +
-                         init->ifs.size() * 2 - 4),
-          proc_stmtlst_(ProcedureStmtlstStore(init->procedures.size(),
-                                              stmtlst_count_)),
-          while_stmtlst_(WhileStmtlstStore(stmt_count_, stmtlst_count_)),
-          if_stmtlst_(IfStmtlstStore(stmt_count_, stmtlst_count_)),
-          stmtlst_stmt_(StmtlstStatementsStore(stmtlst_count_, stmt_count_)),
-          containers_(init->whiles.size() + init->ifs.size() - 1),
-          proc_name_(ProcedureNameStore(std::move(init->procedures))),
-          var_name_(VariableNameStore(std::move(init->variables))),
-          const_value_(ConstantValueStore(std::move(init->constants))),
-          type_stmt_(stmt_count_, std::move(init->reads),
-                     std::move(init->prints), std::move(init->calls),
-                     std::move(init->whiles), std::move(init->ifs),
-                     std::move(init->assigns)),
-          modifies_rel_(stmt_count_, init->variables.size() - 1),
-          uses_rel_(stmt_count_, init->variables.size() - 1) {}
+ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
+        : stmt_count_(init.assigns.size() + init.ifs.size() +
+                      init.whiles.size() + init.calls.size() +
+                      init.reads.size() + init.prints.size() - STMT_TYPE_COUNT),
+          stmtlst_count_(init.procedures.size() + init.whiles.size() +
+                         init.ifs.size() * 2 - 4),
+          proc_stmtlst_(init.procedures.size(), stmtlst_count_),
+          while_stmtlst_(stmt_count_, stmtlst_count_),
+          if_stmtlst_(stmt_count_, stmtlst_count_),
+          stmtlst_stmt_(stmtlst_count_, stmt_count_),
+          containers_(init.whiles.size() + init.ifs.size() - 1),
+          proc_name_(std::move(init.procedures)),
+          var_name_(std::move(init.variables)),
+          const_value_(std::move(init.constants)),
+          type_stmt_(stmt_count_, std::move(init.reads), std::move(init.prints),
+                     std::move(init.calls), std::move(init.whiles),
+                     std::move(init.ifs), std::move(init.assigns)),
+          modifies_rel_(stmt_count_, init.variables.size() - 1),
+          uses_rel_(stmt_count_, init.variables.size() - 1) {}
 
 void ProgramKnowledgeBase::SetIndex(
         Index<SetEntityType::kProc> proc_index,

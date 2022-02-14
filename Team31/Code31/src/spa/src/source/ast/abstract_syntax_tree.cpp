@@ -23,32 +23,28 @@
 
 namespace spa {
 AbstractSyntaxTree::AbstractSyntaxTree(UniquePtrTokens tokens)
-        : tokens_(std::move(tokens)),
-          entities_(std::make_shared<BasicEntities>()) {
+        : tokens_(std::move(tokens)) {
     build_tree();
     check_tree();
 }
-std::shared_ptr<BasicEntities> AbstractSyntaxTree::getInitEntities() const {
-    if (!tree_valid_) return nullptr;
-    entities_->procedures.resize(procedures_.size() + 1);
-    for (auto &[name, ptr] : procedures_) {
-        entities_->procedures[ptr->GetIndex()] = name;
-    }
-    entities_->variables.resize(variables_.size() + 1);
-    for (auto &[name, ptr] : variables_) {
-        entities_->variables[ptr->GetIndex()] = name;
-    }
-    entities_->constants.resize(constants_.size() + 1);
-    for (auto &[name, ptr] : constants_) {
-        entities_->constants[ptr->GetIndex()] = name;
-    }
-    entities_->notations.emplace_back(std::list<PolishNotationNode>());
-    entities_->notations.reserve(expressions_.size() + 1);
-    std::transform(expressions_.begin(), expressions_.end(),
-                   std::back_inserter(entities_->notations),
-                   [](const auto &p) { return *p; });
-
-    return entities_;
+BasicEntities AbstractSyntaxTree::getInitEntities() const {
+    if (!tree_valid_) return {};
+    BasicEntities entities;
+    ExtractStmtIndex(read_stmts_, entities.reads);
+    ExtractStmtIndex(print_stmts_, entities.prints);
+    ExtractStmtIndex(call_stmts_, entities.calls);
+    ExtractStmtIndex(assign_stmts_, entities.assigns);
+    ExtractStmtIndex(if_stmts_, entities.ifs);
+    ExtractStmtIndex(while_stmts_, entities.whiles);
+    ExtractNames(procedures_, entities.procedures);
+    ExtractNames(variables_, entities.variables);
+    ExtractNames(constants_, entities.constants);
+    entities.notations.emplace_back(std::list<PolishNotationNode>());
+    entities.notations.reserve(expressions_.size() + 1);
+    std::for_each(
+            expressions_.begin(), expressions_.end(),
+            [&entities](auto &p) { entities.notations.emplace_back(*p); });
+    return std::move(entities);
 }
 void AbstractSyntaxTree::build_tree() {
     root_ = std::make_unique<ProgramNode>();
@@ -109,14 +105,12 @@ void AbstractSyntaxTree::build_tree() {
                         auto while_stmt = std::make_unique<WhileNode>();
                         while_stmt->SetCondition(conditions_.back().get());
                         parent_path.emplace_back(while_stmt.get());
-                        entities_->whiles.emplace_back(while_stmt->GetIndex());
-                        statements_.emplace_back(std::move(while_stmt));
+                        while_stmts_.emplace_back(std::move(while_stmt));
                     } else if (mode_history.top() == Mode::kIf) {
                         auto if_stmt = std::make_unique<IfNode>();
                         if_stmt->SetCondition(conditions_.back().get());
                         parent_path.emplace_back(if_stmt.get());
-                        entities_->ifs.emplace_back(if_stmt->GetIndex());
-                        statements_.emplace_back(std::move(if_stmt));
+                        if_stmts_.emplace_back(std::move(if_stmt));
                         mode_history.pop();
                     } else {
                         assert(false);
@@ -229,16 +223,17 @@ void AbstractSyntaxTree::build_tree() {
                 assert(mode_history.top() == Mode::kCond);
                 break;
             case SourceTokenType::kSemicolon:
-                if (mode_history.top() == Mode::kRead ||
-                    mode_history.top() == Mode::kPrint ||
-                    mode_history.top() == Mode::kCall) {
-                    stmt_lst_path.top()->AddStatement(statements_.back().get());
+                if (mode_history.top() == Mode::kRead) {
+                    stmt_lst_path.top()->AddStatement(read_stmts_.back().get());
+                } else if (mode_history.top() == Mode::kPrint) {
+                    stmt_lst_path.top()->AddStatement(
+                            print_stmts_.back().get());
+                } else if (mode_history.top() == Mode::kCall) {
+                    stmt_lst_path.top()->AddStatement(call_stmts_.back().get());
                 } else if (mode_history.top() == Mode::kAssign) {
                     auto expr = std::make_unique<PolishNotation>(
                             std::move(curr_expr));
-                    auto assign = dynamic_cast<AssignNode *>(
-                            statements_.back().get());
-                    assert(assign);
+                    auto assign = assign_stmts_.back().get();
                     assign->SetExpr(expr.get());
                     stmt_lst_path.top()->AddStatement(assign);
                     expressions_.emplace_back(std::move(expr));
@@ -258,8 +253,7 @@ void AbstractSyntaxTree::build_tree() {
                             }));
                     auto read = std::make_unique<ReadNode>();
                     read->SetVariable(pair->second.get());
-                    entities_->reads.emplace_back(read->GetIndex());
-                    statements_.emplace_back(std::move(read));
+                    read_stmts_.emplace_back(std::move(read));
                 } else if (mode_history.top() == Mode::kPrint) {
                     auto [pair, success] = variables_.try_emplace(
                             name, LazyFactory([] {
@@ -267,8 +261,7 @@ void AbstractSyntaxTree::build_tree() {
                             }));
                     auto print = std::make_unique<PrintNode>();
                     print->SetVariable(pair->second.get());
-                    entities_->prints.emplace_back(print->GetIndex());
-                    statements_.emplace_back(std::move(print));
+                    print_stmts_.emplace_back(std::move(print));
                 } else if (mode_history.top() == Mode::kCall) {
                     auto [pair, inserted] = procedures_.try_emplace(
                             name, LazyFactory([] {
@@ -278,7 +271,6 @@ void AbstractSyntaxTree::build_tree() {
                     auto call = std::make_unique<CallNode>();
                     auto callee = pair->second.get();
                     call->SetProcedure(callee);
-                    entities_->calls.emplace_back(call->GetIndex());
 
                     // update the call graph
                     auto caller =
@@ -286,7 +278,7 @@ void AbstractSyntaxTree::build_tree() {
                     assert(caller);
                     call_edges_[caller->GetIndex()].emplace(callee->GetIndex());
 
-                    statements_.emplace_back(std::move(call));
+                    call_stmts_.emplace_back(std::move(call));
                 } else if (mode_history.top() == Mode::kCond) {
                     auto [pair, success] = variables_.try_emplace(
                             name, LazyFactory([] {
@@ -303,8 +295,7 @@ void AbstractSyntaxTree::build_tree() {
                     if (mode_history.top() != Mode::kAssign) {
                         auto assign = std::make_unique<AssignNode>();
                         assign->SetModifiedVar(var);
-                        entities_->assigns.emplace_back(assign->GetIndex());
-                        statements_.emplace_back(std::move(assign));
+                        assign_stmts_.emplace_back(std::move(assign));
                         mode_history.emplace(Mode::kAssign);
                         break;
                     }

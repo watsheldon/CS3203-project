@@ -34,7 +34,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     ProgramKnowledgeBase(const ProgramKnowledgeBase &) = delete;
 
-    explicit ProgramKnowledgeBase(const std::shared_ptr<BasicEntities> &init);
+    explicit ProgramKnowledgeBase(BasicEntities init);
 
     // set stmtLst: useful for Parent and Follows relationships
     void SetIndex(Index<SetEntityType::kProc> proc_index,
