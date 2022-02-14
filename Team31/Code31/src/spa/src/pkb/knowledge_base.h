@@ -97,23 +97,34 @@ class KnowledgeBase {
                              int child_stmt) = 0;
 
     /**
-     * Gets stmt# that is directly followed
-     * by given stmt# if get_pos is kLeft,
-     * or directly follow the given stmt# if get_pos is kRight.
+     * Gets stmt# that is directly followed by given stmt#
      */
     virtual std::vector<int> GetFollows(
-            bool transitive, GetPos get_pos, int stmt_no,
+            bool transitive, Index<GetPos::kFirst> stmt_no,
+            const std::vector<int> &filtered_stmt) = 0;
+
+    /**
+     * Gets stmt# that directly follow the given stmt#
+     */
+    virtual std::vector<int> GetFollows(
+            bool transitive, Index<GetPos::kSecond> stmt_no,
             const std::vector<int> &filtered_stmt) = 0;
 
     /**
      * Gets a list of stmt# that
      * are direct or indirect parents of (contain)
-     * the given stmt# if get_pos is kLeft,
-     * or are direct or indirect children of (are nested in)
-     * the given stmt# if get_pos is kRight.
+     * the given stmt# if get_pos is kFirst
      */
     virtual std::vector<int> GetParent(
-            bool transitive, GetPos get_pos, int stmt_no,
+            bool transitive, Index<GetPos::kFirst> stmt_no,
+            const std::vector<int> &filtered_stmt) = 0;
+
+    /**
+     * Gets a list of stmt# that are direct or indirect children of
+     * (are nested in) the given stmt#.
+     */
+    virtual std::vector<int> GetParent(
+            bool transitive, Index<GetPos::kSecond> stmt_no,
             const std::vector<int> &filtered_stmt) = 0;
 
     /**

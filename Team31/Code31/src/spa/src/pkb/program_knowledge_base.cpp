@@ -90,32 +90,60 @@ bool ProgramKnowledgeBase::ExistParent(bool transitive, int parent_stmt,
 }
 
 std::vector<int> ProgramKnowledgeBase::GetFollows(
-        bool transitive, GetPos get_pos, int stmt_no,
+        bool transitive, Index<GetPos::kFirst> stmt_no,
         const std::vector<int> &filtered_stmts) {
     assert(compiled);
     std::vector<int> results;
     int result;
-
-    int index = stmtlst_stmt_.GetIndex(stmt_no);
-    const std::vector<int> &stmts = stmtlst_stmt_.GetStatements(index);
+    int index = stmtlst_stmt_.GetIndex(stmt_no.value);
     int start = 0;
-    int end = stmts.size() - 1;
-    int pos = stmtlst_stmt_.GetPos(stmt_no);
+    int end;
+    int pos = stmtlst_stmt_.GetPos(stmt_no.value);
 
-    switch (get_pos) {
-        case GetPos::kLeft:
-            if (pos == 0) {
-                return results;
-            }
-            end = pos - 1;
-            result = stmtlst_stmt_.GetStatements(index)[end];
-        case GetPos::kRight:
-            if (pos == end) {
-                return results;
-            }
-            start = pos + 1;
-            result = stmtlst_stmt_.GetStatements(index)[start];
+    if (pos == 0) {
+        return results;
     }
+    end = pos - 1;
+    const std::vector<int> &stmts = stmtlst_stmt_.GetStatements(index);
+    result = stmts[end];
+
+    if (!transitive && (filtered_stmts.empty() ||
+                        std::binary_search(filtered_stmts.begin(),
+                                           filtered_stmts.end(), result))) {
+        results.emplace_back(result);
+        return results;
+    }
+
+    auto first = stmts.begin() + start;
+    auto last = stmts.begin() + end + 1;
+    std::vector<int> sub_stmts(first, last);
+    if (filtered_stmts.empty()) {
+        return sub_stmts;
+    }
+
+    std::set_intersection(sub_stmts.begin(), sub_stmts.end(),
+                          filtered_stmts.begin(), filtered_stmts.end(),
+                          std::back_inserter(results));
+    return results;
+}
+
+std::vector<int> ProgramKnowledgeBase::GetFollows(
+        bool transitive, Index<GetPos::kSecond> stmt_no,
+        const std::vector<int> &filtered_stmts) {
+    assert(compiled);
+    std::vector<int> results;
+    int result;
+    int index = stmtlst_stmt_.GetIndex(stmt_no.value);
+    int start;
+    const std::vector<int> &stmts = stmtlst_stmt_.GetStatements(index);
+    int end = static_cast<int>(stmts.size()) - 1;
+    int pos = stmtlst_stmt_.GetPos(stmt_no.value);
+
+    if (pos == end) {
+        return results;
+    }
+    start = pos + 1;
+    result = stmts[start];
 
     if (!transitive && (filtered_stmts.empty() ||
                         std::binary_search(filtered_stmts.begin(),
@@ -139,7 +167,14 @@ std::vector<int> ProgramKnowledgeBase::GetFollows(
 
 // implement after store for Parent nodes is ready
 std::vector<int> ProgramKnowledgeBase::GetParent(
-        bool transitive, GetPos get_pos, int stmt_no,
+        bool transitive, Index<GetPos::kFirst> stmt_no,
+        const std::vector<int> &filtered_stmts) {
+    assert(compiled);
+    std::vector<int> results;
+    return results;
+}
+std::vector<int> ProgramKnowledgeBase::GetParent(
+        bool transitive, Index<GetPos::kSecond> stmt_no,
         const std::vector<int> &filtered_stmts) {
     assert(compiled);
     std::vector<int> results;

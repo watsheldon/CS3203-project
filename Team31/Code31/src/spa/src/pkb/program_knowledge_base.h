@@ -62,10 +62,17 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistParent(bool transitive, int parent_stmt, int child_stmt) override;
 
     std::vector<int> GetFollows(
-            bool transitive, GetPos get_pos, int stmt_no,
+            bool transitive, Index<GetPos::kFirst> stmt_no,
             const std::vector<int> &filtered_stmts) override;
 
-    std::vector<int> GetParent(bool transitive, GetPos get_pos, int stmt_no,
+    std::vector<int> GetFollows(
+            bool transitive, Index<GetPos::kSecond> stmt_no,
+            const std::vector<int> &filtered_stmts) override;
+
+    std::vector<int> GetParent(bool transitive, Index<GetPos::kFirst> stmt_no,
+                               const std::vector<int> &filtered_stmt) override;
+
+    std::vector<int> GetParent(bool transitive, Index<GetPos::kSecond> stmt_no,
                                const std::vector<int> &filtered_stmt) override;
 
     bool ExistModifies(int stmt_no, int var_index) override;
