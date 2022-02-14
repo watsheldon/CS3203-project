@@ -11,10 +11,10 @@ void spa::WhileStmtlstStore::Set(int stmt_no, int stmtlst_index) {
 }
 
 int spa::WhileStmtlstStore::GetStmtNo(int stmtlst_index) const {
-    return stmtlst_to_while_.at(stmtlst_index);
+    return stmtlst_to_while_[stmtlst_index];
 }
 
 int spa::WhileStmtlstStore::GetStmtlst(int stmt_no) const {
-    return while_to_stmtlst_.at(stmt_no);
+    return while_to_stmtlst_[stmt_no];
 }
 }  // namespace spa

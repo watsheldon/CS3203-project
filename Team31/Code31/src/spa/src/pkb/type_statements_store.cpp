@@ -22,8 +22,7 @@ TypeStatementsStore::TypeStatementsStore(size_t size, std::vector<int>&& reads,
     }
 }
 std::vector<int> TypeStatementsStore::GetStatements(StmtType st) {
-    std::vector<int> statements(type_to_statements_[static_cast<int>(st)]);
-    return statements;
+    return type_to_statements_[static_cast<int>(st)];
 }
 
 StmtType TypeStatementsStore::GetType(int stmt_no) {

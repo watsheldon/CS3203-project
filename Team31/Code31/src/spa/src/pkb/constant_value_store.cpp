@@ -6,11 +6,11 @@ namespace spa {
 ConstantValueStore ::ConstantValueStore(std::vector<std::string>&& values)
         : index_to_value_(values) {
     for (int i = 1; i < index_to_value_.size(); ++i) {
-        value_to_index_.emplace(index_to_value_.at(i), i);
+        value_to_index_.emplace(index_to_value_[i], i);
     }
 }
 const std::string& ConstantValueStore ::GetValue(int index) const {
-    return index_to_value_.at(index);
+    return index_to_value_[index];
 }
 int ConstantValueStore ::GetIndex(const std::string& value) const {
     auto iter = value_to_index_.find(value);
