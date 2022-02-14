@@ -3,8 +3,7 @@
 namespace spa {
 spa::ModifiesRelationshipStore::ModifiesRelationshipStore(size_t stmtSize,
                                                           size_t varSize)
-        : stmt_to_var_(stmtSize + 1, 0), 
-          var_to_stmtlst_(varSize) {}
+        : stmt_to_var_(stmtSize + 1, 0), var_to_stmtlst_(varSize + 1) {}
 
 void spa::ModifiesRelationshipStore::Set(int stmt_no, 
                                          int var_index) {

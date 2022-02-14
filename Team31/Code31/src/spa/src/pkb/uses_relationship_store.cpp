@@ -3,8 +3,7 @@
 namespace spa {
 spa::UsesRelationshipStore::UsesRelationshipStore(size_t stmtSize,
                                                   size_t varSize)
-        : stmt_to_varlst_(stmtSize + 1), 
-          var_to_stmtlst_(varSize) {}
+        : stmt_to_varlst_(stmtSize + 1), var_to_stmtlst_(varSize + 1) {}
 
 void spa::UsesRelationshipStore::Set(int stmt_no, 
                                      std::vector<int> &&var_indices) {
