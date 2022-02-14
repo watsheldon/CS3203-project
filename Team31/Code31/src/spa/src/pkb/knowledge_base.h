@@ -92,39 +92,41 @@ class KnowledgeBase {
      * Check if modifies relationships between stmt# and its variable
      * exist
      */
-    virtual bool existModifies(Index<QueryEntityType::kStmt> stmt_no,
+    virtual bool ExistModifies(Index<QueryEntityType::kStmt> stmt_no,
                                Index<QueryEntityType::kVar> var_index) = 0;
 
     /**
      * Check if uses relationships between stmt# and its variable
      * exist
      */
-    virtual bool existUses(Index<QueryEntityType::kStmt> stmt_no,
+    virtual bool ExistUses(Index<QueryEntityType::kStmt> stmt_no,
                            Index<QueryEntityType::kVar> var_index) = 0;
 
     /**
      * Gets a var_index that is modified in stmt#
      */
-    virtual int getModifies(Index<QueryEntityType::kStmt> stmt_no,
-                            std::vector<int> filtered_var) = 0;
+    virtual std::vector<int> GetModifies(
+            Index<QueryEntityType::kStmt> stmt_no,
+            const std::vector<int> &filtered_var) = 0;
 
     /**
      * Gets a list of stmt# that modifies var_index
      */
-    virtual std::vector<int> getModifies(Index<QueryEntityType::kVar> var_index,
-                                         std::vector<int> filtered_stmt) = 0;
+    virtual std::vector<int> GetModifies(
+            Index<QueryEntityType::kVar> var_index,
+            const std::vector<int> &filtered_stmt) = 0;
 
     /**
      * Gets a list of var_index that are used in stmt#
      */
-    virtual std::vector<int> getUses(Index<QueryEntityType::kStmt> stmt_no,
-                                     std::vector<int> filtered_var) = 0;
+    virtual std::vector<int> GetUses(Index<QueryEntityType::kStmt> stmt_no,
+                                     const std::vector<int> &filtered_var) = 0;
 
     /**
      * Gets a list of stmt# that uses var_index
      */
-    virtual std::vector<int> getUses(Index<QueryEntityType::kVar> var_index,
-                                     std::vector<int> filtered_stmt) = 0;
+    virtual std::vector<int> GetUses(Index<QueryEntityType::kVar> var_index,
+                                     const std::vector<int> &filtered_stmt) = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type

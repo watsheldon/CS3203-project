@@ -60,85 +60,75 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
     uses_rel_.Set(stmt_no.value, std::move(var_indices));
 }
 
-bool ProgramKnowledgeBase::existModifies(Index<QueryEntityType::kStmt> stmt_no,
-                                         Index<QueryEntityType::kVar> var_index) {
-    assert(!compiled);
+
+bool ProgramKnowledgeBase::ExistModifies(Index<EntityType::kStmt> stmt_no,
+                                         Index<EntityType::kVar> var_index) {
+    assert(compiled);
     return modifies_rel_.GetVarIndex(stmt_no.value) == var_index.value;
 }
 
-bool ProgramKnowledgeBase::existUses(Index<QueryEntityType::kStmt> stmt_no,
-                                     Index<QueryEntityType::kVar> var_index) {
-    assert(!compiled);
-    return binarySearch(uses_rel_.GetVarIndex(stmt_no.value), 
-                        0,
+bool ProgramKnowledgeBase::ExistUses(Index<EntityType::kStmt> stmt_no,
+                                     Index<EntityType::kVar> var_index) {
+    assert(compiled);
+    return binarySearch(uses_rel_.GetVarIndex(stmt_no.value), 0,
                         uses_rel_.GetVarIndex(stmt_no.value).size() - 1,
                         var_index.value);
 }
 
-int ProgramKnowledgeBase::getModifies(Index<QueryEntityType::kStmt> stmt_no,
-                                      std::vector<int> filtered_var) {
-    assert(!compiled);
-    if (filtered_var.size() == 0) {
-        return modifies_rel_.GetVarIndex(stmt_no.value);
-    } else {
-        if (binarySearch(filtered_var,
-                         0, 
-                         filtered_var.size() - 1,
-                         modifies_rel_.GetVarIndex(stmt_no.value))) {
-            return modifies_rel_.GetVarIndex(stmt_no.value);
-        }
-    }
-
-    return 0;
-}
-
-std::vector<int> ProgramKnowledgeBase::getModifies(Index<QueryEntityType::kVar> var_index,
-                                                   std::vector<int> filtered_stmt) {
-    assert(!compiled);
+std::vector<int> ProgramKnowledgeBase::GetModifies(
+        Index<QueryEntityType::kStmt> stmt_no,
+        const std::vector<int> &filtered_var) {
+    assert(compiled);
     std::vector<int> results;
-
-    if (filtered_stmt.size() == 0) {
-        return modifies_rel_.GetStmtNo(var_index.value);
-    } else {
-        std::set_intersection(modifies_rel_.GetStmtNo(var_index.value).begin(),
-                              modifies_rel_.GetStmtNo(var_index.value).end(),
-                              filtered_stmt.begin(), filtered_stmt.end(),
-                              std::back_inserter(results));
-    }
-    
-    return results;
-}
-
-std::vector<int> ProgramKnowledgeBase::getUses(Index<QueryEntityType::kStmt> stmt_no,
-                                               std::vector<int> filtered_var) {
-    assert(!compiled);
-    std::vector<int> results;
-
-    if (filtered_var.size() == 0) {
-        return uses_rel_.GetVarIndex(stmt_no.value);
-    } else {
-        std::set_intersection(uses_rel_.GetVarIndex(stmt_no.value).begin(),
-                              uses_rel_.GetVarIndex(stmt_no.value).end(),
-                              filtered_var.begin(), filtered_var.end(),
-                              std::back_inserter(results));
+    int modified_var = modifies_rel_.GetVarIndex(stmt_no.value);
+    if (filtered_var.empty() ||
+        binarySearch(filtered_var, 0, filtered_var.size() - 1, modified_var)) {
+        results.emplace_back(modified_var);
     }
     return results;
 }
 
-std::vector<int> ProgramKnowledgeBase::getUses(Index<QueryEntityType::kVar> var_index,
-                                                std::vector<int> filtered_stmt) {
-    assert(!compiled);
-    std::vector<int> results;
+std::vector<int> ProgramKnowledgeBase::GetModifies(
+        Index<QueryEntityType::kVar> var_index,
+        const std::vector<int> &filtered_stmt) {
+    assert(compiled);
 
-    if (filtered_stmt.size() == 0) {
-        return uses_rel_.GetStmtNo(var_index.value);
-    } else {
-        std::set_intersection(uses_rel_.GetStmtNo(var_index.value).begin(),
-                              uses_rel_.GetStmtNo(var_index.value).end(),
-                              filtered_stmt.begin(), filtered_stmt.end(),
-                              std::back_inserter(results));
+    auto stmts = modifies_rel_.GetStmtNo(var_index.value);
+    if (filtered_stmt.empty()) {
+        return stmts;
     }
+    std::vector<int> results;
+    std::set_intersection(stmts.begin(), stmts.end(), filtered_stmt.begin(),
+                          filtered_stmt.end(), std::back_inserter(results));
+    return results;
+}
 
+std::vector<int> ProgramKnowledgeBase::GetUses(
+        Index<QueryEntityType::kStmt> stmt_no,
+        const std::vector<int> &filtered_var) {
+    assert(compiled);
+    const std::vector<int> &used_vars = uses_rel_.GetVarIndex(stmt_no.value);
+    if (filtered_var.empty()) {
+        return used_vars;
+    }
+    std::vector<int> results;
+    std::set_intersection(used_vars.begin(), used_vars.end(),
+                          filtered_var.begin(), filtered_var.end(),
+                          std::back_inserter(results));
+    return results;
+}
+
+std::vector<int> ProgramKnowledgeBase::GetUses(
+        Index<QueryEntityType::kVar> var_index,
+        const std::vector<int> &filtered_stmt) {
+    assert(compiled);
+    const std::vector<int> &stmts = uses_rel_.GetStmtNo(var_index.value);
+    if (filtered_stmt.empty()) {
+        return stmts;
+    }
+    std::vector<int> results;
+    std::set_intersection(stmts.begin(), stmts.end(), filtered_stmt.begin(),
+                          filtered_stmt.end(), std::back_inserter(results));
     return results;
 }
 
@@ -196,7 +186,8 @@ void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
     }
 }
 
-bool ProgramKnowledgeBase::binarySearch(std::vector<int> vec, int left, int right, int x) {
+bool ProgramKnowledgeBase::binarySearch(std::vector<int> vec, int left,
+                                        int right, int x) {
     if (right >= left) {
         int mid = left + (right - left) / 2;
 
