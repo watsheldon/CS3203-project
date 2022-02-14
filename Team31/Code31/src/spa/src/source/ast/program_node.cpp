@@ -1,17 +1,15 @@
 #include "program_node.h"
 
-#include <memory>
-#include <utility>
+#include <vector>
 
+#include "procedure_node.h"
 #include "visitor.h"
 
 namespace spa {
-bool ProgramNode::AddProcedure(std::shared_ptr<ProcedureNode> procedure) {
-    procedures_.emplace_back(std::move(procedure));
-    return true;
+void ProgramNode::AddProcedure(const ProcedureNode *procedure) {
+    procedures_.emplace_back(procedure);
 }
-AbstractSyntaxTreeNode::SharedPtrVec<ProcedureNode>
-ProgramNode::get_procedures() const {
+const std::vector<const ProcedureNode *> &ProgramNode::GetProcedures() const {
     return procedures_;
 }
 void ProgramNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }

@@ -1,24 +1,23 @@
 #ifndef SRC_SPA_SRC_SOURCE_AST_PROCEDURE_H_
 #define SRC_SPA_SRC_SOURCE_AST_PROCEDURE_H_
 
-#include <memory>
-
 #include "indexed_node.h"
+#include "stmt_lst_parent.h"
 #include "visitable.h"
 #include "visitor.h"
 
 namespace spa {
 class StmtLstNode;
-class ProcedureNode : public IndexedNode<ProcedureNode>, public Visitable {
+class ProcedureNode : public IndexedNode<ProcedureNode>,
+                      public StmtLstParent,
+                      public Visitable {
   public:
-    void set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst);
-    [[nodiscard]] std::shared_ptr<StmtLstNode> get_stmtlst() const;
-
-  private:
+    void AddStmtLst(const StmtLstNode *node) override;
+    [[nodiscard]] const StmtLstNode *GetStmtlst() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    std::shared_ptr<StmtLstNode> stmt_lst_;
+    const StmtLstNode *stmt_lst_;
 };
 }  // namespace spa
 

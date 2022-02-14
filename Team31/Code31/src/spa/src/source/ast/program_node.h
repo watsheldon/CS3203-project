@@ -1,7 +1,7 @@
 #ifndef SRC_SPA_SRC_SOURCE_AST_PROGRAM_NODE_H_
 #define SRC_SPA_SRC_SOURCE_AST_PROGRAM_NODE_H_
 
-#include <memory>
+#include <vector>
 
 #include "procedure_node.h"
 #include "visitable.h"
@@ -10,12 +10,13 @@
 namespace spa {
 class ProgramNode : public AbstractSyntaxTreeNode, public Visitable {
   public:
-    bool AddProcedure(std::shared_ptr<ProcedureNode> procedure);
-    [[nodiscard]] SharedPtrVec<ProcedureNode> get_procedures() const;
+    void AddProcedure(const ProcedureNode *procedure);
+    [[nodiscard]] const std::vector<const ProcedureNode *> &GetProcedures()
+            const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    SharedPtrVec<ProcedureNode> procedures_;
+    std::vector<const ProcedureNode *> procedures_;
 };
 }  // namespace spa
 

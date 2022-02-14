@@ -12,13 +12,13 @@ namespace spa {
 class Validator {
   public:
     explicit Validator(const std::filesystem::path &filepath);
-    std::shared_ptr<std::vector<Token>> Validate();
+    std::unique_ptr<std::vector<Token>> Validate();
 
   private:
     static constexpr char kZero = '0';
 
     Tokenizer tokenizer_;
-    std::shared_ptr<std::vector<Token>> tokens_;
+    std::unique_ptr<std::vector<Token>> tokens_;
     std::string curr_token_;
 
     bool Program();

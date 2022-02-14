@@ -1,9 +1,7 @@
 #ifndef SRC_SPA_SRC_SOURCE_AST_CONDITION_H_
 #define SRC_SPA_SRC_SOURCE_AST_CONDITION_H_
 
-#include <memory>
 #include <set>
-#include <vector>
 
 #include "constant_node.h"
 #include "variable_node.h"
@@ -11,16 +9,14 @@
 namespace spa {
 class ConditionNode : public AbstractSyntaxTreeNode {
   public:
-    template <typename T>
-    using SharedPtrSet = std::set<std::shared_ptr<T>>;
-    void AddVariable(std::shared_ptr<VariableNode> variable);
-    void AddConstant(std::shared_ptr<ConstantNode> constant);
-    [[nodiscard]] SharedPtrSet<VariableNode> get_variables() const;
-    [[nodiscard]] SharedPtrSet<ConstantNode> get_constants() const;
+    void AddVariable(const VariableNode *variable);
+    void AddConstant(const ConstantNode *constant);
+    [[nodiscard]] const std::set<const VariableNode *> &get_variables() const;
+    [[nodiscard]] const std::set<const ConstantNode *> &get_constants() const;
 
   private:
-    SharedPtrSet<VariableNode> variables_;
-    SharedPtrSet<ConstantNode> constants_;
+    std::set<const VariableNode *> variables_;
+    std::set<const ConstantNode *> constants_;
 };
 }  // namespace spa
 

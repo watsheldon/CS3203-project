@@ -11,10 +11,11 @@ const std::string& VariableNameStore::GetName(int index) const {
     return index_to_name_.at(index);
 }
 int VariableNameStore::GetIndex(const std::string& name) const {
-    if (name_to_index_.find(name) == name_to_index_.end()) {
+    auto iter = name_to_index_.find(name);
+    if ( iter == name_to_index_.end()) {
         return 0;
     }
-    return name_to_index_.at(name);
+    return iter->second;
 }
 const std::vector<std::string>& VariableNameStore::GetAllNames() const {
     return index_to_name_;

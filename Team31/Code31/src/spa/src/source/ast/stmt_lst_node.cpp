@@ -1,17 +1,13 @@
 #include "stmt_lst_node.h"
 
-#include <memory>
-#include <utility>
-
-#include "abstract_syntax_tree_node.h"
 #include "statement_node.h"
+#include "visitor.h"
 
 namespace spa {
-void StmtLstNode::AddStatement(std::shared_ptr<StatementNode> statement) {
-    statements_.emplace_back(std::move(statement));
+void StmtLstNode::AddStatement(const StatementNode *statement) {
+    statements_.emplace_back(statement);
 }
-AbstractSyntaxTreeNode::SharedPtrVec<StatementNode>
-StmtLstNode::get_statements() const {
+const std::vector<const StatementNode *> &StmtLstNode::GetStatements() const {
     return statements_;
 }
 void StmtLstNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }

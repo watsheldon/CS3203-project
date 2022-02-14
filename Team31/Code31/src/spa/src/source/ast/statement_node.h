@@ -1,12 +1,12 @@
 #ifndef SRC_SPA_SRC_SOURCE_AST_STATEMENT_NODE_H_
 #define SRC_SPA_SRC_SOURCE_AST_STATEMENT_NODE_H_
 
-#include <memory>
-
+#include "common/polish_notation.h"
 #include "condition_node.h"
 #include "indexed_node.h"
 #include "procedure_node.h"
 #include "stmt_lst_node.h"
+#include "stmt_lst_parent.h"
 #include "variable_node.h"
 #include "visitable.h"
 #include "visitor.h"
@@ -20,63 +20,64 @@ class StatementNode : public IndexedNode<StatementNode>, public Visitable {
 };
 class AssignNode : public StatementNode {
   public:
-    void set_lhs(std::shared_ptr<VariableNode> variable);
-    void AddRhsNode(std::shared_ptr<AbstractSyntaxTreeNode> node);
-    [[nodiscard]] std::shared_ptr<VariableNode> get_lhs() const;
-    [[nodiscard]] SharedPtrVec<AbstractSyntaxTreeNode> get_rhs() const;
+    void SetModifiedVar(const VariableNode *variable);
+    void SetExpr(const PolishNotation *expr);
+    [[nodiscard]] const VariableNode *GetLhs() const;
+    [[nodiscard]] const PolishNotation *GetRhs() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    std::shared_ptr<VariableNode> lhs_;
-    SharedPtrVec<AbstractSyntaxTreeNode> rhs_;
+    const VariableNode *lhs_;
+    const PolishNotation *rhs_;
 };
 class CallNode : public StatementNode {
   public:
-    void setProcedure(std::shared_ptr<ProcedureNode> proc);
-    [[nodiscard]] std::shared_ptr<ProcedureNode> get_procedure() const;
+    void SetProcedure(const ProcedureNode *proc);
+    [[nodiscard]] const ProcedureNode *GetProcedure() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    std::shared_ptr<ProcedureNode> procedure_;
+    const ProcedureNode *procedure_;
 };
-class ContainerNode : public StatementNode {
+class IfWhileNode : public StatementNode, public StmtLstParent {
   public:
-    void set_condition(std::shared_ptr<ConditionNode> condition);
-    [[nodiscard]] std::shared_ptr<ConditionNode> get_condition() const;
-    ~ContainerNode() override = 0;
+    void SetCondition(const ConditionNode *condition);
+    [[nodiscard]] const ConditionNode *GetCondition() const;
+    ~IfWhileNode() override = 0;
 
-  protected:
-    std::shared_ptr<ConditionNode> condition_;
+  private:
+    const ConditionNode *condition_;
 };
-class IfNode : public ContainerNode {
+class IfNode : public IfWhileNode {
   public:
-    void set_then(std::shared_ptr<StmtLstNode> thenLst);
-    void set_else(std::shared_ptr<StmtLstNode> elseLst);
-    [[nodiscard]] std::shared_ptr<StmtLstNode> get_then() const;
-    [[nodiscard]] std::shared_ptr<StmtLstNode> get_else() const;
+    struct IfStmtLst {
+        const StmtLstNode *then_lst;
+        const StmtLstNode *else_lst;
+    };
+    void AddStmtLst(const StmtLstNode *node) override;
+    [[nodiscard]] const IfStmtLst &GetStmtLsts() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    std::shared_ptr<StmtLstNode> then_;
-    std::shared_ptr<StmtLstNode> else_;
+    IfStmtLst if_stmt_lst_;
 };
-class WhileNode : public ContainerNode {
+class WhileNode : public IfWhileNode {
   public:
-    void set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst);
-    [[nodiscard]] std::shared_ptr<StmtLstNode> get_stmtlst() const;
+    void AddStmtLst(const StmtLstNode *node) override;
+    [[nodiscard]] const StmtLstNode *GetStmtlst() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    std::shared_ptr<StmtLstNode> stmt_lst_;
+    const StmtLstNode *stmt_lst_;
 };
 class ReadPrintNode : public StatementNode {
   public:
-    void set_variable(std::shared_ptr<VariableNode> variable);
-    [[nodiscard]] std::shared_ptr<VariableNode> get_variable() const;
+    void SetVariable(const VariableNode *variable);
+    [[nodiscard]] const VariableNode *GetVariable() const;
     ~ReadPrintNode() override = 0;
 
   private:
-    std::shared_ptr<VariableNode> variable_;
+    const VariableNode *variable_;
 };
 class ReadNode : public ReadPrintNode {
   public:

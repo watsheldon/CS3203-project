@@ -5,7 +5,7 @@
 #include <utility>
 
 namespace spa {
-enum SourceTokenType {
+enum class SourceTokenType {
     kKeywordProcedure,
     kKeywordRead,
     kKeywordPrint,
@@ -40,64 +40,64 @@ enum SourceTokenType {
 
 constexpr std::string_view Keyword(SourceTokenType token_type) {
     switch (token_type) {
-        case kKeywordProcedure:
+        case SourceTokenType::kKeywordProcedure:
             return "procedure";
-        case kKeywordRead:
+        case SourceTokenType::kKeywordRead:
             return "read";
-        case kKeywordPrint:
+        case SourceTokenType::kKeywordPrint:
             return "print";
-        case kKeywordCall:
+        case SourceTokenType::kKeywordCall:
             return "call";
-        case kKeywordWhile:
+        case SourceTokenType::kKeywordWhile:
             return "while";
-        case kKeywordIf:
+        case SourceTokenType::kKeywordIf:
             return "if";
-        case kKeywordThen:
+        case SourceTokenType::kKeywordThen:
             return "then";
-        case kKeywordElse:
+        case SourceTokenType::kKeywordElse:
             return "else";
-        case kBracketL:
+        case SourceTokenType::kBracketL:
             return "(";
-        case kBracketR:
+        case SourceTokenType::kBracketR:
             return ")";
-        case kBraceL:
+        case SourceTokenType::kBraceL:
             return "{";
-        case kBraceR:
+        case SourceTokenType::kBraceR:
             return "}";
-        case kAssignEqual:
+        case SourceTokenType::kAssignEqual:
             return "=";
-        case kOperatorPlus:
+        case SourceTokenType::kOperatorPlus:
             return "+";
-        case kOperatorMinus:
+        case SourceTokenType::kOperatorMinus:
             return "-";
-        case kOperatorTimes:
+        case SourceTokenType::kOperatorTimes:
             return "*";
-        case kOperatorDivide:
+        case SourceTokenType::kOperatorDivide:
             return "/";
-        case kOperatorModulo:
+        case SourceTokenType::kOperatorModulo:
             return "%";
-        case kCondNot:
+        case SourceTokenType::kCondNot:
             return "!";
-        case kCondAnd:
+        case SourceTokenType::kCondAnd:
             return "&&";
-        case kCondOr:
+        case SourceTokenType::kCondOr:
             return "||";
-        case kRelLt:
+        case SourceTokenType::kRelLt:
             return "<";
-        case kRelLeq:
+        case SourceTokenType::kRelLeq:
             return "<=";
-        case kRelEq:
+        case SourceTokenType::kRelEq:
             return "==";
-        case kRelNeq:
+        case SourceTokenType::kRelNeq:
             return "!=";
-        case kRelGt:
+        case SourceTokenType::kRelGt:
             return ">";
-        case kRelGeq:
+        case SourceTokenType::kRelGeq:
             return ">=";
-        case kSemicolon:
+        case SourceTokenType::kSemicolon:
             return ";";
-        case kName:
-        case kInteger:
+        case SourceTokenType::kName:
+        case SourceTokenType::kInteger:
             return "";
     }
 }
@@ -109,9 +109,9 @@ struct Token {
     explicit Token(const SourceTokenType &t) : type(t) {}
     Token(const SourceTokenType &t, std::string v)
             : type(t), value(std::move(v)) {}
-    bool operator==(const Token &other) {
+    bool operator==(const Token &other) const {
         if (type != other.type) return false;
-        return type < kName || value == other.value;
+        return type < SourceTokenType::kName || value == other.value;
     }
 };
 }  // namespace spa

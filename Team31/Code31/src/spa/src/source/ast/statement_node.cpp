@@ -1,8 +1,8 @@
 #include "statement_node.h"
 
-#include <memory>
-#include <utility>
+#include <cassert>
 
+#include "common/polish_notation.h"
 #include "condition_node.h"
 #include "procedure_node.h"
 #include "stmt_lst_node.h"
@@ -11,54 +11,50 @@
 
 namespace spa {
 StatementNode::~StatementNode() = default;
-void AssignNode::set_lhs(std::shared_ptr<VariableNode> variable) {
-    lhs_ = std::move(variable);
+void AssignNode::SetModifiedVar(const VariableNode *variable) {
+    assert(lhs_ == nullptr);
+    lhs_ = variable;
 }
-void AssignNode::AddRhsNode(std::shared_ptr<AbstractSyntaxTreeNode> node) {
-    rhs_.emplace_back(std::move(node));
+void AssignNode::SetExpr(const PolishNotation *expr) {
+    assert(rhs_ == nullptr);
+    rhs_ = expr;
 }
-std::shared_ptr<VariableNode> AssignNode::get_lhs() const { return lhs_; }
-AbstractSyntaxTreeNode::SharedPtrVec<AbstractSyntaxTreeNode>
-AssignNode::get_rhs() const {
-    return rhs_;
-}
+const VariableNode *AssignNode::GetLhs() const { return lhs_; }
+const PolishNotation *AssignNode::GetRhs() const { return rhs_; }
 void AssignNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
-void CallNode::setProcedure(std::shared_ptr<ProcedureNode> proc) {
-    procedure_ = std::move(proc);
+void CallNode::SetProcedure(const ProcedureNode *proc) {
+    assert(procedure_ == nullptr);
+    procedure_ = proc;
 }
-std::shared_ptr<ProcedureNode> CallNode::get_procedure() const {
-    return procedure_;
-}
+const ProcedureNode *CallNode::GetProcedure() const { return procedure_; }
 void CallNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
-void ContainerNode::set_condition(std::shared_ptr<ConditionNode> condition) {
-    condition_ = std::move(condition);
+void IfWhileNode::SetCondition(const ConditionNode *condition) {
+    assert(condition_ == nullptr);
+    condition_ = condition;
 }
-std::shared_ptr<ConditionNode> ContainerNode::get_condition() const {
-    return condition_;
+const ConditionNode *IfWhileNode::GetCondition() const { return condition_; }
+IfWhileNode::~IfWhileNode() = default;
+void IfNode::AddStmtLst(const StmtLstNode *node) {
+    if (if_stmt_lst_.then_lst == nullptr) {
+        if_stmt_lst_.then_lst = node;
+        return;
+    }
+    assert(if_stmt_lst_.else_lst == nullptr);
+    if_stmt_lst_.else_lst = node;
 }
-ContainerNode::~ContainerNode() = default;
-void IfNode::set_then(std::shared_ptr<StmtLstNode> thenLst) {
-    then_ = std::move(thenLst);
-}
-void IfNode::set_else(std::shared_ptr<StmtLstNode> elseLst) {
-    else_ = std::move(elseLst);
-}
-std::shared_ptr<StmtLstNode> IfNode::get_then() const { return then_; }
-std::shared_ptr<StmtLstNode> IfNode::get_else() const { return else_; }
+const IfNode::IfStmtLst &IfNode::GetStmtLsts() const { return if_stmt_lst_; }
 void IfNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
-void WhileNode::set_stmtlst(std::shared_ptr<StmtLstNode> stmtLst) {
-    stmt_lst_ = std::move(stmtLst);
+void WhileNode::AddStmtLst(const StmtLstNode *node) {
+    assert(stmt_lst_ == nullptr);
+    stmt_lst_ = node;
 }
-std::shared_ptr<StmtLstNode> WhileNode::get_stmtlst() const {
-    return stmt_lst_;
-}
+const StmtLstNode *WhileNode::GetStmtlst() const { return stmt_lst_; }
 void WhileNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
-void ReadPrintNode::set_variable(std::shared_ptr<VariableNode> variable) {
-    variable_ = std::move(variable);
+void ReadPrintNode::SetVariable(const VariableNode *variable) {
+    assert(variable_ == nullptr);
+    variable_ = variable;
 }
-std::shared_ptr<VariableNode> ReadPrintNode::get_variable() const {
-    return variable_;
-}
+const VariableNode *ReadPrintNode::GetVariable() const { return variable_; }
 ReadPrintNode::~ReadPrintNode() = default;
 void ReadNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
 void PrintNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
