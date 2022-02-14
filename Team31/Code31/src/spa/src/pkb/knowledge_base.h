@@ -16,7 +16,8 @@ using CN = spa::ContainerNode;
 
 template <EntityType>
 struct Index {
-    int value = 0;
+    explicit Index(int i = 0) : value(i) {}
+    const int value;
 };
 
 struct BasicEntities {
