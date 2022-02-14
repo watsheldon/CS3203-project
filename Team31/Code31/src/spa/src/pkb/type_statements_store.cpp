@@ -15,7 +15,7 @@ TypeStatementsStore::TypeStatementsStore(size_t size, std::vector<int>&& reads,
     type_to_statements_[4] = ifs;
     type_to_statements_[5] = assigns;
     for (int i = 0; i < 6; ++i) {
-        StmtType type = static_cast<StmtType>(i);
+        auto type = static_cast<StmtType>(i);
         for (auto j : type_to_statements_[i]) {
             statement_to_type_[j] = type;
         }
