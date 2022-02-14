@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "common/entity_type_enum.h"
-#include "container_node.h"
 #include "common/polish_notation.h"
+#include "container_node.h"
 
 namespace spa {
 

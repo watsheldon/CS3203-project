@@ -12,7 +12,7 @@ const std::string& VariableNameStore::GetName(int index) const {
 }
 int VariableNameStore::GetIndex(const std::string& name) const {
     auto iter = name_to_index_.find(name);
-    if ( iter == name_to_index_.end()) {
+    if (iter == name_to_index_.end()) {
         return 0;
     }
     return iter->second;
