@@ -60,19 +60,15 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
     uses_rel_.Set(stmt_no.value, std::move(var_indices));
 }
 
-
-bool ProgramKnowledgeBase::ExistModifies(Index<EntityType::kStmt> stmt_no,
-                                         Index<EntityType::kVar> var_index) {
+bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
     assert(compiled);
-    return modifies_rel_.GetVarIndex(stmt_no.value) == var_index.value;
+    return modifies_rel_.GetVarIndex(stmt_no) == var_index;
 }
 
-bool ProgramKnowledgeBase::ExistUses(Index<EntityType::kStmt> stmt_no,
-                                     Index<EntityType::kVar> var_index) {
+bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     assert(compiled);
-    return binarySearch(uses_rel_.GetVarIndex(stmt_no.value), 0,
-                        uses_rel_.GetVarIndex(stmt_no.value).size() - 1,
-                        var_index.value);
+    const std::vector<int> &used_vars = uses_rel_.GetVarIndex(stmt_no);
+    return std::binary_search(used_vars.begin(), used_vars.end(), var_index);
 }
 
 std::vector<int> ProgramKnowledgeBase::GetModifies(
@@ -82,7 +78,8 @@ std::vector<int> ProgramKnowledgeBase::GetModifies(
     std::vector<int> results;
     int modified_var = modifies_rel_.GetVarIndex(stmt_no.value);
     if (filtered_var.empty() ||
-        binarySearch(filtered_var, 0, filtered_var.size() - 1, modified_var)) {
+        std::binary_search(filtered_var.begin(), filtered_var.end(),
+                           modified_var)) {
         results.emplace_back(modified_var);
     }
     return results;
@@ -92,7 +89,6 @@ std::vector<int> ProgramKnowledgeBase::GetModifies(
         Index<QueryEntityType::kVar> var_index,
         const std::vector<int> &filtered_stmt) {
     assert(compiled);
-
     auto stmts = modifies_rel_.GetStmtNo(var_index.value);
     if (filtered_stmt.empty()) {
         return stmts;
@@ -184,23 +180,6 @@ void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
                            std::back_inserter(names),
                            [](int i) { return std::to_string(i); });
     }
-}
-
-bool ProgramKnowledgeBase::binarySearch(std::vector<int> vec, int left,
-                                        int right, int x) {
-    if (right >= left) {
-        int mid = left + (right - left) / 2;
-
-        if (vec[mid] == x) {
-            return true;
-        }
-        if (vec[mid] > x) {
-            return binarySearch(vec, left, mid - 1, x);
-        }
-
-        return binarySearch(vec, mid + 1, right, x);
-    }
-    return false;
 }
 
 }  // namespace spa

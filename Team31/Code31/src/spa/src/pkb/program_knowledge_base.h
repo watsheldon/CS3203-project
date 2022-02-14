@@ -53,10 +53,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void SetRel(Index<SetEntityType::kStmt> stmt_no,
                 std::vector<int> var_index) override;
 
-    bool ExistModifies(Index<QueryEntityType::kStmt> stmt_no,
-                       Index<QueryEntityType::kVar> var_index) override;
-    bool ExistUses(Index<QueryEntityType::kStmt> stmt_no,
-                   Index<QueryEntityType::kVar> var_index) override;
+    bool ExistModifies(int stmt_no, int var_index) override;
+    bool ExistUses(int stmt_no, int var_index) override;
 
     std::vector<int> GetModifies(Index<QueryEntityType::kStmt> stmt_no,
                                  const std::vector<int> &filtered_var) override;
@@ -73,8 +71,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     void IndexToName(QueryEntityType et, const std::vector<int> &index_list,
                      std::list<std::string> &names) override;
-
-    bool binarySearch(std::vector<int> vec, int left, int right, int x);
 
     // mark the end of source processor
     void Compile() override;

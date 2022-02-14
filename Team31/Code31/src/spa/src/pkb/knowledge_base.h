@@ -92,15 +92,14 @@ class KnowledgeBase {
      * Check if modifies relationships between stmt# and its variable
      * exist
      */
-    virtual bool ExistModifies(Index<QueryEntityType::kStmt> stmt_no,
-                               Index<QueryEntityType::kVar> var_index) = 0;
+
+    virtual bool ExistModifies(int stmt_no, int var_index) = 0;
 
     /**
      * Check if uses relationships between stmt# and its variable
      * exist
      */
-    virtual bool ExistUses(Index<QueryEntityType::kStmt> stmt_no,
-                           Index<QueryEntityType::kVar> var_index) = 0;
+    virtual bool ExistUses(int stmt_no, int var_index) = 0;
 
     /**
      * Gets a var_index that is modified in stmt#
