@@ -1,10 +1,10 @@
 #ifndef SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_DECLARATION_H_
 #define SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_DECLARATION_H_
-#include<string>
+#include <string>
 #include <utility>
 
 namespace spa {
-enum class DeclarationType{
+enum class DeclarationType {
     STMT,
     READ,
     PRINT,
@@ -18,7 +18,7 @@ enum class DeclarationType{
 };
 
 std::string_view keyword(DeclarationType type) {
-    switch(type) {
+    switch (type) {
         case DeclarationType::STMT:
             return "stmt";
         case DeclarationType::READ:
@@ -42,23 +42,16 @@ std::string_view keyword(DeclarationType type) {
     }
 }
 
-class DeclarationClause{
+class DeclarationClause {
   private:
     DeclarationType type;
     std::string synonym;
+
   public:
-    void setDeclarationType(DeclarationType t) {
-        type = t;
-    }
-    void setSynonym(std::string string) {
-        synonym = string;
-    }
-    DeclarationType getDeclarationType() {
-        return this->type;
-    }
-    std::string getDeclarationSynonym() {
-        return this->synonym;
-    }
+    void setDeclarationType(DeclarationType t) { type = t; }
+    void setSynonym(std::string string) { synonym = string; }
+    DeclarationType getDeclarationType() { return this->type; }
+    std::string getDeclarationSynonym() { return this->synonym; }
 };
-}
-#endif //SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_DECLARATION_H_
+}  // namespace spa
+#endif  // SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_DECLARATION_H_

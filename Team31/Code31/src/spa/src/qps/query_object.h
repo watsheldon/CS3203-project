@@ -1,14 +1,15 @@
 #ifndef SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_
 #define SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_
 
+#include <vector>
+
 #include "declaration_cl.h"
 #include "pattern_cl.h"
 #include "select_cl.h"
 #include "such_that_cl.h"
-#include <vector>
 
 namespace spa {
-class QueryObject{
+class QueryObject {
   private:
     bool isValidQuery;
     bool hasSuchThatClause;
@@ -17,6 +18,7 @@ class QueryObject{
     SelectClause select;
     SuchThatClause such_that_;
     PatternClause pattern;
+
   public:
     QueryObject();
 
@@ -38,6 +40,6 @@ class QueryObject{
     void setHasSuchThat(bool hasSuchThat);
     void setHasPattern(bool hasPattern);
 };
-}
+}  // namespace spa
 
-#endif //SPA_TEAM31_CODE31_SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_
+#endif  // SPA_TEAM31_CODE31_SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_
