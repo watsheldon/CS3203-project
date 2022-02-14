@@ -14,7 +14,7 @@ namespace spa {
 using PN = spa::PolishNotation;
 using CN = spa::ContainerNode;
 
-template <EntityType>
+template <SetEntityType>
 struct Index {
     explicit Index(int i = 0) : value(i) {}
     const int value;
@@ -42,51 +42,51 @@ class KnowledgeBase {
      * containing stmt# (only stmt at the outermost same level) inside the
      * procedure.
      */
-    virtual void SetIndex(Index<EntityType::kProc> proc_index,
-                          Index<EntityType::kStmtLst> stmtlst_index) = 0;
+    virtual void SetIndex(Index<SetEntityType::kProc> proc_index,
+                          Index<SetEntityType::kStmtLst> stmtlst_index) = 0;
 
     /**
      * Links stmt# of while statement with its statement list's index
      * containing stmt# (only stmt at the outermost same level) inside while
      * loop.
      */
-    virtual void SetIndex(Index<EntityType::kStmt> while_stmt,
-                          Index<EntityType::kStmtLst> stmtlst_index) = 0;
+    virtual void SetIndex(Index<SetEntityType::kStmt> while_stmt,
+                          Index<SetEntityType::kStmtLst> stmtlst_index) = 0;
 
     /**
      * Links stmt# of if statement with its two statement lists' indices
      * containing stmt# (only stmt at the outermost same level) inside then
      * clause and else clause respectively.
      */
-    virtual void SetIndex(Index<EntityType::kStmt> if_stmt,
-                          Index<EntityType::kStmtLst> then_index,
-                          Index<EntityType::kStmtLst> else_index) = 0;
+    virtual void SetIndex(Index<SetEntityType::kStmt> if_stmt,
+                          Index<SetEntityType::kStmtLst> then_index,
+                          Index<SetEntityType::kStmtLst> else_index) = 0;
 
     /**
      * Stores each statement list to its respective index.
      */
-    virtual void SetLst(Index<EntityType::kStmtLst> stmtlst_index,
+    virtual void SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
                         std::vector<int> stmtlst) = 0;
 
     /**
      * Sets direct Modifes relationships between stmt# and its variable's
      * index
      */
-    virtual void SetRel(Index<EntityType::kStmt> stmt_no,
-                        Index<EntityType::kVar> var_index) = 0;
+    virtual void SetRel(Index<SetEntityType::kStmt> stmt_no,
+                        Index<SetEntityType::kVar> var_index) = 0;
 
 
     /**
      * Sets direct Uses relationships between stmt# and its variable
      * indices
      */
-    virtual void SetRel(Index<EntityType::kStmt> stmt_no,
+    virtual void SetRel(Index<SetEntityType::kStmt> stmt_no,
                         std::vector<int> var_indices) = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type
      */
-    virtual std::vector<int> GetAllEntityIndices(EntityType et) = 0;
+    virtual std::vector<int> GetAllEntityIndices(QueryEntityType et) = 0;
     virtual std::vector<int> GetAllEntityIndices(StmtType st) = 0;
 
     /**
@@ -95,7 +95,8 @@ class KnowledgeBase {
      * internal data structure. The statement types are using stmt# directly as
      * their indices.
      */
-    virtual void IndexToName(EntityType et, const std::vector<int> &index_list,
+    virtual void IndexToName(QueryEntityType et,
+                             const std::vector<int> &index_list,
                              std::list<std::string> &names) = 0;
 
     /**

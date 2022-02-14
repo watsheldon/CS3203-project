@@ -37,27 +37,26 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     explicit ProgramKnowledgeBase(const std::shared_ptr<BasicEntities> &init);
 
     // set stmtLst: useful for Parent and Follows relationships
-    void SetIndex(Index<EntityType::kProc> proc_index,
-                  Index<EntityType::kStmtLst> stmtlst_index) override;
-    void SetIndex(Index<EntityType::kStmt> stmt_no,
-                  Index<EntityType::kStmtLst> stmtlst_index) override;
-    void SetIndex(Index<EntityType::kStmt> stmt_no,
-                  Index<EntityType::kStmtLst> then_index,
-                  Index<EntityType::kStmtLst> else_index) override;
-    void SetLst(Index<EntityType::kStmtLst> stmtlst_index,
+    void SetIndex(Index<SetEntityType::kProc> proc_index,
+                  Index<SetEntityType::kStmtLst> stmtlst_index) override;
+    void SetIndex(Index<SetEntityType::kStmt> stmt_no,
+                  Index<SetEntityType::kStmtLst> stmtlst_index) override;
+    void SetIndex(Index<SetEntityType::kStmt> stmt_no,
+                  Index<SetEntityType::kStmtLst> then_index,
+                  Index<SetEntityType::kStmtLst> else_index) override;
+    void SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
                 std::vector<int> stmtlst) override;
 
     // set direct Uses and Modifies relationships
-    void SetRel(Index<EntityType::kStmt> stmt_no,
-                Index<EntityType::kVar> var_index) override;
-
-    void SetRel(Index<EntityType::kStmt> stmt_no,
+    void SetRel(Index<SetEntityType::kStmt> stmt_no,
+                Index<SetEntityType::kVar> var_index) override;
+    void SetRel(Index<SetEntityType::kStmt> stmt_no,
                 std::vector<int> var_index) override;
 
-    std::vector<int> GetAllEntityIndices(EntityType et) override;
+    std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
 
-    void IndexToName(EntityType et, const std::vector<int> &index_list,
+    void IndexToName(QueryEntityType et, const std::vector<int> &index_list,
                      std::list<std::string> &names) override;
     // mark the end of source processor
     void Compile() override;
