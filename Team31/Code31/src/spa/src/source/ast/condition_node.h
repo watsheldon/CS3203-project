@@ -11,8 +11,8 @@ class ConditionNode : public AbstractSyntaxTreeNode {
   public:
     void AddVariable(const VariableNode *variable);
     void AddConstant(const ConstantNode *constant);
-    [[nodiscard]] const std::set<const VariableNode *> &get_variables() const;
-    [[nodiscard]] const std::set<const ConstantNode *> &get_constants() const;
+    [[nodiscard]] const std::set<const VariableNode *> &GetVariables() const;
+    [[nodiscard]] const std::set<const ConstantNode *> &GetConstants() const;
 
   private:
     std::set<const VariableNode *> variables_;

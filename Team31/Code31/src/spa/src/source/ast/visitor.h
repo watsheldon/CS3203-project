@@ -21,7 +21,7 @@ class AstVisitor {
     virtual void Visit(const IfNode &if_node) = 0;
     virtual void Visit(const WhileNode &while_node) = 0;
     virtual void Visit(const ReadNode &read_node) = 0;
-    virtual void Visit(const PrintNode &write_node) = 0;
+    virtual void Visit(const PrintNode &print_node) = 0;
     virtual ~AstVisitor() = 0;
 };
 inline AstVisitor::~AstVisitor() = default;

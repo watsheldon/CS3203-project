@@ -22,7 +22,7 @@ class DesignAbstractionExtractor : public AstVisitor {
     void Visit(const IfNode &if_node) override;
     void Visit(const WhileNode &while_node) override;
     void Visit(const ReadNode &read_node) override;
-    void Visit(const PrintNode &write_node) override;
+    void Visit(const PrintNode &print_node) override;
 
   private:
     PKB pkb_;
