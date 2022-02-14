@@ -14,23 +14,11 @@ TypeStatementsStore::TypeStatementsStore(size_t size, std::vector<int>&& reads,
     type_to_statements_[3] = whiles;
     type_to_statements_[4] = ifs;
     type_to_statements_[5] = assigns;
-    for (auto& i : type_to_statements_[0]) {
-        statement_to_type_[i] = StmtType::kRead;
-    }
-    for (auto& i : type_to_statements_[1]) {
-        statement_to_type_[i] = StmtType::kPrint;
-    }
-    for (auto& i : type_to_statements_[2]) {
-        statement_to_type_[i] = StmtType::kCall;
-    }
-    for (auto& i : type_to_statements_[3]) {
-        statement_to_type_[i] = StmtType::kWhile;
-    }
-    for (auto& i : type_to_statements_[4]) {
-        statement_to_type_[i] = StmtType::kIf;
-    }
-    for (auto& i : type_to_statements_[5]) {
-        statement_to_type_[i] = StmtType::kAssign;
+    for (int i = 0; i < 6; ++i) {
+        StmtType type = static_cast<StmtType>(i);
+        for (auto j : type_to_statements_[i]) {
+            statement_to_type_[j] = type;
+        }
     }
 }
 std::vector<int> TypeStatementsStore::GetStatements(StmtType st) {

@@ -13,8 +13,8 @@ class ProcedureNameStore {
     explicit ProcedureNameStore(std::vector<std::string> &&names);
     [[nodiscard]] const std::string &GetName(int index) const;
     [[nodiscard]] int GetIndex(const std::string &name) const;
-    [[nodiscard]] const std::vector<std::string> &GetAllName() const;
-    [[nodiscard]] size_t GetCount() const;
+    [[nodiscard]] const std::vector<std::string> &GetAllNames() const;
+    [[nodiscard]] size_t size() const;
 
   private:
     std::vector<std::string> index_to_name_;

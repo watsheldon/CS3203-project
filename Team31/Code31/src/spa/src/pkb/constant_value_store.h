@@ -13,8 +13,8 @@ class ConstantValueStore {
     explicit ConstantValueStore(std::vector<std::string> &&values);
     [[nodiscard]] const std::string &GetValue(int index) const;
     [[nodiscard]] int GetIndex(const std::string &value) const;
-    [[nodiscard]] const std::vector<std::string> &GetAllValue() const;
-    [[nodiscard]] size_t GetCount() const;
+    [[nodiscard]] const std::vector<std::string> &GetAllValues() const;
+    [[nodiscard]] size_t size() const;
 
   private:
     std::vector<std::string> index_to_value_;

@@ -23,30 +23,31 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(
                      std::move(init->whiles), std::move(init->ifs),
                      std::move(init->assigns)) {}
 
-void ProgramKnowledgeBase::SetIndex(int proc_index, int stmtlst_index,
-                                    EntityType et) {
+void ProgramKnowledgeBase::SetIndex(Index<EntityType::kProc> proc_index,
+                                    Index<EntityType::kStmtLst> stmtlst_index) {
     assert(!compiled);
-    assert(et == EntityType::kProc);
-    proc_stmtlst_.Set(proc_index, stmtlst_index);
+    proc_stmtlst_.Set(proc_index.value, stmtlst_index.value);
 }
-void ProgramKnowledgeBase::SetIndex(int while_stmt, int stmtlst_index,
-                                    StmtType st) {
+void ProgramKnowledgeBase::SetIndex(Index<EntityType::kStmt> while_stmt,
+                                    Index<EntityType::kStmtLst> stmtlst_index) {
     assert(!compiled);
-    assert(st == StmtType::kWhile);
-    while_stmtlst_.Set(while_stmt, stmtlst_index);
+    while_stmtlst_.Set(while_stmt.value, stmtlst_index.value);
 }
-void ProgramKnowledgeBase::SetIndex(int if_stmt, int then_index,
-                                    int else_index) {
+void ProgramKnowledgeBase::SetIndex(Index<EntityType::kStmt> if_stmt,
+                                    Index<EntityType::kStmtLst> then_index,
+                                    Index<EntityType::kStmtLst> else_index) {
     assert(!compiled);
-    if_stmtlst_.Set(if_stmt, then_index, else_index);
-}
-
-void ProgramKnowledgeBase::SetLst(int stmtlst_index, std::vector<int> stmtlst) {
-    assert(!compiled);
-    stmtlst_stmt_.Set(stmtlst_index, std::move(stmtlst));
+    if_stmtlst_.Set(if_stmt.value, then_index.value, else_index.value);
 }
 
-void ProgramKnowledgeBase::SetRel(int stmt_no, int var_index) {
+void ProgramKnowledgeBase::SetLst(Index<EntityType::kStmtLst> stmtlst_index,
+                                  std::vector<int> stmtlst) {
+    assert(!compiled);
+    stmtlst_stmt_.Set(stmtlst_index.value, std::move(stmtlst));
+}
+
+void ProgramKnowledgeBase::SetRel(Index<EntityType::kStmt> stmt_no,
+                                  Index<EntityType::kVar> var_index) {
     assert(!compiled);
 }
 
@@ -62,18 +63,17 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(EntityType et) {
     std::vector<int> results;
     switch (et) {
         case EntityType::kProc:
-            results.reserve(proc_name_.GetCount());
-            std::iota(results.begin(), results.end(), 1);
+            results.resize(proc_name_.size());
         case EntityType::kVar:
-            results.reserve(var_name_.GetCount());
-            std::iota(results.begin(), results.end(), 1);
+            results.resize(var_name_.size());
         case EntityType::kConst:
-            results.reserve(const_value_.GetCount());
-            std::iota(results.begin(), results.end(), 1);
+            results.resize(const_value_.size());
+        case EntityType::kStmt:
+            results.resize(stmt_count_);
         default:
-            results.reserve(stmt_count_);
-            std::iota(results.begin(), results.end(), 1);
+            results.resize(0);
     }
+    std::iota(results.begin(), results.end(), 1);
     return results;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(StmtType st) {

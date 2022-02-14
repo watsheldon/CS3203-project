@@ -35,13 +35,19 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     explicit ProgramKnowledgeBase(const std::shared_ptr<BasicEntities> &init);
 
     // set stmtLst: useful for Parent and Follows relationships
-    void SetIndex(int proc_index, int stmtlst_index, EntityType et) override;
-    void SetIndex(int stmt_no, int stmtlst_index, StmtType st) override;
-    void SetIndex(int stmt_no, int then_index, int else_index) override;
-    void SetLst(int stmtlst_index, std::vector<int> stmtlst) override;
+    void SetIndex(Index<EntityType::kProc> proc_index,
+                  Index<EntityType::kStmtLst> stmtlst_index) override;
+    void SetIndex(Index<EntityType::kStmt> stmt_no,
+                  Index<EntityType::kStmtLst> stmtlst_index) override;
+    void SetIndex(Index<EntityType::kStmt> stmt_no,
+                  Index<EntityType::kStmtLst> then_index,
+                  Index<EntityType::kStmtLst> else_index) override;
+    void SetLst(Index<EntityType::kStmtLst> stmtlst_index,
+                std::vector<int> stmtlst) override;
 
     // set direct Uses and Modifies relationships
-    void SetRel(int stmt_no, int var_index) override;
+    void SetRel(Index<EntityType::kStmt> stmt_no,
+                Index<EntityType::kVar> var_index) override;
 
     std::vector<int> GetAllEntityIndices(EntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;

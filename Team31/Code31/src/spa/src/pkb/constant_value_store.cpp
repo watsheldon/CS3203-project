@@ -13,15 +13,14 @@ const std::string& ConstantValueStore ::GetValue(int index) const {
     return index_to_value_.at(index);
 }
 int ConstantValueStore ::GetIndex(const std::string& value) const {
-    if (value_to_index_.find(value) == value_to_index_.end()) {
+    auto iter = value_to_index_.find(value);
+    if (iter == value_to_index_.end()) {
         return 0;
     }
-    return value_to_index_.at(value);
+    return iter->second;
 }
-const std::vector<std::string>& ConstantValueStore::GetAllValue() const {
+const std::vector<std::string>& ConstantValueStore::GetAllValues() const {
     return index_to_value_;
 }
-size_t ConstantValueStore::GetCount() const {
-    return index_to_value_.size() - 1;
-}
+size_t ConstantValueStore::size() const { return index_to_value_.size() - 1; }
 }  // namespace spa

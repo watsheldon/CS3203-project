@@ -10,15 +10,14 @@ const std::string& ProcedureNameStore::GetName(int index) const {
     return index_to_name_.at(index);
 }
 int ProcedureNameStore::GetIndex(const std::string& name) const {
-    if (name_to_index_.find(name) == name_to_index_.end()) {
+    auto iter = name_to_index_.find(name);
+    if (iter == name_to_index_.end()) {
         return 0;
     }
-    return name_to_index_.at(name);
+    return iter->second;
 }
-const std::vector<std::string>& ProcedureNameStore::GetAllName() const {
+const std::vector<std::string>& ProcedureNameStore::GetAllNames() const {
     return index_to_name_;
 }
-size_t ProcedureNameStore::GetCount() const {
-    return index_to_name_.size() - 1;
-}
+size_t ProcedureNameStore::size() const { return index_to_name_.size() - 1; }
 }  // namespace spa

@@ -1,7 +1,3 @@
-//
-// Created by Yichen Gu on 13/2/22.
-//
-
 #ifndef SPA_SRC_SPA_SRC_COMMON_ENTITY_TYPE_ENUM_H_
 #define SPA_SRC_SPA_SRC_COMMON_ENTITY_TYPE_ENUM_H_
 

@@ -14,6 +14,11 @@ namespace spa {
 using PN = spa::PolishNotation;
 using CN = spa::ContainerNode;
 
+template <EntityType>
+struct Index {
+    int value = 0;
+};
+
 struct BasicEntities {
     std::vector<std::string> procedures;
     std::vector<std::string> variables;
@@ -36,32 +41,38 @@ class KnowledgeBase {
      * containing stmt# (only stmt at the outermost same level) inside the
      * procedure.
      */
-    virtual void SetIndex(int proc_index, int stmtlst_index, EntityType et) = 0;
+    virtual void SetIndex(Index<EntityType::kProc> proc_index,
+                          Index<EntityType::kStmtLst> stmtlst_index) = 0;
 
     /**
      * Links stmt# of while statement with its statement list's index
      * containing stmt# (only stmt at the outermost same level) inside while
      * loop.
      */
-    virtual void SetIndex(int while_stmt, int stmtlst_index, StmtType st) = 0;
+    virtual void SetIndex(Index<EntityType::kStmt> while_stmt,
+                          Index<EntityType::kStmtLst> stmtlst_index) = 0;
 
     /**
      * Links stmt# of if statement with its two statement lists' indices
      * containing stmt# (only stmt at the outermost same level) inside then
      * clause and else clause respectively.
      */
-    virtual void SetIndex(int if_stmt, int then_index, int else_index) = 0;
+    virtual void SetIndex(Index<EntityType::kStmt> if_stmt,
+                          Index<EntityType::kStmtLst> then_index,
+                          Index<EntityType::kStmtLst> else_index) = 0;
 
     /**
      * Stores each statement list to its respective index.
      */
-    virtual void SetLst(int stmtlst_index, std::vector<int> stmtlst) = 0;
+    virtual void SetLst(Index<EntityType::kStmtLst> stmtlst_index,
+                        std::vector<int> stmtlst) = 0;
 
     /**
      * Sets direct Uses relationships between print stmt# and its variable's
      * index
      */
-    virtual void SetRel(int stmt_no, int var_index) = 0;
+    virtual void SetRel(Index<EntityType::kStmt> stmt_no,
+                        Index<EntityType::kVar> var_index) = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type

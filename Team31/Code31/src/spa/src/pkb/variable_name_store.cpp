@@ -16,8 +16,8 @@ int VariableNameStore::GetIndex(const std::string& name) const {
     }
     return name_to_index_.at(name);
 }
-const std::vector<std::string>& VariableNameStore::GetAllName() const {
+const std::vector<std::string>& VariableNameStore::GetAllNames() const {
     return index_to_name_;
 }
-size_t VariableNameStore::GetCount() const { return index_to_name_.size() - 1; }
+size_t VariableNameStore::size() const { return index_to_name_.size() - 1; }
 }  // namespace spa

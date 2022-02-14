@@ -19,7 +19,6 @@ int spa::StmtlstStatementsStore::GetStmtlst(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no];
 }
 std::vector<int> spa::StmtlstStatementsStore::GetStatements(int stmtlst_index) {
-    std::vector<int> statements(stmtlst_to_statements_[stmtlst_index]);
-    return statements;
+    return stmtlst_to_statements_[stmtlst_index];
 }
 }  // namespace spa

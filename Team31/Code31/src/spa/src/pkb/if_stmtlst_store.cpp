@@ -13,19 +13,16 @@ void spa::IfStmtlstStore::Set(int stmt_no, int then_index, int else_index) {
 }
 
 int spa::IfStmtlstStore::GetStmtNo(int stmtlst_index) const {
-    return int{stmtlst_to_if_.at(stmtlst_index)};
+    return stmtlst_to_if_[stmtlst_index];
 }
 
 int spa::IfStmtlstStore::GetThenStmtlst(int stmt_no) const {
-    return int{if_to_stmtlst_.at(stmt_no).then_index};
+    return if_to_stmtlst_[stmt_no].then_index;
 }
 int spa::IfStmtlstStore::GetElseStmtlst(int stmt_no) const {
-    return if_to_stmtlst_.at(stmt_no).else_index;
+    return if_to_stmtlst_[stmt_no].else_index;
 }
 IfPairs IfStmtlstStore::GetBothStmtlst(int stmt_no) const {
-    IfPairs indices;
-    indices.then_index = int{if_to_stmtlst_.at(stmt_no).then_index};
-    indices.else_index = int{if_to_stmtlst_.at(stmt_no).else_index};
-    return indices;
+    return if_to_stmtlst_[stmt_no];
 }
 }  // namespace spa
