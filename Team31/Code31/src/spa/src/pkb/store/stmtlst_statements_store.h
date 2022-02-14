@@ -1,9 +1,9 @@
-#ifndef SPA_SRC_SPA_SRC_PKB_STMTLST_STATEMENTS_STORE_H_
-#define SPA_SRC_SPA_SRC_PKB_STMTLST_STATEMENTS_STORE_H_
+#ifndef SPA_SRC_SPA_SRC_PKB_STORE_STMTLST_STATEMENTS_STORE_H_
+#define SPA_SRC_SPA_SRC_PKB_STORE_STMTLST_STATEMENTS_STORE_H_
 
 #include <vector>
 
-#include "knowledge_base.h"
+#include "pkb/knowledge_base.h"
 
 namespace spa {
 class StmtlstStatementsStore {
@@ -18,4 +18,4 @@ class StmtlstStatementsStore {
     std::vector<int> statement_to_stmtlst_;
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_PKB_STMTLST_STATEMENTS_STORE_H_
+#endif  // SPA_SRC_SPA_SRC_PKB_STORE_STMTLST_STATEMENTS_STORE_H_

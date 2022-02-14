@@ -1,16 +1,16 @@
-#ifndef SPA_SRC_SPA_SRC_PKB_VARIABLE_NAME_STORE_H_
-#define SPA_SRC_SPA_SRC_PKB_VARIABLE_NAME_STORE_H_
+#ifndef SPA_SRC_SPA_SRC_PKB_STORE_PROCEDURE_NAME_STORE_H_
+#define SPA_SRC_SPA_SRC_PKB_STORE_PROCEDURE_NAME_STORE_H_
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include "knowledge_base.h"
+#include "pkb/knowledge_base.h"
 
 namespace spa {
-class VariableNameStore {
+class ProcedureNameStore {
   public:
-    explicit VariableNameStore(std::vector<std::string> &&names);
+    explicit ProcedureNameStore(std::vector<std::string> &&names);
     [[nodiscard]] const std::string &GetName(int index) const;
     [[nodiscard]] int GetIndex(const std::string &name) const;
     [[nodiscard]] const std::vector<std::string> &GetAllNames() const;
@@ -22,4 +22,4 @@ class VariableNameStore {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_PKB_VARIABLE_NAME_STORE_H_
+#endif  // SPA_SRC_SPA_SRC_PKB_STORE_PROCEDURE_NAME_STORE_H_

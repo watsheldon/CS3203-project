@@ -1,6 +1,6 @@
 #include "constant_value_store.h"
 
-#include "knowledge_base.h"
+#include "pkb/knowledge_base.h"
 
 namespace spa {
 ConstantValueStore ::ConstantValueStore(std::vector<std::string>&& values)

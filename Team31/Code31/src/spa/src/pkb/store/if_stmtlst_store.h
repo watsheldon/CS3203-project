@@ -1,7 +1,7 @@
-#ifndef SPA_SRC_SPA_SRC_PKB_IF_STMTLST_STORE_H_
-#define SPA_SRC_SPA_SRC_PKB_IF_STMTLST_STORE_H_
+#ifndef SPA_SRC_SPA_SRC_PKB_STORE_IF_STMTLST_STORE_H_
+#define SPA_SRC_SPA_SRC_PKB_STORE_IF_STMTLST_STORE_H_
 
-#include "knowledge_base.h"
+#include "pkb/knowledge_base.h"
 
 namespace spa {
 struct IfPairs {
@@ -23,4 +23,4 @@ class IfStmtlstStore {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_PKB_IF_STMTLST_STORE_H_
+#endif  // SPA_SRC_SPA_SRC_PKB_STORE_IF_STMTLST_STORE_H_

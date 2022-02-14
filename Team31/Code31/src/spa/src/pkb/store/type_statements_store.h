@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_PKB_TYPE_STATEMENTS_STORE_H_
-#define SPA_SRC_SPA_SRC_PKB_TYPE_STATEMENTS_STORE_H_
+#ifndef SPA_SRC_SPA_SRC_PKB_STORE_TYPE_STATEMENTS_STORE_H_
+#define SPA_SRC_SPA_SRC_PKB_STORE_TYPE_STATEMENTS_STORE_H_
 
 #include <vector>
 
@@ -20,4 +20,4 @@ class TypeStatementsStore {
     std::vector<StmtType> statement_to_type_;
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_PKB_TYPE_STATEMENTS_STORE_H_
+#endif  // SPA_SRC_SPA_SRC_PKB_STORE_TYPE_STATEMENTS_STORE_H_

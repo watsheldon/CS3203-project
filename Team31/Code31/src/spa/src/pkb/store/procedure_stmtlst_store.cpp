@@ -1,6 +1,6 @@
 #include "procedure_stmtlst_store.h"
 
-#include "knowledge_base.h"
+#include "pkb/knowledge_base.h"
 
 namespace spa {
 spa::ProcedureStmtlstStore::ProcedureStmtlstStore(size_t proc_size,

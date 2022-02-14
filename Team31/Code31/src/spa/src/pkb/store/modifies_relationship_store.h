@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_PKB_MODIFIES_RELATIONSHIP_STORE_H_
-#define SPA_SRC_SPA_SRC_PKB_MODIFIES_RELATIONSHIP_STORE_H_
+#ifndef SPA_SRC_SPA_SRC_PKB_STORE_MODIFIES_RELATIONSHIP_STORE_H_
+#define SPA_SRC_SPA_SRC_PKB_STORE_MODIFIES_RELATIONSHIP_STORE_H_
 
 #include <vector>
 
@@ -9,7 +9,8 @@ namespace spa {
 class ModifiesRelationshipStore {
   public:
     ModifiesRelationshipStore(size_t stmtSize, size_t varSize);
-    void Set(int stmt_no, int var_index); // Set modify relationship between stmt_no and var_index
+    void Set(int stmt_no, int var_index);  // Set modify relationship between
+                                           // stmt_no and var_index
     [[nodiscard]] std::vector<int> GetStmtNo(int var_index) const; //Gets a list of stmt that modifies var_index
     [[nodiscard]] int GetVarIndex(int stmt_no) const; //Gets a var_index that is modified in given stmt_no
 
@@ -19,4 +20,4 @@ class ModifiesRelationshipStore {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_PKB_MODIFIES_RELATIONSHIP_STORE_H_
+#endif  // SPA_SRC_SPA_SRC_PKB_STORE_MODIFIES_RELATIONSHIP_STORE_H_

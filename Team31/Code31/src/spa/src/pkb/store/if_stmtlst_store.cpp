@@ -1,6 +1,6 @@
 #include "if_stmtlst_store.h"
 
-#include "knowledge_base.h"
+#include "pkb/knowledge_base.h"
 
 namespace spa {
 spa::IfStmtlstStore::IfStmtlstStore(size_t stmt_count, size_t stmtlst_count)

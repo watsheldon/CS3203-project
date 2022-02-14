@@ -1,10 +1,10 @@
-#ifndef SPA_SRC_SPA_SRC_PKB_PROCEDURE_STMTLST_STORE_H_
-#define SPA_SRC_SPA_SRC_PKB_PROCEDURE_STMTLST_STORE_H_
+#ifndef SPA_SRC_SPA_SRC_PKB_STORE_PROCEDURE_STMTLST_STORE_H_
+#define SPA_SRC_SPA_SRC_PKB_STORE_PROCEDURE_STMTLST_STORE_H_
 
 #include <unordered_map>
 #include <vector>
 
-#include "knowledge_base.h"
+#include "pkb/knowledge_base.h"
 
 namespace spa {
 class ProcedureStmtlstStore {
@@ -20,4 +20,4 @@ class ProcedureStmtlstStore {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_PKB_PROCEDURE_STMTLST_STORE_H_
+#endif  // SPA_SRC_SPA_SRC_PKB_STORE_PROCEDURE_STMTLST_STORE_H_

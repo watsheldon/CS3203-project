@@ -1,11 +1,11 @@
-#ifndef SPA_SRC_SPA_SRC_PKB_CONSTANT_VALUE_STORE_H_
-#define SPA_SRC_SPA_SRC_PKB_CONSTANT_VALUE_STORE_H_
+#ifndef SPA_SRC_SPA_SRC_PKB_STORE_CONSTANT_VALUE_STORE_H_
+#define SPA_SRC_SPA_SRC_PKB_STORE_CONSTANT_VALUE_STORE_H_
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include "knowledge_base.h"
+#include "pkb/knowledge_base.h"
 
 namespace spa {
 class ConstantValueStore {
@@ -22,4 +22,4 @@ class ConstantValueStore {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_PKB_CONSTANT_VALUE_STORE_H_
+#endif  // SPA_SRC_SPA_SRC_PKB_STORE_CONSTANT_VALUE_STORE_H_
