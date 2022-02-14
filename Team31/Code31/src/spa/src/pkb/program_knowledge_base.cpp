@@ -1,8 +1,13 @@
 #include "program_knowledge_base.h"
 
+#include <algorithm>
 #include <cassert>
+#include <list>
+#include <vector>
 
+#include "common/entity_type_enum.h"
 #include "common/index.h"
+#include "knowledge_base.h"
 
 namespace spa {
 ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
