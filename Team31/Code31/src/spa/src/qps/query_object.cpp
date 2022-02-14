@@ -1,34 +1,60 @@
 #include "query_object.h"
 
 namespace spa{
+QueryObject::QueryObject() : isValidQuery(true), hasSuchThatClause(false), hasPatternClause(false) {}
 
-QueryObject::QueryObject(bool isValid,
-                         bool hasSuchThat,
-                         bool hasPattern,
-                         std::vector<Declaration> declarations,
-                         Select select,
-                         SuchThat such_that_,
-                         Pattern pattern)
-        : isValid(isValid),
-          hasSuchThat(hasSuchThat),
-          hasPattern(hasPattern),
-          declarations(declarations),
-          select(select),
-          such_that_(such_that_),
-          pattern(pattern) {}
-
-std::vector<Declaration> QueryObject::getDeclarations() {
+std::vector<DeclarationClause> QueryObject::getDeclarations() {
     return this->declarations;
 }
-Select QueryObject::getSelect() {
+SelectClause QueryObject::getSelect() {
     return this->select;
 }
 
-SuchThat QueryObject::getSuchThat() {
+SuchThatClause QueryObject::getSuchThat() {
     return this->such_that_;
 }
 
-Pattern QueryObject::getPattern() {
+PatternClause QueryObject::getPattern() {
     return this->pattern;
+}
+
+bool QueryObject::isValid() {
+    return isValidQuery;
+}
+bool QueryObject::hasSuchThat() {
+    return hasSuchThatClause;
+}
+bool QueryObject::hasPattern() {
+    return hasPatternClause;
+}
+void QueryObject::addDeclaration(DeclarationType type, std::string synonym) {
+    DeclarationClause declaration_cl;
+    declaration_cl.setDeclarationType(type);
+    declaration_cl.setSynonym(synonym);
+    declarations.emplace_back(declaration_cl);
+}
+void QueryObject::setSelect(DeclarationType type, std::string synonym) {
+    select.setSelectType(type);
+    select.setSynonym(synonym);
+}
+
+void QueryObject::setSuchThat(SuchThatType type, std::string ref1, std::string ref2) {
+    such_that_.setType(type);
+    such_that_.setRef1(ref1);
+    such_that_.setRef2(ref2);
+}
+void QueryObject::setPattern(std::string syn, std::string ref1, std::string ref2) {
+    pattern.setSynonym(syn);
+    pattern.setRef1(ref1);
+    pattern.setRef2(ref2);
+}
+void QueryObject::setIsValid(bool isValid) {
+    isValidQuery = isValid;
+}
+void QueryObject::setHasSuchThat(bool hasSuchThat) {
+    hasSuchThatClause = hasSuchThat;
+}
+void QueryObject::setHasPattern(bool hasPattern) {
+    hasPatternClause = hasPattern;
 }
 }
