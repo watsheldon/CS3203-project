@@ -3,6 +3,7 @@
 
 #include <list>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "common/entity_type_enum.h"
@@ -14,11 +15,16 @@ namespace spa {
 using PN = spa::PolishNotation;
 using CN = spa::ContainerNode;
 
-template <SetEntityType>
-struct Index {
-    explicit Index(int i = 0) : value(i) {}
+template <typename EnumClass, EnumClass EnumVal>
+struct IndexBase {
+    static_assert(std::is_same_v<EnumClass, SetEntityType> ||
+                  std::is_same_v<EnumClass, QueryEntityType>);
+    explicit IndexBase(int i = 0) : value(i) {}
     const int value;
 };
+
+template <auto EnumVal>
+struct Index : IndexBase<decltype(EnumVal), EnumVal> {};
 
 struct BasicEntities {
     std::vector<std::string> procedures;
@@ -75,13 +81,50 @@ class KnowledgeBase {
     virtual void SetRel(Index<SetEntityType::kStmt> stmt_no,
                         Index<SetEntityType::kVar> var_index) = 0;
 
-
     /**
      * Sets direct Uses relationships between stmt# and its variable
      * indices
      */
     virtual void SetRel(Index<SetEntityType::kStmt> stmt_no,
                         std::vector<int> var_indices) = 0;
+
+    /**
+     * Check if modifies relationships between stmt# and its variable
+     * exist
+     */
+    virtual bool existModifies(Index<QueryEntityType::kStmt> stmt_no,
+                               Index<QueryEntityType::kVar> var_index) = 0;
+
+    /**
+     * Check if uses relationships between stmt# and its variable
+     * exist
+     */
+    virtual bool existUses(Index<QueryEntityType::kStmt> stmt_no,
+                           Index<QueryEntityType::kVar> var_index) = 0;
+
+    /**
+     * Gets a var_index that is modified in stmt#
+     */
+    virtual int getModifies(Index<QueryEntityType::kStmt> stmt_no,
+                            std::vector<int> filtered_var) = 0;
+
+    /**
+     * Gets a list of stmt# that modifies var_index
+     */
+    virtual std::vector<int> getModifies(Index<QueryEntityType::kVar> var_index,
+                                         std::vector<int> filtered_stmt) = 0;
+
+    /**
+     * Gets a list of var_index that are used in stmt#
+     */
+    virtual std::vector<int> getUses(Index<QueryEntityType::kStmt> stmt_no,
+                                     std::vector<int> filtered_var) = 0;
+
+    /**
+     * Gets a list of stmt# that uses var_index
+     */
+    virtual std::vector<int> getUses(Index<QueryEntityType::kVar> var_index,
+                                     std::vector<int> filtered_stmt) = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type
