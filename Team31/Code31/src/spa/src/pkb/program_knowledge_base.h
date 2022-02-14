@@ -10,19 +10,19 @@
 #include <vector>
 
 #include "common/entity_type_enum.h"
-#include "constant_value_store.h"
 #include "common/polish_notation.h"
+#include "constant_value_store.h"
 #include "container_node.h"
 #include "if_stmtlst_store.h"
 #include "knowledge_base.h"
+#include "modifies_relationship_store.h"
 #include "procedure_name_store.h"
 #include "procedure_stmtlst_store.h"
 #include "stmtlst_statements_store.h"
 #include "type_statements_store.h"
+#include "uses_relationship_store.h"
 #include "variable_name_store.h"
 #include "while_stmtlst_store.h"
-#include "modifies_relationship_store.h"
-#include "uses_relationship_store.h"
 
 namespace spa {
 
@@ -52,7 +52,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                 Index<EntityType::kVar> var_index) override;
 
     void SetRel(Index<EntityType::kStmt> stmt_no,
-            std::vector<int> var_index) override;
+                std::vector<int> var_index) override;
 
     std::vector<int> GetAllEntityIndices(EntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
@@ -82,7 +82,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     TypeStatementsStore type_stmt_;
     ModifiesRelationshipStore modifies_rel_;
     UsesRelationshipStore uses_rel_;
-
 };
 
 }  // namespace spa
