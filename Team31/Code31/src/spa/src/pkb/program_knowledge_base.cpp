@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "common/index.h"
+
 namespace spa {
 ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
         : stmt_count_(init.assigns.size() + init.ifs.size() +

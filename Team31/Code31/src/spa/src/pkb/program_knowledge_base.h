@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "common/entity_type_enum.h"
+#include "common/index.h"
 #include "common/polish_notation.h"
 #include "constant_value_store.h"
 #include "container_node.h"

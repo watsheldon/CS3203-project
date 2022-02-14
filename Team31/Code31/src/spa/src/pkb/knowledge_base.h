@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "common/entity_type_enum.h"
+#include "common/index.h"
 #include "common/polish_notation.h"
 #include "container_node.h"
 
@@ -14,17 +15,6 @@ namespace spa {
 
 using PN = spa::PolishNotation;
 using CN = spa::ContainerNode;
-
-template <typename EnumClass, EnumClass EnumVal>
-struct IndexBase {
-    static_assert(std::is_same_v<EnumClass, SetEntityType> ||
-                  std::is_same_v<EnumClass, QueryEntityType>);
-    explicit IndexBase(int i = 0) : value(i) {}
-    const int value;
-};
-
-template <auto EnumVal>
-struct Index : IndexBase<decltype(EnumVal), EnumVal> {};
 
 struct BasicEntities {
     std::vector<std::string> procedures;
