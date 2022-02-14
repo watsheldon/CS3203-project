@@ -15,4 +15,6 @@ bool PolishNotation::SupersetOf(const PolishNotation& other) const {
     // essentially a substring problem
     return *this == other;  // placeholder for now
 }
+
+std::vector<int> PolishNotation::GetAllVarIndices() const {}
 }  // namespace spa

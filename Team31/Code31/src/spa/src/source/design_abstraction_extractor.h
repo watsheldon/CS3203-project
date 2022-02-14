@@ -13,7 +13,7 @@ class DesignAbstractionExtractor : public AstVisitor {
     using PKB = std::unique_ptr<ProgramKnowledgeBase>;
 
   public:
-    std::unique_ptr<KnowledgeBase> Extract(AST ast) override;
+    std::unique_ptr<KnowledgeBase> Extract(AST ast);
     void Visit(const ProgramNode &program_node) override;
     void Visit(const ProcedureNode &procedure_node) override;
     void Visit(const StmtLstNode &stmt_lst_node) override;
