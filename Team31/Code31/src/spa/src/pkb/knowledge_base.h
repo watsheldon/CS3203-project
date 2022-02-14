@@ -68,11 +68,19 @@ class KnowledgeBase {
                         std::vector<int> stmtlst) = 0;
 
     /**
-     * Sets direct Uses relationships between print stmt# and its variable's
+     * Sets direct Modifes relationships between stmt# and its variable's
      * index
      */
     virtual void SetRel(Index<EntityType::kStmt> stmt_no,
                         Index<EntityType::kVar> var_index) = 0;
+
+
+    /**
+     * Sets direct Uses relationships between stmt# and its variable
+     * indices
+     */
+    virtual void SetRel(Index<EntityType::kStmt> stmt_no,
+                        std::vector<int> var_indices) = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type

@@ -21,7 +21,9 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(
           type_stmt_(stmt_count_, std::move(init->reads),
                      std::move(init->prints), std::move(init->calls),
                      std::move(init->whiles), std::move(init->ifs),
-                     std::move(init->assigns)) {}
+                     std::move(init->assigns)),
+          modifies_rel_(stmt_count_,init->variables.size()),
+          uses_rel_(stmt_count_,init->variables.size()) {}
 
 void ProgramKnowledgeBase::SetIndex(Index<EntityType::kProc> proc_index,
                                     Index<EntityType::kStmtLst> stmtlst_index) {

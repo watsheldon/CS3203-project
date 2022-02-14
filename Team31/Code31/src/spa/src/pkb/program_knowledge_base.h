@@ -21,6 +21,8 @@
 #include "type_statements_store.h"
 #include "variable_name_store.h"
 #include "while_stmtlst_store.h"
+#include "modifies_relationship_store.h"
+#include "uses_relationship_store.h"
 
 namespace spa {
 
@@ -49,6 +51,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void SetRel(Index<EntityType::kStmt> stmt_no,
                 Index<EntityType::kVar> var_index) override;
 
+    void SetRel(Index<EntityType::kStmt> stmt_no,
+            std::vector<int> var_index) override;
+
     std::vector<int> GetAllEntityIndices(EntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
 
@@ -75,6 +80,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     IfStmtlstStore if_stmtlst_;
     StmtlstStatementsStore stmtlst_stmt_;
     TypeStatementsStore type_stmt_;
+    ModifiesRelationshipStore modifies_rel_;
+    UsesRelationshipStore uses_rel_;
+
 };
 
 }  // namespace spa
