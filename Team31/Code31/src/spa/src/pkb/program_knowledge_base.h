@@ -2,6 +2,7 @@
 #define SRC_SPA_SRC_PKB_PROGRAM_KNOWLEDGE_BASE_H_
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <list>
 #include <memory>
@@ -16,15 +17,13 @@
 #include "knowledge_base.h"
 #include "pkb/store/call_procedure_store.h"
 #include "pkb/store/constant_value_store.h"
-#include "pkb/store/if_stmtlst_store.h"
 #include "pkb/store/modifies_relationship_store.h"
 #include "pkb/store/procedure_name_store.h"
-#include "pkb/store/procedure_stmtlst_store.h"
 #include "pkb/store/stmtlst_statements_store.h"
 #include "pkb/store/type_statements_store.h"
 #include "pkb/store/uses_relationship_store.h"
 #include "pkb/store/variable_name_store.h"
-#include "pkb/store/while_stmtlst_store.h"
+#include "store/stmtlst_parent_store.h"
 
 namespace spa {
 
@@ -88,13 +87,10 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     size_t stmt_count_;     // store number of stmt
     size_t stmtlst_count_;  // store number of stmtlst
 
+    StmtlstParentStore stmtlst_parent_;
     ProcedureNameStore proc_name_;
     VariableNameStore var_name_;
     ConstantValueStore const_value_;
-
-    ProcedureStmtlstStore proc_stmtlst_;
-    WhileStmtlstStore while_stmtlst_;
-    IfStmtlstStore if_stmtlst_;
     StmtlstStatementsStore stmtlst_stmt_;
     TypeStatementsStore type_stmt_;
     ModifiesRelationshipStore modifies_rel_;

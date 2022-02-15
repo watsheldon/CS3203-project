@@ -17,9 +17,8 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
           stmtlst_count_(init.procedures.size() + init.whiles.size() +
                          init.ifs.size() * 2 - 4),
           call_proc_(stmt_count_, init.procedures.size() - 1),
-          proc_stmtlst_(init.procedures.size() - 1, stmtlst_count_),
-          while_stmtlst_(stmt_count_, stmtlst_count_),
-          if_stmtlst_(stmt_count_, stmtlst_count_),
+          stmtlst_parent_(init.procedures.size() - 1, stmt_count_,
+                          stmtlst_count_),
           stmtlst_stmt_(stmtlst_count_, stmt_count_),
           containers_(init.whiles.size() + init.ifs.size() - 1),
           proc_name_(std::move(init.procedures)),
@@ -35,19 +34,19 @@ void ProgramKnowledgeBase::SetIndex(
         Index<SetEntityType::kProc> proc_index,
         Index<SetEntityType::kStmtLst> stmtlst_index) {
     assert(!compiled);
-    proc_stmtlst_.Set(proc_index.value, stmtlst_index.value);
+    stmtlst_parent_.Set(proc_index, stmtlst_index);
 }
 void ProgramKnowledgeBase::SetIndex(
         Index<SetEntityType::kStmt> while_stmt,
         Index<SetEntityType::kStmtLst> stmtlst_index) {
     assert(!compiled);
-    while_stmtlst_.Set(while_stmt.value, stmtlst_index.value);
+    stmtlst_parent_.Set(while_stmt, stmtlst_index);
 }
 void ProgramKnowledgeBase::SetIndex(Index<SetEntityType::kStmt> if_stmt,
                                     Index<SetEntityType::kStmtLst> then_index,
                                     Index<SetEntityType::kStmtLst> else_index) {
     assert(!compiled);
-    if_stmtlst_.Set(if_stmt.value, then_index.value, else_index.value);
+    stmtlst_parent_.Set(if_stmt, then_index, else_index);
 }
 void ProgramKnowledgeBase::SetIndex(Index<SetEntityType::kStmt> call_stmt,
                                     Index<SetEntityType::kProc> proc_index) {
