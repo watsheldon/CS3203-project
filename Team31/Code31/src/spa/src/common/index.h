@@ -14,7 +14,9 @@ struct IndexBase {
     const int value;
 };
 template <auto EnumVal>
-struct Index : IndexBase<decltype(EnumVal), EnumVal> {};
+struct Index : IndexBase<decltype(EnumVal), EnumVal> {
+    using IndexBase<decltype(EnumVal), EnumVal>::IndexBase;
+};
 }  // namespace spa
 
 #endif  // SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_INDEX_H_
