@@ -13,13 +13,13 @@
 namespace spa {
 std::unique_ptr<KnowledgeBase> DesignAbstractionExtractor::Extract(AST ast) {
     pkb_ = std::make_unique<ProgramKnowledgeBase>(ast->getInitEntities());
-    pkb_->Compile();
 
     auto ast_root = ast->GetRoot();
     assert(ast_root != nullptr);
     ast_root->Accept(*this);
 
-    return pkb_;
+    pkb_->Compile();
+    return std::move(pkb_);
 }
 
 void DesignAbstractionExtractor::Visit(const ProgramNode &program_node) {
@@ -62,8 +62,8 @@ void DesignAbstractionExtractor::Visit(const AssignNode &assign_node) {
                  Index<SetEntityType::kVar>(var_index));
 
     // Extracts direct Uses relationship from assignment statement.
-    std::vector<int> used_var_indices =
-            assign_node.GetRhs()->GetAllVarIndices();
+    auto polish_notation = assign_node.GetRhs();
+    std::vector<int> used_var_indices = polish_notation->GetAllVarIndices();
     pkb_->SetRel(Index<SetEntityType::kStmt>(stmt_no), used_var_indices);
 }
 
@@ -71,7 +71,7 @@ void DesignAbstractionExtractor::Visit(const CallNode &call_node) {
     // Links call statement to the procedure it calls via their indices.
     int stmt_no = call_node.GetIndex();
     auto procedure = call_node.GetProcedure();
-    int procedure_index = procedure->GetIndex();
+    int proc_index = procedure->GetIndex();
     pkb_->SetIndex(Index<SetEntityType::kStmt>(stmt_no),
                    Index<SetEntityType::kProc>(proc_index));
 }

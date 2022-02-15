@@ -59,7 +59,7 @@ class IfNode : public IfWhileNode {
     void Accept(AstVisitor &visitor) const override;
 
   private:
-    const IfStmtLst if_stmt_lst_;
+    IfStmtLst if_stmt_lst_;
 };
 class WhileNode : public IfWhileNode {
   public:
