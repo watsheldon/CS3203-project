@@ -52,6 +52,7 @@ void ProgramKnowledgeBase::SetIndex(Index<SetEntityType::kStmt> if_stmt,
 void ProgramKnowledgeBase::SetIndex(Index<SetEntityType::kStmt> call_stmt,
                                     Index<SetEntityType::kProc> proc_index) {
     assert(!compiled);
+    call_proc_.Set(call_stmt.value, proc_index.value);
 }
 
 void ProgramKnowledgeBase::SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
