@@ -16,7 +16,8 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
                       init.reads.size() + init.prints.size() - STMT_TYPE_COUNT),
           stmtlst_count_(init.procedures.size() + init.whiles.size() +
                          init.ifs.size() * 2 - 4),
-          proc_stmtlst_(init.procedures.size(), stmtlst_count_),
+          call_proc_(stmt_count_, init.procedures.size() - 1),
+          proc_stmtlst_(init.procedures.size() - 1, stmtlst_count_),
           while_stmtlst_(stmt_count_, stmtlst_count_),
           if_stmtlst_(stmt_count_, stmtlst_count_),
           stmtlst_stmt_(stmtlst_count_, stmt_count_),
@@ -47,6 +48,10 @@ void ProgramKnowledgeBase::SetIndex(Index<SetEntityType::kStmt> if_stmt,
                                     Index<SetEntityType::kStmtLst> else_index) {
     assert(!compiled);
     if_stmtlst_.Set(if_stmt.value, then_index.value, else_index.value);
+}
+void ProgramKnowledgeBase::SetIndex(Index<SetEntityType::kStmt> call_stmt,
+                                    Index<SetEntityType::kProc> proc_index) {
+    assert(!compiled);
 }
 
 void ProgramKnowledgeBase::SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,

@@ -3,9 +3,10 @@
 #include "pkb/knowledge_base.h"
 
 namespace spa {
-spa::ProcedureStmtlstStore::ProcedureStmtlstStore(size_t proc_size,
+spa::ProcedureStmtlstStore::ProcedureStmtlstStore(size_t proc_count,
                                                   size_t stmtlst_count)
-        : proc_to_stmtlst_(proc_size), stmtlst_to_proc_(stmtlst_count + 1) {}
+        : proc_to_stmtlst_(proc_count + 1),
+          stmtlst_to_proc_(stmtlst_count + 1) {}
 
 void spa::ProcedureStmtlstStore::Set(int stmt_no, int stmtlst_index) {
     proc_to_stmtlst_[stmt_no] = stmtlst_index;

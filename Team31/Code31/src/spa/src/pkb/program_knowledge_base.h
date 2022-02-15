@@ -12,10 +12,11 @@
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "common/polish_notation.h"
-#include "pkb/store/constant_value_store.h"
 #include "container_node.h"
-#include "pkb/store/if_stmtlst_store.h"
 #include "knowledge_base.h"
+#include "pkb/store/call_procedure_store.h"
+#include "pkb/store/constant_value_store.h"
+#include "pkb/store/if_stmtlst_store.h"
 #include "pkb/store/modifies_relationship_store.h"
 #include "pkb/store/procedure_name_store.h"
 #include "pkb/store/procedure_stmtlst_store.h"
@@ -45,6 +46,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void SetIndex(Index<SetEntityType::kStmt> stmt_no,
                   Index<SetEntityType::kStmtLst> then_index,
                   Index<SetEntityType::kStmtLst> else_index) override;
+    void SetIndex(Index<SetEntityType::kStmt> call_stmt,
+                  Index<SetEntityType::kProc> proc_index) override;
     void SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
                 std::vector<int> stmtlst) override;
 
@@ -96,6 +99,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     TypeStatementsStore type_stmt_;
     ModifiesRelationshipStore modifies_rel_;
     UsesRelationshipStore uses_rel_;
+    CallProcedureStore call_proc_;
 };
 
 }  // namespace spa
