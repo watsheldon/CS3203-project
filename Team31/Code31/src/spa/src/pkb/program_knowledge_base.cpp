@@ -8,6 +8,7 @@
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "knowledge_base.h"
+#include "secondary_structure/container_forest.h"
 
 namespace spa {
 ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
@@ -141,7 +142,8 @@ std::vector<int> ProgramKnowledgeBase::GetUses(
 
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
-
+    container_forest_ = std::make_unique<ContainerForest>(
+            stmtlst_parent_, stmtlst_stmt_, stmt_count_);
     compiled = true;
 }
 

@@ -22,6 +22,7 @@
 #include "pkb/store/type_statements_store.h"
 #include "pkb/store/uses_relationship_store.h"
 #include "pkb/store/variable_name_store.h"
+#include "secondary_structure/container_forest.h"
 #include "store/stmtlst_parent_store.h"
 
 namespace spa {
@@ -93,6 +94,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     ModifiesRelationshipStore modifies_rel_;
     UsesRelationshipStore uses_rel_;
     CallProcedureStore call_proc_;
+
+    std::unique_ptr<ContainerForest> container_forest_;
 };
 
 }  // namespace spa
