@@ -9,12 +9,11 @@
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "common/polish_notation.h"
-#include "container_node.h"
+#include "pkb/secondary_structure/container_node.h"
 
 namespace spa {
 
 using PN = spa::PolishNotation;
-using CN = spa::ContainerNode;
 
 struct BasicEntities {
     std::vector<std::string> procedures;

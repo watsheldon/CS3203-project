@@ -13,7 +13,6 @@
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "common/polish_notation.h"
-#include "container_node.h"
 #include "knowledge_base.h"
 #include "pkb/store/call_procedure_store.h"
 #include "pkb/store/constant_value_store.h"
@@ -81,8 +80,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
   private:
     bool compiled = false;
     const int STMT_TYPE_COUNT = 6;
-
-    std::vector<CN> containers_;  // store relationships among containers
 
     size_t stmt_count_;     // store number of stmt
     size_t stmtlst_count_;  // store number of stmtlst

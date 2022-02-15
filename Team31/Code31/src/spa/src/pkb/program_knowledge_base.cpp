@@ -20,7 +20,6 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
           stmtlst_parent_(init.procedures.size() - 1, stmt_count_,
                           stmtlst_count_),
           stmtlst_stmt_(stmtlst_count_, stmt_count_),
-          containers_(init.whiles.size() + init.ifs.size() - 1),
           proc_name_(std::move(init.procedures)),
           var_name_(std::move(init.variables)),
           const_value_(std::move(init.constants)),
