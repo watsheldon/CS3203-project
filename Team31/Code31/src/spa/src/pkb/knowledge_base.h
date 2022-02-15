@@ -58,6 +58,10 @@ class KnowledgeBase {
                           Index<SetEntityType::kStmtLst> then_index,
                           Index<SetEntityType::kStmtLst> else_index) = 0;
 
+    // Links call statement to the procedure it calls via their indices.
+    virtual void SetIndex(Index<SetEntityType::kStmt> call_stmt,
+                          Index<SetEntityType::kProc> proc_index) = 0;
+
     /**
      * Stores each statement list to its respective index.
      */
