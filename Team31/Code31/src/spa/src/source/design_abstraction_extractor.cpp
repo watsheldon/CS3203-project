@@ -2,11 +2,11 @@
 
 #include <cassert>
 #include <memory>
-#include <set>
 #include <utility>
 #include <vector>
 
 #include "common/entity_type_enum.h"
+#include "common/index.h"
 #include "pkb/knowledge_base.h"
 #include "pkb/program_knowledge_base.h"
 
