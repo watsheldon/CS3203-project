@@ -2,6 +2,7 @@
 #define SRC_SPA_SRC_POLISH_NOTATION_H_
 
 #include <list>
+#include <vector>
 
 #include "polish_notation_node.h"
 
@@ -12,6 +13,7 @@ class PolishNotation {
     explicit PolishNotation(std::list<PolishNotationNode> &&expr);
     bool operator==(const PolishNotation &other) const;
     [[nodiscard]] bool SupersetOf(const PolishNotation &other) const;
+    std::vector<int> GetAllVarIndices() const;
 
   private:
     // not storing the final output as string due to possibility that the

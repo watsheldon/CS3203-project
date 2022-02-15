@@ -11,10 +11,10 @@ void ConditionNode::AddVariable(const VariableNode *variable) {
 void ConditionNode::AddConstant(const ConstantNode *constant) {
     constants_.emplace(constant);
 }
-const std::set<const VariableNode *> &ConditionNode::get_variables() const {
+const std::set<const VariableNode *> &ConditionNode::GetVariables() const {
     return variables_;
 }
-const std::set<const ConstantNode *> &ConditionNode::get_constants() const {
+const std::set<const ConstantNode *> &ConditionNode::GetConstants() const {
     return constants_;
 }
 }  // namespace spa
