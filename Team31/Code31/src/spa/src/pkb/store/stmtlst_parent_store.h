@@ -30,7 +30,7 @@ class StmtlstParentStore {
     void Set(Index<SetEntityType::kStmt> if_no,
              Index<SetEntityType::kStmtLst> then_index,
              Index<SetEntityType::kStmtLst> else_index);
-    [[nodiscard]] StmtLstParent GetParent(int stmtlst_index) const;
+    [[nodiscard]] const StmtLstParent& GetParent(int stmtlst_index) const;
     [[nodiscard]] int GetProcStmtLst(int proc_index) const;
     [[nodiscard]] int GetWhileStmtLst(int stmt_no) const;
     [[nodiscard]] IfPairs GetIfStmtLst(int stmt_no) const;

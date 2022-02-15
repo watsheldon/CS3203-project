@@ -30,7 +30,7 @@ void StmtlstParentStore::Set(Index<SetEntityType::kStmt> if_no,
     stmtlst_parent_[then_index.value] =
             stmtlst_parent_[else_index.value] = {kIf, if_no.value};
 }
-StmtlstParentStore::StmtLstParent StmtlstParentStore::GetParent(
+const StmtlstParentStore::StmtLstParent& StmtlstParentStore::GetParent(
         int stmtlst_index) const {
     return stmtlst_parent_[stmtlst_index];
 }
