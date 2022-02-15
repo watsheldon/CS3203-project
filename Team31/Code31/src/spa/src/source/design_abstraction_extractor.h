@@ -26,7 +26,6 @@ class DesignAbstractionExtractor : public AstVisitor {
 
   private:
     PKB pkb_;
-    AST ast_;
 };
 }  // namespace spa
 

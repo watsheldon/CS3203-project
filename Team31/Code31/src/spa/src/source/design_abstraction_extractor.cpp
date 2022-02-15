@@ -1,5 +1,6 @@
 #include "design_abstraction_extractor.h"
 
+#include <cassert>
 #include <memory>
 #include <set>
 #include <utility>
@@ -11,8 +12,11 @@
 
 namespace spa {
 std::unique_ptr<KnowledgeBase> DesignAbstractionExtractor::Extract(AST ast) {
+    auto ast_root = ast->GetRoot();
+    assert(ast_root != nullptr);
+    ast_root->Accept(*this);
+
     pkb_ = std::make_unique<ProgramKnowledgeBase>(ast->getInitEntities());
-    ast_ = std::move(ast);
     pkb_->Compile();
     return pkb_;
 }
