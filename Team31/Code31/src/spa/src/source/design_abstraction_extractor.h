@@ -8,6 +8,8 @@
 #include "pkb/program_knowledge_base.h"
 
 namespace spa {
+class IfWhileNode;
+
 class DesignAbstractionExtractor : public AstVisitor {
     using AST = std::unique_ptr<AbstractSyntaxTree>;
     using PKB = std::unique_ptr<ProgramKnowledgeBase>;
@@ -26,6 +28,7 @@ class DesignAbstractionExtractor : public AstVisitor {
 
   private:
     PKB pkb_;
+    void SetUsesFromCondition(const IfWhileNode &if_while_node);
 };
 }  // namespace spa
 
