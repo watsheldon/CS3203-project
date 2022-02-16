@@ -56,23 +56,24 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void SetRel(Index<SetEntityType::kStmt> stmt_no,
                 std::vector<int> var_index) override;
 
-    bool ExistFollows(bool transitive, int first_stmt,
-                      int second_stmt) override;
+    bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
+                      Index<ArgPos::kSecond> second_stmt) override;
 
-    bool ExistParent(bool transitive, int parent_stmt, int child_stmt) override;
+    bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
+                     Index<ArgPos::kSecond> child_stmt) override;
 
     std::vector<int> GetFollows(
-            bool transitive, Index<GetPos::kFirst> stmt_no,
+            bool transitive, Index<ArgPos::kFirst> first_stmt,
             const std::vector<int> &filtered_stmts) override;
 
     std::vector<int> GetFollows(
-            bool transitive, Index<GetPos::kSecond> stmt_no,
+            bool transitive, Index<ArgPos::kSecond> second_stmt,
             const std::vector<int> &filtered_stmts) override;
 
-    std::vector<int> GetParent(bool transitive, Index<GetPos::kFirst> stmt_no,
+    std::vector<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
                                const std::vector<int> &filtered_stmt) override;
 
-    std::vector<int> GetParent(bool transitive, Index<GetPos::kSecond> stmt_no,
+    std::vector<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
                                const std::vector<int> &filtered_stmt) override;
 
     bool ExistModifies(int stmt_no, int var_index) override;

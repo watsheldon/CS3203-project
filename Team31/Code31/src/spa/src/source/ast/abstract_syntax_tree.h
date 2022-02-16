@@ -75,14 +75,14 @@ class AbstractSyntaxTree {
         dst.reserve(src.size() + 1);
         dst.emplace_back();
         std::for_each(src.begin(), src.end(),
-                      [&dst](auto &p) { dst.emplace_back(p->GetIndex()); });
+                      [&dst](auto &p) { dst.emplace_back(p->GetStmtlstIndex()); });
     }
     template <typename T>
     static void ExtractNames(const NamePtrMap<T> &src,
                              std::vector<std::string> &dst) {
         dst.resize(src.size() + 1);
         std::for_each(src.begin(), src.end(), [&dst](auto &pair) {
-            dst[pair.second->GetIndex()] = pair.first;
+            dst[pair.second->GetStmtlstIndex()] = pair.first;
         });
     }
 };

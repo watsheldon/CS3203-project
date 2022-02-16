@@ -86,28 +86,30 @@ class KnowledgeBase {
     /**
      * Check if Follows or Follows* relationships between two stmt# exist
      */
-    virtual bool ExistFollows(bool transitive, int first_stmt,
-                              int second_stmt) = 0;
+    virtual bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
+                              Index<ArgPos::kSecond> second_stmt) = 0;
 
     /**
      * Check if Parent or Parents* relationships between container stmt# and
      * another stmt# exist
      */
-    virtual bool ExistParent(bool transitive, int parent_stmt,
-                             int child_stmt) = 0;
+    virtual bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
+                             Index<ArgPos::kSecond> child_stmt) = 0;
 
     /**
-     * Gets stmt# that is directly followed by given stmt#
+     * Gets a list of stmt# that appear after the given stmt#
+     * at the same nesting level.
      */
     virtual std::vector<int> GetFollows(
-            bool transitive, Index<GetPos::kFirst> stmt_no,
+            bool transitive, Index<ArgPos::kFirst> stmt_no,
             const std::vector<int> &filtered_stmt) = 0;
 
     /**
-     * Gets stmt# that directly follow the given stmt#
+     * Gets a list of stmt# that appear before the given stmt#
+     * at the same nesting level
      */
     virtual std::vector<int> GetFollows(
-            bool transitive, Index<GetPos::kSecond> stmt_no,
+            bool transitive, Index<ArgPos::kSecond> stmt_no,
             const std::vector<int> &filtered_stmt) = 0;
 
     /**
@@ -116,7 +118,7 @@ class KnowledgeBase {
      * the given stmt# if get_pos is kFirst
      */
     virtual std::vector<int> GetParent(
-            bool transitive, Index<GetPos::kFirst> stmt_no,
+            bool transitive, Index<ArgPos::kFirst> stmt_no,
             const std::vector<int> &filtered_stmt) = 0;
 
     /**
@@ -124,7 +126,7 @@ class KnowledgeBase {
      * (are nested in) the given stmt#.
      */
     virtual std::vector<int> GetParent(
-            bool transitive, Index<GetPos::kSecond> stmt_no,
+            bool transitive, Index<ArgPos::kSecond> stmt_no,
             const std::vector<int> &filtered_stmt) = 0;
 
     /**

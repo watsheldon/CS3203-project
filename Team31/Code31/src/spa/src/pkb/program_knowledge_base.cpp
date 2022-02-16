@@ -72,94 +72,85 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
     uses_rel_.Set(stmt_no.value, std::move(var_indices));
 }
 
-bool ProgramKnowledgeBase::ExistFollows(bool transitive, int first_stmt,
-                                        int second_stmt) {
+bool ProgramKnowledgeBase::ExistFollows(bool transitive,
+                                        Index<ArgPos::kFirst> first_stmt,
+                                        Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
-    return (first_stmt < second_stmt) &&
-           (stmtlst_stmt_.GetIndex(first_stmt) ==
-            stmtlst_stmt_.GetIndex(second_stmt)) &&
-           (transitive || stmtlst_stmt_.GetPos(first_stmt) ==
-                                  stmtlst_stmt_.GetPos(second_stmt) - 1);
+    // boundary check
+    if (stmt_count_ <= 1 || first_stmt.value > stmt_count_ - 1 ||
+        second_stmt.value > stmt_count_) {
+        return false;
+    }
+
+    //(_,_)
+    if (first_stmt.value == 0 && second_stmt.value == 0) {
+        return stmtlst_stmt_.Follows();
+    }
+    //(first_stmt, _)
+    if (second_stmt.value == 0) {
+        return stmtlst_stmt_.Follows(first_stmt);
+    }
+    //(_, second_stmt)
+    if (first_stmt.value == 0) {
+        return stmtlst_stmt_.Follows(second_stmt);
+    }
+    //(first_stmt, second_stmt)
+    return stmtlst_stmt_.Follows(transitive, first_stmt, second_stmt);
 }
 
 // implement after store for Parent nodes is ready
-bool ProgramKnowledgeBase::ExistParent(bool transitive, int parent_stmt,
-                                       int child_stmt) {
+bool ProgramKnowledgeBase::ExistParent(bool transitive,
+                                       Index<ArgPos::kFirst> parent_stmt,
+                                       Index<ArgPos::kSecond> child_stmt) {
     assert(compiled);
     return false;
 }
 
+
+
 std::vector<int> ProgramKnowledgeBase::GetFollows(
-        bool transitive, Index<GetPos::kFirst> stmt_no,
+        bool transitive, Index<ArgPos::kFirst> first_stmt,
         const std::vector<int> &filtered_stmts) {
     assert(compiled);
-    std::vector<int> results;
-    int result;
-    int index = stmtlst_stmt_.GetIndex(stmt_no.value);
-    int start = 0;
-    int end;
-    int pos = stmtlst_stmt_.GetPos(stmt_no.value);
-
-    if (pos == 0) {
-        return results;
-    }
-    end = pos - 1;
-    const std::vector<int> &stmts = stmtlst_stmt_.GetStatements(index);
-    result = stmts[end];
-
-    if (!transitive && (filtered_stmts.empty() ||
-                        std::binary_search(filtered_stmts.begin(),
-                                           filtered_stmts.end(), result))) {
-        results.emplace_back(result);
-        return results;
+    // boundary check
+    if (stmt_count_ <= 1 || first_stmt.value > stmt_count_ - 1) {
+        return {};
     }
 
-    auto first = stmts.begin() + start;
-    auto last = stmts.begin() + end + 1;
-    std::vector<int> sub_stmts(first, last);
+    std::vector<int> partial_results;
+    if (first_stmt.value == 0) {  // (_,outputs)
+        partial_results = stmtlst_stmt_.GetFollows(first_stmt);
+    }
+    partial_results = stmtlst_stmt_.GetFollows(transitive, first_stmt);
     if (filtered_stmts.empty()) {
-        return sub_stmts;
+        return partial_results;
     }
-
-    std::set_intersection(sub_stmts.begin(), sub_stmts.end(),
+    std::vector<int> results;
+    std::set_intersection(partial_results.begin(), partial_results.end(),
                           filtered_stmts.begin(), filtered_stmts.end(),
                           std::back_inserter(results));
     return results;
 }
 
 std::vector<int> ProgramKnowledgeBase::GetFollows(
-        bool transitive, Index<GetPos::kSecond> stmt_no,
+        bool transitive, Index<ArgPos::kSecond> second_stmt,
         const std::vector<int> &filtered_stmts) {
     assert(compiled);
-    std::vector<int> results;
-    int result;
-    int index = stmtlst_stmt_.GetIndex(stmt_no.value);
-    int start;
-    const std::vector<int> &stmts = stmtlst_stmt_.GetStatements(index);
-    int end = static_cast<int>(stmts.size()) - 1;
-    int pos = stmtlst_stmt_.GetPos(stmt_no.value);
-
-    if (pos == end) {
-        return results;
-    }
-    start = pos + 1;
-    result = stmts[start];
-
-    if (!transitive && (filtered_stmts.empty() ||
-                        std::binary_search(filtered_stmts.begin(),
-                                           filtered_stmts.end(), result))) {
-        results.emplace_back(result);
-        return results;
+    // boundary check
+    if (stmt_count_ <= 1 || second_stmt.value > stmt_count_) {
+        return {};
     }
 
-    auto first = stmts.begin() + start;
-    auto last = stmts.begin() + end + 1;
-    std::vector<int> sub_stmts(first, last);
+    std::vector<int> partial_results;
+    if (second_stmt.value == 0) {  // (outputs, _)
+        partial_results = stmtlst_stmt_.GetFollows(second_stmt);
+    }
+    partial_results = stmtlst_stmt_.GetFollows(transitive, second_stmt);
     if (filtered_stmts.empty()) {
-        return sub_stmts;
+        return partial_results;
     }
-
-    std::set_intersection(sub_stmts.begin(), sub_stmts.end(),
+    std::vector<int> results;
+    std::set_intersection(partial_results.begin(), partial_results.end(),
                           filtered_stmts.begin(), filtered_stmts.end(),
                           std::back_inserter(results));
     return results;
@@ -167,14 +158,14 @@ std::vector<int> ProgramKnowledgeBase::GetFollows(
 
 // implement after store for Parent nodes is ready
 std::vector<int> ProgramKnowledgeBase::GetParent(
-        bool transitive, Index<GetPos::kFirst> stmt_no,
+        bool transitive, Index<ArgPos::kFirst> stmt_no,
         const std::vector<int> &filtered_stmts) {
     assert(compiled);
     std::vector<int> results;
     return results;
 }
 std::vector<int> ProgramKnowledgeBase::GetParent(
-        bool transitive, Index<GetPos::kSecond> stmt_no,
+        bool transitive, Index<ArgPos::kSecond> stmt_no,
         const std::vector<int> &filtered_stmts) {
     assert(compiled);
     std::vector<int> results;
