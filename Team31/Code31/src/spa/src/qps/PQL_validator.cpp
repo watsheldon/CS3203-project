@@ -116,13 +116,13 @@ bool PQLValidator::parseSuchThat() {
     if (!accept(QueryTokenType::SUCH)) return false;
     if (!accept(QueryTokenType::THAT)) return false;
     if (accept(QueryTokenType::FOLLOWS)) {
-        if(accept(QueryTokenType::TIMES)) {
+        if (accept(QueryTokenType::TIMES)) {
             return parseFollowsT();
         }
         return parseFollows();
     }
     if (accept(QueryTokenType::PARENT)) {
-        if(accept(QueryTokenType::TIMES)) {
+        if (accept(QueryTokenType::TIMES)) {
             return parseParentT();
         }
         return parseParent();
@@ -159,16 +159,21 @@ bool PQLValidator::parseParentT() {
            expect(QueryTokenType::RIGHTBRACKET);
 }
 bool PQLValidator::parseUsesS() {
-    return expect(QueryTokenType::LEFTBRACKET) && parseStmtRef() &&
+    return expect(QueryTokenType::LEFTBRACKET) && parseUsesModifiesStmtRef() &&
            expect(QueryTokenType::COMMA) && parseEntRef() &&
            expect(QueryTokenType::RIGHTBRACKET);
 }
 bool PQLValidator::parseModifiesS() {
-    return expect(QueryTokenType::LEFTBRACKET) && parseStmtRef() &&
+    return expect(QueryTokenType::LEFTBRACKET) && parseUsesModifiesStmtRef() &&
            expect(QueryTokenType::COMMA) && parseEntRef() &&
            expect(QueryTokenType::RIGHTBRACKET);
 }
 
+// The first argument for Modifies and Uses cannot be UNDERSCORE
+// as it is unclear whether _ refers to a statement or procedure
+bool PQLValidator::parseUsesModifiesStmtRef() {
+    return expect(QueryTokenType::WORD) || accept(QueryTokenType::INTEGER);
+}
 bool PQLValidator::parsePattern() {
     if (!accept(QueryTokenType::PATTERN)) return false;
     if (!accept(QueryTokenType::WORD)) return false;
@@ -180,7 +185,7 @@ bool PQLValidator::parsePattern() {
     return true;
 }
 bool PQLValidator::parseStmtRef() {
-    return parseSynonym() || expect(QueryTokenType::UNDERSCORE) || IsConstant();
+    return parseSynonym() || expect(QueryTokenType::UNDERSCORE) || accept(QueryTokenType::INTEGER);
 }
 
 bool PQLValidator::parseEntRef() {
@@ -199,7 +204,7 @@ bool PQLValidator::parseExpressionSpec() {
            expect(QueryTokenType::UNDERSCORE);
 }
 bool PQLValidator::parseFactor() {
-    return IsConstant() || expect(QueryTokenType::WORD);
+    return accept(QueryTokenType::INTEGER) || expect(QueryTokenType::WORD);
 }
 
 }  // namespace spa

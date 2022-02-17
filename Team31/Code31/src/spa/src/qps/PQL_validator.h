@@ -33,6 +33,7 @@ class PQLValidator {
 
     bool parseSynonym();
     bool parseStmtRef();
+    bool parseUsesModifiesStmtRef();
     bool parseEntRef();
     bool parseExpressionSpec();
     bool parseIdentifier();
