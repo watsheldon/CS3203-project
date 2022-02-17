@@ -8,7 +8,7 @@
 namespace spa{
 class PQLTokenizer{
   private:
-    static constexpr char kSpecialSingle[] = "%()*+-/;,";
+    static constexpr char kSpecialSingle[] = "%()*+-/;,_";
     std::stringstream buffer_;
     bool error = false;  // triggered by either EOF or unrecognized token
 

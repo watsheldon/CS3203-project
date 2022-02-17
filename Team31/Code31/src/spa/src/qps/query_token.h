@@ -16,7 +16,8 @@ enum class QueryTokenType {
     CONSTANT,
     PROCEDURE,
     SELECT,
-    SUCHTHAT,
+    SUCH,
+    THAT,
     PATTERN,
     FOLLOWS,
     FOLLOWS_T,
@@ -102,6 +103,10 @@ std::string_view Keyword(QueryTokenType token_type) {
             return "(";
         case QueryTokenType::RIGHTBRACKET:
             return ")";
+        case QueryTokenType::SUCH:
+            return "such";
+        case QueryTokenType::THAT:
+            return "that";
         case QueryTokenType::WORD:
         case QueryTokenType::INTEGER:
             return "";
