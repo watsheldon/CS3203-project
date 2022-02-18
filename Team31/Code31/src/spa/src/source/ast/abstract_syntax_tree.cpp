@@ -276,8 +276,7 @@ void AbstractSyntaxTree::build_tree() {
                     auto caller =
                             dynamic_cast<ProcedureNode *>(parent_path.front());
                     assert(caller);
-                    call_edges_[caller->GetIndex()].emplace(
-                            callee->GetStmtlstIndex());
+                    call_edges_[caller->GetIndex()].emplace(callee->GetIndex());
 
                     call_stmts_.emplace_back(std::move(call));
                 } else if (mode_history.top() == Mode::kCond) {
@@ -302,7 +301,7 @@ void AbstractSyntaxTree::build_tree() {
                     }
                     assert(mode_history.top() == Mode::kAssign);
                     curr_expr.emplace_back(ExprNodeType::kVariable,
-                                           var->GetStmtlstIndex());
+                                           var->GetIndex());
                 }
             } break;
             case SourceTokenType::kInteger:
@@ -313,7 +312,7 @@ void AbstractSyntaxTree::build_tree() {
                             }));
                     auto constant = pair->second.get();
                     curr_expr.emplace_back(ExprNodeType::kConstant,
-                                           constant->GetStmtlstIndex());
+                                           constant->GetIndex());
                 } else if (mode_history.top() == Mode::kCond) {
                     auto [pair, success] = constants_.try_emplace(
                             name, LazyFactory([] {
