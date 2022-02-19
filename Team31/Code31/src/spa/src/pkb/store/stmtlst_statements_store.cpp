@@ -1,5 +1,10 @@
 #include "stmtlst_statements_store.h"
 
+#include <algorithm>
+#include <cassert>
+#include <utility>
+#include <vector>
+
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "pkb/knowledge_base.h"
