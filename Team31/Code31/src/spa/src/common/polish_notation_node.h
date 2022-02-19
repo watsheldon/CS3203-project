@@ -9,7 +9,13 @@ enum class ExprNodeType {
     kBracketR,
     kOperator
 };
-enum class OperatorType : int { kPlus, kMinus, kTimes, kDivide, kModulo };
+enum class OperatorType : int {
+    kPlus = 1,
+    kMinus = 1,
+    kTimes = 2,
+    kDivide = 2,
+    kModulo = 2
+};
 struct PolishNotationNode {
     const ExprNodeType type;
     const int id;
