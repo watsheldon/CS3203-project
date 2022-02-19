@@ -24,12 +24,13 @@ TypeStatementsStore::TypeStatementsStore(size_t size, std::vector<int>&& reads,
         }
     }
 }
-std::vector<int> TypeStatementsStore::GetStatements(StmtType st) {
+
+const std::vector<int>& TypeStatementsStore::GetStatements(StmtType st) const {
     assert(st != StmtType::kAll);
     return type_to_statements_[static_cast<int>(st)];
 }
 
-StmtType TypeStatementsStore::GetType(int stmt_no) {
+StmtType TypeStatementsStore::GetType(int stmt_no) const {
     return statement_to_type_[stmt_no];
 }
 }  // namespace spa
