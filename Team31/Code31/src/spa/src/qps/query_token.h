@@ -112,17 +112,12 @@ std::string_view Keyword(QueryTokenType token_type) {
             return "";
     }
 };
-class QueryToken {
-  private:
-    QueryTokenType type;
-    std::string string;
-
-  public:
+struct QueryToken {
+    const QueryTokenType type;
+    const std::string string;
     explicit QueryToken(const QueryTokenType &type) : type(type){};
     QueryToken(const QueryTokenType &type, std::string string)
             : type(type), string(std::move(string)){};
-
-    QueryTokenType getTokenType() { return this->type; }
 };
 }  // namespace spa
 
