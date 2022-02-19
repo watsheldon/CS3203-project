@@ -3,7 +3,7 @@
 #include <utility>
 
 namespace spa {
-PolishNotation::PolishNotation(std::list<PolishNotationNode>&& expr)
+PolishNotation::PolishNotation(std::vector<PolishNotationNode>&& expr)
         : expr_(std::move(expr)) {
     // todo: do the actual conversion
 }
