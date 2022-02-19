@@ -4,7 +4,7 @@
 #include <utility>
 
 namespace spa {
-PolishNotation::PolishNotation(std::vector<PolishNotationNode>&& expr) {
+PolishNotation::PolishNotation(const std::vector<PolishNotationNode>& expr) {
     // Convert to reverse Polish Notation for ease of implementation
     std::vector<PolishNotationNode> pn;
     std::stack<PolishNotationNode> s;

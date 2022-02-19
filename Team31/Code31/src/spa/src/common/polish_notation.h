@@ -9,7 +9,7 @@ namespace spa {
 
 class PolishNotation {
   public:
-    explicit PolishNotation(std::vector<PolishNotationNode> &&expr);
+    explicit PolishNotation(const std::vector<PolishNotationNode> &expr);
     bool operator==(const PolishNotation &other) const;
     [[nodiscard]] bool Contains(const PolishNotation &other) const;
     [[nodiscard]] std::vector<int> GetAllVarIndices() const;
