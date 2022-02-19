@@ -3,7 +3,6 @@
 #include <list>
 #include <string_view>
 
-#include "evaluator/evaluator.h"
 #include "pkb/program_knowledge_base.h"
 
 namespace spa {
