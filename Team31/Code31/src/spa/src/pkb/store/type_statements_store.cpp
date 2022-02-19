@@ -1,5 +1,8 @@
 #include "type_statements_store.h"
 
+#include <cassert>
+#include <vector>
+
 namespace spa {
 TypeStatementsStore::TypeStatementsStore(size_t size, std::vector<int>&& reads,
                                          std::vector<int>&& prints,

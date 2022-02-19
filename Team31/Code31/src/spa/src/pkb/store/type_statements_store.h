@@ -1,6 +1,7 @@
 #ifndef SPA_SRC_SPA_SRC_PKB_STORE_TYPE_STATEMENTS_STORE_H_
 #define SPA_SRC_SPA_SRC_PKB_STORE_TYPE_STATEMENTS_STORE_H_
 
+#include <cassert>
 #include <vector>
 
 #include "common/entity_type_enum.h"
