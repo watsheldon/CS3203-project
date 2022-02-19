@@ -47,8 +47,8 @@ bool PolishNotation::Contains(const PolishNotation& other) const {
     // Use KMP algorithm for pattern matching
     auto lps = ComputeLps(other);
     auto pattern = other.GetExpr();
-    int i = 0;
-    int j = 0;
+    size_t i = 0;
+    size_t j = 0;
     while (i < expr_.size()) {
         if (expr_[i] == pattern[j]) {
             i++;
@@ -88,7 +88,7 @@ std::vector<int> PolishNotation::ComputeLps(
     auto expr = pattern.GetExpr();
     std::vector<int> lps(expr.size());
     lps[0] = 0;
-    int len = 0;
+    size_t len = 0;
     for (int i = 1; i < lps.size();) {
         if (expr[i] == expr[len]) {
             lps[i++] = ++len;
