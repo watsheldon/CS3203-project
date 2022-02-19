@@ -104,7 +104,7 @@ class KnowledgeBase {
                                         Index<ArgPos::kFirst> stmt_no,
                                         StmtType return_type) = 0;
     std::vector<int> GetFollows(bool transitive,
-                                        Index<ArgPos::kFirst> stmt_no) {
+                                Index<ArgPos::kFirst> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
     }
 
@@ -116,8 +116,8 @@ class KnowledgeBase {
                                         Index<ArgPos::kSecond> stmt_no,
                                         StmtType return_type) = 0;
     std::vector<int> GetFollows(bool transitive,
-                                        Index<ArgPos::kSecond> stmt_no){
-            return GetFollows(transitive, stmt_no, StmtType::kAll);
+                                Index<ArgPos::kSecond> stmt_no) {
+        return GetFollows(transitive, stmt_no, StmtType::kAll);
     }
 
     /**
@@ -134,8 +134,7 @@ class KnowledgeBase {
     virtual std::vector<int> GetParent(bool transitive,
                                        Index<ArgPos::kFirst> stmt_no,
                                        StmtType return_type) = 0;
-    std::vector<int> GetParent(bool transitive,
-                                Index<ArgPos::kFirst> stmt_no) {
+    std::vector<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no) {
         return GetParent(transitive, stmt_no, StmtType::kAll);
     }
 
