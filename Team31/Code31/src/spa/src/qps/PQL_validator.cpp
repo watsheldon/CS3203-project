@@ -116,15 +116,11 @@ bool PQLValidator::parseSuchThat() {
     if (!accept(QueryTokenType::SUCH)) return false;
     if (!accept(QueryTokenType::THAT)) return false;
     if (accept(QueryTokenType::FOLLOWS)) {
-        if (accept(QueryTokenType::TIMES)) {
-            return parseFollowsT();
-        }
+        accept(QueryTokenType::TIMES);
         return parseFollows();
     }
     if (accept(QueryTokenType::PARENT)) {
-        if (accept(QueryTokenType::TIMES)) {
-            return parseParentT();
-        }
+        accept(QueryTokenType::TIMES);
         return parseParent();
     }
     if (accept(QueryTokenType::USES_S)) {
@@ -142,22 +138,12 @@ bool PQLValidator::parseFollows() {
            expect(QueryTokenType::RIGHTBRACKET);
 }
 
-bool PQLValidator::parseFollowsT() {
-    return expect(QueryTokenType::LEFTBRACKET) && parseStmtRef() &&
-           expect(QueryTokenType::COMMA) && parseStmtRef() &&
-           expect(QueryTokenType::RIGHTBRACKET);
-}
-
 bool PQLValidator::parseParent() {
     return expect(QueryTokenType::LEFTBRACKET) && parseStmtRef() &&
            expect(QueryTokenType::COMMA) && parseStmtRef() &&
            expect(QueryTokenType::RIGHTBRACKET);
 }
-bool PQLValidator::parseParentT() {
-    return expect(QueryTokenType::LEFTBRACKET) && parseStmtRef() &&
-           expect(QueryTokenType::COMMA) && parseStmtRef() &&
-           expect(QueryTokenType::RIGHTBRACKET);
-}
+
 bool PQLValidator::parseUsesS() {
     return expect(QueryTokenType::LEFTBRACKET) && parseUsesModifiesStmtRef() &&
            expect(QueryTokenType::COMMA) && parseEntRef() &&
@@ -185,7 +171,8 @@ bool PQLValidator::parsePattern() {
     return true;
 }
 bool PQLValidator::parseStmtRef() {
-    return parseSynonym() || expect(QueryTokenType::UNDERSCORE) || accept(QueryTokenType::INTEGER);
+    return parseSynonym() || expect(QueryTokenType::UNDERSCORE) ||
+           accept(QueryTokenType::INTEGER);
 }
 
 bool PQLValidator::parseEntRef() {

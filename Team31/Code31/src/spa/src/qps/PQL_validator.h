@@ -40,13 +40,10 @@ class PQLValidator {
     bool parseFactor();
 
     bool parseFollows();
-    bool parseFollowsT();
     bool parseParent();
-    bool parseParentT();
     bool parseUsesS();
     bool parseModifiesS();
     bool IsConstant();
-    //  bool IsIdentifier();
     void fetchToken();
     bool accept(QueryTokenType type);
     bool expect(QueryTokenType type);
