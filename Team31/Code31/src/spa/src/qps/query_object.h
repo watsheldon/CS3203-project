@@ -7,38 +7,25 @@
 #include "pattern_cl.h"
 #include "select_cl.h"
 #include "such_that_cl.h"
+#include "synonym.h"
 
 namespace spa {
 class QueryObject {
-  private:
-    bool isValidQuery;
-    bool hasSuchThatClause;
-    bool hasPatternClause;
-    std::vector<DeclarationClause> declarations;
-    SelectClause select;
-    SuchThatClause such_that_;
-    PatternClause pattern;
-
   public:
-    QueryObject();
-
-    // getters
-    std::vector<DeclarationClause> getDeclarations();
-    SelectClause getSelect();
-    SuchThatClause getSuchThat();
-    PatternClause getPattern();
-    bool isValid();
-    bool hasSuchThat();
-    bool hasPattern();
-
-    // setters
-    void addDeclaration(DeclarationType type, std::string synonym);
-    void setSelect(DeclarationType type, std::string synonym);
-    void setSuchThat(SuchThatType type, std::string ref1, std::string ref2);
-    void setPattern(std::string syn, std::string ref1, std::string ref2);
-    void setIsValid(bool isValid);
-    void setHasSuchThat(bool hasSuchThat);
-    void setHasPattern(bool hasPattern);
+    const bool isValidQuery;
+    const std::vector<std::unique_ptr<Synonym>> synonyms;
+    const std::unique_ptr<Synonym> select;
+    const std::unique_ptr<SuchThatClause> such_that_;
+    const std::unique_ptr<PatternClause> pattern;
+    QueryObject(bool isValid, bool hasSuchThat, bool hasPattern,
+                std::vector<std::unique_ptr<Synonym>> syns,
+                std::unique_ptr<Synonym> sel, std::unique_ptr<SuchThatClause> suchthat,
+                std::unique_ptr<PatternClause> pat)
+            : isValidQuery(isValid),
+              synonyms(std::move(syns)),
+              select(std::move(sel)),
+              such_that_(std::move(suchthat)),
+              pattern(std::move(pat)) {}
 };
 }  // namespace spa
 

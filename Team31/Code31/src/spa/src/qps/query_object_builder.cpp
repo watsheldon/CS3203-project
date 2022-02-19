@@ -3,38 +3,32 @@
 #include <utility>
 
 namespace spa {
-QueryObjectBuilder& QueryObjectBuilder::withIsValid(bool isValid) {
-    isValidQuery = isValid;
+QueryObjectBuilder& QueryObjectBuilder::SetIsValid(bool isValid) {
+    isValidQuery_ = isValid;
     return *this;
 }
-QueryObjectBuilder& QueryObjectBuilder::withHasSuchThatClause(bool hasSuchThat) {
-    hasSuchThatClause = hasSuchThat;
-    return *this;
-}
-QueryObjectBuilder& QueryObjectBuilder::withHasPattern(bool hasPattern) {
-    hasPatternClause = hasPattern;
-    return *this;
-}
-QueryObjectBuilder& QueryObjectBuilder::withSynonyms(
+QueryObjectBuilder& QueryObjectBuilder::SetSynonyms(
         std::vector<std::unique_ptr<Synonym>> syns) {
-    synonyms = std::move(syns);
+    synonyms_ = std::move(syns);
     return *this;
 }
-QueryObjectBuilder& QueryObjectBuilder::withSelect(
+QueryObjectBuilder& QueryObjectBuilder::SetSelect(
         std::unique_ptr<Synonym> sel) {
-    select = std::move(sel);
+    select_ = std::move(sel);
     return *this;
 }
-QueryObjectBuilder& QueryObjectBuilder::withSuchThat(SuchThatClause suchthat) {
+QueryObjectBuilder& QueryObjectBuilder::SetSuchThat(
+        std::unique_ptr<SuchThatClause> suchthat) {
     such_that_ = std::move(suchthat);
     return *this;
 }
-QueryObjectBuilder& QueryObjectBuilder::withPattern(PatternClause pat) {
-    pattern = std::move(pat);
+QueryObjectBuilder& QueryObjectBuilder::SetPattern(
+        std::unique_ptr<PatternClause> pat) {
+    pattern_ = std::move(pat);
     return *this;
 }
 QueryObject QueryObjectBuilder::build() {
-    return QueryObject(isValidQuery, hasSuchThatClause, hasPatternClause,
-                       synonyms, std::move(select), such_that_, pattern);
+    return QueryObject(isValidQuery_, synonyms_, select_, such_that_, pattern_);
 }
+
 }  // namespace spa

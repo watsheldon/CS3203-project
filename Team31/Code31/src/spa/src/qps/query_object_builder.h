@@ -14,35 +14,19 @@
 namespace spa {
 class QueryObjectBuilder {
   private:
-    bool isValidQuery;
-    bool hasSuchThatClause;
-    bool hasPatternClause;
-    std::vector<std::unique_ptr<Synonym>> synonyms;
-    std::unique_ptr<Synonym> select;
-    SuchThatClause such_that_;
-    PatternClause pattern;
+    bool isValidQuery_ = true;
+    std::vector<std::unique_ptr<Synonym>> synonyms_;
+    std::unique_ptr<Synonym> select_;
+    std::unique_ptr<SuchThatClause> such_that_;
+    std::unique_ptr<PatternClause> pattern_;
 
   public:
-    QueryObjectBuilder(bool isValid, bool hasSuchThat, bool hasPattern,
-                       std::vector<std::unique_ptr<Synonym>> syns,
-                       std::unique_ptr<Synonym> sel, SuchThatClause suchthat,
-                       PatternClause pat)
-            : isValidQuery(isValid),
-              hasSuchThatClause(hasSuchThat),
-              hasPatternClause(hasPattern),
-              synonyms(std::move(syns)),
-              select(std::move(sel)),
-              such_that_(std::move(suchthat)),
-              pattern(std::move(pat)) {}
-
-    QueryObjectBuilder& withIsValid(bool isValid);
-    QueryObjectBuilder& withHasSuchThatClause(bool hasSuchThat);
-    QueryObjectBuilder& withHasPattern(bool hasPattern);
-    QueryObjectBuilder& withSynonyms(
+    QueryObjectBuilder& SetIsValid(bool isValid);
+    QueryObjectBuilder& SetSynonyms(
             std::vector<std::unique_ptr<Synonym>> syns);
-    QueryObjectBuilder& withSelect(std::unique_ptr<Synonym> sel);
-    QueryObjectBuilder& withSuchThat(SuchThatClause suchthat);
-    QueryObjectBuilder& withPattern(PatternClause pat);
+    QueryObjectBuilder& SetSelect(std::unique_ptr<Synonym> sel);
+    QueryObjectBuilder& SetSuchThat(std::unique_ptr<SuchThatClause> suchthat);
+    QueryObjectBuilder& SetPattern(std::unique_ptr<PatternClause> pat);
     QueryObject build();
 };
 }  // namespace spa
