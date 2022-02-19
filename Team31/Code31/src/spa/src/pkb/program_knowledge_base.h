@@ -56,6 +56,32 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void SetRel(Index<SetEntityType::kStmt> stmt_no,
                 std::vector<int> var_index) override;
 
+    bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
+                      Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistFollows(Index<ArgPos::kFirst> first_stmt) override;
+    bool ExistFollows(Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistFollows() override;
+
+    bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
+                     Index<ArgPos::kSecond> child_stmt) override;
+
+    std::vector<int> GetFollows(bool transitive,
+                                Index<ArgPos::kFirst> first_stmt,
+                                StmtType return_type) override;
+
+    std::vector<int> GetFollows(bool transitive,
+                                Index<ArgPos::kSecond> second_stmt,
+                                StmtType return_type) override;
+    std::vector<std::pair<int, int>> GetFollowsPairs(
+            bool transitive, StmtType first_type,
+            StmtType second_type) override;
+
+    std::vector<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
+                               StmtType return_type) override;
+
+    std::vector<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
+                               StmtType return_type) override;
+
     bool ExistModifies(int stmt_no, int var_index) override;
     bool ExistUses(int stmt_no, int var_index) override;
 

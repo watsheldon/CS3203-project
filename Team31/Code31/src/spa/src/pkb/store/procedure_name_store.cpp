@@ -1,7 +1,7 @@
 #include "procedure_name_store.h"
 namespace spa {
 ProcedureNameStore::ProcedureNameStore(std::vector<std::string>&& names)
-        : index_to_name_(names) {
+        : index_to_name_(std::move(names)) {
     for (int i = 1; i < index_to_name_.size(); ++i) {
         name_to_index_.emplace(index_to_name_[i], i);
     }

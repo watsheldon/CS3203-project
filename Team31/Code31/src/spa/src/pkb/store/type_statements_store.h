@@ -1,6 +1,7 @@
 #ifndef SPA_SRC_SPA_SRC_PKB_STORE_TYPE_STATEMENTS_STORE_H_
 #define SPA_SRC_SPA_SRC_PKB_STORE_TYPE_STATEMENTS_STORE_H_
 
+#include <cassert>
 #include <vector>
 
 #include "common/entity_type_enum.h"
@@ -12,7 +13,7 @@ class TypeStatementsStore {
                         std::vector<int>&& prints, std::vector<int>&& calls,
                         std::vector<int>&& whiles, std::vector<int>&& ifs,
                         std::vector<int>&& assigns);
-    std::vector<int> GetStatements(StmtType et);
+    std::vector<int> GetStatements(StmtType st);
     StmtType GetType(int stmt_no);
 
   private:

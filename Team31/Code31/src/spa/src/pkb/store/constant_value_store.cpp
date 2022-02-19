@@ -4,7 +4,7 @@
 
 namespace spa {
 ConstantValueStore ::ConstantValueStore(std::vector<std::string>&& values)
-        : index_to_value_(values) {
+        : index_to_value_(std::move(values)) {
     for (int i = 1; i < index_to_value_.size(); ++i) {
         value_to_index_.emplace(index_to_value_[i], i);
     }

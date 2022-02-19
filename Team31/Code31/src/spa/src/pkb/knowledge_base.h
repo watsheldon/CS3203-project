@@ -84,6 +84,85 @@ class KnowledgeBase {
                         std::vector<int> var_indices) = 0;
 
     /**
+     * Check if Follows or Follows* (first_stmt, second_stmt) exist
+     */
+    virtual bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
+                              Index<ArgPos::kSecond> second_stmt) = 0;
+    /**
+     * Check if Follows or Follows* (first_stmt, _) exists
+     */
+    virtual bool ExistFollows(Index<ArgPos::kFirst> first_stmt) = 0;
+    /**
+     * Check if Follows or Follows* (_, second_stmt) exist
+     */
+    virtual bool ExistFollows(Index<ArgPos::kSecond> second_stmt) = 0;
+    /**
+     * Check if Follows or Follows* (_,_)
+     */
+    virtual bool ExistFollows() = 0;
+
+    /**
+     * Check if Parent or Parents* relationships between container stmt# and
+     * another stmt# exist
+     */
+    virtual bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
+                             Index<ArgPos::kSecond> child_stmt) = 0;
+
+    /**
+     * Gets a list of stmt# that appear after the given stmt#
+     * at the same nesting level.
+     */
+    virtual std::vector<int> GetFollows(bool transitive,
+                                        Index<ArgPos::kFirst> stmt_no,
+                                        StmtType return_type) = 0;
+    std::vector<int> GetFollows(bool transitive,
+                                Index<ArgPos::kFirst> stmt_no) {
+        return GetFollows(transitive, stmt_no, StmtType::kAll);
+    }
+
+    /**
+     * Gets a list of stmt# that appear before the given stmt#
+     * at the same nesting level
+     */
+    virtual std::vector<int> GetFollows(bool transitive,
+                                        Index<ArgPos::kSecond> stmt_no,
+                                        StmtType return_type) = 0;
+    std::vector<int> GetFollows(bool transitive,
+                                Index<ArgPos::kSecond> stmt_no) {
+        return GetFollows(transitive, stmt_no, StmtType::kAll);
+    }
+
+    /**
+     * Gets a list of stmt# pairs that exist in Follows relationship
+     */
+    virtual std::vector<std::pair<int, int>> GetFollowsPairs(
+            bool transitive, StmtType first_type, StmtType second_type) = 0;
+
+    /**
+     * Gets a list of stmt# that
+     * are direct or indirect parents of (contain)
+     * the given stmt# if get_pos is kFirst
+     */
+    virtual std::vector<int> GetParent(bool transitive,
+                                       Index<ArgPos::kFirst> stmt_no,
+                                       StmtType return_type) = 0;
+    std::vector<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no) {
+        return GetParent(transitive, stmt_no, StmtType::kAll);
+    }
+
+    /**
+     * Gets a list of stmt# that are direct or indirect children of
+     * (are nested in) the given stmt#.
+     */
+    virtual std::vector<int> GetParent(bool transitive,
+                                       Index<ArgPos::kSecond> stmt_no,
+                                       StmtType return_type) = 0;
+    std::vector<int> GetParent(bool transitive,
+                               Index<ArgPos::kSecond> stmt_no) {
+        return GetParent(transitive, stmt_no, StmtType::kAll);
+    }
+
+    /**
      * Check if modifies relationships between stmt# and its variable
      * exist
      */

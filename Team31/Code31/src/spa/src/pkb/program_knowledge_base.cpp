@@ -72,6 +72,103 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
     uses_rel_.Set(stmt_no.value, std::move(var_indices));
 }
 
+bool ProgramKnowledgeBase::ExistFollows(bool transitive,
+                                        Index<ArgPos::kFirst> first_stmt,
+                                        Index<ArgPos::kSecond> second_stmt) {
+    assert(compiled);
+    return stmtlst_stmt_.ExistFollows(transitive, first_stmt, second_stmt);
+}
+bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt) {
+    assert(compiled);
+    return stmtlst_stmt_.ExistFollows(first_stmt);
+}
+bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kSecond> second_stmt) {
+    assert(compiled);
+    return stmtlst_stmt_.ExistFollows(second_stmt);
+}
+bool ProgramKnowledgeBase::ExistFollows() {
+    assert(compiled);
+    return stmtlst_stmt_.ExistFollows();
+}
+
+// implement after store for Parent nodes is ready
+bool ProgramKnowledgeBase::ExistParent(bool transitive,
+                                       Index<ArgPos::kFirst> parent_stmt,
+                                       Index<ArgPos::kSecond> child_stmt) {
+    assert(compiled);
+    return false;
+}
+
+std::vector<int> ProgramKnowledgeBase::GetFollows(
+        bool transitive, Index<ArgPos::kFirst> first_stmt,
+        StmtType return_type) {
+    assert(compiled);
+    std::vector<int> results = stmtlst_stmt_.GetFollows(transitive, first_stmt);
+    if (return_type == StmtType::kAll) {
+        return results;
+    }
+    std::vector<int> filtered_results;
+    std::copy_if(results.begin(), results.end(),
+                 std::back_inserter(filtered_results),
+                 [this, return_type](int i) {
+                     return type_stmt_.GetType(i) == return_type;
+                 });
+    return filtered_results;
+}
+
+std::vector<int> ProgramKnowledgeBase::GetFollows(
+        bool transitive, Index<ArgPos::kSecond> second_stmt,
+        StmtType return_type) {
+    assert(compiled);
+    std::vector<int> results =
+            stmtlst_stmt_.GetFollows(transitive, second_stmt);
+    if (return_type == StmtType::kAll) {
+        return results;
+    }
+    std::vector<int> filtered_results;
+    std::copy_if(results.begin(), results.end(),
+                 std::back_inserter(filtered_results),
+                 [this, return_type](int i) {
+                     return type_stmt_.GetType(i) == return_type;
+                 });
+    return filtered_results;
+}
+
+std::vector<std::pair<int, int>> ProgramKnowledgeBase::GetFollowsPairs(
+        bool transitive, StmtType first_type, StmtType second_type) {
+    std::vector<std::pair<int, int>> results =
+            stmtlst_stmt_.GetFollowsPairs(transitive);
+    if (first_type == StmtType::kAll && second_type == StmtType::kAll) {
+        return results;
+    }
+    std::vector<std::pair<int, int>> filtered_results;
+    std::copy_if(results.begin(), results.end(),
+                 std::back_inserter(filtered_results),
+                 [this, first_type, second_type](std::pair<int, int> p) {
+                     return (first_type == StmtType::kAll ||
+                             type_stmt_.GetType(p.first) == first_type) &&
+                            (second_type == StmtType::kAll ||
+                             type_stmt_.GetType(p.second) == second_type);
+                 });
+    return filtered_results;
+}
+
+// implement after store for Parent nodes is ready
+std::vector<int> ProgramKnowledgeBase::GetParent(bool transitive,
+                                                 Index<ArgPos::kFirst> stmt_no,
+                                                 StmtType return_type) {
+    assert(compiled);
+    std::vector<int> results;
+    return results;
+}
+std::vector<int> ProgramKnowledgeBase::GetParent(bool transitive,
+                                                 Index<ArgPos::kSecond> stmt_no,
+                                                 StmtType return_type) {
+    assert(compiled);
+    std::vector<int> results;
+    return results;
+}
+
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
     assert(compiled);
     return modifies_rel_.GetVarIndex(stmt_no) == var_index;
