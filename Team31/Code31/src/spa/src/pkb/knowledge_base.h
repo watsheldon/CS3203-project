@@ -100,34 +100,40 @@ class KnowledgeBase {
      * Gets a list of stmt# that appear after the given stmt#
      * at the same nesting level.
      */
-    virtual std::vector<int> GetFollows(
-            bool transitive, Index<ArgPos::kFirst> stmt_no,
-            const std::vector<int> &filtered_stmt) = 0;
+    virtual std::vector<int> GetFollows(bool transitive,
+                                        Index<ArgPos::kFirst> stmt_no,
+                                        StmtType return_type) = 0;
 
     /**
      * Gets a list of stmt# that appear before the given stmt#
      * at the same nesting level
      */
-    virtual std::vector<int> GetFollows(
-            bool transitive, Index<ArgPos::kSecond> stmt_no,
-            const std::vector<int> &filtered_stmt) = 0;
+    virtual std::vector<int> GetFollows(bool transitive,
+                                        Index<ArgPos::kSecond> stmt_no,
+                                        StmtType return_type) = 0;
+
+    /**
+     * Gets a list of stmt# pairs that exist in Follows relationship
+     */
+    virtual std::vector<std::pair<int, int>> GetFollowsPairs(
+            bool transitive, StmtType first_type, StmtType second_type) = 0;
 
     /**
      * Gets a list of stmt# that
      * are direct or indirect parents of (contain)
      * the given stmt# if get_pos is kFirst
      */
-    virtual std::vector<int> GetParent(
-            bool transitive, Index<ArgPos::kFirst> stmt_no,
-            const std::vector<int> &filtered_stmt) = 0;
+    virtual std::vector<int> GetParent(bool transitive,
+                                       Index<ArgPos::kFirst> stmt_no,
+                                       StmtType return_type) = 0;
 
     /**
      * Gets a list of stmt# that are direct or indirect children of
      * (are nested in) the given stmt#.
      */
-    virtual std::vector<int> GetParent(
-            bool transitive, Index<ArgPos::kSecond> stmt_no,
-            const std::vector<int> &filtered_stmt) = 0;
+    virtual std::vector<int> GetParent(bool transitive,
+                                       Index<ArgPos::kSecond> stmt_no,
+                                       StmtType return_type) = 0;
 
     /**
      * Check if modifies relationships between stmt# and its variable

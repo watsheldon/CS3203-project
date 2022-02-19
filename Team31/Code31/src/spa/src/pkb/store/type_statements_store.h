@@ -12,7 +12,7 @@ class TypeStatementsStore {
                         std::vector<int>&& prints, std::vector<int>&& calls,
                         std::vector<int>&& whiles, std::vector<int>&& ifs,
                         std::vector<int>&& assigns);
-    std::vector<int> GetStatements(StmtType et);
+    std::vector<int> GetStatements(StmtType st);
     StmtType GetType(int stmt_no);
 
   private:

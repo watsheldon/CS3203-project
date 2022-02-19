@@ -76,26 +76,7 @@ bool ProgramKnowledgeBase::ExistFollows(bool transitive,
                                         Index<ArgPos::kFirst> first_stmt,
                                         Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
-    // boundary check
-    if (stmt_count_ <= 1 || first_stmt.value > stmt_count_ - 1 ||
-        second_stmt.value > stmt_count_) {
-        return false;
-    }
-
-    //(_,_)
-    if (first_stmt.value == 0 && second_stmt.value == 0) {
-        return stmtlst_stmt_.Follows();
-    }
-    //(first_stmt, _)
-    if (second_stmt.value == 0) {
-        return stmtlst_stmt_.Follows(first_stmt);
-    }
-    //(_, second_stmt)
-    if (first_stmt.value == 0) {
-        return stmtlst_stmt_.Follows(second_stmt);
-    }
-    //(first_stmt, second_stmt)
-    return stmtlst_stmt_.Follows(transitive, first_stmt, second_stmt);
+    return stmtlst_stmt_.ExistFollows(transitive, first_stmt, second_stmt);
 }
 
 // implement after store for Parent nodes is ready
@@ -106,67 +87,71 @@ bool ProgramKnowledgeBase::ExistParent(bool transitive,
     return false;
 }
 
-
-
 std::vector<int> ProgramKnowledgeBase::GetFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt,
-        const std::vector<int> &filtered_stmts) {
+        StmtType return_type) {
     assert(compiled);
-    // boundary check
-    if (stmt_count_ <= 1 || first_stmt.value > stmt_count_ - 1) {
-        return {};
+    std::vector<int> results = stmtlst_stmt_.GetFollows(transitive, first_stmt);
+    if (return_type == StmtType::kAll) {
+        return results;
     }
-
-    std::vector<int> partial_results;
-    if (first_stmt.value == 0) {  // (_,outputs)
-        partial_results = stmtlst_stmt_.GetFollows(first_stmt);
-    }
-    partial_results = stmtlst_stmt_.GetFollows(transitive, first_stmt);
-    if (filtered_stmts.empty()) {
-        return partial_results;
-    }
-    std::vector<int> results;
-    std::set_intersection(partial_results.begin(), partial_results.end(),
-                          filtered_stmts.begin(), filtered_stmts.end(),
-                          std::back_inserter(results));
-    return results;
+    std::vector<int> filtered_results;
+    std::copy_if(results.begin(), results.end(),
+                 std::back_inserter(filtered_results),
+                 [this, return_type](int i) {
+                     return type_stmt_.GetType(i) == return_type;
+                 });
+    return filtered_results;
 }
 
 std::vector<int> ProgramKnowledgeBase::GetFollows(
         bool transitive, Index<ArgPos::kSecond> second_stmt,
-        const std::vector<int> &filtered_stmts) {
+        StmtType return_type) {
     assert(compiled);
-    // boundary check
-    if (stmt_count_ <= 1 || second_stmt.value > stmt_count_) {
-        return {};
+    std::vector<int> results =
+            stmtlst_stmt_.GetFollows(transitive, second_stmt);
+    if (return_type == StmtType::kAll) {
+        return results;
     }
+    std::vector<int> filtered_results;
+    std::copy_if(results.begin(), results.end(),
+                 std::back_inserter(filtered_results),
+                 [this, return_type](int i) {
+                     return type_stmt_.GetType(i) == return_type;
+                 });
+    return filtered_results;
+}
 
-    std::vector<int> partial_results;
-    if (second_stmt.value == 0) {  // (outputs, _)
-        partial_results = stmtlst_stmt_.GetFollows(second_stmt);
+std::vector<std::pair<int, int>> ProgramKnowledgeBase::GetFollowsPairs(
+        bool transitive, StmtType first_type, StmtType second_type) {
+    std::vector<std::pair<int, int>> results =
+            stmtlst_stmt_.GetFollowsPairs(transitive);
+    if (first_type == StmtType::kAll && second_type == StmtType::kAll) {
+        return results;
     }
-    partial_results = stmtlst_stmt_.GetFollows(transitive, second_stmt);
-    if (filtered_stmts.empty()) {
-        return partial_results;
-    }
-    std::vector<int> results;
-    std::set_intersection(partial_results.begin(), partial_results.end(),
-                          filtered_stmts.begin(), filtered_stmts.end(),
-                          std::back_inserter(results));
-    return results;
+    std::vector<std::pair<int, int>> filtered_results;
+    std::copy_if(results.begin(), results.end(),
+                 std::back_inserter(filtered_results),
+                 [this, first_type, second_type](std::pair<int, int> p) {
+                     return (first_type == StmtType::kAll ||
+                             type_stmt_.GetType(p.first) == first_type) &&
+                            (second_type == StmtType::kAll ||
+                             type_stmt_.GetType(p.second) == second_type);
+                 });
+    return filtered_results;
 }
 
 // implement after store for Parent nodes is ready
-std::vector<int> ProgramKnowledgeBase::GetParent(
-        bool transitive, Index<ArgPos::kFirst> stmt_no,
-        const std::vector<int> &filtered_stmts) {
+std::vector<int> ProgramKnowledgeBase::GetParent(bool transitive,
+                                                 Index<ArgPos::kFirst> stmt_no,
+                                                 StmtType return_type) {
     assert(compiled);
     std::vector<int> results;
     return results;
 }
-std::vector<int> ProgramKnowledgeBase::GetParent(
-        bool transitive, Index<ArgPos::kSecond> stmt_no,
-        const std::vector<int> &filtered_stmts) {
+std::vector<int> ProgramKnowledgeBase::GetParent(bool transitive,
+                                                 Index<ArgPos::kSecond> stmt_no,
+                                                 StmtType return_type) {
     assert(compiled);
     std::vector<int> results;
     return results;

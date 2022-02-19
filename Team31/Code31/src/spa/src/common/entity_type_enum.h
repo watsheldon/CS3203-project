@@ -5,7 +5,7 @@ enum class QueryEntityType { kProc, kVar, kConst, kStmt };
 
 enum class SetEntityType { kProc, kVar, kConst, kStmt, kStmtLst, kNotation };
 
-enum class StmtType { kRead = 0, kPrint, kCall, kWhile, kIf, kAssign };
+enum class StmtType { kAll = 0, kRead, kPrint, kCall, kWhile, kIf, kAssign };
 
 enum class ArgPos { kFirst, kSecond };
 

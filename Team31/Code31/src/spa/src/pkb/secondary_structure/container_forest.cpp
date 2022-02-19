@@ -17,7 +17,7 @@ ContainerForest::ContainerForest(
         assert(type != StmtlstParentStore::kNone);
         if (type == StmtlstParentStore::kProc) continue;
 
-        auto parent = stmtlst_stmts_store.GetStmtlstIndex(stmt_no);
+        auto parent = stmtlst_stmts_store.GetStmtlst(stmt_no);
         stmtlsts_[i].SetParent(parent);
         if (stmtlsts_[parent].GetFirstChild() == 0) {
             stmtlsts_[parent].SetFirstChild(i);
