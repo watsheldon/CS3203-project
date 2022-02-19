@@ -43,9 +43,28 @@ bool PolishNotation::operator==(const PolishNotation& other) const {
     if (this == &other) return true;
     return expr_ == other.expr_;
 }
-bool PolishNotation::SupersetOf(const PolishNotation& other) const {
-    // essentially a substring problem
-    return *this == other;  // placeholder for now
+bool PolishNotation::Contains(const PolishNotation& other) const {
+    // Use KMP algorithm for pattern matching
+    auto lps = ComputeLps(other);
+    auto pattern = other.GetExpr();
+    int i = 0;
+    int j = 0;
+    while (i < expr_.size()) {
+        if (expr_[i] == pattern[j]) {
+            i++;
+            j++;
+            if (j == pattern.size()) {
+                return true;
+            }
+        } else {
+            if (j == 0) {
+                i++;
+            } else {
+                j = lps[j - 1];
+            }
+        }
+    }
+    return false;
 }
 
 std::vector<int> PolishNotation::GetAllVarIndices() const {
@@ -56,5 +75,34 @@ std::vector<int> PolishNotation::GetAllVarIndices() const {
         }
     }
     return var_indices;
+}
+
+const std::vector<PolishNotationNode>& PolishNotation::GetExpr() const {
+    return expr_;
+}
+
+std::vector<int> PolishNotation::ComputeLps(
+        const PolishNotation& pattern) const {
+    // Compute the longest proper prefix suffix array
+    // Helper method for KMP
+    auto expr = pattern.GetExpr();
+    std::vector<int> lps(expr.size());
+    lps[0] = 0;
+    int len = 0;
+    for (int i = 1; i < lps.size();) {
+        if (expr[i] == expr[len]) {
+            lps[i++] = ++len;
+            continue;
+        } else {
+            if (len == 0) {
+                lps[i++] = 0;
+                continue;
+            } else {
+                len = lps[len - 1];
+                continue;
+            }
+        }
+    }
+    return lps;
 }
 }  // namespace spa
