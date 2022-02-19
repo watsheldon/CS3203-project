@@ -3,7 +3,6 @@
 #include <cassert>
 #include <deque>
 #include <iterator>
-#include <list>
 #include <memory>
 #include <stack>
 #include <utility>
@@ -39,7 +38,7 @@ BasicEntities AbstractSyntaxTree::getInitEntities() const {
     ExtractNames(procedures_, entities.procedures);
     ExtractNames(variables_, entities.variables);
     ExtractNames(constants_, entities.constants);
-    entities.notations.emplace_back(std::list<PolishNotationNode>());
+    entities.notations.emplace_back(std::vector<PolishNotationNode>());
     entities.notations.reserve(expressions_.size() + 1);
     std::for_each(
             expressions_.begin(), expressions_.end(),
@@ -52,7 +51,7 @@ void AbstractSyntaxTree::build_tree() {
     std::stack<Mode> mode_history;
     std::deque<StmtLstParent *> parent_path;
     std::stack<StmtLstNode *> stmt_lst_path;
-    std::list<PolishNotationNode> curr_expr;
+    std::vector<PolishNotationNode> curr_expr;
     int cond_depth = 0;
     for (const auto &[type, name] : *tokens_) {
         if (!tree_valid_) break;
