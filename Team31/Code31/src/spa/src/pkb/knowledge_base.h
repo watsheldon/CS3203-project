@@ -103,6 +103,10 @@ class KnowledgeBase {
     virtual std::vector<int> GetFollows(bool transitive,
                                         Index<ArgPos::kFirst> stmt_no,
                                         StmtType return_type) = 0;
+    std::vector<int> GetFollows(bool transitive,
+                                        Index<ArgPos::kFirst> stmt_no) {
+        return GetFollows(transitive, stmt_no, StmtType::kAll);
+    }
 
     /**
      * Gets a list of stmt# that appear before the given stmt#
@@ -111,6 +115,10 @@ class KnowledgeBase {
     virtual std::vector<int> GetFollows(bool transitive,
                                         Index<ArgPos::kSecond> stmt_no,
                                         StmtType return_type) = 0;
+    std::vector<int> GetFollows(bool transitive,
+                                        Index<ArgPos::kSecond> stmt_no){
+            return GetFollows(transitive, stmt_no, StmtType::kAll);
+    }
 
     /**
      * Gets a list of stmt# pairs that exist in Follows relationship
@@ -126,6 +134,10 @@ class KnowledgeBase {
     virtual std::vector<int> GetParent(bool transitive,
                                        Index<ArgPos::kFirst> stmt_no,
                                        StmtType return_type) = 0;
+    std::vector<int> GetParent(bool transitive,
+                                Index<ArgPos::kFirst> stmt_no) {
+        return GetParent(transitive, stmt_no, StmtType::kAll);
+    }
 
     /**
      * Gets a list of stmt# that are direct or indirect children of
@@ -134,6 +146,10 @@ class KnowledgeBase {
     virtual std::vector<int> GetParent(bool transitive,
                                        Index<ArgPos::kSecond> stmt_no,
                                        StmtType return_type) = 0;
+    std::vector<int> GetParent(bool transitive,
+                               Index<ArgPos::kSecond> stmt_no) {
+        return GetParent(transitive, stmt_no, StmtType::kAll);
+    }
 
     /**
      * Check if modifies relationships between stmt# and its variable
