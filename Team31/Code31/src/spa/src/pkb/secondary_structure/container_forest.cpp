@@ -75,4 +75,15 @@ std::vector<int> ContainerForest::GetChildren(const int parent) const {
     }
     return children;
 }
+int ContainerForest::GetRightmostGrandchild(const int grandparent) const {
+    assert(grandparent != 0);
+    auto grandchild = grandparent;
+    while (stmtlsts_[grandchild].GetFirstChild()) {
+        grandchild = stmtlsts_[grandchild].GetFirstChild();
+        while (stmtlsts_[grandchild].GetNextSibling()) {
+            grandchild = stmtlsts_[grandchild].GetNextSibling();
+        }
+    }
+    return grandchild;
+}
 }  // namespace spa
