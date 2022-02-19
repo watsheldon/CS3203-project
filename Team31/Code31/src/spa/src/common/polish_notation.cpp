@@ -15,7 +15,7 @@ PolishNotation::PolishNotation(const std::vector<PolishNotationNode>& expr) {
                 pn.emplace_back(node);
                 break;
             case ExprNodeType::kBracketL:
-                s.push(node);
+                s.emplace(node);
                 break;
             case ExprNodeType::kBracketR:
                 while (s.top().type != ExprNodeType::kBracketL) {
@@ -29,7 +29,7 @@ PolishNotation::PolishNotation(const std::vector<PolishNotationNode>& expr) {
                     pn.emplace_back(s.top());
                     s.pop();
                 }
-                s.push(node);
+                s.emplace(node);
         }
     }
     while (!s.empty()) {
@@ -46,7 +46,7 @@ bool PolishNotation::operator==(const PolishNotation& other) const {
 bool PolishNotation::Contains(const PolishNotation& other) const {
     // Use KMP algorithm for pattern matching
     auto lps = ComputeLps(other);
-    auto pattern = other.GetExpr();
+    auto pattern = other.expr_;
     size_t i = 0;
     size_t j = 0;
     while (i < expr_.size()) {
@@ -77,15 +77,11 @@ std::vector<int> PolishNotation::GetAllVarIndices() const {
     return var_indices;
 }
 
-const std::vector<PolishNotationNode>& PolishNotation::GetExpr() const {
-    return expr_;
-}
-
 std::vector<int> PolishNotation::ComputeLps(
         const PolishNotation& pattern) const {
     // Compute the longest proper prefix suffix array
     // Helper method for KMP
-    auto expr = pattern.GetExpr();
+    auto expr = pattern.expr_;
     std::vector<int> lps(expr.size());
     lps[0] = 0;
     size_t len = 0;

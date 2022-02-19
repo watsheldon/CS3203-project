@@ -13,7 +13,6 @@ class PolishNotation {
     bool operator==(const PolishNotation &other) const;
     [[nodiscard]] bool Contains(const PolishNotation &other) const;
     [[nodiscard]] std::vector<int> GetAllVarIndices() const;
-    [[nodiscard]] const std::vector<PolishNotationNode> &GetExpr() const;
 
   private:
     std::vector<PolishNotationNode> expr_;
