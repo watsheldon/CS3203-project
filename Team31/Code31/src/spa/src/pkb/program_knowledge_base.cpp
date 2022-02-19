@@ -78,6 +78,18 @@ bool ProgramKnowledgeBase::ExistFollows(bool transitive,
     assert(compiled);
     return stmtlst_stmt_.ExistFollows(transitive, first_stmt, second_stmt);
 }
+bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt) {
+    assert(compiled);
+    return stmtlst_stmt_.ExistFollows(first_stmt);
+}
+bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kSecond> second_stmt) {
+    assert(compiled);
+    return stmtlst_stmt_.ExistFollows(second_stmt);
+}
+bool ProgramKnowledgeBase::ExistFollows() {
+    assert(compiled);
+    return stmtlst_stmt_.ExistFollows();
+}
 
 // implement after store for Parent nodes is ready
 bool ProgramKnowledgeBase::ExistParent(bool transitive,

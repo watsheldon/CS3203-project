@@ -24,6 +24,9 @@ class StmtlstStatementsStore {
     [[nodiscard]] bool ExistFollows(bool transitive,
                                     Index<ArgPos::kFirst> first_stmt,
                                     Index<ArgPos::kSecond> second_stmt) const;
+    [[nodiscard]] bool ExistFollows(Index<ArgPos::kFirst> first_stmt) const;
+    [[nodiscard]] bool ExistFollows(Index<ArgPos::kSecond> second_stmt) const;
+    [[nodiscard]] bool ExistFollows() const;
     [[nodiscard]] std::vector<int> GetFollows(
             bool transitive, Index<ArgPos::kFirst> first_stmt) const;
     [[nodiscard]] std::vector<int> GetFollows(
@@ -34,15 +37,7 @@ class StmtlstStatementsStore {
   private:
     std::vector<std::vector<int>> stmtlst_to_statements_;
     std::vector<StmtProperties> statement_to_stmtlst_;
-    [[nodiscard]] inline int GetStmtlstSize(int stmt_no) const;
-    [[nodiscard]] inline bool FollowsBetweenWildcards() const;
-    [[nodiscard]] inline bool FollowedByWildcard(
-            Index<ArgPos::kFirst> first_stmt) const;
-    [[nodiscard]] inline bool FollowsWildcard(
-            Index<ArgPos::kSecond> second_stmt) const;
-    [[nodiscard]] inline bool Follows(bool transitive,
-                                      Index<ArgPos::kFirst> first_stmt,
-                                      Index<ArgPos::kSecond> second_stmt) const;
+    [[nodiscard]] inline size_t GetStmtlstSize(int stmt_no) const;
     [[nodiscard]] std::vector<int> GetFollowsWildcard() const;
     [[nodiscard]] std::vector<int> GetFollowsFirst(
             bool transitive, Index<ArgPos::kFirst> first_stmt) const;

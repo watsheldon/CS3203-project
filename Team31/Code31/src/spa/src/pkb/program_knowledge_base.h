@@ -58,6 +58,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
                       Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistFollows(Index<ArgPos::kFirst> first_stmt) override;
+    bool ExistFollows(Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistFollows() override;
 
     bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
                      Index<ArgPos::kSecond> child_stmt) override;

@@ -84,10 +84,22 @@ class KnowledgeBase {
                         std::vector<int> var_indices) = 0;
 
     /**
-     * Check if Follows or Follows* relationships between two stmt# exist
+     * Check if Follows or Follows* (first_stmt, second_stmt) exist
      */
     virtual bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
                               Index<ArgPos::kSecond> second_stmt) = 0;
+    /**
+     * Check if Follows or Follows* (first_stmt, _) exists
+     */
+    virtual bool ExistFollows(Index<ArgPos::kFirst> first_stmt) = 0;
+    /**
+     * Check if Follows or Follows* (_, second_stmt) exist
+     */
+    virtual bool ExistFollows(Index<ArgPos::kSecond> second_stmt) = 0;
+    /**
+     * Check if Follows or Follows* (_,_)
+     */
+    virtual bool ExistFollows() = 0;
 
     /**
      * Check if Parent or Parents* relationships between container stmt# and

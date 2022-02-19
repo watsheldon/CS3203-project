@@ -23,10 +23,9 @@ int StmtlstStatementsStore::GetStmtlst(int stmt_no) const {
 int StmtlstStatementsStore::GetStmtRelativePos(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no].pos_in_stmtlst;
 }
-int StmtlstStatementsStore::GetStmtlstSize(int stmt_no) const {
-    return static_cast<int>(
-            stmtlst_to_statements_[statement_to_stmtlst_[stmt_no].stmtlst_index]
-                    .size());
+size_t StmtlstStatementsStore::GetStmtlstSize(int stmt_no) const {
+    return stmtlst_to_statements_[statement_to_stmtlst_[stmt_no].stmtlst_index]
+            .size();
 }
 StmtProperties StmtlstStatementsStore::GetStmtProperties(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no];
@@ -36,29 +35,6 @@ std::vector<int> StmtlstStatementsStore::GetStatements(
     return stmtlst_to_statements_[stmtlst_index];
 }
 
-bool StmtlstStatementsStore::FollowsBetweenWildcards() const {
-    return std::any_of(stmtlst_to_statements_.begin() + 1,
-                       stmtlst_to_statements_.end(),
-                       [](auto &stmtlst) { return stmtlst.size() > 1; });
-}
-bool StmtlstStatementsStore::FollowedByWildcard(
-        Index<ArgPos::kFirst> first_stmt) const {
-    return GetStmtRelativePos(first_stmt.value) <
-           GetStmtlstSize(first_stmt.value);
-}
-bool StmtlstStatementsStore::FollowsWildcard(
-        Index<ArgPos::kSecond> second_stmt) const {
-    return GetStmtRelativePos(second_stmt.value) > 1;
-}
-bool StmtlstStatementsStore::Follows(bool transitive,
-                                     Index<ArgPos::kFirst> first_stmt,
-                                     Index<ArgPos::kSecond> second_stmt) const {
-    return (first_stmt.value < second_stmt.value) &&
-           (GetStmtlst(first_stmt.value) == GetStmtlst(second_stmt.value)) &&
-           (transitive || (GetStmtRelativePos(second_stmt.value) -
-                                   GetStmtRelativePos(first_stmt.value) ==
-                           1));
-}
 bool StmtlstStatementsStore::ExistFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt,
         Index<ArgPos::kSecond> second_stmt) const {
@@ -68,20 +44,32 @@ bool StmtlstStatementsStore::ExistFollows(
         return false;
     }
 
-    //(_,_)
-    if (first_stmt.value == 0 && second_stmt.value == 0) {
-        return FollowsBetweenWildcards();
+    return (first_stmt.value < second_stmt.value) &&
+           (GetStmtlst(first_stmt.value) == GetStmtlst(second_stmt.value)) &&
+           (transitive || (GetStmtRelativePos(second_stmt.value) -
+                                   GetStmtRelativePos(first_stmt.value) ==
+                           1));
+}
+bool StmtlstStatementsStore::ExistFollows(
+        Index<ArgPos::kFirst> first_stmt) const {
+    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
+        return false;
     }
-    //(first_stmt, _)
-    if (second_stmt.value == 0) {
-        return FollowedByWildcard(first_stmt);
+    return GetStmtRelativePos(first_stmt.value) <
+           GetStmtlstSize(first_stmt.value) - 1;
+}
+bool StmtlstStatementsStore::ExistFollows(
+        Index<ArgPos::kSecond> second_stmt) const {
+    // boundary check
+    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
+        return false;
     }
-    //(_, second_stmt)
-    if (first_stmt.value == 0) {
-        return FollowsWildcard(second_stmt);
-    }
-    //(first_stmt, second_stmt)
-    return Follows(transitive, first_stmt, second_stmt);
+    return GetStmtRelativePos(second_stmt.value) > 0;
+}
+bool StmtlstStatementsStore::ExistFollows() const {
+    return std::any_of(stmtlst_to_statements_.begin() + 1,
+                       stmtlst_to_statements_.end(),
+                       [](auto &stmtlst) { return stmtlst.size() > 1; });
 }
 
 std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
@@ -97,16 +85,13 @@ std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
 std::vector<int> StmtlstStatementsStore::GetFollowsFirst(
         bool transitive, Index<ArgPos::kFirst> first_stmt) const {
     int pos = GetStmtRelativePos(first_stmt.value);
-    if (pos == GetStmtlstSize(first_stmt.value) - 1) {
-        return {};
-    }
     int index = GetStmtlst(first_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
     if (!transitive) {
         return {stmts[pos + 1]};
     }
     auto first = stmts.begin() + pos + 1;
-    auto last = stmts.begin() + GetStmtlstSize(first_stmt.value);
+    auto last = stmts.end();
     return {first, last};
 }
 std::vector<int> StmtlstStatementsStore::GetFollows(
@@ -133,15 +118,12 @@ std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
 std::vector<int> StmtlstStatementsStore::GetFollowedBySecond(
         bool transitive, Index<ArgPos::kSecond> second_stmt) const {
     int pos = GetStmtRelativePos(second_stmt.value);
-    if (pos == 0) {
-        return {};
-    }
     int index = GetStmtlst(second_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
     if (!transitive) {
         return {stmts[pos - 1]};
     }
-    auto first = stmts.begin() + 1;
+    auto first = stmts.begin();
     auto last = stmts.begin() + pos;
     return {first, last};
 }
