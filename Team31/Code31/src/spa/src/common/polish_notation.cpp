@@ -48,5 +48,13 @@ bool PolishNotation::SupersetOf(const PolishNotation& other) const {
     return *this == other;  // placeholder for now
 }
 
-std::vector<int> PolishNotation::GetAllVarIndices() const { return {}; }
+std::vector<int> PolishNotation::GetAllVarIndices() const {
+    std::vector<int> var_indices;
+    for (auto node : expr_) {
+        if (node.type == ExprNodeType::kVariable) {
+            var_indices.emplace_back(node.id);
+        }
+    }
+    return var_indices;
+}
 }  // namespace spa
