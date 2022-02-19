@@ -93,15 +93,12 @@ std::vector<int> PolishNotation::ComputeLps(
         if (expr[i] == expr[len]) {
             lps[i++] = ++len;
             continue;
-        } else {
-            if (len == 0) {
-                lps[i++] = 0;
-                continue;
-            } else {
-                len = lps[len - 1];
-                continue;
-            }
         }
+        if (len == 0) {
+            lps[i++] = 0;
+            continue;
+        }
+        len = lps[len - 1];
     }
     return lps;
 }
