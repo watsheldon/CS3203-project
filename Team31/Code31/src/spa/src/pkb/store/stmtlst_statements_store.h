@@ -1,6 +1,8 @@
 #ifndef SPA_SRC_SPA_SRC_PKB_STORE_STMTLST_STATEMENTS_STORE_H_
 #define SPA_SRC_SPA_SRC_PKB_STORE_STMTLST_STATEMENTS_STORE_H_
 
+#include <algorithm>
+#include <cassert>
 #include <utility>
 #include <vector>
 
