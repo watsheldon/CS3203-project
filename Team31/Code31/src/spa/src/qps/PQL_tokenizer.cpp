@@ -1,6 +1,8 @@
 #include "PQL_tokenizer.h"
 
 #include <algorithm>
+#include <cassert>
+#include <cstring>
 #include <fstream>
 
 namespace spa {
