@@ -1,7 +1,6 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_STMT_REF_H_
 #define SPA_SRC_SPA_SRC_QPS_STMT_REF_H_
 
-#include "declaration_cl.h"
 #include "synonym.h"
 
 namespace spa {

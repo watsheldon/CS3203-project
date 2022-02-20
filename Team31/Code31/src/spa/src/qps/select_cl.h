@@ -2,7 +2,7 @@
 #define SRC_SPA_SRC_QPS_SELECT_H_
 #include <string>
 
-#include "declaration_cl.h"
+#include "synonym.h"
 
 namespace spa {
 class SelectClause {

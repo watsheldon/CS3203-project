@@ -4,7 +4,6 @@
 #include <utility>
 #include <vector>
 
-#include "declaration_cl.h"
 #include "pattern_cl.h"
 #include "query_object.h"
 #include "select_cl.h"

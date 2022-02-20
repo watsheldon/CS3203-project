@@ -3,7 +3,6 @@
 
 #include <string>
 
-#include "declaration_cl.h"
 #include "synonym.h"
 
 namespace spa {

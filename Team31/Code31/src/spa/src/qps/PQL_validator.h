@@ -4,7 +4,6 @@
 #include <filesystem>
 
 #include "PQL_tokenizer.h"
-#include "declaration_cl.h"
 #include "pattern_cl.h"
 #include "query_object.h"
 #include "query_token.h"

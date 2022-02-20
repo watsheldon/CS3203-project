@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "declaration_cl.h"
 #include "pattern_cl.h"
 #include "select_cl.h"
 #include "such_that_cl.h"
@@ -17,8 +16,7 @@ class QueryObject {
     const std::unique_ptr<Synonym> select;
     const std::unique_ptr<SuchThatClause> such_that_;
     const std::unique_ptr<PatternClause> pattern;
-    QueryObject(bool isValid, bool hasSuchThat, bool hasPattern,
-                std::vector<std::unique_ptr<Synonym>> syns,
+    QueryObject(bool isValid, std::vector<std::unique_ptr<Synonym>> syns,
                 std::unique_ptr<Synonym> sel, std::unique_ptr<SuchThatClause> suchthat,
                 std::unique_ptr<PatternClause> pat)
             : isValidQuery(isValid),
