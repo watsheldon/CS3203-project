@@ -116,8 +116,7 @@ bool ProgramKnowledgeBase::ExistParent(bool transitive,
     if (transitive) {
         std::vector<int> parent_follower =
                 GetFollows(false, parent_stmt, StmtType::kAll);
-        return parent_follower.empty() ||
-                child_stmt.value < parent_follower[0];
+        return parent_follower.empty() || child_stmt.value < parent_follower[0];
     }
     int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
     return stmtlst_parent_.GetWhileStmtLst(parent) == stmtlst_index ||
