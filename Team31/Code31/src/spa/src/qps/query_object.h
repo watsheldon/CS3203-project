@@ -4,9 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "pattern_cl.h"
-#include "select_cl.h"
-#include "such_that_cl.h"
+#include "qps/conditions/condition_clause.h"
 #include "synonym.h"
 
 namespace spa {
@@ -15,18 +13,16 @@ class QueryObject {
     const bool isValidQuery;
     const std::vector<std::unique_ptr<Synonym>> synonyms;
     const std::unique_ptr<Synonym> select;
-    const std::unique_ptr<SuchThatClause> such_that_;
-    const std::unique_ptr<PatternClause> pattern;
+    std::vector<std::unique_ptr<ConditionClause>> conditions;
     QueryObject(bool isValid, std::vector<std::unique_ptr<Synonym>> syns,
                 std::unique_ptr<Synonym> sel,
-                std::unique_ptr<SuchThatClause> suchthat,
-                std::unique_ptr<PatternClause> pat)
+                std::vector<std::unique_ptr<ConditionClause>> cons)
             : isValidQuery(isValid),
               synonyms(std::move(syns)),
               select(std::move(sel)),
-              such_that_(std::move(suchthat)),
-              pattern(std::move(pat)) {}
+              conditions(std::move(cons)) {}
 };
+
 }  // namespace spa
 
-#endif  // SPA_TEAM31_CODE31_SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_
+#endif  // SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_

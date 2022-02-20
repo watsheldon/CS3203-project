@@ -1,6 +1,7 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
 #define SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
 
+#include <string_view>
 namespace spa {
 
 enum class DeclarationType {

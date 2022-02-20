@@ -1,6 +1,7 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_ENT_REF_H_
 #define SPA_SRC_SPA_SRC_QPS_ENT_REF_H_
 
+#include <cassert>
 #include <string>
 
 #include "synonym.h"

@@ -4,10 +4,9 @@
 #include <utility>
 #include <vector>
 
-#include "pattern_cl.h"
+#include "conditions/condition_clause.h"
 #include "query_object.h"
 #include "select_cl.h"
-#include "such_that_cl.h"
 #include "synonym.h"
 
 namespace spa {
@@ -16,15 +15,14 @@ class QueryObjectBuilder {
     bool isValidQuery_ = true;
     std::vector<std::unique_ptr<Synonym>> synonyms_;
     std::unique_ptr<Synonym> select_;
-    std::unique_ptr<SuchThatClause> such_that_;
-    std::unique_ptr<PatternClause> pattern_;
+    std::vector<std::unique_ptr<ConditionClause>> conditions_;
 
   public:
     QueryObjectBuilder& SetIsValid(bool isValid);
     QueryObjectBuilder& SetSynonyms(std::vector<std::unique_ptr<Synonym>> syns);
     QueryObjectBuilder& SetSelect(std::unique_ptr<Synonym> sel);
-    QueryObjectBuilder& SetSuchThat(std::unique_ptr<SuchThatClause> suchthat);
-    QueryObjectBuilder& SetPattern(std::unique_ptr<PatternClause> pat);
+    QueryObjectBuilder& SetConditions(
+            std::vector<std::unique_ptr<ConditionClause>>& cons);
     QueryObject build();
 };
 }  // namespace spa

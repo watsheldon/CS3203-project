@@ -13,7 +13,6 @@ Parser::Parser(const std::string &inputFile) : queryPath(inputFile){};
 
 QueryObject Parser::parse() {
     PQLValidator validator(queryPath);
-    return QueryObject(false, std::vector<std::unique_ptr<Synonym>>(), nullptr,
-                       nullptr, nullptr);
+    return QueryObject(false, {}, nullptr, {});
 }
 }  // namespace spa
