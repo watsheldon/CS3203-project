@@ -1,18 +1,27 @@
 #ifndef SRC_SPA_SRC_QPS_PARSER_H_
 #define SRC_SPA_SRC_QPS_PARSER_H_
-#include "query_object.h"
+
+#include <filesystem>
+#include <fstream>
+
 #include "PQL_tokenizer.h"
-#include "token.h"
-#include <vector>
+#include "PQL_validator.h"
+#include "query_object.h"
+#include "query_token.h"
 
 namespace spa {
+class Parser{
+  private:
+    std::filesystem::path queryPath;
 
-    class parser{
-        QueryObject parseQuery(const std::string& inputFile);
-        std::vector<Declaration> parseDeclarations(std::vector<Token> tokenList, int endPos);
-        Select parseSelect(std::vector<Token> tokenList, int startPos, std::vector<Declaration>);
-        bool checkIdent(std::string s);
-        DeclarationType getType(Token token);
+  public:
+    explicit Parser(const std::string& inputFile);
+    QueryObject parse();
+//        QueryObject parseQuery(const std::string& inputFile);
+//        Declaration parseDeclaration(std::vector<Token> tokenList);
+//        Select parseSelect(std::vector<Token> tokenList, int startPos, Declaration declaration);
+//        bool checkIdent(std::string s);
+//        DeclarationType getType(Token token);
     };
 }
 
