@@ -2,10 +2,10 @@
 #define SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_
 
 #include <list>
+#include <set>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <set>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -132,7 +132,7 @@ class KnowledgeBase {
      * Follows/Follows*(_, stmt#)
      */
     virtual std::set<int> GetFollows(ArgPos return_pos,
-                                        StmtType return_type) = 0;
+                                     StmtType return_type) = 0;
     std::set<int> GetFollows(ArgPos return_pos) {
         return GetFollows(return_pos, StmtType::kAll);
     }
@@ -141,10 +141,9 @@ class KnowledgeBase {
      * at the same nesting level.
      */
     virtual std::set<int> GetFollows(bool transitive,
-                                        Index<ArgPos::kFirst> stmt_no,
-                                        StmtType return_type) = 0;
-    std::set<int> GetFollows(bool transitive,
-                                Index<ArgPos::kFirst> stmt_no) {
+                                     Index<ArgPos::kFirst> stmt_no,
+                                     StmtType return_type) = 0;
+    std::set<int> GetFollows(bool transitive, Index<ArgPos::kFirst> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
     }
 
@@ -153,17 +152,16 @@ class KnowledgeBase {
      * at the same nesting level
      */
     virtual std::set<int> GetFollows(bool transitive,
-                                        Index<ArgPos::kSecond> stmt_no,
-                                        StmtType return_type) = 0;
-    std::set<int> GetFollows(bool transitive,
-                                Index<ArgPos::kSecond> stmt_no) {
+                                     Index<ArgPos::kSecond> stmt_no,
+                                     StmtType return_type) = 0;
+    std::set<int> GetFollows(bool transitive, Index<ArgPos::kSecond> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
     }
 
     /**
      * Gets a list of stmt# pairs that exist in Follows relationship
      */
-    virtual std::vector<std::pair<int, int>> GetFollowsPairs(
+    virtual std::pair<std::vector<int>, std::vector<int>> GetFollowsPairs(
             bool transitive, StmtType first_type, StmtType second_type) = 0;
 
     /**
@@ -171,7 +169,7 @@ class KnowledgeBase {
      * Parent/Parent*(_, stmt#)
      */
     virtual std::set<int> GetParent(ArgPos return_pos,
-                                       StmtType return_type) = 0;
+                                    StmtType return_type) = 0;
     std::set<int> GetParent(ArgPos return_pos) {
         return GetParent(return_pos, StmtType::kAll);
     }
@@ -180,10 +178,10 @@ class KnowledgeBase {
      * are direct or indirect children of (are nested in) the given stmt#
      */
     virtual std::set<int> GetParent(bool transitive,
-                                       Index<ArgPos::kFirst> parent_stmt,
-                                       StmtType return_type) = 0;
+                                    Index<ArgPos::kFirst> parent_stmt,
+                                    StmtType return_type) = 0;
     std::set<int> GetParent(bool transitive,
-                               Index<ArgPos::kFirst> parent_stmt) {
+                            Index<ArgPos::kFirst> parent_stmt) {
         return GetParent(transitive, parent_stmt, StmtType::kAll);
     }
 
@@ -192,17 +190,17 @@ class KnowledgeBase {
      * (contain) the given stmt#.
      */
     virtual std::set<int> GetParent(bool transitive,
-                                       Index<ArgPos::kSecond> child_stmt,
-                                       StmtType return_type) = 0;
+                                    Index<ArgPos::kSecond> child_stmt,
+                                    StmtType return_type) = 0;
     std::set<int> GetParent(bool transitive,
-                               Index<ArgPos::kSecond> child_stmt) {
+                            Index<ArgPos::kSecond> child_stmt) {
         return GetParent(transitive, child_stmt, StmtType::kAll);
     }
 
     /**
      * Gets a list of stmt# pairs that exist in Parent/Parent* relationship
      */
-    virtual std::vector<std::pair<int, int>> GetParentPairs(
+    virtual std::pair<std::vector<int>, std::vector<int>> GetParentPairs(
             bool transitive, StmtType parent_type, StmtType child_type) = 0;
 
     /**

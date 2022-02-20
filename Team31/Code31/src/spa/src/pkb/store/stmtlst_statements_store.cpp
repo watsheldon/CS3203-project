@@ -129,33 +129,35 @@ std::vector<int> StmtlstStatementsStore::GetFollows(
 
 void StmtlstStatementsStore::AddPairs(
         const std::vector<int> &stmtlst,
-        std::vector<std::pair<int, int>> results) const {
+        std::pair<std::vector<int>, std::vector<int>> &results) const {
     for (int i = 0; i < stmtlst.size() - 1; ++i) {
         for (int j = i + 1; j < stmtlst.size(); ++j) {
-            results.emplace_back(std::make_pair(stmtlst[i], stmtlst[j]));
+            results.first.emplace_back(stmtlst[i]);
+            results.second.emplace_back(stmtlst[j]);
         }
     }
 }
-std::vector<std::pair<int, int>> StmtlstStatementsStore::GetTransitivePairs()
-        const {
-    std::vector<std::pair<int, int>> results;
+std::pair<std::vector<int>, std::vector<int>>
+StmtlstStatementsStore::GetTransitivePairs() const {
+    std::pair<std::vector<int>, std::vector<int>> results;
     for (auto &stmtlst : stmtlst_to_statements_) {
         AddPairs(stmtlst, results);
     }
     return results;
 }
-std::vector<std::pair<int, int>> StmtlstStatementsStore::GetNonTransitivePairs()
-        const {
-    std::vector<std::pair<int, int>> results;
+std::pair<std::vector<int>, std::vector<int>>
+StmtlstStatementsStore::GetNonTransitivePairs() const {
+    std::pair<std::vector<int>, std::vector<int>> results;
     for (auto &stmtlst : stmtlst_to_statements_) {
         for (int i = 0; i < stmtlst.size() - 1; ++i) {
-            results.emplace_back(std::make_pair(stmtlst[i], stmtlst[i + 1]));
+            results.first.emplace_back(stmtlst[i]);
+            results.second.emplace_back(stmtlst[i + 1]);
         }
     }
     return results;
 }
-std::vector<std::pair<int, int>> StmtlstStatementsStore::GetFollowsPairs(
-        bool transitive) const {
+std::pair<std::vector<int>, std::vector<int>>
+StmtlstStatementsStore::GetFollowsPairs(bool transitive) const {
     if (!transitive) {
         return GetTransitivePairs();
     }

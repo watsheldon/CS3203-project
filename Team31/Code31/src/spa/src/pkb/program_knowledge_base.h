@@ -7,9 +7,9 @@
 #include <list>
 #include <memory>
 #include <numeric>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -73,28 +73,25 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistParent(Index<ArgPos::kSecond> child_stmt) override;
     bool ExistParent() override;
 
-    std::set<int> GetFollows(ArgPos return_pos,
-                                StmtType return_type) override;
+    std::set<int> GetFollows(ArgPos return_pos, StmtType return_type) override;
+
+    std::set<int> GetFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
+                             StmtType return_type) override;
 
     std::set<int> GetFollows(bool transitive,
-                                Index<ArgPos::kFirst> first_stmt,
-                                StmtType return_type) override;
-
-    std::set<int> GetFollows(bool transitive,
-                                Index<ArgPos::kSecond> second_stmt,
-                                StmtType return_type) override;
-    std::vector<std::pair<int, int>> GetFollowsPairs(
+                             Index<ArgPos::kSecond> second_stmt,
+                             StmtType return_type) override;
+    std::pair<std::vector<int>, std::vector<int>> GetFollowsPairs(
             bool transitive, StmtType first_type,
             StmtType second_type) override;
 
-    std::set<int> GetParent(ArgPos return_pos,
-                               StmtType return_type) override;
+    std::set<int> GetParent(ArgPos return_pos, StmtType return_type) override;
     std::set<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
-                               StmtType return_type) override;
+                            StmtType return_type) override;
 
     std::set<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
-                               StmtType return_type) override;
-    std::vector<std::pair<int, int>> GetParentPairs(
+                            StmtType return_type) override;
+    std::pair<std::vector<int>, std::vector<int>> GetParentPairs(
             bool transitive, StmtType parent_type,
             StmtType child_type) override;
 
@@ -149,8 +146,10 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                                      std::vector<int> &results) const;
     void GetTransitiveParentFirst(std::vector<int> parent_follower, int parent,
                                   std::vector<int> &results) const;
-    void GetTransitiveParentPairs(std::vector<std::pair<int, int>> &results);
-    void GetNonTransitiveParentPairs(std::vector<std::pair<int, int>> &results);
+    void GetTransitiveParentPairs(
+            std::pair<std::vector<int>, std::vector<int>> &results);
+    void GetNonTransitiveParentPairs(
+            std::pair<std::vector<int>, std::vector<int>> &results);
 };
 
 }  // namespace spa
