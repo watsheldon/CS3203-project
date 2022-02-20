@@ -7,29 +7,26 @@ QueryObjectBuilder& QueryObjectBuilder::SetIsValid(bool isValid) {
     isValidQuery_ = isValid;
     return *this;
 }
+
 QueryObjectBuilder& QueryObjectBuilder::SetSynonyms(
-        std::vector<std::unique_ptr<Synonym>> syns) {
-    synonyms_ = std::move(syns);
+        std::vector<Synonym* const>& syns) {
+    synonyms_ = (std::move(syns));
     return *this;
 }
-QueryObjectBuilder& QueryObjectBuilder::SetSelect(
-        std::unique_ptr<Synonym> sel) {
-    select_ = std::move(sel);
+
+QueryObjectBuilder& QueryObjectBuilder::SetSelect(Synonym* sel) {
+    select_ = sel;
     return *this;
 }
-QueryObjectBuilder& QueryObjectBuilder::SetSuchThat(
-        std::unique_ptr<SuchThatClause> suchthat) {
-    such_that_ = std::move(suchthat);
+
+QueryObjectBuilder& QueryObjectBuilder::SetConditions(std::vector<std::unique_ptr<ConditionClause>>& cons) {
+    conditions = std::move(cons);
     return *this;
 }
-QueryObjectBuilder& QueryObjectBuilder::SetPattern(
-        std::unique_ptr<PatternClause> pat) {
-    pattern_ = std::move(pat);
-    return *this;
-}
+
 QueryObject QueryObjectBuilder::build() {
-    return QueryObject(isValidQuery_, std::move(synonyms_), std::move(select_),
-                       std::move(such_that_), std::move(pattern_));
+    return {isValidQuery_, synonyms_, select_, conditions};
 }
+
 
 }  // namespace spa
