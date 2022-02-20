@@ -1,8 +1,8 @@
 #ifndef SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_
 #define SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "pattern_cl.h"
 #include "select_cl.h"
