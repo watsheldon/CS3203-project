@@ -185,10 +185,14 @@ bool PQLValidator::parseIdentifier() {
            expect(QueryTokenType::WORD) && expect(QueryTokenType::DOUBLEQUOTE);
 }
 bool PQLValidator::parseExpressionSpec() {
-    return expect(QueryTokenType::UNDERSCORE) &&
-           expect(QueryTokenType::DOUBLEQUOTE) && parseFactor() &&
-           expect(QueryTokenType::DOUBLEQUOTE) &&
-           expect(QueryTokenType::UNDERSCORE);
+    if (accept(QueryTokenType::UNDERSCORE)) {
+        return expect(QueryTokenType::DOUBLEQUOTE) && parseFactor() &&
+               expect(QueryTokenType::DOUBLEQUOTE) &&
+               expect(QueryTokenType::UNDERSCORE);
+    }
+    return expect(QueryTokenType::DOUBLEQUOTE) && parseFactor() &&
+           expect(QueryTokenType::DOUBLEQUOTE);
+
 }
 bool PQLValidator::parseFactor() {
     return accept(QueryTokenType::INTEGER) || expect(QueryTokenType::WORD);
