@@ -9,6 +9,7 @@
 #include <numeric>
 #include <string>
 #include <vector>
+#include <set>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -72,26 +73,26 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistParent(Index<ArgPos::kSecond> child_stmt) override;
     bool ExistParent() override;
 
-    std::vector<int> GetFollows(ArgPos return_pos,
+    std::set<int> GetFollows(ArgPos return_pos,
                                 StmtType return_type) override;
 
-    std::vector<int> GetFollows(bool transitive,
+    std::set<int> GetFollows(bool transitive,
                                 Index<ArgPos::kFirst> first_stmt,
                                 StmtType return_type) override;
 
-    std::vector<int> GetFollows(bool transitive,
+    std::set<int> GetFollows(bool transitive,
                                 Index<ArgPos::kSecond> second_stmt,
                                 StmtType return_type) override;
     std::vector<std::pair<int, int>> GetFollowsPairs(
             bool transitive, StmtType first_type,
             StmtType second_type) override;
 
-    std::vector<int> GetParent(ArgPos return_pos,
+    std::set<int> GetParent(ArgPos return_pos,
                                StmtType return_type) override;
-    std::vector<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
+    std::set<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
                                StmtType return_type) override;
 
-    std::vector<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
+    std::set<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
                                StmtType return_type) override;
     std::vector<std::pair<int, int>> GetParentPairs(
             bool transitive, StmtType parent_type,
@@ -142,8 +143,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ContainsUnseenVarConst(std::vector<QueryToken> tokens);
     PolishNotation ConvertFromQueryTokens(std::vector<QueryToken> tokens);
 
-    std::vector<int> GetAllParents(StmtType return_type);
-    std::vector<int> GetAllChildren(StmtType return_type);
+    std::set<int> GetAllParents(StmtType return_type);
+    std::set<int> GetAllChildren(StmtType return_type);
     void GetNonTransitiveParentFirst(StmtType parent_type, int parent,
                                      std::vector<int> &results) const;
     void GetTransitiveParentFirst(std::vector<int> parent_follower, int parent,

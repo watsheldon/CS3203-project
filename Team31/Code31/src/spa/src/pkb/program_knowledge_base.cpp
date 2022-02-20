@@ -4,6 +4,7 @@
 #include <cassert>
 #include <list>
 #include <vector>
+#include <set>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -115,7 +116,7 @@ bool ProgramKnowledgeBase::ExistParent(bool transitive,
 
     if (transitive) {
         std::vector<int> parent_follower =
-                GetFollows(false, parent_stmt, StmtType::kAll);
+                stmtlst_stmt_.GetFollows(false, parent_stmt);
         return parent_follower.empty() || child_stmt.value < parent_follower[0];
     }
     int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
@@ -144,7 +145,7 @@ bool ProgramKnowledgeBase::ExistParent() {
            !type_stmt_.GetStatements(StmtType::kIf).empty();
 }
 
-std::vector<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
+std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
                                                   StmtType return_type) {
     std::vector<int> results;
     if (return_pos == ArgPos::kFirst) {
@@ -152,33 +153,33 @@ std::vector<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
     } else {
         results = stmtlst_stmt_.GetFollowsWildcard();
     }
-    std::vector<int> filtered_results;
+    std::set<int> filtered_results;
     std::copy_if(results.begin(), results.end(),
-                 std::back_inserter(filtered_results),
+                 std::inserter(filtered_results, filtered_results.end()),
                  [this, return_type](int i) {
                      return type_stmt_.GetType(i) == return_type;
                  });
     return filtered_results;
 }
-std::vector<int> ProgramKnowledgeBase::GetFollows(
+std::set<int> ProgramKnowledgeBase::GetFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt,
         StmtType return_type) {
     assert(compiled);
     assert(first_stmt.value > 0);
     std::vector<int> results = stmtlst_stmt_.GetFollows(transitive, first_stmt);
     if (return_type == StmtType::kAll) {
-        return results;
+        return {results.begin(), results.end()};
     }
-    std::vector<int> filtered_results;
+    std::set<int> filtered_results;
     std::copy_if(results.begin(), results.end(),
-                 std::back_inserter(filtered_results),
+                 std::inserter(filtered_results, filtered_results.end()),
                  [this, return_type](int i) {
                      return type_stmt_.GetType(i) == return_type;
                  });
     return filtered_results;
 }
 
-std::vector<int> ProgramKnowledgeBase::GetFollows(
+std::set<int> ProgramKnowledgeBase::GetFollows(
         bool transitive, Index<ArgPos::kSecond> second_stmt,
         StmtType return_type) {
     assert(compiled);
@@ -186,11 +187,11 @@ std::vector<int> ProgramKnowledgeBase::GetFollows(
     std::vector<int> results =
             stmtlst_stmt_.GetFollows(transitive, second_stmt);
     if (return_type == StmtType::kAll) {
-        return results;
+        return {results.begin(), results.end()};
     }
-    std::vector<int> filtered_results;
+    std::set<int> filtered_results;
     std::copy_if(results.begin(), results.end(),
-                 std::back_inserter(filtered_results),
+                 std::inserter(filtered_results, filtered_results.end()),
                  [this, return_type](int i) {
                      return type_stmt_.GetType(i) == return_type;
                  });
@@ -217,16 +218,18 @@ std::vector<std::pair<int, int>> ProgramKnowledgeBase::GetFollowsPairs(
     return filtered_results;
 }
 
-std::vector<int> ProgramKnowledgeBase::GetAllParents(StmtType return_type) {
+std::set<int> ProgramKnowledgeBase::GetAllParents(StmtType return_type) {
+    std::vector<int> results;
     if (return_type == StmtType::kAll) {
-        std::vector<int> results = type_stmt_.GetStatements(StmtType::kWhile);
+        results = type_stmt_.GetStatements(StmtType::kWhile);
         std::vector<int> if_stmts = type_stmt_.GetStatements(StmtType::kIf);
         results.insert(results.end(), if_stmts.begin(), if_stmts.end());
-        return results;
+    } else {
+        results = type_stmt_.GetStatements(return_type);
     }
-    return type_stmt_.GetStatements(return_type);
+    return {results.begin(), results.end()};
 }
-std::vector<int> ProgramKnowledgeBase::GetAllChildren(StmtType return_type) {
+std::set<int> ProgramKnowledgeBase::GetAllChildren(StmtType return_type) {
     if (return_type == StmtType::kAll) {
         std::vector<int> results;
         for (auto &while_stmt : type_stmt_.GetStatements(StmtType::kWhile)) {
@@ -247,7 +250,7 @@ std::vector<int> ProgramKnowledgeBase::GetAllChildren(StmtType return_type) {
             results.insert(results.end(), else_stmtlst.begin(),
                            else_stmtlst.end());
         }
-        return results;
+        return {results.begin(), results.end()};
     }
     std::vector<int> results = type_stmt_.GetStatements(return_type);
     std::vector<int> filtered_results;
@@ -259,9 +262,9 @@ std::vector<int> ProgramKnowledgeBase::GetAllChildren(StmtType return_type) {
                      return type == StmtlstParentStore::ParentType::kIf ||
                             type == StmtlstParentStore::ParentType::kWhile;
                  });
-    return filtered_results;
+    return {filtered_results.begin(), filtered_results.end()};
 }
-std::vector<int> ProgramKnowledgeBase::GetParent(ArgPos return_pos,
+std::set<int> ProgramKnowledgeBase::GetParent(ArgPos return_pos,
                                                  StmtType return_type) {
     if (return_pos == ArgPos::kFirst) {
         return GetAllParents(return_type);
@@ -292,7 +295,7 @@ void ProgramKnowledgeBase::GetTransitiveParentFirst(
     results.resize(size);
     std::iota(results.begin(), results.end(), parent + 1);
 }
-std::vector<int> ProgramKnowledgeBase::GetParent(
+std::set<int> ProgramKnowledgeBase::GetParent(
         bool transitive, Index<ArgPos::kFirst> parent_stmt,
         StmtType return_type) {
     assert(compiled);
@@ -307,13 +310,13 @@ std::vector<int> ProgramKnowledgeBase::GetParent(
 
     std::vector<int> results;
     if (transitive) {
-        GetTransitiveParentFirst(GetFollows(false, parent_stmt, StmtType::kAll),
+        GetTransitiveParentFirst(stmtlst_stmt_.GetFollows(false, parent_stmt),
                                  parent_stmt.value, results);
     } else {
         GetNonTransitiveParentFirst(parent_type, parent_stmt.value, results);
     }
     if (return_type == StmtType::kAll) {
-        return results;
+        return {results.begin(), results.end()};
     }
     std::vector<int> filtered_results;
     std::copy_if(results.begin(), results.end(),
@@ -321,9 +324,9 @@ std::vector<int> ProgramKnowledgeBase::GetParent(
                  [this, return_type](int i) {
                      return type_stmt_.GetType(i) == return_type;
                  });
-    return filtered_results;
+    return {filtered_results.begin(), filtered_results.end()};
 }
-std::vector<int> ProgramKnowledgeBase::GetParent(
+std::set<int> ProgramKnowledgeBase::GetParent(
         bool transitive, Index<ArgPos::kSecond> child_stmt,
         StmtType return_type) {
     assert(compiled);
@@ -351,7 +354,7 @@ std::vector<int> ProgramKnowledgeBase::GetParent(
     }
 
     if (return_type == StmtType::kAll) {
-        return results;
+        return {results.begin(), results.end()};
     }
     std::vector<int> filtered_results;
     std::copy_if(results.begin(), results.end(),
@@ -359,14 +362,14 @@ std::vector<int> ProgramKnowledgeBase::GetParent(
                  [this, return_type](int i) {
                      return type_stmt_.GetType(i) == return_type;
                  });
-    return filtered_results;
+    return {filtered_results.begin(), filtered_results.end()};
 }
 
 void ProgramKnowledgeBase::GetTransitiveParentPairs(
         std::vector<std::pair<int, int>> &results) {
     for (auto &while_stmt : type_stmt_.GetStatements(StmtType::kWhile)) {
-        std::vector<int> follower = GetFollows(
-                false, Index<ArgPos::kFirst>(while_stmt), StmtType::kAll);
+        std::vector<int> follower = stmtlst_stmt_.GetFollows(
+                false, Index<ArgPos::kFirst>(while_stmt));
         int end;
         if (follower.empty()) {
             end = static_cast<int>(stmt_count_) + 1;
@@ -378,8 +381,8 @@ void ProgramKnowledgeBase::GetTransitiveParentPairs(
         }
     }
     for (auto &if_stmt : type_stmt_.GetStatements(StmtType::kIf)) {
-        std::vector<int> follower = GetFollows(
-                false, Index<ArgPos::kFirst>(if_stmt), StmtType::kAll);
+        std::vector<int> follower = stmtlst_stmt_.GetFollows(
+                false, Index<ArgPos::kFirst>(if_stmt));
         int end;
         if (follower.empty()) {
             end = static_cast<int>(stmt_count_) + 1;

@@ -5,6 +5,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <set>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -130,19 +131,19 @@ class KnowledgeBase {
      * Gets a list of stmt# that satisfy Follows/Follows*(stmt#, _) or
      * Follows/Follows*(_, stmt#)
      */
-    virtual std::vector<int> GetFollows(ArgPos return_pos,
+    virtual std::set<int> GetFollows(ArgPos return_pos,
                                         StmtType return_type) = 0;
-    std::vector<int> GetFollows(ArgPos return_pos) {
+    std::set<int> GetFollows(ArgPos return_pos) {
         return GetFollows(return_pos, StmtType::kAll);
     }
     /**
      * Gets a list of stmt# that appear after the given stmt#
      * at the same nesting level.
      */
-    virtual std::vector<int> GetFollows(bool transitive,
+    virtual std::set<int> GetFollows(bool transitive,
                                         Index<ArgPos::kFirst> stmt_no,
                                         StmtType return_type) = 0;
-    std::vector<int> GetFollows(bool transitive,
+    std::set<int> GetFollows(bool transitive,
                                 Index<ArgPos::kFirst> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
     }
@@ -151,10 +152,10 @@ class KnowledgeBase {
      * Gets a list of stmt# that appear before the given stmt#
      * at the same nesting level
      */
-    virtual std::vector<int> GetFollows(bool transitive,
+    virtual std::set<int> GetFollows(bool transitive,
                                         Index<ArgPos::kSecond> stmt_no,
                                         StmtType return_type) = 0;
-    std::vector<int> GetFollows(bool transitive,
+    std::set<int> GetFollows(bool transitive,
                                 Index<ArgPos::kSecond> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
     }
@@ -169,19 +170,19 @@ class KnowledgeBase {
      * Gets a list of stmt# that satisfy Parent/Parent*(stmt#, _) or
      * Parent/Parent*(_, stmt#)
      */
-    virtual std::vector<int> GetParent(ArgPos return_pos,
+    virtual std::set<int> GetParent(ArgPos return_pos,
                                        StmtType return_type) = 0;
-    std::vector<int> GetParent(ArgPos return_pos) {
+    std::set<int> GetParent(ArgPos return_pos) {
         return GetParent(return_pos, StmtType::kAll);
     }
     /**
      * Gets a list of stmt# that
      * are direct or indirect children of (are nested in) the given stmt#
      */
-    virtual std::vector<int> GetParent(bool transitive,
+    virtual std::set<int> GetParent(bool transitive,
                                        Index<ArgPos::kFirst> parent_stmt,
                                        StmtType return_type) = 0;
-    std::vector<int> GetParent(bool transitive,
+    std::set<int> GetParent(bool transitive,
                                Index<ArgPos::kFirst> parent_stmt) {
         return GetParent(transitive, parent_stmt, StmtType::kAll);
     }
@@ -190,10 +191,10 @@ class KnowledgeBase {
      * Gets a list of stmt# that are direct or indirect parents of
      * (contain) the given stmt#.
      */
-    virtual std::vector<int> GetParent(bool transitive,
+    virtual std::set<int> GetParent(bool transitive,
                                        Index<ArgPos::kSecond> child_stmt,
                                        StmtType return_type) = 0;
-    std::vector<int> GetParent(bool transitive,
+    std::set<int> GetParent(bool transitive,
                                Index<ArgPos::kSecond> child_stmt) {
         return GetParent(transitive, child_stmt, StmtType::kAll);
     }
