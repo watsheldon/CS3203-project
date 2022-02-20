@@ -84,7 +84,6 @@ std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
             followers.emplace_back(stmtlst[i]);
         }
     }
-    std::sort(followers.begin(), followers.end());
     return followers;
 }
 std::vector<int> StmtlstStatementsStore::GetFollowsFirst(
@@ -117,7 +116,6 @@ std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
             followees.emplace_back(stmtlst[i]);
         }
     }
-    std::sort(followees.begin(), followees.end());
     return followees;
 }
 std::vector<int> StmtlstStatementsStore::GetFollowedBySecond(
