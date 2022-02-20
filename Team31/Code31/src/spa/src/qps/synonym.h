@@ -1,8 +1,7 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
 #define SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
 
-
-namespace spa{
+namespace spa {
 
 enum class DeclarationType {
     STMT,
@@ -45,11 +44,10 @@ std::string_view keyword(DeclarationType type) {
 struct Synonym {
     const DeclarationType type;
     int count = 0;
-  public :
-    explicit Synonym(DeclarationType t): type(t) {}
-    void RefCountSetter(int num) {
-        count++;
-    }
+
+  public:
+    explicit Synonym(DeclarationType t) : type(t) {}
+    void RefCountSetter(int num) { count++; }
 };
-}
+}  // namespace spa
 #endif  // SPA_SRC_SPA_SRC_QPS_SYNONYM_H_

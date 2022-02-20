@@ -1,4 +1,5 @@
 #include "generator.h"
+
 #include "query_object_builder.h"
 
 namespace spa {
@@ -38,9 +39,9 @@ QueryObject Generator::Generate() {
                             std::make_unique<Synonym>(curr_type_);
                     auto pair = map.try_emplace(value, std::move(ptr1));
                     // do not insert means repeated synonym
-//                    if (!pair.second) {
-//
-//                    }
+                    //                    if (!pair.second) {
+                    //
+                    //                    }
                 }
                 if (curr_mode_ == Mode::kSelect) {
                 }
@@ -59,12 +60,9 @@ QueryObject Generator::Generate() {
                 break;
             case QueryTokenType::UNDERSCORE:
                 if (curr_mode_ == Mode::kCondition) {
-
                 }
                 if (curr_mode_ == Mode::kExpression) {
-
                 }
-
         }
     }
     return builder.build();
@@ -96,22 +94,20 @@ DeclarationType Generator::TypeConvert(QueryTokenType type) {
 }
 bool Generator::GenerateDeclarations() {
     DeclarationType curr_type_;
-//    if (comma) {
-//        addSynonym()
-//    }
-//    isValid
+    //    if (comma) {
+    //        addSynonym()
+    //    }
+    //    isValid
     return false;
 }
 bool Generator::GenerateSelect() {
     std::string value;
-//    checkMapContains(value);
-//    isValid;
-//    setSelect()
+    //    checkMapContains(value);
+    //    isValid;
+    //    setSelect()
     return false;
 }
-bool Generator::GenerateSuchThat() {
-    return false;
-}
+bool Generator::GenerateSuchThat() { return false; }
 }  // namespace spa
 
 // namespace spa

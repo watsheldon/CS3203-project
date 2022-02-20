@@ -5,8 +5,8 @@
 #include <sstream>
 #include <string_view>
 
-namespace spa{
-class PQLTokenizer{
+namespace spa {
+class PQLTokenizer {
   private:
     static constexpr char kSpecialSingle[] = "%()*+-/;,_";
     std::stringstream buffer_;
@@ -20,7 +20,6 @@ class PQLTokenizer{
     explicit PQLTokenizer(const std::filesystem::path &inputFile);
     PQLTokenizer &operator()(std::string_view str);
     PQLTokenizer &operator>>(std::string &token);
-
 };
-}
-#endif //INC_21S2_CP_SPA_TEAM_31_TEAM31_CODE31_SRC_SPA_SRC_QPS_PQL_TOKENIZER_H_
+}  // namespace spa
+#endif  // INC_21S2_CP_SPA_TEAM_31_TEAM31_CODE31_SRC_SPA_SRC_QPS_PQL_TOKENIZER_H_

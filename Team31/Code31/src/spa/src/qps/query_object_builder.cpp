@@ -28,7 +28,8 @@ QueryObjectBuilder& QueryObjectBuilder::SetPattern(
     return *this;
 }
 QueryObject QueryObjectBuilder::build() {
-    return QueryObject(isValidQuery_, std::move(synonyms_), std::move(select_), std::move(such_that_), std::move(pattern_));
+    return QueryObject(isValidQuery_, std::move(synonyms_), std::move(select_),
+                       std::move(such_that_), std::move(pattern_));
 }
 
 }  // namespace spa

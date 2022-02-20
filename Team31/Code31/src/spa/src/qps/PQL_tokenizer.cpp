@@ -59,4 +59,4 @@ PQLTokenizer &PQLTokenizer::operator()(std::string_view str) {
     return *this;
 }
 
-}
+}  // namespace spa

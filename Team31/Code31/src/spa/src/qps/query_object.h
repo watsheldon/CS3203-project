@@ -17,7 +17,8 @@ class QueryObject {
     const std::unique_ptr<SuchThatClause> such_that_;
     const std::unique_ptr<PatternClause> pattern;
     QueryObject(bool isValid, std::vector<std::unique_ptr<Synonym>> syns,
-                std::unique_ptr<Synonym> sel, std::unique_ptr<SuchThatClause> suchthat,
+                std::unique_ptr<Synonym> sel,
+                std::unique_ptr<SuchThatClause> suchthat,
                 std::unique_ptr<PatternClause> pat)
             : isValidQuery(isValid),
               synonyms(std::move(syns)),

@@ -21,8 +21,7 @@ class QueryObjectBuilder {
 
   public:
     QueryObjectBuilder& SetIsValid(bool isValid);
-    QueryObjectBuilder& SetSynonyms(
-            std::vector<std::unique_ptr<Synonym>> syns);
+    QueryObjectBuilder& SetSynonyms(std::vector<std::unique_ptr<Synonym>> syns);
     QueryObjectBuilder& SetSelect(std::unique_ptr<Synonym> sel);
     QueryObjectBuilder& SetSuchThat(std::unique_ptr<SuchThatClause> suchthat);
     QueryObjectBuilder& SetPattern(std::unique_ptr<PatternClause> pat);
