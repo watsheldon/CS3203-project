@@ -53,7 +53,7 @@ QueryObject Generator::Generate() {
                         return query_object_builder_.build();
                     }
                     auto &[name, synonym] = *it;
-                    query_object_builder_.SetSelect(synonyms_.get());
+                    // query_object_builder_.SetSelect(synonyms_.get());
                 }
                 if (curr_mode_ == Mode::kCondition) {
                 }
@@ -73,6 +73,7 @@ QueryObject Generator::Generate() {
                 if (curr_mode_ == Mode::kExpression) {
                 }
             case QueryTokenType::TIMES:
+                break;
         }
     }
     return query_object_builder_.build();

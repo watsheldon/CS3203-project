@@ -11,14 +11,18 @@ namespace spa {
 class QueryObject {
   public:
     const bool isValidQuery;
-    const std::vector<Synonym* const> synonyms;
-    const Synonym* select;
+    const std::vector<std::unique_ptr<Synonym>> synonyms;
+    const std::unique_ptr<Synonym> select;
     std::vector<std::unique_ptr<ConditionClause>> conditions;
-    QueryObject(bool isValid, std::vector<Synonym* const>& syns,
-                const Synonym* sel,
-                std::vector<std::unique_ptr<ConditionClause>>& cons)
-            : isValidQuery(isValid), synonyms(std::move(syns)), select(sel), conditions(std::move(cons)) {}
+    QueryObject(bool isValid, std::vector<std::unique_ptr<Synonym>> syns,
+                std::unique_ptr<Synonym> sel,
+                std::vector<std::unique_ptr<ConditionClause>> cons)
+            : isValidQuery(isValid),
+              synonyms(std::move(syns)),
+              select(std::move(sel)),
+              conditions(std::move(cons)) {}
 };
+
 }  // namespace spa
 
 #endif  // SRC_SPA_SRC_QUERYPROCESSINGSUBSYSTEM_QUERYOBJECT_H_

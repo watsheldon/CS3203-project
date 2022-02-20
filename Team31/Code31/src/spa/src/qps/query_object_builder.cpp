@@ -9,24 +9,25 @@ QueryObjectBuilder& QueryObjectBuilder::SetIsValid(bool isValid) {
 }
 
 QueryObjectBuilder& QueryObjectBuilder::SetSynonyms(
-        std::vector<Synonym* const>& syns) {
-    synonyms_ = (std::move(syns));
+        std::vector<std::unique_ptr<Synonym>> syns) {
+    synonyms_ = std::move(syns);
     return *this;
 }
 
-QueryObjectBuilder& QueryObjectBuilder::SetSelect(Synonym* sel) {
-    select_ = sel;
+QueryObjectBuilder& QueryObjectBuilder::SetSelect(
+        std::unique_ptr<Synonym> sel) {
+    select_ = std::move(sel);
     return *this;
 }
 
 QueryObjectBuilder& QueryObjectBuilder::SetConditions(std::vector<std::unique_ptr<ConditionClause>>& cons) {
-    conditions = std::move(cons);
+    conditions_ = std::move(cons);
     return *this;
 }
 
 QueryObject QueryObjectBuilder::build() {
-    return {isValidQuery_, synonyms_, select_, conditions};
+    return QueryObject(isValidQuery_, std::move(synonyms_), std::move(select_),
+                       std::move(conditions_));
 }
-
 
 }  // namespace spa
