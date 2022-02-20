@@ -86,8 +86,11 @@ std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
     }
     return followers;
 }
-std::vector<int> StmtlstStatementsStore::GetFollowsFirst(
+std::vector<int> StmtlstStatementsStore::GetFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt) const {
+    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
+        return {};
+    }
     int pos = GetStmtRelativePos(first_stmt.value);
     int index = GetStmtlst(first_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
@@ -97,16 +100,6 @@ std::vector<int> StmtlstStatementsStore::GetFollowsFirst(
     auto first = stmts.begin() + pos + 1;
     auto last = stmts.end();
     return {first, last};
-}
-std::vector<int> StmtlstStatementsStore::GetFollows(
-        bool transitive, Index<ArgPos::kFirst> first_stmt) const {
-    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
-        return {};
-    }
-    if (first_stmt.value == 0) {  // (_,outputs)
-        return GetFollowsWildcard();
-    }
-    return GetFollowsFirst(transitive, first_stmt);
 }
 
 std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
@@ -118,8 +111,11 @@ std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
     }
     return followees;
 }
-std::vector<int> StmtlstStatementsStore::GetFollowedBySecond(
+std::vector<int> StmtlstStatementsStore::GetFollows(
         bool transitive, Index<ArgPos::kSecond> second_stmt) const {
+    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
+        return {};
+    }
     int pos = GetStmtRelativePos(second_stmt.value);
     int index = GetStmtlst(second_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
@@ -129,16 +125,6 @@ std::vector<int> StmtlstStatementsStore::GetFollowedBySecond(
     auto first = stmts.begin();
     auto last = stmts.begin() + pos;
     return {first, last};
-}
-std::vector<int> StmtlstStatementsStore::GetFollows(
-        bool transitive, Index<ArgPos::kSecond> second_stmt) const {
-    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
-        return {};
-    }
-    if (second_stmt.value == 0) {  // (outputs, _)
-        return GetFollowedByWildcard();
-    }
-    return GetFollowedBySecond(transitive, second_stmt);
 }
 
 void StmtlstStatementsStore::AddPairs(

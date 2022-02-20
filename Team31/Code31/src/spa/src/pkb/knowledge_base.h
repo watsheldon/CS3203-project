@@ -127,6 +127,15 @@ class KnowledgeBase {
     virtual bool ExistParent() = 0;
 
     /**
+     * Gets a list of stmt# that satisfy Follows/Follows*(stmt#, _) or
+     * Follows/Follows*(_, stmt#)
+     */
+    virtual std::vector<int> GetFollows(ArgPos return_pos,
+                                        StmtType return_type) = 0;
+    std::vector<int> GetFollows(ArgPos return_pos) {
+        return GetFollows(return_pos, StmtType::kAll);
+    }
+    /**
      * Gets a list of stmt# that appear after the given stmt#
      * at the same nesting level.
      */
@@ -156,6 +165,15 @@ class KnowledgeBase {
     virtual std::vector<std::pair<int, int>> GetFollowsPairs(
             bool transitive, StmtType first_type, StmtType second_type) = 0;
 
+    /**
+     * Gets a list of stmt# that satisfy Parent/Parent*(stmt#, _) or
+     * Parent/Parent*(_, stmt#)
+     */
+    virtual std::vector<int> GetParent(ArgPos return_pos,
+                                       StmtType return_type) = 0;
+    std::vector<int> GetParent(ArgPos return_pos) {
+        return GetParent(return_pos, StmtType::kAll);
+    }
     /**
      * Gets a list of stmt# that
      * are direct or indirect children of (are nested in) the given stmt#
