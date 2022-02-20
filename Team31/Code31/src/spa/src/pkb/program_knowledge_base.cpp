@@ -112,15 +112,17 @@ bool ProgramKnowledgeBase::ExistParent(bool transitive,
         type_stmt_.GetType(parent) != StmtType::kIf) {
         return false;
     }
-    std::vector<int> parent_follower =
-            GetFollows(false, parent_stmt, StmtType::kAll);
-    int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
 
-    return (parent_follower.empty() || child_stmt.value < parent_follower[0]) &&
-           (transitive ||
-            stmtlst_parent_.GetWhileStmtLst(parent) == stmtlst_index ||
-            stmtlst_parent_.GetIfStmtLst(parent).then_index == stmtlst_index ||
-            stmtlst_parent_.GetIfStmtLst(parent).else_index == stmtlst_index);
+    if (transitive) {
+        std::vector<int> parent_follower =
+                GetFollows(false, parent_stmt, StmtType::kAll);
+        return parent_follower.empty() ||
+                child_stmt.value < parent_follower[0];
+    }
+    int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
+    return stmtlst_parent_.GetWhileStmtLst(parent) == stmtlst_index ||
+           stmtlst_parent_.GetIfStmtLst(parent).then_index == stmtlst_index ||
+           stmtlst_parent_.GetIfStmtLst(parent).else_index == stmtlst_index;
 }
 bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt) {
     assert(compiled);
