@@ -222,27 +222,35 @@ class KnowledgeBase {
      * Gets a var_index that is modified in stmt#
      */
     virtual std::vector<int> GetModifies(
-            Index<QueryEntityType::kStmt> stmt_no,
-            const std::vector<int> &filtered_var) = 0;
+            Index<QueryEntityType::kStmt> stmt_no) = 0;
 
     /**
      * Gets a list of stmt# that modifies var_index
      */
     virtual std::vector<int> GetModifies(
             Index<QueryEntityType::kVar> var_index,
-            const std::vector<int> &filtered_stmt) = 0;
+            StmtType type) = 0;
+
+    /**
+     * Gets a list of stmt# that modifies any var_index (wildcard)
+     */
+    virtual std::vector<int> GetModifies(StmtType type) = 0;
 
     /**
      * Gets a list of var_index that are used in stmt#
      */
-    virtual std::vector<int> GetUses(Index<QueryEntityType::kStmt> stmt_no,
-                                     const std::vector<int> &filtered_var) = 0;
+    virtual std::vector<int> GetUses(Index<QueryEntityType::kStmt> stmt_no) = 0;
 
     /**
      * Gets a list of stmt# that uses var_index
      */
     virtual std::vector<int> GetUses(Index<QueryEntityType::kVar> var_index,
-                                     const std::vector<int> &filtered_stmt) = 0;
+                                     StmtType type) = 0;
+
+    /**
+     * Gets a list of stmt# that uses var_index
+     */
+    virtual std::vector<int> GetUses(StmtType type) = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type

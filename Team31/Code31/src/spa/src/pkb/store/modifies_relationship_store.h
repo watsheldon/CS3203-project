@@ -10,7 +10,7 @@ class ModifiesRelationshipStore {
   public:
     ModifiesRelationshipStore(size_t stmtSize, size_t varSize);
     void Set(int stmt_no, int var_index);
-    [[nodiscard]] const std::vector<int>& GetStmtNo(int var_index) const;
+    [[nodiscard]] const std::vector<int>& GetModifiesStmt(int var_index) const;
     [[nodiscard]] int GetVarIndex(int stmt_no) const;
 
   private:

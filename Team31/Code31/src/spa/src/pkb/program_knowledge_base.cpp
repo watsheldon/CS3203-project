@@ -5,6 +5,7 @@
 #include <list>
 #include <set>
 #include <vector>
+#include <set>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -443,71 +444,517 @@ ProgramKnowledgeBase::GetParentPairs(bool transitive, StmtType parent_type,
 
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
     assert(compiled);
-    return modifies_rel_.GetVarIndex(stmt_no) == var_index;
+    assert(stmt_no != 0);
+    StmtType type = type_stmt_.GetType(stmt_no);
+
+    if (type == StmtType::kPrint || type == StmtType::kCall) {
+        return false;
+    }
+
+    if (type == StmtType::kAssign || type == StmtType::kRead) {
+        return var_index == 0 ||
+               var_index == modifies_rel_.GetVarIndex(stmt_no);
+    }
+
+    auto first_stmt = stmt_no + 1;
+    int last_stmt;
+
+    auto follow_vec =
+            GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
+
+    if (follow_vec.size() == 1) {
+        last_stmt = follow_vec.front();
+    } else {
+        int stmtlst =
+                type == StmtType::kWhile
+                        ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
+                        : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
+        int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
+        auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
+        last_stmt = grandchild_stmt.back();
+    }
+
+    if (var_index == 0) {
+        const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
+        auto first_assign = std::lower_bound(assign_stmts.begin(),
+                                             assign_stmts.end(), first_stmt);
+        if (first_assign != assign_stmts.end() && *first_assign <= last_stmt) {
+            return true;
+        }
+
+        const auto &read_stmts = type_stmt_.GetStatements(StmtType::kRead);
+        auto first_read = std::lower_bound(read_stmts.begin(), read_stmts.end(),
+                                           first_stmt);
+        if (first_read != read_stmts.end() && *first_read <= last_stmt) {
+            return true;
+        }
+
+        return false;
+    }
+
+    auto modifying_stmt = modifies_rel_.GetModifiesStmt(var_index);
+    return std::any_of(modifying_stmt.begin(), modifying_stmt.end(),
+                       [first_stmt, last_stmt](auto i) {
+                           return first_stmt <= i && i <= last_stmt;
+                       });
 }
 
 bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     assert(compiled);
-    const std::vector<int> &used_vars = uses_rel_.GetVarIndex(stmt_no);
-    return std::binary_search(used_vars.begin(), used_vars.end(), var_index);
+    assert(stmt_no != 0);
+
+    StmtType type = type_stmt_.GetType(stmt_no);
+
+    if (type == StmtType::kRead || type == StmtType::kCall) {
+        return false;
+    }
+
+    if (type == StmtType::kAssign || type == StmtType::kPrint) {
+        return var_index == 0 ||
+               std::binary_search(uses_rel_.GetVarIndex(stmt_no).begin(),
+                                  uses_rel_.GetVarIndex(stmt_no).end(),
+                                  var_index);
+    }
+
+    auto first_stmt = stmt_no + 1;
+    int last_stmt;
+
+    auto follow_vec =
+            GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
+
+    if (follow_vec.size() == 1) {
+        last_stmt = follow_vec.front();
+    } else {
+        int stmtlst =
+                type == StmtType::kWhile
+                        ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
+                        : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
+        int grandchild = container_forest_->GetRightmostGrandchild(stmt_no);
+        auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
+        last_stmt = grandchild_stmt.back();
+    }
+
+    if (var_index == 0) {
+        const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
+        auto first_assign = std::lower_bound(assign_stmts.begin(),
+                                             assign_stmts.end(), first_stmt);
+        if (first_assign != assign_stmts.end() && *first_assign <= last_stmt) {
+            return true;
+        }
+
+        const auto &print_stmts = type_stmt_.GetStatements(StmtType::kPrint);
+        auto first_print = std::lower_bound(print_stmts.begin(),
+                                            print_stmts.end(), first_stmt);
+        if (first_print != print_stmts.end() && *first_print <= last_stmt) {
+            return true;
+        }
+
+        return false;
+    }
+
+    auto modifying_stmt = modifies_rel_.GetModifiesStmt(var_index);
+    return std::any_of(modifying_stmt.begin(), modifying_stmt.end(),
+                       [first_stmt, last_stmt](auto i) {
+                           return first_stmt <= i && i <= last_stmt;
+                       });
 }
 
 std::vector<int> ProgramKnowledgeBase::GetModifies(
-        Index<QueryEntityType::kStmt> stmt_no,
-        const std::vector<int> &filtered_var) {
+        Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
+    assert(stmt_no.value != 0);
     std::vector<int> results;
-    int modified_var = modifies_rel_.GetVarIndex(stmt_no.value);
-    if (filtered_var.empty() ||
-        std::binary_search(filtered_var.begin(), filtered_var.end(),
-                           modified_var)) {
-        results.emplace_back(modified_var);
+
+    StmtType type = type_stmt_.GetType(stmt_no.value);
+
+    if (type == StmtType::kPrint || type == StmtType::kCall) {
+        return results;
     }
+
+    if (type == StmtType::kAssign || type == StmtType::kRead) {
+        results.emplace_back(modifies_rel_.GetVarIndex(stmt_no.value));
+        return results;
+    }
+
+    auto first_stmt = stmt_no.value + 1;
+    int last_stmt;
+
+    auto follow_vec = GetFollows(false, Index<ArgPos::kFirst>(stmt_no.value),
+                                 StmtType::kAll);
+
+    if (follow_vec.size() == 1) {
+        last_stmt = follow_vec.front();
+    } else {
+        int stmtlst = type == StmtType::kWhile
+                              ? stmtlst_parent_.GetWhileStmtLst(stmt_no.value)
+                              : stmtlst_parent_.GetIfStmtLst(stmt_no.value)
+                                        .else_index;
+        int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
+        auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
+        last_stmt = grandchild_stmt.back();
+    }
+
+    const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
+    auto first_assign = std::lower_bound(assign_stmts.begin(),
+                                         assign_stmts.end(), first_stmt);
+
+    auto second_assign =
+            std::upper_bound(first_assign, assign_stmts.end(), last_stmt);
+
+    std::set<int> remove_dup;
+
+    for (auto i = first_assign; i != second_assign; i++) {
+        remove_dup.insert(modifies_rel_.GetVarIndex(*i));
+    }
+
+    const auto &read_stmts = type_stmt_.GetStatements(StmtType::kRead);
+    auto first_read =
+            std::lower_bound(read_stmts.begin(), read_stmts.end(), first_stmt);
+    auto second_read =
+            std::upper_bound(first_read, read_stmts.end(), last_stmt);
+
+    for (auto i = first_read; i != second_read; i++) {
+        remove_dup.insert(modifies_rel_.GetVarIndex(*i));
+    }
+
+    results.assign(remove_dup.begin(), remove_dup.end());
+
     return results;
 }
 
 std::vector<int> ProgramKnowledgeBase::GetModifies(
-        Index<QueryEntityType::kVar> var_index,
-        const std::vector<int> &filtered_stmt) {
+        Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
-    auto stmts = modifies_rel_.GetStmtNo(var_index.value);
-    if (filtered_stmt.empty()) {
-        return stmts;
+    assert(var_index.value != 0);
+
+    if (type == StmtType::kPrint || type == StmtType::kCall) {
+        return {};
     }
+
+    auto direct_modifying_stmt = modifies_rel_.GetModifiesStmt(var_index.value);
+
+    if (type == StmtType::kAssign) {
+        std::vector<int> assign_stmt;
+        std::copy_if(direct_modifying_stmt.begin(), direct_modifying_stmt.end(),
+                     std::back_inserter(assign_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kAssign;
+                     });
+        return assign_stmt;
+    }
+
+    if (type == StmtType::kRead) {
+        std::vector<int> read_stmt;
+        std::copy_if(direct_modifying_stmt.begin(), direct_modifying_stmt.end(),
+                     std::back_inserter(read_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kRead;
+                     });
+        return read_stmt;
+    }
+
+    std::set<int> container_stmt;
+    std::vector<int> parents;
+
+    for (auto &i : direct_modifying_stmt) {
+        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+        parents = container_forest_->GetParents(stmtlst);
+        std::transform(
+                parents.begin(), parents.end(),
+                std::inserter(container_stmt, container_stmt.begin()),
+                [this](int i) { return stmtlst_parent_.GetParent(i).index; });
+    }
+
+    if (type == StmtType::kAll) {
+        std::vector<int> all_stmt;
+        container_stmt.insert(direct_modifying_stmt.begin(),
+                              direct_modifying_stmt.end());
+        all_stmt.assign(container_stmt.begin(), container_stmt.end());
+        return all_stmt;
+    }
+
+    if (type == StmtType::kIf) {
+        std::vector<int> if_stmt;
+        std::copy_if(container_stmt.begin(), container_stmt.end(),
+                     std::back_inserter(if_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kIf;
+                     });
+        return if_stmt;
+    }
+
+    if (type == StmtType::kWhile) {
+        std::vector<int> while_stmt;
+        std::copy_if(container_stmt.begin(), container_stmt.end(),
+                     std::back_inserter(while_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kWhile;
+                     });
+        return while_stmt;
+    }
+    return {};
+}
+
+std::vector<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
+    assert(compiled);
+
+    if (type == StmtType::kPrint || type == StmtType::kCall) {
+        return {};
+    }
+
+    if (type == StmtType::kAssign) {
+        std::vector<int> assign_stmt;
+        assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+        return assign_stmt;
+    }
+
+    if (type == StmtType::kRead) {
+        std::vector<int> read_stmt;
+        read_stmt = type_stmt_.GetStatements(StmtType::kRead);
+        return read_stmt;
+    }
+
+    std::set<int> container_stmt;
+    std::vector<int> parents, direct_modifying_stmt;
+
+    direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    direct_modifying_stmt.insert(
+            direct_modifying_stmt.end(),
+            type_stmt_.GetStatements(StmtType::kRead).begin(),
+            type_stmt_.GetStatements(StmtType::kRead).end());
+
+    for (auto &i : direct_modifying_stmt) {
+        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+        parents = container_forest_->GetParents(stmtlst);
+        std::transform(
+                parents.begin(), parents.end(),
+                std::inserter(container_stmt, container_stmt.begin()),
+                [this](int i) { return stmtlst_parent_.GetParent(i).index; });
+    }
+
+    if (type == StmtType::kAll) {
+        std::vector<int> all_stmt;
+        container_stmt.insert(direct_modifying_stmt.begin(),
+                              direct_modifying_stmt.end());
+        all_stmt.assign(container_stmt.begin(), container_stmt.end());
+        return all_stmt;
+    }
+
+    if (type == StmtType::kIf) {
+        std::vector<int> if_stmt;
+        std::copy_if(container_stmt.begin(), container_stmt.end(),
+                     std::back_inserter(if_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kIf;
+                     });
+        return if_stmt;
+    }
+
+    if (type == StmtType::kWhile) {
+        std::vector<int> while_stmt;
+        std::copy_if(container_stmt.begin(), container_stmt.end(),
+                     std::back_inserter(while_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kWhile;
+                     });
+        return while_stmt;
+    }
+    return {};
+}
+
+std::vector<int> ProgramKnowledgeBase::GetUses(
+        Index<QueryEntityType::kStmt> stmt_no) {
+    assert(compiled);
+    assert(stmt_no.value != 0);
     std::vector<int> results;
-    std::set_intersection(stmts.begin(), stmts.end(), filtered_stmt.begin(),
-                          filtered_stmt.end(), std::back_inserter(results));
+
+    StmtType type = type_stmt_.GetType(stmt_no.value);
+
+    if (type == StmtType::kRead || type == StmtType::kCall) {
+        return results;
+    }
+
+    if (type == StmtType::kAssign || type == StmtType::kPrint) {
+        results = uses_rel_.GetVarIndex(stmt_no.value);
+        return results;
+    }
+
+    auto first_stmt = stmt_no.value + 1;
+    int last_stmt;
+
+    auto follow_vec = GetFollows(false, Index<ArgPos::kFirst>(stmt_no.value),
+                                 StmtType::kAll);
+
+    if (follow_vec.size() == 1) {
+        last_stmt = follow_vec.front();
+    } else {
+        int stmtlst = type == StmtType::kWhile
+                              ? stmtlst_parent_.GetWhileStmtLst(stmt_no.value)
+                              : stmtlst_parent_.GetIfStmtLst(stmt_no.value)
+                                        .else_index;
+        int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
+        auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
+        last_stmt = grandchild_stmt.back();
+    }
+
+    const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
+    auto first_assign = std::lower_bound(assign_stmts.begin(),
+                                         assign_stmts.end(), first_stmt);
+
+    auto second_assign =
+            std::upper_bound(first_assign, assign_stmts.end(), last_stmt);
+
+    std::set<int> remove_dup;
+
+    for (auto i = first_assign; i != second_assign; i++) {
+        remove_dup.insert(uses_rel_.GetVarIndex(*i).begin(),
+                          uses_rel_.GetVarIndex(*i).end());
+    }
+
+    const auto &print_stmts = type_stmt_.GetStatements(StmtType::kPrint);
+    auto first_print = std::lower_bound(print_stmts.begin(), print_stmts.end(),
+                                        first_stmt);
+    auto second_print =
+            std::upper_bound(first_print, print_stmts.end(), last_stmt);
+
+    for (auto i = first_print; i != second_print; i++) {
+        remove_dup.insert(uses_rel_.GetVarIndex(*i).begin(),
+                          uses_rel_.GetVarIndex(*i).end());
+    }
+
+    results.assign(remove_dup.begin(), remove_dup.end());
+
     return results;
 }
 
 std::vector<int> ProgramKnowledgeBase::GetUses(
-        Index<QueryEntityType::kStmt> stmt_no,
-        const std::vector<int> &filtered_var) {
+        Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
-    const std::vector<int> &used_vars = uses_rel_.GetVarIndex(stmt_no.value);
-    if (filtered_var.empty()) {
-        return used_vars;
+    assert(var_index.value != 0);
+
+    if (type == StmtType::kPrint || type == StmtType::kCall) {
+        return {};
     }
-    std::vector<int> results;
-    std::set_intersection(used_vars.begin(), used_vars.end(),
-                          filtered_var.begin(), filtered_var.end(),
-                          std::back_inserter(results));
-    return results;
+
+    auto direct_uses_stmt = uses_rel_.GetUsesStmt(var_index.value);
+
+    if (type == StmtType::kAssign) {
+        std::vector<int> assign_stmt;
+        std::copy_if(direct_uses_stmt.begin(), direct_uses_stmt.end(),
+                     std::back_inserter(assign_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kAssign;
+                     });
+        return assign_stmt;
+    }
+
+    if (type == StmtType::kPrint) {
+        std::vector<int> print_stmt;
+        std::copy_if(direct_uses_stmt.begin(), direct_uses_stmt.end(),
+                     std::back_inserter(print_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kPrint;
+                     });
+        return print_stmt;
+    }
+
+    std::set<int> container_stmt;
+    std::vector<int> parents;
+
+    for (auto &i : direct_uses_stmt) {
+        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+        parents = container_forest_->GetParents(stmtlst);
+        std::transform(
+                parents.begin(), parents.end(),
+                std::inserter(container_stmt, container_stmt.begin()),
+                [this](int i) { return stmtlst_parent_.GetParent(i).index; });
+    }
+
+    if (type == StmtType::kAll) {
+        std::vector<int> all_stmt;
+        container_stmt.insert(direct_uses_stmt.begin(), direct_uses_stmt.end());
+        all_stmt.assign(container_stmt.begin(), container_stmt.end());
+        return all_stmt;
+    }
+
+    if (type == StmtType::kIf) {
+        std::vector<int> if_stmt;
+        std::copy_if(container_stmt.begin(), container_stmt.end(),
+                     std::back_inserter(if_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kIf;
+                     });
+        return if_stmt;
+    }
+
+    if (type == StmtType::kWhile) {
+        std::vector<int> while_stmt;
+        std::copy_if(container_stmt.begin(), container_stmt.end(),
+                     std::back_inserter(while_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kWhile;
+                     });
+        return while_stmt;
+    }
+    return {};
 }
 
-std::vector<int> ProgramKnowledgeBase::GetUses(
-        Index<QueryEntityType::kVar> var_index,
-        const std::vector<int> &filtered_stmt) {
+std::vector<int> ProgramKnowledgeBase::GetUses(StmtType type) {
     assert(compiled);
-    const std::vector<int> &stmts = uses_rel_.GetStmtNo(var_index.value);
-    if (filtered_stmt.empty()) {
-        return stmts;
+
+    if (type == StmtType::kRead || type == StmtType::kCall) {
+        return {};
     }
-    std::vector<int> results;
-    std::set_intersection(stmts.begin(), stmts.end(), filtered_stmt.begin(),
-                          filtered_stmt.end(), std::back_inserter(results));
-    return results;
+
+    if (type == StmtType::kAssign) {
+        std::vector<int> assign_stmt;
+        assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+        return assign_stmt;
+    }
+
+    if (type == StmtType::kPrint) {
+        std::vector<int> print_stmt;
+        print_stmt = type_stmt_.GetStatements(StmtType::kPrint);
+        return print_stmt;
+    }
+
+    std::set<int> container_stmt;
+    std::vector<int> parents, direct_modifying_stmt;
+
+    direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    direct_modifying_stmt.insert(
+            direct_modifying_stmt.end(),
+            type_stmt_.GetStatements(StmtType::kPrint).begin(),
+            type_stmt_.GetStatements(StmtType::kPrint).end());
+
+    for (auto &i : direct_modifying_stmt) {
+        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+        parents = container_forest_->GetParents(stmtlst);
+        std::transform(
+                parents.begin(), parents.end(),
+                std::inserter(container_stmt, container_stmt.begin()),
+                [this](int i) { return stmtlst_parent_.GetParent(i).index; });
+    }
+
+    if (type == StmtType::kAll) {
+        std::vector<int> all_stmt;
+        container_stmt.insert(direct_modifying_stmt.begin(),
+                              direct_modifying_stmt.end());
+        all_stmt.assign(container_stmt.begin(), container_stmt.end());
+        return all_stmt;
+    }
+
+    if (type == StmtType::kIf) {
+        std::vector<int> if_stmt;
+        std::copy_if(container_stmt.begin(), container_stmt.end(),
+                     std::back_inserter(if_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kIf;
+                     });
+        return if_stmt;
+    }
+
+    if (type == StmtType::kWhile) {
+        std::vector<int> while_stmt;
+        std::copy_if(container_stmt.begin(), container_stmt.end(),
+                     std::back_inserter(while_stmt), [this](int i) {
+                         return type_stmt_.GetType(i) == StmtType::kWhile;
+                     });
+        return while_stmt;
+    }
+
+    return {};
 }
+
 
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);

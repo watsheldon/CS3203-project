@@ -13,7 +13,7 @@ void spa::UsesRelationshipStore::Set(int stmt_no,
     }
 }
 
-std::vector<int> spa::UsesRelationshipStore::GetStmtNo(int var_index) const {
+std::vector<int> spa::UsesRelationshipStore::GetUsesStmt(int var_index) const {
     return var_to_stmtlst_[var_index];
 }
 
