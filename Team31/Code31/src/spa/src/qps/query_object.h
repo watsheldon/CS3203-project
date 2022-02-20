@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include "synonym.h"
 #include "qps/conditions/condition_clause.h"
+#include "synonym.h"
 
 namespace spa {
 class QueryObject {

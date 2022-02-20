@@ -6,8 +6,8 @@
 #include <memory>
 #include <vector>
 
-#include "ent_ref.h"
 #include "PQL_validator.h"
+#include "ent_ref.h"
 #include "query_object.h"
 #include "query_object_builder.h"
 #include "query_token.h"

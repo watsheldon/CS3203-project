@@ -20,7 +20,8 @@ QueryObjectBuilder& QueryObjectBuilder::SetSelect(
     return *this;
 }
 
-QueryObjectBuilder& QueryObjectBuilder::SetConditions(std::vector<std::unique_ptr<ConditionClause>>& cons) {
+QueryObjectBuilder& QueryObjectBuilder::SetConditions(
+        std::vector<std::unique_ptr<ConditionClause>>& cons) {
     conditions_ = std::move(cons);
     return *this;
 }

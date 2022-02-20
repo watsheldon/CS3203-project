@@ -192,7 +192,6 @@ bool PQLValidator::parseExpressionSpec() {
     }
     return expect(QueryTokenType::DOUBLEQUOTE) && parseFactor() &&
            expect(QueryTokenType::DOUBLEQUOTE);
-
 }
 bool PQLValidator::parseFactor() {
     return accept(QueryTokenType::INTEGER) || expect(QueryTokenType::WORD);
