@@ -1,7 +1,5 @@
 #include "generator.h"
 
-#include "query_object_builder.h"
-
 namespace spa {
 Generator::Generator(std::filesystem::path &filepath) : validator_(filepath) {}
 
@@ -9,7 +7,9 @@ QueryObject Generator::Generate() {
     tokens = validator_.Validate();
     Mode curr_mode_;
     DeclarationType curr_type_;
-    QueryObjectBuilder builder;
+    ConditionClause curr_condition_;
+    std::vector<std::unique_ptr<Synonym>> synonyms_;
+    QueryObjectBuilder query_object_builder_;
 
     for (const auto &[type, value] : *tokens) {
         switch (type) {
@@ -35,15 +35,25 @@ QueryObject Generator::Generate() {
                 break;
             case QueryTokenType::WORD:
                 if (curr_mode_ == Mode::kDeclaration) {
-                    std::unique_ptr<Synonym> ptr1 =
+                    std::unique_ptr<Synonym> ptr =
                             std::make_unique<Synonym>(curr_type_);
-                    auto pair = map.try_emplace(value, std::move(ptr1));
+                    auto pair = map.try_emplace(value, std::move(ptr));
                     // do not insert means repeated synonym
-                    //                    if (!pair.second) {
-                    //
-                    //                    }
+                    if (!pair.second) {
+                        query_object_builder_.SetIsValid(false);
+                        return query_object_builder_.build();
+                    }
+                    synonyms_.emplace_back(std::move(ptr));
                 }
                 if (curr_mode_ == Mode::kSelect) {
+                    auto it = map.find(value);
+                    if (it == map.end()) {
+                        // this synonym is not declared before
+                        query_object_builder_.SetIsValid(false);
+                        return query_object_builder_.build();
+                    }
+                    auto &[name, synonym] = *it;
+                    query_object_builder_.SetSelect(synonyms_.get());
                 }
                 if (curr_mode_ == Mode::kCondition) {
                 }
@@ -51,7 +61,6 @@ QueryObject Generator::Generate() {
             case QueryTokenType::SEMICOLON:
             case QueryTokenType::PLUS:
             case QueryTokenType::MINUS:
-            case QueryTokenType::TIMES:
             case QueryTokenType::DIVIDE:
             case QueryTokenType::MODULO:
             case QueryTokenType::LEFTBRACKET:
@@ -63,9 +72,10 @@ QueryObject Generator::Generate() {
                 }
                 if (curr_mode_ == Mode::kExpression) {
                 }
+            case QueryTokenType::TIMES:
         }
     }
-    return builder.build();
+    return query_object_builder_.build();
 }
 
 DeclarationType Generator::TypeConvert(QueryTokenType type) {

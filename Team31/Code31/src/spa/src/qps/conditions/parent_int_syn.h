@@ -1,7 +1,8 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_CONDITIONS_PARENT_INT_SYN_H_
 #define SPA_SRC_SPA_SRC_QPS_CONDITIONS_PARENT_INT_SYN_H_
-#include "parent_follows_clause.h"
+
+#include "parent_clause.h"
 namespace spa {
-class ParentIntSyn : public ParentFollowsClause {};
+class ParentIntSyn : public ParentClause {};
 }  // namespace spa
 #endif  // SPA_SRC_SPA_SRC_QPS_CONDITIONS_PARENT_INT_SYN_H_
