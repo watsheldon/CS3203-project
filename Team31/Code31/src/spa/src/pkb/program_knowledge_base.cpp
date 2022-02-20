@@ -552,8 +552,8 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
         return false;
     }
 
-    auto modifying_stmt = modifies_rel_.GetModifiesStmt(var_index);
-    return std::any_of(modifying_stmt.begin(), modifying_stmt.end(),
+    auto using_stmt = uses_rel_.GetUsesStmt(var_index);
+    return std::any_of(using_stmt.begin(), using_stmt.end(),
                        [first_stmt, last_stmt](auto i) {
                            return first_stmt <= i && i <= last_stmt;
                        });

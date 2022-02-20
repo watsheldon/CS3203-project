@@ -227,9 +227,8 @@ class KnowledgeBase {
     /**
      * Gets a list of stmt# that modifies var_index
      */
-    virtual std::vector<int> GetModifies(
-            Index<QueryEntityType::kVar> var_index,
-            StmtType type) = 0;
+    virtual std::vector<int> GetModifies(Index<QueryEntityType::kVar> var_index,
+                                         StmtType type) = 0;
 
     /**
      * Gets a list of stmt# that modifies any var_index (wildcard)
