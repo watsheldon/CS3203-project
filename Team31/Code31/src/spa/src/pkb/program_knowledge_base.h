@@ -98,13 +98,18 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistModifies(int stmt_no, int var_index) override;
     bool ExistUses(int stmt_no, int var_index) override;
 
-    std::vector<int> GetModifies(Index<QueryEntityType::kStmt> stmt_no) override;
-    std::vector<int> GetModifies(
-            Index<QueryEntityType::kVar> var_index, StmtType type) override;
-    std::vector<int> GetModifies(StmtType type) override;
-    std::vector<int> GetUses(Index<QueryEntityType::kStmt> stmt_no) override;
-    std::vector<int> GetUses(Index<QueryEntityType::kVar> var_index, StmtType type) override;
-    std::vector<int> GetUses(StmtType type) override;
+    std::set<int> GetModifies(Index<QueryEntityType::kStmt> stmt_no) override;
+    std::set<int> GetModifies(Index<QueryEntityType::kVar> var_index,
+                              StmtType type) override;
+    std::set<int> GetModifies(StmtType type) override;
+    std::pair<std::vector<int>, std::vector<int>> GetModifiesStmtVar(
+            StmtType type) override;
+    std::set<int> GetUses(Index<QueryEntityType::kStmt> stmt_no) override;
+    std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
+                          StmtType type) override;
+    std::set<int> GetUses(StmtType type) override;
+    std::pair<std::vector<int>, std::vector<int>> GetUsesStmtVar(
+            StmtType type) override;
 
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;

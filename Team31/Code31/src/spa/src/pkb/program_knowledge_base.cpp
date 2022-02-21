@@ -510,8 +510,11 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     }
 
     if (type == StmtType::kAssign || type == StmtType::kPrint) {
-        return var_index == 0 ||
-               std::binary_search(uses_rel_.GetVarIndex(stmt_no).begin(),
+        if (var_index == 0) {
+            return uses_rel_.GetVarIndex(stmt_no).size() > 0;
+        }
+
+        return std::binary_search(uses_rel_.GetVarIndex(stmt_no).begin(),
                                   uses_rel_.GetVarIndex(stmt_no).end(),
                                   var_index);
     }
@@ -559,21 +562,20 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
                        });
 }
 
-std::vector<int> ProgramKnowledgeBase::GetModifies(
+std::set<int> ProgramKnowledgeBase::GetModifies(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
     assert(stmt_no.value != 0);
-    std::vector<int> results;
 
     StmtType type = type_stmt_.GetType(stmt_no.value);
 
     if (type == StmtType::kPrint || type == StmtType::kCall) {
-        return results;
+        return {};
     }
 
     if (type == StmtType::kAssign || type == StmtType::kRead) {
-        results.emplace_back(modifies_rel_.GetVarIndex(stmt_no.value));
-        return results;
+        // use a temp
+        return {modifies_rel_.GetVarIndex(stmt_no.value)};
     }
 
     auto first_stmt = stmt_no.value + 1;
@@ -601,10 +603,10 @@ std::vector<int> ProgramKnowledgeBase::GetModifies(
     auto second_assign =
             std::upper_bound(first_assign, assign_stmts.end(), last_stmt);
 
-    std::set<int> remove_dup;
+    std::set<int> results;
 
     for (auto i = first_assign; i != second_assign; i++) {
-        remove_dup.insert(modifies_rel_.GetVarIndex(*i));
+        results.emplace(modifies_rel_.GetVarIndex(*i));
     }
 
     const auto &read_stmts = type_stmt_.GetStatements(StmtType::kRead);
@@ -614,15 +616,13 @@ std::vector<int> ProgramKnowledgeBase::GetModifies(
             std::upper_bound(first_read, read_stmts.end(), last_stmt);
 
     for (auto i = first_read; i != second_read; i++) {
-        remove_dup.insert(modifies_rel_.GetVarIndex(*i));
+        results.emplace(modifies_rel_.GetVarIndex(*i));
     }
-
-    results.assign(remove_dup.begin(), remove_dup.end());
 
     return results;
 }
 
-std::vector<int> ProgramKnowledgeBase::GetModifies(
+std::set<int> ProgramKnowledgeBase::GetModifies(
         Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
     assert(var_index.value != 0);
@@ -634,18 +634,20 @@ std::vector<int> ProgramKnowledgeBase::GetModifies(
     auto direct_modifying_stmt = modifies_rel_.GetModifiesStmt(var_index.value);
 
     if (type == StmtType::kAssign) {
-        std::vector<int> assign_stmt;
+        std::set<int> assign_stmt;
         std::copy_if(direct_modifying_stmt.begin(), direct_modifying_stmt.end(),
-                     std::back_inserter(assign_stmt), [this](int i) {
+                     std::inserter(assign_stmt, assign_stmt.begin()),
+                     [this](int i) {
                          return type_stmt_.GetType(i) == StmtType::kAssign;
                      });
         return assign_stmt;
     }
 
     if (type == StmtType::kRead) {
-        std::vector<int> read_stmt;
+        std::set<int> read_stmt;
         std::copy_if(direct_modifying_stmt.begin(), direct_modifying_stmt.end(),
-                     std::back_inserter(read_stmt), [this](int i) {
+                     std::inserter(read_stmt, read_stmt.begin()),
+                     [this](int i) {
                          return type_stmt_.GetType(i) == StmtType::kRead;
                      });
         return read_stmt;
@@ -664,34 +666,32 @@ std::vector<int> ProgramKnowledgeBase::GetModifies(
     }
 
     if (type == StmtType::kAll) {
-        std::vector<int> all_stmt;
         container_stmt.insert(direct_modifying_stmt.begin(),
                               direct_modifying_stmt.end());
-        all_stmt.assign(container_stmt.begin(), container_stmt.end());
-        return all_stmt;
+        return container_stmt;
     }
 
     if (type == StmtType::kIf) {
-        std::vector<int> if_stmt;
+        std::set<int> if_stmt;
         std::copy_if(container_stmt.begin(), container_stmt.end(),
-                     std::back_inserter(if_stmt), [this](int i) {
+                     std::inserter(if_stmt, if_stmt.begin()), [this](int i) {
                          return type_stmt_.GetType(i) == StmtType::kIf;
                      });
         return if_stmt;
     }
 
-    if (type == StmtType::kWhile) {
-        std::vector<int> while_stmt;
-        std::copy_if(container_stmt.begin(), container_stmt.end(),
-                     std::back_inserter(while_stmt), [this](int i) {
-                         return type_stmt_.GetType(i) == StmtType::kWhile;
-                     });
-        return while_stmt;
-    }
-    return {};
+    assert(type == StmtType::kWhile);
+    
+    std::set<int> while_stmt;
+    std::copy_if(container_stmt.begin(), container_stmt.end(),
+                 std::inserter(while_stmt, while_stmt.begin()), [this](int i) {
+                     return type_stmt_.GetType(i) == StmtType::kWhile;
+                 });
+
+    return while_stmt;       
 }
 
-std::vector<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
+std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
     assert(compiled);
 
     if (type == StmtType::kPrint || type == StmtType::kCall) {
@@ -699,15 +699,13 @@ std::vector<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
     }
 
     if (type == StmtType::kAssign) {
-        std::vector<int> assign_stmt;
-        assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-        return assign_stmt;
+        return {type_stmt_.GetStatements(StmtType::kAssign).begin(),
+                type_stmt_.GetStatements(StmtType::kAssign).end()};
     }
 
     if (type == StmtType::kRead) {
-        std::vector<int> read_stmt;
-        read_stmt = type_stmt_.GetStatements(StmtType::kRead);
-        return read_stmt;
+        return {type_stmt_.GetStatements(StmtType::kRead).begin(),
+                type_stmt_.GetStatements(StmtType::kRead).end()};
     }
 
     std::set<int> container_stmt;
@@ -729,48 +727,127 @@ std::vector<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
     }
 
     if (type == StmtType::kAll) {
-        std::vector<int> all_stmt;
         container_stmt.insert(direct_modifying_stmt.begin(),
                               direct_modifying_stmt.end());
-        all_stmt.assign(container_stmt.begin(), container_stmt.end());
-        return all_stmt;
+        return container_stmt;
     }
 
     if (type == StmtType::kIf) {
-        std::vector<int> if_stmt;
+        std::set<int> if_stmt;
         std::copy_if(container_stmt.begin(), container_stmt.end(),
-                     std::back_inserter(if_stmt), [this](int i) {
+                     std::inserter(if_stmt, if_stmt.begin()), [this](int i) {
                          return type_stmt_.GetType(i) == StmtType::kIf;
                      });
         return if_stmt;
     }
 
-    if (type == StmtType::kWhile) {
-        std::vector<int> while_stmt;
-        std::copy_if(container_stmt.begin(), container_stmt.end(),
-                     std::back_inserter(while_stmt), [this](int i) {
-                         return type_stmt_.GetType(i) == StmtType::kWhile;
-                     });
-        return while_stmt;
-    }
-    return {};
+    assert(type == StmtType::kWhile);
+    std::set<int> while_stmt;
+    std::copy_if(container_stmt.begin(), container_stmt.end(),
+                 std::inserter(while_stmt, while_stmt.begin()), [this](int i) {
+                     return type_stmt_.GetType(i) == StmtType::kWhile;
+                 });
+    return while_stmt;
 }
 
-std::vector<int> ProgramKnowledgeBase::GetUses(
+std::pair<std::vector<int>, std::vector<int>>
+ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
+    assert(compiled);
+
+    if (type == StmtType::kPrint || type == StmtType::kCall) {
+        return {{}, {}};
+    }
+
+    if (type == StmtType::kAssign) {
+        std::vector<int> assign_stmt =
+                type_stmt_.GetStatements(StmtType::kAssign);
+        std::vector<int> assign_var;
+
+        for (auto &i : assign_stmt) {
+            assign_var.emplace_back(modifies_rel_.GetVarIndex(i));
+        } 
+
+        return {assign_stmt, assign_var};
+    }
+
+    if (type == StmtType::kRead) {
+        std::vector<int> read_stmt = type_stmt_.GetStatements(StmtType::kRead);
+        std::vector<int> read_var;
+
+        for (auto &i : read_stmt) {
+            read_var.emplace_back(modifies_rel_.GetVarIndex(i));
+        }
+
+        return {read_stmt, read_var};
+    }
+
+    std::set<int> container_stmt;
+    std::vector<int> parents, direct_modifying_stmt;
+
+    direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    direct_modifying_stmt.insert(
+            direct_modifying_stmt.end(),
+            type_stmt_.GetStatements(StmtType::kRead).begin(),
+            type_stmt_.GetStatements(StmtType::kRead).end());
+
+
+    std::vector<int> if_stmt;
+    std::vector<int> while_stmt;
+    std::vector<int> all_stmt;
+    std::vector<int> if_var;
+    std::vector<int> while_var;
+    std::vector<int> all_var;
+    for (auto &i : direct_modifying_stmt) {
+        all_stmt.emplace_back(i);
+        int var_index = modifies_rel_.GetVarIndex(i);
+        all_var.emplace_back(var_index);
+        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+        parents = container_forest_->GetParents(stmtlst);
+
+        for (auto &j : parents) {
+            if (stmtlst_parent_.GetParent(j).type == StmtlstParentStore::kIf) {
+                if_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                if_var.emplace_back(var_index);
+                all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                all_var.emplace_back(var_index);
+            }
+
+            if (stmtlst_parent_.GetParent(j).type == StmtlstParentStore::kWhile) {
+                while_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                while_var.emplace_back(var_index);
+                all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                all_var.emplace_back(var_index);
+            }        
+        }
+    }
+
+    if (type == StmtType::kAll) {
+        return {all_stmt, all_var};
+    }
+
+    if (type == StmtType::kIf) {
+        return {if_stmt, if_var};
+    }
+
+    assert(type == StmtType::kWhile);
+    return {while_stmt, while_var};
+}
+
+
+std::set<int> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
     assert(stmt_no.value != 0);
-    std::vector<int> results;
 
     StmtType type = type_stmt_.GetType(stmt_no.value);
 
     if (type == StmtType::kRead || type == StmtType::kCall) {
-        return results;
+        return {};
     }
 
     if (type == StmtType::kAssign || type == StmtType::kPrint) {
-        results = uses_rel_.GetVarIndex(stmt_no.value);
-        return results;
+        return {uses_rel_.GetVarIndex(stmt_no.value).begin(),
+                uses_rel_.GetVarIndex(stmt_no.value).end()};
     }
 
     auto first_stmt = stmt_no.value + 1;
@@ -798,11 +875,11 @@ std::vector<int> ProgramKnowledgeBase::GetUses(
     auto second_assign =
             std::upper_bound(first_assign, assign_stmts.end(), last_stmt);
 
-    std::set<int> remove_dup;
+    std::set<int> results;
 
     for (auto i = first_assign; i != second_assign; i++) {
-        remove_dup.insert(uses_rel_.GetVarIndex(*i).begin(),
-                          uses_rel_.GetVarIndex(*i).end());
+        results.insert(uses_rel_.GetVarIndex(*i).begin(),
+                       uses_rel_.GetVarIndex(*i).end());
     }
 
     const auto &print_stmts = type_stmt_.GetStatements(StmtType::kPrint);
@@ -812,16 +889,13 @@ std::vector<int> ProgramKnowledgeBase::GetUses(
             std::upper_bound(first_print, print_stmts.end(), last_stmt);
 
     for (auto i = first_print; i != second_print; i++) {
-        remove_dup.insert(uses_rel_.GetVarIndex(*i).begin(),
-                          uses_rel_.GetVarIndex(*i).end());
+        results.insert(uses_rel_.GetVarIndex(*i).begin(),
+                       uses_rel_.GetVarIndex(*i).end());
     }
-
-    results.assign(remove_dup.begin(), remove_dup.end());
-
     return results;
 }
 
-std::vector<int> ProgramKnowledgeBase::GetUses(
+std::set<int> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
     assert(var_index.value != 0);
@@ -833,18 +907,20 @@ std::vector<int> ProgramKnowledgeBase::GetUses(
     auto direct_uses_stmt = uses_rel_.GetUsesStmt(var_index.value);
 
     if (type == StmtType::kAssign) {
-        std::vector<int> assign_stmt;
+        std::set<int> assign_stmt;
         std::copy_if(direct_uses_stmt.begin(), direct_uses_stmt.end(),
-                     std::back_inserter(assign_stmt), [this](int i) {
+                     std::inserter(assign_stmt, assign_stmt.begin()),
+                     [this](int i) {
                          return type_stmt_.GetType(i) == StmtType::kAssign;
                      });
         return assign_stmt;
     }
 
     if (type == StmtType::kPrint) {
-        std::vector<int> print_stmt;
+        std::set<int> print_stmt;
         std::copy_if(direct_uses_stmt.begin(), direct_uses_stmt.end(),
-                     std::back_inserter(print_stmt), [this](int i) {
+                     std::inserter(print_stmt, print_stmt.begin()),
+                     [this](int i) {
                          return type_stmt_.GetType(i) == StmtType::kPrint;
                      });
         return print_stmt;
@@ -863,33 +939,30 @@ std::vector<int> ProgramKnowledgeBase::GetUses(
     }
 
     if (type == StmtType::kAll) {
-        std::vector<int> all_stmt;
         container_stmt.insert(direct_uses_stmt.begin(), direct_uses_stmt.end());
-        all_stmt.assign(container_stmt.begin(), container_stmt.end());
-        return all_stmt;
+        return container_stmt;
     }
 
     if (type == StmtType::kIf) {
-        std::vector<int> if_stmt;
+        std::set<int> if_stmt;
         std::copy_if(container_stmt.begin(), container_stmt.end(),
-                     std::back_inserter(if_stmt), [this](int i) {
+                     std::inserter(if_stmt, if_stmt.begin()), [this](int i) {
                          return type_stmt_.GetType(i) == StmtType::kIf;
                      });
         return if_stmt;
     }
 
-    if (type == StmtType::kWhile) {
-        std::vector<int> while_stmt;
-        std::copy_if(container_stmt.begin(), container_stmt.end(),
-                     std::back_inserter(while_stmt), [this](int i) {
-                         return type_stmt_.GetType(i) == StmtType::kWhile;
-                     });
-        return while_stmt;
-    }
-    return {};
+    assert(type == StmtType::kWhile);
+
+    std::set<int> while_stmt;
+    std::copy_if(container_stmt.begin(), container_stmt.end(),
+                 std::inserter(while_stmt, while_stmt.begin()), [this](int i) {
+                     return type_stmt_.GetType(i) == StmtType::kWhile;
+                 });
+    return while_stmt;    
 }
 
-std::vector<int> ProgramKnowledgeBase::GetUses(StmtType type) {
+std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
     assert(compiled);
 
     if (type == StmtType::kRead || type == StmtType::kCall) {
@@ -897,15 +970,19 @@ std::vector<int> ProgramKnowledgeBase::GetUses(StmtType type) {
     }
 
     if (type == StmtType::kAssign) {
-        std::vector<int> assign_stmt;
-        assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+        std::set<int> assign_stmt;
+        std::copy_if(
+                type_stmt_.GetStatements(StmtType::kAssign).begin(),
+                type_stmt_.GetStatements(StmtType::kAssign).end(),
+                std::inserter(assign_stmt, assign_stmt.begin()),
+                [this](int i) { return uses_rel_.GetVarIndex(i).size() > 0; });
         return assign_stmt;
     }
+   
 
     if (type == StmtType::kPrint) {
-        std::vector<int> print_stmt;
-        print_stmt = type_stmt_.GetStatements(StmtType::kPrint);
-        return print_stmt;
+        return {type_stmt_.GetStatements(StmtType::kPrint).begin(),
+                type_stmt_.GetStatements(StmtType::kPrint).end()};
     }
 
     std::set<int> container_stmt;
@@ -927,32 +1004,128 @@ std::vector<int> ProgramKnowledgeBase::GetUses(StmtType type) {
     }
 
     if (type == StmtType::kAll) {
-        std::vector<int> all_stmt;
         container_stmt.insert(direct_modifying_stmt.begin(),
                               direct_modifying_stmt.end());
-        all_stmt.assign(container_stmt.begin(), container_stmt.end());
-        return all_stmt;
+        return container_stmt;
     }
 
     if (type == StmtType::kIf) {
-        std::vector<int> if_stmt;
+        std::set<int> if_stmt;
         std::copy_if(container_stmt.begin(), container_stmt.end(),
-                     std::back_inserter(if_stmt), [this](int i) {
+                     std::inserter(if_stmt, if_stmt.begin()), [this](int i) {
                          return type_stmt_.GetType(i) == StmtType::kIf;
                      });
         return if_stmt;
     }
 
-    if (type == StmtType::kWhile) {
-        std::vector<int> while_stmt;
-        std::copy_if(container_stmt.begin(), container_stmt.end(),
-                     std::back_inserter(while_stmt), [this](int i) {
-                         return type_stmt_.GetType(i) == StmtType::kWhile;
-                     });
-        return while_stmt;
+    assert(type == StmtType::kWhile);
+    std::set<int> while_stmt;
+    std::copy_if(container_stmt.begin(), container_stmt.end(),
+                 std::inserter(while_stmt, while_stmt.begin()), [this](int i) {
+                     return type_stmt_.GetType(i) == StmtType::kWhile;
+                 });
+    return while_stmt;
+}
+
+std::pair<std::vector<int>, std::vector<int>>
+ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
+    if (type == StmtType::kRead || type == StmtType::kCall) {
+        return {{}, {}};
     }
 
-    return {};
+    if (type == StmtType::kAssign) {
+        std::vector<int> assign_stmt =
+                type_stmt_.GetStatements(StmtType::kAssign);
+        std::vector<int> assign_var;
+        std::vector<int> assign_stmt_pair;
+
+        for (auto &i : assign_stmt) {
+            assign_var.insert(assign_var.end(),
+                              uses_rel_.GetVarIndex(i).begin(),
+                              uses_rel_.GetVarIndex(i).end());
+            for (int i = 0; i < uses_rel_.GetVarIndex(i).size(); i++) {
+                assign_stmt_pair.emplace_back(i);
+            }
+        }
+        return {assign_stmt_pair, assign_var};
+    }
+
+    if (type == StmtType::kPrint) {
+        std::vector<int> print_stmt =
+                type_stmt_.GetStatements(StmtType::kPrint);
+        std::vector<int> print_var;
+
+        for (auto &i : print_stmt) {
+            print_var.emplace_back(uses_rel_.GetVarIndex(i)[0]);
+        }
+
+        return {print_stmt, print_var};
+    }
+
+    std::set<int> container_stmt;
+    std::vector<int> parents, direct_modifying_stmt;
+
+    direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    direct_modifying_stmt.insert(
+            direct_modifying_stmt.end(),
+            type_stmt_.GetStatements(StmtType::kPrint).begin(),
+            type_stmt_.GetStatements(StmtType::kPrint).end());
+
+    std::vector<int> if_stmt;
+    std::vector<int> while_stmt;
+    std::vector<int> all_stmt;
+    std::vector<int> if_var;
+    std::vector<int> while_var;
+    std::vector<int> all_var;
+
+    for (auto &i : direct_modifying_stmt) {
+        auto var_indices = uses_rel_.GetVarIndex(i);
+        all_var.insert(all_var.end(), var_indices.begin(), var_indices.end());
+        for (int i = 0; i < var_indices.size(); i++) {
+            all_stmt.emplace_back(i);
+        }
+
+        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+        parents = container_forest_->GetParents(stmtlst);
+
+        for (auto &j : parents) {
+            if (stmtlst_parent_.GetParent(j).type == StmtlstParentStore::kIf) {
+                if_var.insert(if_var.end(), var_indices.begin(),
+                              var_indices.end());
+                all_var.insert(all_var.end(), var_indices.begin(),
+                               var_indices.end());
+
+                for (int i = 0; i < var_indices.size(); i++) {
+                    all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                    if_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                }
+            }
+
+            if (stmtlst_parent_.GetParent(j).type ==
+                StmtlstParentStore::kWhile) {
+                while_var.insert(if_var.end(), var_indices.begin(),
+                                 var_indices.end());
+                all_var.insert(all_var.end(), var_indices.begin(),
+                               var_indices.end());
+
+                for (int i = 0; i < var_indices.size(); i++) {
+                    all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                    while_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                }
+            }
+        }
+    }
+
+    if (type == StmtType::kAll) {
+        return {all_stmt, all_var};
+    }
+
+    if (type == StmtType::kIf) {
+        return {if_stmt, if_var};
+    }
+
+    assert(type == StmtType::kWhile);
+    return {while_stmt, while_var};
 }
 
 
