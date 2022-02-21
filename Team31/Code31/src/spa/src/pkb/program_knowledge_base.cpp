@@ -1188,9 +1188,10 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     return {all_stmt, all_var};
 }
 
-// ( _, " ")
+// ( _, " ") , (" ", _)
+>>>>>>> cf48cba (change method signature)
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
-                                               Index<ArgPos::kFirst> first){
+                                               ArgPos token_pos){
     std::vector<int> assign_stmt;
     assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
     for (auto &i : assign_stmt) {
@@ -1199,10 +1200,7 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
     }
 
 }
-// (" ", _)
-std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
-    Index<ArgPos::kSecond> second) {
-}
+
 // (" ", " ")
 std::set<int> ProgramKnowledgeBase::GetPattern(
         std::vector<QueryToken> first_tokens,

@@ -113,10 +113,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     // ( _, " ")
     std::set<int> GetPattern(std::vector<QueryToken> tokens,
-                             Index<ArgPos::kFirst>) override;
-    // (" ", _)
-    std::set<int> GetPattern(std::vector<QueryToken> tokens,
-                             Index<ArgPos::kSecond>) override;
+                             ArgPos token_pos) override;
     // (" ", " ")
     std::set<int> GetPattern(std::vector<QueryToken> first_tokens,
                              std::vector<QueryToken> second_tokens) override;
