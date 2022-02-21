@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_PKB_STORE_VARIABLE_NAME_STORE_H_
-#define SPA_SRC_SPA_SRC_PKB_STORE_VARIABLE_NAME_STORE_H_
+#ifndef SRC_SPA_SRC_PKB_STORE_VARIABLE_NAME_STORE_H_
+#define SRC_SPA_SRC_PKB_STORE_VARIABLE_NAME_STORE_H_
 
 #include <map>
 #include <string>
@@ -22,4 +22,4 @@ class VariableNameStore {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_PKB_STORE_VARIABLE_NAME_STORE_H_
+#endif  // SRC_SPA_SRC_PKB_STORE_VARIABLE_NAME_STORE_H_
