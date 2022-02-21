@@ -6,14 +6,13 @@
 #include "query_token.h"
 
 namespace spa {
-PQLValidator::PQLValidator(const std::filesystem::path &filepath)
-        : tokenizer_(filepath),
-          tokens_(std::make_shared<std::vector<QueryToken>>()) {}
 
-std::shared_ptr<std::vector<QueryToken>> PQLValidator::Validate() {
+std::vector<QueryToken> PQLValidator::Validate(const std::string& value) {
+    tokens_.clear();
+    tokenizer_(value);
     fetchToken();
     bool valid_query = Query();
-    return valid_query ? tokens_ : nullptr;
+    return valid_query ? std::move(tokens_) : std::vector<QueryToken>();
 }
 
 bool PQLValidator::Query() {
@@ -38,18 +37,18 @@ bool PQLValidator::accept(QueryTokenType type) {
     if (type < QueryTokenType::WORD) {
         auto target = Keyword(type);
         if (curr_token_ != target) return false;
-        tokens_->emplace_back(type);
+        tokens_.emplace_back(type);
         fetchToken();
         return true;
     }
     if (type == QueryTokenType::WORD) {
         if (!std::isalpha(curr_token_[0])) return false;
-        tokens_->emplace_back(type, curr_token_);
+        tokens_.emplace_back(type, curr_token_);
         fetchToken();
         return true;
     }
     if (IsConstant()) {
-        tokens_->emplace_back(type, curr_token_);
+        tokens_.emplace_back(type, curr_token_);
         fetchToken();
         return true;
     }
@@ -123,11 +122,11 @@ bool PQLValidator::parseSuchThat() {
         accept(QueryTokenType::TIMES);
         return parseParent();
     }
-    if (accept(QueryTokenType::USES_S)) {
-        return parseUsesS();
+    if (accept(QueryTokenType::USES)) {
+        return parseUses();
     }
-    if (accept(QueryTokenType::MODIFIES_S)) {
-        return parseModifiesS();
+    if (accept(QueryTokenType::MODIFIES)) {
+        return parseModifies();
     }
     return false;
 }
@@ -144,12 +143,12 @@ bool PQLValidator::parseParent() {
            expect(QueryTokenType::RIGHTBRACKET);
 }
 
-bool PQLValidator::parseUsesS() {
+bool PQLValidator::parseUses() {
     return expect(QueryTokenType::LEFTBRACKET) && parseUsesModifiesStmtRef() &&
            expect(QueryTokenType::COMMA) && parseEntRef() &&
            expect(QueryTokenType::RIGHTBRACKET);
 }
-bool PQLValidator::parseModifiesS() {
+bool PQLValidator::parseModifies() {
     return expect(QueryTokenType::LEFTBRACKET) && parseUsesModifiesStmtRef() &&
            expect(QueryTokenType::COMMA) && parseEntRef() &&
            expect(QueryTokenType::RIGHTBRACKET);

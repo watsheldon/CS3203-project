@@ -20,13 +20,9 @@ enum class QueryTokenType {
     THAT,
     PATTERN,
     FOLLOWS,
-    FOLLOWS_T,
     PARENT,
-    PARENT_T,
-    USES_S,
-    USES_P,
-    MODIFIES_S,
-    MODIFIES_P,
+    USES,
+    MODIFIES,
     SEMICOLON,     // ;
     COMMA,         // ,
     UNDERSCORE,    // _
@@ -71,15 +67,11 @@ inline std::string_view Keyword(QueryTokenType token_type) {
             return "pattern";
         case QueryTokenType::FOLLOWS:
             return "Follows";
-        case QueryTokenType::FOLLOWS_T:
-            return "Follows*";
         case QueryTokenType::PARENT:
             return "Parent";
-        case QueryTokenType::PARENT_T:
-            return "Parent*";
-        case QueryTokenType::USES_S:
+        case QueryTokenType::USES:
             return "Uses";
-        case QueryTokenType::MODIFIES_S:
+        case QueryTokenType::MODIFIES:
             return "Modifies";
         case QueryTokenType::SEMICOLON:
             return ";";

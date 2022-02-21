@@ -17,7 +17,6 @@ class PQLTokenizer {
     void ExtractInto(std::string &token);
 
   public:
-    explicit PQLTokenizer(const std::filesystem::path &inputFile);
     PQLTokenizer &operator()(std::string_view str);
     PQLTokenizer &operator>>(std::string &token);
 };

@@ -8,15 +8,15 @@
 #include "PQL_validator.h"
 #include "query_object.h"
 #include "query_token.h"
+#include "generator.h"
 
 namespace spa {
 class Parser {
   private:
-    std::filesystem::path queryPath;
+    Generator generator_;
 
   public:
-    explicit Parser(const std::string& inputFile);
-    QueryObject parse();
+    QueryObject parse(const std::string& value);
     //        QueryObject parseQuery(const std::string& inputFile);
     //        Declaration parseDeclaration(std::vector<Token> tokenList);
     //        Select parseSelect(std::vector<Token> tokenList, int startPos,

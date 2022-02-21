@@ -1,18 +1,13 @@
 #include "parser.h"
 
 #include <memory>
-#include <string>
-#include <vector>
 
-#include "PQL_tokenizer.h"
-#include "query_token.h"
-#include "select_cl.h"
+#include "generator.h"
 
 namespace spa {
-Parser::Parser(const std::string &inputFile) : queryPath(inputFile){};
-
-QueryObject Parser::parse() {
-    PQLValidator validator(queryPath);
-    return QueryObject(false, {}, nullptr, {});
+QueryObject Parser::parse(const std::string& value) {
+    PQLValidator validator;
+    auto tokens = validator.Validate(value);
+    return generator_.Generate(tokens);
 }
 }  // namespace spa

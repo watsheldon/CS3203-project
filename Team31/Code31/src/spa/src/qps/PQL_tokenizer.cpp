@@ -6,10 +6,6 @@
 #include <fstream>
 
 namespace spa {
-PQLTokenizer::PQLTokenizer(const std::filesystem::path &inputFile) {
-    std::ifstream query(inputFile);
-    buffer_ << query.rdbuf();
-}
 
 // keep chars of token until pred is not met
 void PQLTokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
