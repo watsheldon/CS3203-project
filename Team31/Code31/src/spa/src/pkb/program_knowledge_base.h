@@ -111,6 +111,22 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::pair<std::vector<int>, std::vector<int>> GetUsesStmtVar(
             StmtType type) override;
 
+    // ( _, " ")
+    std::set<int> GetPattern(std::vector<QueryToken> tokens,
+                             Index<ArgPos::kFirst>) override;
+    // (" ", _)
+    std::set<int> GetPattern(std::vector<QueryToken> tokens,
+                             Index<ArgPos::kSecond>) override;
+    // (" ", " ")
+    std::set<int> GetPattern(std::vector<QueryToken> first_tokens,
+                             std::vector<QueryToken> second_tokens) override;
+    // (v, " ")
+    std::pair<std::vector<int>, std::vector<int>> GetPattern(
+            std::vector<QueryToken> tokens) override;
+
+    // (v, _)
+    std::pair<std::vector<int>, std::vector<int>> GetPattern() override;
+
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
 

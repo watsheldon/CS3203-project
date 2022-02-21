@@ -263,10 +263,19 @@ class KnowledgeBase {
     virtual std::pair<std::vector<int>, std::vector<int>> GetUsesStmtVar(
             StmtType type) = 0;
 
+    // ( _, " ") , (" ", _)
+    virtual std::set<int> GetPattern(std::vector<QueryToken> tokens,
+                                     ArgPos token_pos) = 0;
 
-    virtual std::set<int> GetPattern(std::vector<QueryToken> first_token,
-                                     std::vector<QueryToken> second_token) = 0;
-   
+    // (" ", " ")
+    virtual std::set<int> GetPattern(std::vector<QueryToken> first_tokens,
+                                     std::vector<QueryToken> second_tokens) = 0;
+    // (v, " ")
+    virtual std::pair<std::vector<int>, std::vector<int>> GetPattern(
+            std::vector<QueryToken> tokens) = 0;
+
+    // (v, _)
+    virtual std::pair<std::vector<int>, std::vector<int>> GetPattern() = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type

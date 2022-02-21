@@ -1188,6 +1188,39 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     return {all_stmt, all_var};
 }
 
+// ( _, " ")
+std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
+                                               Index<ArgPos::kFirst> first){
+    std::vector<int> assign_stmt;
+    assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    for (auto &i : assign_stmt) {
+        PN pn = polish_notation_.GetNotation(
+                polish_notation_.GetPolishIndex(i));
+    }
+
+}
+// (" ", _)
+std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
+    Index<ArgPos::kSecond> second) {
+}
+// (" ", " ")
+std::set<int> ProgramKnowledgeBase::GetPattern(
+        std::vector<QueryToken> first_tokens,
+    std::vector<QueryToken> second_tokens) {
+
+}
+// (v, " ")
+std::pair<std::vector<int>, std::vector<int>> ProgramKnowledgeBase::GetPattern(
+    std::vector<QueryToken> tokens) {
+
+}
+
+// (v, _)
+std::pair<std::vector<int>, std::vector<int>>
+ProgramKnowledgeBase::GetPattern() {
+    return GetUses(StmtType::kAssign);
+}
+
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(
