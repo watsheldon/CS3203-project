@@ -16,11 +16,7 @@ VariableColumn::VariableColumn(Synonym *syn, std::set<int> &&syn_domain,
         : synonym(syn),
           domain(std::move(syn_domain)),
           column(std::move(values)) {}
-void VariableColumn::Clear() {
-    domain.clear();
-    column.clear();
-}
-void VariableColumn::Update(std::set<int> &&new_domain,
+void VariableColumn::Assign(std::set<int> &&new_domain,
                             std::vector<int> &&new_column) {
     domain.swap(new_domain);
     column.swap(new_column);

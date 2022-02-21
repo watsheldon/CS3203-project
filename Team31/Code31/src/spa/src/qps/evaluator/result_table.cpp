@@ -7,110 +7,130 @@
 #include "qps/synonym.h"
 
 namespace spa {
-ResultTable::ResultTable(bool found_result) : has_result_(found_result) {}
-ResultTable::ResultTable(Synonym *synonym, std::set<int> &&domain)
-        : has_result_(!domain.empty()),
-          first_(std::make_unique<VariableColumn>(synonym, std::move(domain))) {
-}
-ResultTable::ResultTable(Synonym *synonym_1, std::vector<int> &&column_1,
-                         Synonym *synonym_2, std::vector<int> &&column_2)
-        : has_result_(!column_1.empty()),
+ResultTable::ResultTable(bool found_result)
+        : has_result(found_result), type(kBool) {}
+ResultTable::ResultTable(Synonym *synonym, Domain &&domain)
+        : has_result(!domain.empty()),
+          first_(std::make_unique<VariableColumn>(synonym, std::move(domain))),
+          type(kSingle) {}
+ResultTable::ResultTable(Synonym *synonym_1, Column &&column_1,
+                         Synonym *synonym_2, Column &&column_2)
+        : has_result(!column_1.empty()),
           first_(std::make_unique<VariableColumn>(synonym_1,
-                                                  std::move(column_1))) {}
-const VariableColumn *ResultTable::Update(const VariableColumn *other) {
-    assert(second_);
-    assert(other->synonym == first_->synonym ||
-           other->synonym == second_->synonym);
-    const auto &[changed, affected] =
-            other->synonym == first_->synonym
+                                                  std::move(column_1))),
+          type(kDouble) {}
+ResultTable::DomainPair ResultTable::Update(const ResultTable &other) {
+    assert(type != kDouble);
+
+    // align the first and second column according to other
+    const auto &[this_1st, this_2nd] =
+            first_->synonym == other.first_->synonym
                     ? std::make_pair(first_.get(), second_.get())
                     : std::make_pair(second_.get(), first_.get());
+    assert(other.first_->synonym == this_1st->synonym &&
+           other.second_->synonym == this_2nd->synonym);
+    Domain common_1st = Intersect(other.first_->domain, this_1st->domain),
+           common_2nd = Intersect(other.second_->domain, this_2nd->domain);
+    if (common_1st.empty() || common_2nd.empty()) return {{}, {}};
 
-    std::set<int> intersect;
-    std::set_intersection(changed->domain.begin(), changed->domain.end(),
-                          other->domain.begin(), other->domain.end(),
-                          std::inserter(intersect, intersect.begin()));
-    if (changed->domain == intersect) {
-        return affected;
-    }
-
-    std::vector<int> changed_col, affected_col;
-    std::set<int> affected_domain;
-    for (int i = 0; i < changed->column.size(); ++i) {
-        if (intersect.find(changed->column[i]) != intersect.end()) {
-            changed_col.emplace_back(changed->column[i]);
-            affected_col.emplace_back(affected->column[i]);
-            affected_domain.emplace(affected->column[i]);
-        }
-    }
-    changed->Update(std::move(intersect), std::move(changed_col));
-    affected->Update(std::move(affected_domain), std::move(affected_col));
-    return affected;
-}
-void ResultTable::Update(const ResultTable &other) {
-    const auto &[other_first, other_second] =
-            other.first_->synonym == first_->synonym
-                    ? std::make_pair(other.first_.get(), other.second_.get())
-                    : std::make_pair(other.second_.get(), other.first_.get());
-    assert(other_first->synonym == first_->synonym &&
-           other_second->synonym == second_->synonym);
-    std::set<int> first_intersect =
-                          Intersect(first_->domain, other_first->domain),
-                  second_intersect =
-                          Intersect(second_->domain, other_second->domain);
-    if (first_intersect.empty() || second_intersect.empty()) {
-        Clear();
-        return;
-    }
-
-    const auto n_row = 1 + *std::max_element(first_intersect.begin(),
-                                             first_intersect.end());
-    const auto n_col = 1 + *std::max_element(second_intersect.begin(),
-                                             second_intersect.end());
+    const auto n_row = 1 + *common_1st.rbegin(),
+               n_col = 1 + *common_2nd.rbegin();
     Bitmap bitmap(n_row, std::vector<bool>(n_col, false));
-    const auto first_min = *first_intersect.begin(),
-               first_max = *first_intersect.rbegin(),
-               second_min = *second_intersect.begin(),
-               second_max = *second_intersect.rbegin();
-    for (int i = 0; i < first_->column.size(); ++i) {
-        const auto first = first_->column[i];
-        const auto second = second_->column[i];
-        if (first < first_min || first > first_max || second < second_min ||
-            second > second_max) {
+    for (int i = 0; i < this_1st->column.size(); ++i) {
+        const auto a = this_1st->column[i], b = this_2nd->column[i];
+        if (common_1st.find(a) == common_1st.end() ||
+            common_2nd.find(b) == common_2nd.end()) {
             continue;
         }
-        bitmap[first][second] = true;
+        bitmap[a][b] = true;
     }
 
-    std::vector<int> first_col, second_col;
-    std::set<int> first_dom, second_dom;
-    for (int i = 0; i < other_first->column.size(); ++i) {
-        const auto first = other_first->column[i];
-        const auto second = other_second->column[i];
-        if (first < first_min || first > first_max || second < second_min ||
-            second > second_max) {
+    Domain domain_1st, domain_2nd;
+    Column column_1st, column_2nd;
+    for (int i = 0; i < other.first_->column.size(); ++i) {
+        const auto a = other.first_->column[i];
+        const auto b = other.second_->column[i];
+        if (common_1st.find(a) == common_1st.end() ||
+            common_2nd.find(b) == common_2nd.end() || !bitmap[a][b]) {
             continue;
         }
-        if (bitmap[first][second]) {
-            first_col.emplace_back(first);
-            first_dom.emplace(first);
-            second_col.emplace_back(second);
-            second_dom.emplace(second);
-        }
+        domain_1st.emplace(a), domain_2nd.emplace(b);
+        column_1st.emplace_back(a), column_2nd.emplace_back(b);
     }
-    first_->Update(std::move(first_dom), std::move(first_col));
-    second_->Update(std::move(second_dom), std::move(second_col));
+    this_1st->Assign(std::move(domain_1st), std::move(column_1st));
+    this_2nd->Assign(std::move(domain_2nd), std::move(column_2nd));
+    return {this_1st->domain, this_2nd->domain};
 }
-std::set<int> ResultTable::Intersect(const std::set<int> &first,
-                                     const std::set<int> &second) {
-    std::set<int> intersection;
+ResultTable::DomainPair ResultTable::Update(const Synonym *syn_a,
+                                            const Domain &domain_a,
+                                            const Synonym *syn_b,
+                                            const Domain &domain_b) {
+    auto [this_a, this_b] =
+            first_->synonym == syn_a
+                    ? std::make_pair(first_.get(), second_.get())
+                    : std::make_pair(second_.get(), first_.get());
+    assert(this_a->synonym == syn_a && this_b->synonym == syn_b);
+    auto common_a = Intersect(this_a->domain, domain_a),
+         common_b = Intersect(this_b->domain, domain_b);
+    if (common_a.empty() || common_b.empty()) {
+        return {{}, {}};
+    }
+    Column column_a, column_b;
+    Domain domain_a_new, domain_b_new;
+    for (int i = 0; i < this_a->column.size(); ++i) {
+        const auto x = this_a->column[i], y = this_b->column[i];
+        if (common_a.find(x) == common_a.end() ||
+            common_b.find(y) == common_b.end()) {
+            continue;
+        }
+        domain_a_new.emplace(x), domain_b_new.emplace(y);
+        column_a.emplace_back(x), column_b.emplace_back(y);
+    }
+    this_a->domain.swap(domain_a_new), this_b->domain.swap(domain_b_new);
+    this_a->column.swap(column_a), this_b->column.swap(column_b);
+    return {this_a->domain, this_b->domain};
+}
+const ResultTable::Domain &ResultTable::Update(const Synonym *syn_a,
+                                               const Domain &domain_a) {
+    auto [this_a, this_b] =
+            first_->synonym == syn_a
+                    ? std::make_pair(first_.get(), second_.get())
+                    : std::make_pair(second_.get(), first_.get());
+    assert(this_a->synonym == syn_a);
+    auto common_a = Intersect(this_a->domain, domain_a);
+    if (common_a.empty()) {
+        return std::move(Domain());
+    }
+    Column column_a, column_b;
+    Domain domain_a_new, domain_b_new;
+    for (int i = 0; i < this_a->column.size(); ++i) {
+        const auto x = this_a->column[i], y = this_b->column[i];
+        if (common_a.find(x) == common_a.end()) continue;
+        domain_a_new.emplace(x), domain_b_new.emplace(y);
+        column_a.emplace_back(x), column_b.emplace_back(y);
+    }
+    this_a->domain.swap(domain_a_new), this_b->domain.swap(domain_b_new);
+    this_a->column.swap(column_a), this_b->column.swap(column_b);
+    return this_b->domain;
+}
+ResultTable::Domain ResultTable::Intersect(const Domain &first,
+                                           const Domain &second) {
+    Domain intersection;
     std::set_intersection(first.begin(), first.end(), second.begin(),
                           second.end(),
                           std::inserter(intersection, intersection.begin()));
     return intersection;
 }
-void ResultTable::Clear() {
-    first_->Clear();
-    second_->Clear();
+const VariableColumn *ResultTable::GetFirstColumn() const {
+    assert(type != kBool);
+    return first_.get();
+}
+const VariableColumn *ResultTable::GetSecondColumn() const {
+    assert(type == kDouble);
+    return second_.get();
+}
+ResultTable::SynonymPair ResultTable::GetSynonyms() const {
+    assert(type == kDouble);
+    return {first_->synonym, second_->synonym};
 }
 }  // namespace spa

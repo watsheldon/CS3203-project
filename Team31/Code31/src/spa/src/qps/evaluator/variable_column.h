@@ -9,17 +9,17 @@
 
 namespace spa {
 struct VariableColumn {
-    VariableColumn(Synonym *syn, std::set<int> &&syn_domain);
+    using Domain = std::set<int>;
+    using Column = std::vector<int>;
+    VariableColumn(Synonym *syn, Domain &&syn_domain);
     VariableColumn(Synonym *syn, std::vector<int> &&values);
     Synonym *const synonym;
-    std::set<int> domain;
-    std::vector<int> column;
-    void Clear();
-    void Update(std::set<int> &&new_domain, std::vector<int> &&new_column);
+    Domain domain;
+    Column column;
+    void Assign(Domain &&new_domain, Column &&new_column);
 
   private:
-    VariableColumn(Synonym *syn, std::set<int> &&syn_domain,
-                   std::vector<int> &&values);
+    VariableColumn(Synonym *syn, Domain &&syn_domain, Column &&values);
 };
 
 }  // namespace spa
