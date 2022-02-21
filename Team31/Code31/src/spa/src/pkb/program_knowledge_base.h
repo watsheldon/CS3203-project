@@ -17,6 +17,7 @@
 #include "pkb/store/call_procedure_store.h"
 #include "pkb/store/constant_value_store.h"
 #include "pkb/store/modifies_relationship_store.h"
+#include "pkb/store/polish_notation_store.h"
 #include "pkb/store/procedure_name_store.h"
 #include "pkb/store/stmtlst_statements_store.h"
 #include "pkb/store/type_statements_store.h"
@@ -24,7 +25,6 @@
 #include "pkb/store/variable_name_store.h"
 #include "secondary_structure/container_forest.h"
 #include "store/stmtlst_parent_store.h"
-#include "pkb/store/polish_notation_store.h"
 
 namespace spa {
 

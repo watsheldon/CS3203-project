@@ -69,7 +69,6 @@ class KnowledgeBase {
     virtual void SetIndex(Index<SetEntityType::kStmt> assign_stmt,
                           Index<SetEntityType::kNotation> notation_index) = 0;
 
-
     /**
      * Stores each statement list to its respective index.
      */
