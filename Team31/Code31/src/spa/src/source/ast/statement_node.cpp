@@ -19,8 +19,10 @@ void AssignNode::SetExpr(const PolishNotation *expr) {
     assert(rhs_ == nullptr);
     rhs_ = expr;
 }
+void AssignNode::SetRhsIndex(int rhs_index) { rhs_index_ = rhs_index; }
 const VariableNode *AssignNode::GetLhs() const { return lhs_; }
 const PolishNotation *AssignNode::GetRhs() const { return rhs_; }
+int AssignNode::GetRhsIndex() const { return rhs_index_; }
 void AssignNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
 void CallNode::SetProcedure(const ProcedureNode *proc) {
     assert(procedure_ == nullptr);

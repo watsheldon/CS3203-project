@@ -22,13 +22,16 @@ class AssignNode : public StatementNode {
   public:
     void SetModifiedVar(const VariableNode *variable);
     void SetExpr(const PolishNotation *expr);
+    void SetRhsIndex(int rhs_index);
     [[nodiscard]] const VariableNode *GetLhs() const;
     [[nodiscard]] const PolishNotation *GetRhs() const;
+    [[nodiscard]] int GetRhsIndex() const;
     void Accept(AstVisitor &visitor) const override;
 
   private:
     const VariableNode *lhs_;
     const PolishNotation *rhs_;
+    int rhs_index_;
 };
 class CallNode : public StatementNode {
   public:
