@@ -20,9 +20,9 @@ TEST_CASE("pkb/store/StmtlstStatementsStore") {
     }
     SECTION("ExistFollows") {
         REQUIRE_FALSE(sss.ExistFollows(true, Index<ArgPos::kFirst>(1),
-                                  Index<ArgPos::kSecond>(2)));
+                                       Index<ArgPos::kSecond>(2)));
         REQUIRE_FALSE(sss.ExistFollows(false, Index<ArgPos::kFirst>(1),
-                                  Index<ArgPos::kSecond>(10)));
+                                       Index<ArgPos::kSecond>(10)));
         REQUIRE(sss.ExistFollows(true, Index<ArgPos::kFirst>(1),
                                  Index<ArgPos::kSecond>(10)));
         REQUIRE(sss.ExistFollows(Index<ArgPos::kFirst>(1)));

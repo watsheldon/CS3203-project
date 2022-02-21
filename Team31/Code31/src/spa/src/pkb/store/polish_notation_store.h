@@ -8,16 +8,16 @@
 namespace spa {
 class PolishNotationStore {
   public:
-    explicit PolishNotationStore(std::vector<PN> &&pn);
+    explicit PolishNotationStore(size_t stmt_count, std::vector<PN> &&pn);
     void Set(int stmt_no, int polish_index);
     [[nodiscard]] const PN &GetNotation(int polish_index) const;
     [[nodiscard]] int GetPolishStmt(int polish_index) const;
     [[nodiscard]] int GetPolishIndex(int stmt_no) const;
 
   private:
-    std::vector<PN> index_to_pn_;
     std::vector<int> stmt_to_index_;
     std::vector<int> index_to_stmt_;
+    std::vector<PN> index_to_pn_;
 };
 }  // namespace spa
 
