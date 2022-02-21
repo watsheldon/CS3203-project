@@ -28,7 +28,8 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
                      std::move(init.calls), std::move(init.whiles),
                      std::move(init.ifs), std::move(init.assigns)),
           modifies_rel_(stmt_count_, init.variables.size() - 1),
-          uses_rel_(stmt_count_, init.variables.size() - 1) {}
+          uses_rel_(stmt_count_, init.variables.size() - 1),
+          polish_notation_(std::move(init.notations)) {}
 
 void ProgramKnowledgeBase::SetIndex(
         Index<SetEntityType::kProc> proc_index,
@@ -52,6 +53,13 @@ void ProgramKnowledgeBase::SetIndex(Index<SetEntityType::kStmt> call_stmt,
                                     Index<SetEntityType::kProc> proc_index) {
     assert(!compiled);
     call_proc_.Set(call_stmt.value, proc_index.value);
+}
+
+void ProgramKnowledgeBase::SetIndex(
+        Index<SetEntityType::kStmt> assign_stmt,
+        Index<SetEntityType::kNotation> notation_index) {
+    assert(!compiled);
+    polish_notation_.Set(assign_stmt.value, notation_index.value);
 }
 
 void ProgramKnowledgeBase::SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,

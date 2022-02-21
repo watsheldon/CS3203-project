@@ -24,6 +24,7 @@
 #include "pkb/store/variable_name_store.h"
 #include "secondary_structure/container_forest.h"
 #include "store/stmtlst_parent_store.h"
+#include "pkb/store/polish_notation_store.h"
 
 namespace spa {
 
@@ -47,6 +48,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                   Index<SetEntityType::kStmtLst> else_index) override;
     void SetIndex(Index<SetEntityType::kStmt> call_stmt,
                   Index<SetEntityType::kProc> proc_index) override;
+    void SetIndex(Index<SetEntityType::kStmt> assign_stmt,
+                  Index<SetEntityType::kNotation> notation_index) override;
     void SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
                 std::vector<int> stmtlst) override;
 
@@ -120,6 +123,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     ModifiesRelationshipStore modifies_rel_;
     UsesRelationshipStore uses_rel_;
     CallProcedureStore call_proc_;
+    PolishNotationStore polish_notation_;
 
     std::unique_ptr<ContainerForest> container_forest_;
 };
