@@ -72,8 +72,7 @@ class AbstractSyntaxTree {
               typename = std::enable_if_t<std::is_base_of_v<StatementNode, T>>>
     static void ExtractStmtIndex(const UniquePtrVec<T> &src,
                                  std::vector<int> &dst) {
-        dst.reserve(src.size() + 1);
-        dst.emplace_back();
+        dst.reserve(src.size());
         std::for_each(src.begin(), src.end(),
                       [&dst](auto &p) { dst.emplace_back(p->GetIndex()); });
     }

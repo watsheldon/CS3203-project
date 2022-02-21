@@ -65,6 +65,11 @@ void DesignAbstractionExtractor::Visit(const AssignNode &assign_node) {
     auto polish_notation = assign_node.GetRhs();
     std::vector<int> used_var_indices = polish_notation->GetAllVarIndices();
     pkb_->SetRel(Index<SetEntityType::kStmt>(stmt_no), used_var_indices);
+
+    // Links statement number with polish notation index.
+    int pn_index = assign_node.GetRhsIndex();
+    pkb_->SetIndex(Index<SetEntityType::kStmt>(stmt_no),
+                   Index<SetEntityType::kNotation>(pn_index));
 }
 
 void DesignAbstractionExtractor::Visit(const CallNode &call_node) {
