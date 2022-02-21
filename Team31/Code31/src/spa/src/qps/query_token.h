@@ -43,7 +43,7 @@ enum class QueryTokenType {
     INTEGER,
 };
 
-std::string_view Keyword(QueryTokenType token_type) {
+inline std::string_view Keyword(QueryTokenType token_type) {
     switch (token_type) {
         case QueryTokenType::STMT:
             return "stmt";
