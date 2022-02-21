@@ -21,15 +21,15 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
           stmtlst_parent_(init.procedures.size() - 1, stmt_count_,
                           stmtlst_count_),
           stmtlst_stmt_(stmtlst_count_, stmt_count_),
+          modifies_rel_(stmt_count_, init.variables.size() - 1),
+          uses_rel_(stmt_count_, init.variables.size() - 1),
+          polish_notation_(stmt_count_, std::move(init.notations)),
           proc_name_(std::move(init.procedures)),
           var_name_(std::move(init.variables)),
           const_value_(std::move(init.constants)),
           type_stmt_(stmt_count_, std::move(init.reads), std::move(init.prints),
                      std::move(init.calls), std::move(init.whiles),
-                     std::move(init.ifs), std::move(init.assigns)),
-          modifies_rel_(stmt_count_, init.variables.size() - 1),
-          uses_rel_(stmt_count_, init.variables.size() - 1),
-          polish_notation_(std::move(init.notations)) {}
+                     std::move(init.ifs), std::move(init.assigns)) {}
 
 void ProgramKnowledgeBase::SetIndex(
         Index<SetEntityType::kProc> proc_index,
