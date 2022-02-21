@@ -4,13 +4,11 @@
 #include <vector>
 
 namespace spa {
-TypeStatementsStore::TypeStatementsStore(size_t size, std::vector<int>&& reads,
-                                         std::vector<int>&& prints,
-                                         std::vector<int>&& calls,
-                                         std::vector<int>&& whiles,
-                                         std::vector<int>&& ifs,
-                                         std::vector<int>&& assigns)
-        : statement_to_type_(size), type_to_statements_(7) {
+TypeStatementsStore::TypeStatementsStore(
+        size_t stmt_count, std::vector<int>&& reads, std::vector<int>&& prints,
+        std::vector<int>&& calls, std::vector<int>&& whiles,
+        std::vector<int>&& ifs, std::vector<int>&& assigns)
+        : statement_to_type_(stmt_count + 1), type_to_statements_(7) {
     type_to_statements_[1] = reads;
     type_to_statements_[2] = prints;
     type_to_statements_[3] = calls;

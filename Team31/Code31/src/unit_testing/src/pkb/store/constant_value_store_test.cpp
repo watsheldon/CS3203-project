@@ -1,9 +1,8 @@
-#include "catch.hpp"
-
 #include "pkb/store/constant_value_store.h"
 
-using namespace spa;
+#include "catch.hpp"
 
+namespace spa {
 TEST_CASE("pkb/store/ConstantValueStore") {
     ConstantValueStore cvs({std::string(), "1", "2", "3"});
     SECTION("GetValue") { REQUIRE(cvs.GetValue(3) == "3"); }
@@ -13,3 +12,4 @@ TEST_CASE("pkb/store/ConstantValueStore") {
     SECTION("GetAllValues") { REQUIRE(cvs.GetAllValues() == values); }
     SECTION("size") { REQUIRE(cvs.size() == 3); }
 }
+}  // namespace spa
