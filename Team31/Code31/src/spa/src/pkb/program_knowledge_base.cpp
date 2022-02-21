@@ -351,7 +351,17 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
     if (!transitive) {
         results = {direct_parent};
     } else {
-        results = container_forest_->GetParents(direct_parent);
+        std::vector<int> stmtlsts =
+                container_forest_->GetParents(stmtlst_index);
+        for (auto &i : stmtlsts) {
+            if (stmtlst_parent_.GetParent(i).type !=
+                        StmtlstParentStore::ParentType::kWhile &&
+                stmtlst_parent_.GetParent(i).type !=
+                        StmtlstParentStore::ParentType::kIf)
+                continue;
+            int indirect_parent = stmtlst_parent_.GetParent(i).index;
+            results.emplace_back(indirect_parent);
+        }
         results.emplace_back(direct_parent);
     }
 
