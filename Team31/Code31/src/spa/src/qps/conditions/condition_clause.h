@@ -3,12 +3,14 @@
 
 #include <utility>
 
-#include "qps/var_table.h"
+#include "pkb/knowledge_base.h"
+#include "qps/evaluator/result_table.h"
 
 namespace spa {
 class ConditionClause {
   public:
-    // virtual std::pair<VarTable, bool> execute() = 0;
+    virtual std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const = 0;
 };
 }  // namespace spa
 #endif  // SPA_SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_
