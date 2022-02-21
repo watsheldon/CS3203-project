@@ -6,7 +6,6 @@
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <set>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -251,7 +250,7 @@ class KnowledgeBase {
      * Gets a list of stmt# that uses var_index
      */
     virtual std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
-                                     StmtType type) = 0;
+                                  StmtType type) = 0;
 
     /**
      * Gets a list of stmt# that uses var_index

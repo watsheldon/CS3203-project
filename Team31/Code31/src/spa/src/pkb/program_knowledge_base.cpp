@@ -5,7 +5,6 @@
 #include <list>
 #include <set>
 #include <vector>
-#include <set>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -681,14 +680,14 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
     }
 
     assert(type == StmtType::kWhile);
-    
+
     std::set<int> while_stmt;
     std::copy_if(container_stmt.begin(), container_stmt.end(),
                  std::inserter(while_stmt, while_stmt.begin()), [this](int i) {
                      return type_stmt_.GetType(i) == StmtType::kWhile;
                  });
 
-    return while_stmt;       
+    return while_stmt;
 }
 
 std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
@@ -765,7 +764,7 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
 
         for (auto &i : assign_stmt) {
             assign_var.emplace_back(modifies_rel_.GetVarIndex(i));
-        } 
+        }
 
         return {assign_stmt, assign_var};
     }
@@ -790,7 +789,6 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
             type_stmt_.GetStatements(StmtType::kRead).begin(),
             type_stmt_.GetStatements(StmtType::kRead).end());
 
-
     std::vector<int> if_stmt;
     std::vector<int> while_stmt;
     std::vector<int> all_stmt;
@@ -812,12 +810,13 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
                 all_var.emplace_back(var_index);
             }
 
-            if (stmtlst_parent_.GetParent(j).type == StmtlstParentStore::kWhile) {
+            if (stmtlst_parent_.GetParent(j).type ==
+                StmtlstParentStore::kWhile) {
                 while_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
                 while_var.emplace_back(var_index);
                 all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
                 all_var.emplace_back(var_index);
-            }        
+            }
         }
     }
 
@@ -832,7 +831,6 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
     assert(type == StmtType::kWhile);
     return {while_stmt, while_var};
 }
-
 
 std::set<int> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kStmt> stmt_no) {
@@ -959,7 +957,7 @@ std::set<int> ProgramKnowledgeBase::GetUses(
                  std::inserter(while_stmt, while_stmt.begin()), [this](int i) {
                      return type_stmt_.GetType(i) == StmtType::kWhile;
                  });
-    return while_stmt;    
+    return while_stmt;
 }
 
 std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
@@ -978,7 +976,6 @@ std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
                 [this](int i) { return uses_rel_.GetVarIndex(i).size() > 0; });
         return assign_stmt;
     }
-   
 
     if (type == StmtType::kPrint) {
         return {type_stmt_.GetStatements(StmtType::kPrint).begin(),
@@ -1127,7 +1124,6 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     assert(type == StmtType::kWhile);
     return {while_stmt, while_var};
 }
-
 
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
