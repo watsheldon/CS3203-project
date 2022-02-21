@@ -491,7 +491,7 @@ bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
         return false;
     }
 
-    auto modifying_stmt = modifies_rel_.GetModifiesStmt(var_index);
+    auto modifying_stmt = modifies_rel_.GetStmtNo(var_index);
     return std::any_of(modifying_stmt.begin(), modifying_stmt.end(),
                        [first_stmt, last_stmt](auto i) {
                            return first_stmt <= i && i <= last_stmt;
@@ -554,7 +554,7 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
         return false;
     }
 
-    auto using_stmt = uses_rel_.GetUsesStmt(var_index);
+    auto using_stmt = uses_rel_.GetStmtNo(var_index);
     return std::any_of(using_stmt.begin(), using_stmt.end(),
                        [first_stmt, last_stmt](auto i) {
                            return first_stmt <= i && i <= last_stmt;
@@ -630,7 +630,7 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
         return {};
     }
 
-    auto direct_modifying_stmt = modifies_rel_.GetModifiesStmt(var_index.value);
+    auto direct_modifying_stmt = modifies_rel_.GetStmtNo(var_index.value);
 
     if (type == StmtType::kAssign) {
         std::set<int> assign_stmt;
@@ -902,7 +902,7 @@ std::set<int> ProgramKnowledgeBase::GetUses(
         return {};
     }
 
-    auto direct_uses_stmt = uses_rel_.GetUsesStmt(var_index.value);
+    auto direct_uses_stmt = uses_rel_.GetStmtNo(var_index.value);
 
     if (type == StmtType::kAssign) {
         std::set<int> assign_stmt;

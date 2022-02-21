@@ -10,7 +10,7 @@ void spa::ModifiesRelationshipStore::Set(int stmt_no, int var_index) {
     var_to_stmtlst_[var_index].emplace_back(stmt_no);
 }
 
-const std::vector<int>& spa::ModifiesRelationshipStore::GetModifiesStmt(
+const std::vector<int>& spa::ModifiesRelationshipStore::GetStmtNo(
         int var_index) const {
     return var_to_stmtlst_[var_index];
 }
