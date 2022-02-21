@@ -300,4 +300,88 @@ void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
     }
 }
 
+bool ProgramKnowledgeBase::ContainsUnseenVarConst(
+        std::vector<QueryToken> tokens) {
+    for (auto token : tokens) {
+        switch (token.type) {
+            case QueryTokenType::WORD: {
+                if (var_name_.GetIndex(token.value) == 0) {
+                    return true;
+                }
+                break;
+            }
+            case QueryTokenType::INTEGER: {
+                if (const_value_.GetIndex(token.value) == 0) {
+                    return true;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return false;
+}
+
+PolishNotation ProgramKnowledgeBase::ConvertFromQueryTokens(
+        std::vector<QueryToken> tokens) {
+    std::vector<PolishNotationNode> expr;
+    for (auto token : tokens) {
+        switch (token.type) {
+            case QueryTokenType::WORD: {
+                int var_index = var_name_.GetIndex(token.value);
+                assert(var_index > 0);
+                PolishNotationNode node(ExprNodeType::kVariable, var_index);
+                expr.emplace_back(node);
+                break;
+            }
+            case QueryTokenType::INTEGER: {
+                int const_index = const_value_.GetIndex(token.value);
+                assert(const_index > 0);
+                PolishNotationNode node(ExprNodeType::kConstant, const_index);
+                expr.emplace_back(node);
+                break;
+            }
+            case QueryTokenType::PLUS: {
+                PolishNotationNode node(OperatorType::kPlus);
+                expr.emplace_back(node);
+                break;
+            }
+            case QueryTokenType::MINUS: {
+                PolishNotationNode node(OperatorType::kMinus);
+                expr.emplace_back(node);
+                break;
+            }
+            case QueryTokenType::TIMES: {
+                PolishNotationNode node(OperatorType::kTimes);
+                expr.emplace_back(node);
+                break;
+            }
+            case QueryTokenType::DIVIDE: {
+                PolishNotationNode node(OperatorType::kDivide);
+                expr.emplace_back(node);
+                break;
+            }
+            case QueryTokenType::MODULO: {
+                PolishNotationNode node(OperatorType::kModulo);
+                expr.emplace_back(node);
+                break;
+            }
+            case QueryTokenType::LEFTBRACKET: {
+                PolishNotationNode node(ExprNodeType::kBracketL);
+                expr.emplace_back(node);
+                break;
+            }
+            case QueryTokenType::RIGHTBRACKET: {
+                PolishNotationNode node(ExprNodeType::kBracketR);
+                expr.emplace_back(node);
+                break;
+            }
+            default:
+                assert(false);
+        }
+    }
+    return PolishNotation(expr);
+}
+
 }  // namespace spa

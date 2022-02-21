@@ -13,6 +13,7 @@
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "common/polish_notation.h"
+#include "common/polish_notation_node.h"
 #include "knowledge_base.h"
 #include "pkb/store/call_procedure_store.h"
 #include "pkb/store/constant_value_store.h"
@@ -126,6 +127,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     PolishNotationStore polish_notation_;
 
     std::unique_ptr<ContainerForest> container_forest_;
+
+    bool ContainsUnseenVarConst(std::vector<QueryToken> tokens);
+    PolishNotation ConvertFromQueryTokens(std::vector<QueryToken> tokens);
 };
 
 }  // namespace spa

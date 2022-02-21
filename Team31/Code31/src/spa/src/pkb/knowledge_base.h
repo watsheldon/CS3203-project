@@ -10,6 +10,7 @@
 #include "common/index.h"
 #include "common/polish_notation.h"
 #include "pkb/secondary_structure/container_node.h"
+#include "qps/query_token.h"
 
 namespace spa {
 
