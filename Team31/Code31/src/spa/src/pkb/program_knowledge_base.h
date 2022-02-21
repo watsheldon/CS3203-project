@@ -17,6 +17,7 @@
 #include "pkb/store/call_procedure_store.h"
 #include "pkb/store/constant_value_store.h"
 #include "pkb/store/modifies_relationship_store.h"
+#include "pkb/store/polish_notation_store.h"
 #include "pkb/store/procedure_name_store.h"
 #include "pkb/store/stmtlst_statements_store.h"
 #include "pkb/store/type_statements_store.h"
@@ -47,6 +48,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                   Index<SetEntityType::kStmtLst> else_index) override;
     void SetIndex(Index<SetEntityType::kStmt> call_stmt,
                   Index<SetEntityType::kProc> proc_index) override;
+    void SetIndex(Index<SetEntityType::kStmt> assign_stmt,
+                  Index<SetEntityType::kNotation> notation_index) override;
     void SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
                 std::vector<int> stmtlst) override;
 
@@ -120,6 +123,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     ModifiesRelationshipStore modifies_rel_;
     UsesRelationshipStore uses_rel_;
     CallProcedureStore call_proc_;
+    PolishNotationStore polish_notation_;
 
     std::unique_ptr<ContainerForest> container_forest_;
 };

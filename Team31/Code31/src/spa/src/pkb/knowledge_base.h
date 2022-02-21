@@ -64,6 +64,12 @@ class KnowledgeBase {
                           Index<SetEntityType::kProc> proc_index) = 0;
 
     /**
+     * Links assign statement to the polish_notation it calls via their indices.
+     */
+    virtual void SetIndex(Index<SetEntityType::kStmt> assign_stmt,
+                          Index<SetEntityType::kNotation> notation_index) = 0;
+
+    /**
      * Stores each statement list to its respective index.
      */
     virtual void SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
