@@ -789,12 +789,49 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
             type_stmt_.GetStatements(StmtType::kRead).begin(),
             type_stmt_.GetStatements(StmtType::kRead).end());
 
-    std::vector<int> if_stmt;
-    std::vector<int> while_stmt;
+    if (type == StmtType::kIf) {
+        std::vector<int> if_stmt;
+        std::vector<int> if_var;
+
+        for (auto &i : direct_modifying_stmt) {
+            int var_index = modifies_rel_.GetVarIndex(i);
+            int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+            parents = container_forest_->GetParents(stmtlst);
+            for (auto &j : parents) {
+                if (stmtlst_parent_.GetParent(j).type ==
+                    StmtlstParentStore::kIf) {
+                    if_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                    if_var.emplace_back(var_index);
+                }
+            }
+        }
+        return {if_stmt, if_var};
+    }
+
+    if (type == StmtType::kWhile) {
+        std::vector<int> while_stmt;
+        std::vector<int> while_var;
+
+        for (auto &i : direct_modifying_stmt) {
+            int var_index = modifies_rel_.GetVarIndex(i);
+            int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+            parents = container_forest_->GetParents(stmtlst);
+            for (auto &j : parents) {
+                if (stmtlst_parent_.GetParent(j).type ==
+                    StmtlstParentStore::kWhile) {
+                    while_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                    while_var.emplace_back(var_index);
+                }
+            }
+        }
+        return {while_stmt, while_var};
+    }
+
+    assert(type == StmtType::kAll);
+
     std::vector<int> all_stmt;
-    std::vector<int> if_var;
-    std::vector<int> while_var;
     std::vector<int> all_var;
+
     for (auto &i : direct_modifying_stmt) {
         all_stmt.emplace_back(i);
         int var_index = modifies_rel_.GetVarIndex(i);
@@ -803,33 +840,11 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
         parents = container_forest_->GetParents(stmtlst);
 
         for (auto &j : parents) {
-            if (stmtlst_parent_.GetParent(j).type == StmtlstParentStore::kIf) {
-                if_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
-                if_var.emplace_back(var_index);
-                all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
-                all_var.emplace_back(var_index);
-            }
-
-            if (stmtlst_parent_.GetParent(j).type ==
-                StmtlstParentStore::kWhile) {
-                while_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
-                while_var.emplace_back(var_index);
-                all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
-                all_var.emplace_back(var_index);
-            }
+            all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+            all_var.emplace_back(var_index);
         }
     }
-
-    if (type == StmtType::kAll) {
-        return {all_stmt, all_var};
-    }
-
-    if (type == StmtType::kIf) {
-        return {if_stmt, if_var};
-    }
-
-    assert(type == StmtType::kWhile);
-    return {while_stmt, while_var};
+    return {all_stmt, all_var};
 }
 
 std::set<int> ProgramKnowledgeBase::GetUses(
@@ -1068,11 +1083,58 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
             type_stmt_.GetStatements(StmtType::kPrint).begin(),
             type_stmt_.GetStatements(StmtType::kPrint).end());
 
-    std::vector<int> if_stmt;
-    std::vector<int> while_stmt;
+    if (type == StmtType::kIf) {
+        std::vector<int> if_stmt;
+        std::vector<int> if_var;
+
+        for (auto &i : direct_modifying_stmt) {
+            auto var_indices = uses_rel_.GetVarIndex(i);
+            int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+            parents = container_forest_->GetParents(stmtlst);
+
+            for (auto &j : parents) {
+                if (stmtlst_parent_.GetParent(j).type ==
+                    StmtlstParentStore::kIf) {
+                    if_var.insert(if_var.end(), var_indices.begin(),
+                                  var_indices.end());
+
+                    for (int i = 0; i < var_indices.size(); i++) {
+                        if_stmt.emplace_back(
+                                stmtlst_parent_.GetParent(j).index);
+                    }
+                }
+            }
+        }
+        return {if_stmt, if_var};
+    }
+
+    if (type == StmtType::kWhile) {
+        std::vector<int> while_var;
+        std::vector<int> while_stmt;
+
+        for (auto &i : direct_modifying_stmt) {
+            auto var_indices = uses_rel_.GetVarIndex(i);
+            int stmtlst = stmtlst_stmt_.GetStmtlst(i);
+            parents = container_forest_->GetParents(stmtlst);
+
+            for (auto &j : parents) {
+                if (stmtlst_parent_.GetParent(j).type ==
+                    StmtlstParentStore::kWhile) {
+                    while_var.insert(while_var.end(), var_indices.begin(),
+                                     var_indices.end());
+
+                    for (int i = 0; i < var_indices.size(); i++) {
+                        while_stmt.emplace_back(
+                                stmtlst_parent_.GetParent(j).index);
+                    }
+                }
+            }
+        }
+        return {while_stmt, while_var};
+    }
+
+    assert(type == StmtType::kAll);
     std::vector<int> all_stmt;
-    std::vector<int> if_var;
-    std::vector<int> while_var;
     std::vector<int> all_var;
 
     for (auto &i : direct_modifying_stmt) {
@@ -1086,43 +1148,14 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
         parents = container_forest_->GetParents(stmtlst);
 
         for (auto &j : parents) {
-            if (stmtlst_parent_.GetParent(j).type == StmtlstParentStore::kIf) {
-                if_var.insert(if_var.end(), var_indices.begin(),
-                              var_indices.end());
-                all_var.insert(all_var.end(), var_indices.begin(),
-                               var_indices.end());
-
-                for (int i = 0; i < var_indices.size(); i++) {
-                    all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
-                    if_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
-                }
-            }
-
-            if (stmtlst_parent_.GetParent(j).type ==
-                StmtlstParentStore::kWhile) {
-                while_var.insert(if_var.end(), var_indices.begin(),
-                                 var_indices.end());
-                all_var.insert(all_var.end(), var_indices.begin(),
-                               var_indices.end());
-
-                for (int i = 0; i < var_indices.size(); i++) {
-                    all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
-                    while_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
-                }
+            all_var.insert(all_var.end(), var_indices.begin(),
+                           var_indices.end());
+            for (int i = 0; i < var_indices.size(); i++) {
+                all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
             }
         }
     }
-
-    if (type == StmtType::kAll) {
-        return {all_stmt, all_var};
-    }
-
-    if (type == StmtType::kIf) {
-        return {if_stmt, if_var};
-    }
-
-    assert(type == StmtType::kWhile);
-    return {while_stmt, while_var};
+    return {all_stmt, all_var};
 }
 
 void ProgramKnowledgeBase::Compile() {
