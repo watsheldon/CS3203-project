@@ -5,14 +5,59 @@
 
 namespace spa {
 class ParentClause : public ConditionClause {};
-class ParentIntInt : public ParentClause {};
-class ParentIntSyn : public ParentClause {};
-class ParentIntWild : public ParentClause {};
-class ParentSynInt : public ParentClause {};
-class ParentSynSyn : public ParentClause {};
-class ParentSynWild : public ParentClause {};
-class ParentWildInt : public ParentClause {};
-class ParentWildSyn : public ParentClause {};
-class ParentWildWild : public ParentClause {};
+class ParentIntInt : public ParentClause {
+  public:
+    ParentIntInt(int first, int second, bool isTrans);
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
+class ParentIntSyn : public ParentClause {
+  public:
+    ParentIntSyn(int first, Synonym* second, bool isTrans);
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
+class ParentIntWild : public ParentClause {
+  public:
+    ParentIntWild(int first, bool isTrans);
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
+class ParentSynInt : public ParentClause {
+  public:
+    ParentSynInt(Synonym* first, int second, bool isTrans);
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
+class ParentSynSyn : public ParentClause {
+  public:
+    ParentSynSyn(Synonym* first, Synonym* second, bool isTrans);
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
+class ParentSynWild : public ParentClause {
+  public:
+    ParentSynWild(Synonym* first, bool isTrans);
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
+class ParentWildInt : public ParentClause {
+  public:
+    ParentWildInt(int second, bool isTrans);
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
+class ParentWildSyn : public ParentClause {
+  public:
+    ParentWildSyn(Synonym* second, bool isTrans);
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
+class ParentWildWild : public ParentClause {
+  public:
+    ParentWildWild();
+    std::pair<ResultTable, bool> Execute(
+            const KnowledgeBase* knowledge_base) const override;
+};
 }  // namespace spa
 #endif  // SPA_SRC_SPA_SRC_QPS_PARENT_FOLLOWS_CLAUSE_H_
