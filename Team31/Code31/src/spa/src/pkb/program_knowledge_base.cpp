@@ -1359,7 +1359,7 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
             }
             case QueryTokenType::INTEGER: {
                 int const_index = const_value_.GetIndex(token.value);
-                if (const_index = 0) {
+                if (const_index == 0) {
                     contains_unseen = true;
                     break;
                 }
