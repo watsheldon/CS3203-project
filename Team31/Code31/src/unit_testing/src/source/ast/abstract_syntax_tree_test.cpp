@@ -1,4 +1,5 @@
 #include "source/ast/abstract_syntax_tree.h"
+#include "source/token.h"
 
 #include "catch.hpp"
 
