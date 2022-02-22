@@ -283,9 +283,20 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.NameToIndex(QueryEntityType::kVar, "v1") == 1);
         REQUIRE(pkb.NameToIndex(QueryEntityType::kProc, "a") == 0);
         REQUIRE(pkb.NameToIndex(QueryEntityType::kProc, "p1") == 1);
+    }
     SECTION("GetEntity") {
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kAssign) ==
                 std::vector<int>{7, 8, 9});
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kCall) ==
+                std::vector<int>{});
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kIf) ==
+                std::vector<int>{4});
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kPrint) ==
+                std::vector<int>{3, 6});
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kRead) ==
+                std::vector<int>{2, 10});
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kWhile) ==
+                std::vector<int>{1, 5});
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kConst) ==
                 std::vector<int>{1, 2, 3});
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kProc) ==
@@ -295,6 +306,6 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kVar) ==
                 std::vector<int>{1, 2, 3});
     }
-}
+    }
 
 }  // namespace spa
