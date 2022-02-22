@@ -1188,6 +1188,104 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     return {all_stmt, all_var};
 }
 
+// ( _, " "), (_, _" "_)
+std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
+                                               bool partial_match) {
+    assert(compiled);
+    auto converted_token = ConvertFromQueryTokens(tokens);
+    if (converted_token.second) {
+        return {};
+    }
+
+    std::vector<int> assign_stmt;
+    assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    PN converted_pn = converted_token.first;
+
+    if (partial_match) {
+        std::set<int> partial_match_stmt;
+
+        for (auto &i : assign_stmt) {
+            const PN &pn = polish_notation_.GetNotation(
+                    polish_notation_.GetPolishIndex(i));
+            if (pn.Contains(converted_pn)) {
+                partial_match_stmt.emplace(i);
+            }
+        }
+        return partial_match_stmt;
+    }
+
+    assert(partial_match == false);
+    std::set<int> full_match_stmt;
+
+    for (auto &i : assign_stmt) {
+        const PN &pn = polish_notation_.GetNotation(
+                polish_notation_.GetPolishIndex(i));
+        if (pn == converted_pn) {
+            full_match_stmt.emplace(i);
+        }
+    }
+
+    return full_match_stmt;
+}
+
+// (" ", _)
+std::set<int> ProgramKnowledgeBase::GetPattern(QueryToken token) {
+    assert(compiled);
+    int var_index = var_name_.GetIndex(token.value);
+    if (var_index == 0) {
+        return {};
+    }
+
+    return GetModifies(Index<QueryEntityType::kVar>(var_index),
+                       StmtType::kAssign);
+}
+
+// (" ", " ") , (" ", _" "_)
+std::set<int> ProgramKnowledgeBase::GetPattern(
+        QueryToken first_token, std::vector<QueryToken> second_tokens,
+        bool partial_match) {
+    assert(compiled);
+
+    int var_index = var_name_.GetIndex(first_token.value);
+    if (var_index == 0) {
+        return {};
+    }
+
+    std::set<int> assign_stmt;
+    std::set<int> filtered_assign_stmt;
+    assign_stmt = GetPattern(second_tokens, partial_match);
+
+    for (auto &i : assign_stmt) {
+        if (ExistModifies(i, var_index)) {
+            filtered_assign_stmt.emplace(i);
+        }
+    }
+    return filtered_assign_stmt;
+}
+// (v, " ") , (v, _" "_)
+std::pair<std::vector<int>, std::vector<int>>
+ProgramKnowledgeBase::GetPatternPair(std::vector<QueryToken> tokens,
+                                     bool partial_match) {
+    assert(compiled);
+
+    std::set<int> assign_stmt_set;
+    std::vector<int> assign_var;
+    std::vector<int> assign_stmt;
+    assign_stmt_set = GetPattern(tokens, partial_match);
+
+    for (auto &i : assign_stmt_set) {
+        auto index = Index<QueryEntityType::kStmt>(i);
+        assign_var.emplace_back(*GetModifies(index).begin());
+    }
+    return {assign_stmt, assign_var};
+}
+
+// (v, _)
+std::pair<std::vector<int>, std::vector<int>>
+ProgramKnowledgeBase::GetPatternPair() {
+    return GetModifiesStmtVar(StmtType::kAssign);
+}
+
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(
@@ -1243,44 +1341,28 @@ void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
     }
 }
 
-bool ProgramKnowledgeBase::ContainsUnseenVarConst(
-        const std::vector<QueryToken> &tokens) {
-    for (const auto &token : tokens) {
-        switch (token.type) {
-            case QueryTokenType::WORD: {
-                if (var_name_.GetIndex(token.value) == 0) {
-                    return true;
-                }
-                break;
-            }
-            case QueryTokenType::INTEGER: {
-                if (const_value_.GetIndex(token.value) == 0) {
-                    return true;
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
-    return false;
-}
-
-PolishNotation ProgramKnowledgeBase::ConvertFromQueryTokens(
+std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
         const std::vector<QueryToken> &tokens) {
     std::vector<PolishNotationNode> expr;
+    bool contains_unseen = false;
     for (const auto &token : tokens) {
         switch (token.type) {
             case QueryTokenType::WORD: {
                 int var_index = var_name_.GetIndex(token.value);
-                assert(var_index > 0);
+                if (var_index == 0) {
+                    contains_unseen = true;
+                    break;
+                }
                 PolishNotationNode node(ExprNodeType::kVariable, var_index);
                 expr.emplace_back(node);
                 break;
             }
             case QueryTokenType::INTEGER: {
                 int const_index = const_value_.GetIndex(token.value);
-                assert(const_index > 0);
+                if (const_index = 0) {
+                    contains_unseen = true;
+                    break;
+                }
                 PolishNotationNode node(ExprNodeType::kConstant, const_index);
                 expr.emplace_back(node);
                 break;
@@ -1323,8 +1405,11 @@ PolishNotation ProgramKnowledgeBase::ConvertFromQueryTokens(
             default:
                 assert(false);
         }
+        if (contains_unseen) {
+            break;
+        }
     }
-    return PolishNotation(expr);
+    return {PolishNotation(expr), contains_unseen};
 }
 
 }  // namespace spa

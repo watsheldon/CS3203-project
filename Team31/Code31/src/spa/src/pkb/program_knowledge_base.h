@@ -9,6 +9,7 @@
 #include <numeric>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "common/entity_type_enum.h"
@@ -111,6 +112,24 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::pair<std::vector<int>, std::vector<int>> GetUsesStmtVar(
             StmtType type) override;
 
+    // ( _, " "), (_ , _" "_)
+    std::set<int> GetPattern(std::vector<QueryToken> tokens,
+                             bool partial_match) override;
+
+    //(" ", _)
+    std::set<int> GetPattern(QueryToken token) override;
+
+    // (" ", " ") , (" ", _" "_)
+    std::set<int> GetPattern(QueryToken first_token,
+                             std::vector<QueryToken> second_tokens,
+                             bool partial_match) override;
+    // (v, " ")  , (v, _" "_)
+    std::pair<std::vector<int>, std::vector<int>> GetPatternPair(
+            std::vector<QueryToken> tokens, bool partial_match) override;
+
+    // (v, _)
+    std::pair<std::vector<int>, std::vector<int>> GetPatternPair() override;
+
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
 
@@ -139,8 +158,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::unique_ptr<ContainerForest> container_forest_;
 
-    bool ContainsUnseenVarConst(const std::vector<QueryToken> &tokens);
-    PolishNotation ConvertFromQueryTokens(
+    std::pair<PolishNotation, bool> ConvertFromQueryTokens(
             const std::vector<QueryToken> &tokens);
 
     std::set<int> GetAllParents(StmtType return_type);
