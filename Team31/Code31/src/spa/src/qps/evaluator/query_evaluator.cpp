@@ -9,6 +9,7 @@
 #include "pkb/knowledge_base.h"
 #include "qps/conditions/condition_clause.h"
 #include "qps/query_object.h"
+#include "qps/synonym.h"
 
 namespace spa {
 QueryEvaluator::QueryEvaluator(std::unique_ptr<KnowledgeBase> knowledge_base_)
@@ -29,7 +30,7 @@ void QueryEvaluator::Evaluate(const QueryObject& query,
         }
         queue.pop();
     }
-    Populate(list, query.select.get());
+    Populate(list, query.select);
 }
 bool QueryEvaluator::UpdateResult(ResultTable& result_table) {
     if (!result_table.has_result) {
@@ -151,7 +152,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
                               const Synonym* selected) {
     auto domain = domains_.find(selected);
     switch (selected->type) {
-        case DeclarationType::STMT: {
+        case Synonym::kStmtAny: {
             auto stmt_nos = domain == domains_.end()
                                     ? knowledge_base_->GetAllEntityIndices(
                                               StmtType::kAll)
@@ -161,7 +162,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
                                          list);
             return;
         }
-        case DeclarationType::READ: {
+        case Synonym::kStmtRead: {
             auto reads = domain == domains_.end()
                                  ? knowledge_base_->GetAllEntityIndices(
                                            StmtType::kRead)
@@ -170,7 +171,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
             knowledge_base_->IndexToName(QueryEntityType::kStmt, reads, list);
             return;
         }
-        case DeclarationType::PRINT: {
+        case Synonym::kStmtPrint: {
             auto prints = domain == domains_.end()
                                   ? knowledge_base_->GetAllEntityIndices(
                                             StmtType::kRead)
@@ -179,7 +180,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
             knowledge_base_->IndexToName(QueryEntityType::kStmt, prints, list);
             return;
         }
-        case DeclarationType::CALL: {
+        case Synonym::kStmtCall: {
             auto calls = domain == domains_.end()
                                  ? knowledge_base_->GetAllEntityIndices(
                                            StmtType::kCall)
@@ -188,7 +189,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
             knowledge_base_->IndexToName(QueryEntityType::kStmt, calls, list);
             return;
         }
-        case DeclarationType::WHILE: {
+        case Synonym::kStmtWhile: {
             auto whiles = domain == domains_.end()
                                   ? knowledge_base_->GetAllEntityIndices(
                                             StmtType::kWhile)
@@ -197,7 +198,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
             knowledge_base_->IndexToName(QueryEntityType::kStmt, whiles, list);
             return;
         }
-        case DeclarationType::IF: {
+        case Synonym::kStmtIf: {
             auto ifs = domain == domains_.end()
                                ? knowledge_base_->GetAllEntityIndices(
                                          StmtType::kIf)
@@ -206,7 +207,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
             knowledge_base_->IndexToName(QueryEntityType::kStmt, ifs, list);
             return;
         }
-        case DeclarationType::ASSIGN: {
+        case Synonym::kStmtAssign: {
             auto assigns = domain == domains_.end()
                                    ? knowledge_base_->GetAllEntityIndices(
                                              StmtType::kAssign)
@@ -215,7 +216,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
             knowledge_base_->IndexToName(QueryEntityType::kStmt, assigns, list);
             return;
         }
-        case DeclarationType::VARIABLE: {
+        case Synonym::kVar: {
             auto vars = domain == domains_.end()
                                 ? knowledge_base_->GetAllEntityIndices(
                                           QueryEntityType::kVar)
@@ -224,7 +225,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
             knowledge_base_->IndexToName(QueryEntityType::kVar, vars, list);
             return;
         }
-        case DeclarationType::CONSTANT: {
+        case Synonym::kConst: {
             auto constants = domain == domains_.end()
                                      ? knowledge_base_->GetAllEntityIndices(
                                                QueryEntityType::kConst)
@@ -234,7 +235,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
                                          list);
             return;
         }
-        case DeclarationType::PROCEDURE: {
+        case Synonym::kProc: {
             auto procs = domain == domains_.end()
                                  ? knowledge_base_->GetAllEntityIndices(
                                            QueryEntityType::kProc)
@@ -242,6 +243,8 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
                                                     domain->second.end());
             knowledge_base_->IndexToName(QueryEntityType::kProc, procs, list);
         }
+        default:
+            assert(false);
     }
 }
 }  // namespace spa

@@ -109,6 +109,7 @@ struct QueryToken {
     explicit QueryToken(const QueryTokenType &type) : type(type){};
     QueryToken(const QueryTokenType &type, std::string string)
             : type(type), value(std::move(string)){};
+    QueryToken(const QueryToken &other) = default;
 };
 }  // namespace spa
 
