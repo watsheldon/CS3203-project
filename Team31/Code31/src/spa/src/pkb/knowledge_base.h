@@ -221,28 +221,47 @@ class KnowledgeBase {
     /**
      * Gets a var_index that is modified in stmt#
      */
-    virtual std::vector<int> GetModifies(
-            Index<QueryEntityType::kStmt> stmt_no,
-            const std::vector<int> &filtered_var) = 0;
+    virtual std::set<int> GetModifies(
+            Index<QueryEntityType::kStmt> stmt_no) = 0;
 
     /**
      * Gets a list of stmt# that modifies var_index
      */
-    virtual std::vector<int> GetModifies(
-            Index<QueryEntityType::kVar> var_index,
-            const std::vector<int> &filtered_stmt) = 0;
+    virtual std::set<int> GetModifies(Index<QueryEntityType::kVar> var_index,
+                                      StmtType type) = 0;
+
+    /**
+     * Gets a list of stmt# that modifies any var_index (wildcard)
+     */
+    virtual std::set<int> GetModifies(StmtType type) = 0;
+
+    /**
+     * For Modifies (s,v)
+     */
+    virtual std::pair<std::vector<int>, std::vector<int>> GetModifiesStmtVar(
+            StmtType type) = 0;
 
     /**
      * Gets a list of var_index that are used in stmt#
      */
-    virtual std::vector<int> GetUses(Index<QueryEntityType::kStmt> stmt_no,
-                                     const std::vector<int> &filtered_var) = 0;
+    virtual std::set<int> GetUses(Index<QueryEntityType::kStmt> stmt_no) = 0;
 
     /**
      * Gets a list of stmt# that uses var_index
      */
-    virtual std::vector<int> GetUses(Index<QueryEntityType::kVar> var_index,
-                                     const std::vector<int> &filtered_stmt) = 0;
+    virtual std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
+                                  StmtType type) = 0;
+
+    /**
+     * Gets a list of stmt# that uses var_index
+     */
+    virtual std::set<int> GetUses(StmtType type) = 0;
+
+    /**
+     * For Uses (s,v)
+     */
+    virtual std::pair<std::vector<int>, std::vector<int>> GetUsesStmtVar(
+            StmtType type) = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type
