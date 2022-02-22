@@ -269,6 +269,21 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         // pairs can have duplication
         REQUIRE(pkb.GetModifiesStmtVar(StmtType::kAll).second.size() == 13);
     }
+    SECTION("IndexToName") {
+        std::vector<int> list1 = {1, 2};
+        std::list<std::string> names;
+        pkb.IndexToName(QueryEntityType::kVar, list1, names);
+        REQUIRE(names == std::list<std::string>{"v1", "v2"});
+        std::list<std::string> stmts;
+        pkb.IndexToName(QueryEntityType::kStmt, list1, stmts);
+        REQUIRE(stmts == std::list<std::string>{"1", "2"});
+    }
+    SECTION("NameToIndex") {
+        REQUIRE(pkb.NameToIndex(QueryEntityType::kVar, "a") == 0);
+        REQUIRE(pkb.NameToIndex(QueryEntityType::kVar, "v1") == 1);
+        REQUIRE(pkb.NameToIndex(QueryEntityType::kProc, "a") == 0);
+        REQUIRE(pkb.NameToIndex(QueryEntityType::kProc, "p1") == 1);
+    }
 }
 
 }  // namespace spa
