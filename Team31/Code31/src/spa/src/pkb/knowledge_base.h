@@ -268,10 +268,10 @@ class KnowledgeBase {
                                      bool partial_match) = 0;
 
     //(" ", _)
-    virtual std::set<int> GetPattern(QueryToken token) = 0;
+    virtual std::set<int> GetPattern(int var_index) = 0;
 
     // (" ", " ") , (" ", _" "_)
-    virtual std::set<int> GetPattern(QueryToken first_token,
+    virtual std::set<int> GetPattern(int var_index,
                                      std::vector<QueryToken> second_tokens,
                                      bool partial_match) = 0;
     // (v, " ") , (v, _" "_)

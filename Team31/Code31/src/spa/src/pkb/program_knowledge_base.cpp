@@ -1291,12 +1291,9 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
 }
 
 // (" ", _)
-std::set<int> ProgramKnowledgeBase::GetPattern(QueryToken token) {
+std::set<int> ProgramKnowledgeBase::GetPattern(int var_index) {
     assert(compiled);
-    int var_index = var_name_.GetIndex(token.value);
-    if (var_index == 0) {
-        return {};
-    }
+    assert(var_index != 0);
 
     return GetModifies(Index<QueryEntityType::kVar>(var_index),
                        StmtType::kAssign);
@@ -1304,14 +1301,10 @@ std::set<int> ProgramKnowledgeBase::GetPattern(QueryToken token) {
 
 // (" ", " ") , (" ", _" "_)
 std::set<int> ProgramKnowledgeBase::GetPattern(
-        QueryToken first_token, std::vector<QueryToken> second_tokens,
+        int var_index, std::vector<QueryToken> second_tokens,
         bool partial_match) {
     assert(compiled);
-
-    int var_index = var_name_.GetIndex(first_token.value);
-    if (var_index == 0) {
-        return {};
-    }
+    assert(var_index != 0);
 
     std::set<int> assign_stmt;
     std::set<int> filtered_assign_stmt;

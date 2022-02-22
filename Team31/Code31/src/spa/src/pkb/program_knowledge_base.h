@@ -117,10 +117,10 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                              bool partial_match) override;
 
     //(" ", _)
-    std::set<int> GetPattern(QueryToken token) override;
+    std::set<int> GetPattern(int var_index) override;
 
     // (" ", " ") , (" ", _" "_)
-    std::set<int> GetPattern(QueryToken first_token,
+    std::set<int> GetPattern(int var_index,
                              std::vector<QueryToken> second_tokens,
                              bool partial_match) override;
     // (v, " ")  , (v, _" "_)
