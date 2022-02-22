@@ -15,9 +15,12 @@ TEST_CASE("common/PQLTokenizer") {
                 "stmt s;\n"
                 "Select s such that Follows* (6, s)"};
 
-        PQLTokenizer tokenizer1(code1);
-        PQLTokenizer tokenizer2(code2);
-        PQLTokenizer tokenizer3(code3);
+        PQLTokenizer tokenizer1;
+        tokenizer1(code1);
+        PQLTokenizer tokenizer2;
+        tokenizer2(code2);
+        PQLTokenizer tokenizer3;
+        tokenizer3(code3);
 
         REQUIRE(tokenizer1.Next().empty());
         REQUIRE(tokenizer1.Next().empty());
@@ -48,7 +51,8 @@ TEST_CASE("common/PQLTokenizer") {
         std::string_view code4{
                 "assign newa;\n"
                 "Select newa pattern newa ( \"normSq\" , _\"cenX * cenX\"_)"};
-        PQLTokenizer tokenizer4(code4);
+        PQLTokenizer tokenizer4;
+        tokenizer4(code4);
         REQUIRE(tokenizer4.Next() == "assign");
         REQUIRE(tokenizer4.Next() == "newa");
         REQUIRE(tokenizer4.Next() == ";");
@@ -76,7 +80,8 @@ TEST_CASE("common/PQLTokenizer") {
                 "assign a; while w;\n"
                 "Select a such that Parent* (w, a)     pattern a(\"x\",     "
                 "_\"read % print \"_"};
-        PQLTokenizer tokenizer5(code5);
+        PQLTokenizer tokenizer5;
+        tokenizer5(code5);
         REQUIRE(tokenizer5.Next() == "assign");
         REQUIRE(tokenizer5.Next() == "a");
         REQUIRE(tokenizer5.Next() == ";");
