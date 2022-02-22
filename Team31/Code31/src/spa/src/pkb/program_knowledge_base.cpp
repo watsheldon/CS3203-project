@@ -661,11 +661,11 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
         parents.emplace_back(stmtlst);
 
         for (int i = 0; i < parents.size(); i++) {
-            if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
-                stmtlst_parent_.GetParent(i).type != PType::kIf) {
+            auto stmt = stmtlst_parent_.GetParent(i);
+            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
-            container_stmt.emplace(stmtlst_parent_.GetParent(i).index);
+            container_stmt.emplace(stmt.index);
         }
     }
 
@@ -727,11 +727,11 @@ std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
         parents.emplace_back(stmtlst);
 
         for (int i = 0; i < parents.size(); i++) {
-            if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
-                stmtlst_parent_.GetParent(i).type != PType::kIf) {
+            auto stmt = stmtlst_parent_.GetParent(i);
+            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
-            container_stmt.emplace(stmtlst_parent_.GetParent(i).index);
+            container_stmt.emplace(stmt.index);
         }
     }
 
@@ -848,9 +848,14 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
         all_var.emplace_back(var_index);
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
         parents = container_forest_->GetParents(stmtlst);
+        parents.emplace_back(stmtlst);
 
         for (auto &j : parents) {
-            all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+            auto stmt = stmtlst_parent_.GetParent(j);
+            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
+                continue;
+            }
+            all_stmt.emplace_back(stmt.index);
             all_var.emplace_back(var_index);
         }
     }
@@ -958,11 +963,11 @@ std::set<int> ProgramKnowledgeBase::GetUses(
         parents.emplace_back(stmtlst);
 
         for (int i = 0; i < parents.size(); i++) {
-            if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
-                stmtlst_parent_.GetParent(i).type != PType::kIf) {
+            auto stmt = stmtlst_parent_.GetParent(i);
+            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
-            container_stmt.emplace(stmtlst_parent_.GetParent(i).index);
+            container_stmt.emplace(stmt.index);
         }
     }
 
@@ -1027,13 +1032,11 @@ std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
         parents.emplace_back(stmtlst);
 
         for (int i = 0; i < parents.size(); i++) {
-            if (stmtlst_parent_.GetParent(i).type !=
-                        StmtlstParentStore::ParentType::kWhile &&
-                stmtlst_parent_.GetParent(i).type !=
-                        StmtlstParentStore::ParentType::kIf) {
+            auto stmt = stmtlst_parent_.GetParent(i);
+            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
-            container_stmt.emplace(stmtlst_parent_.GetParent(i).index);
+            container_stmt.emplace(stmt.index);
         }
     }
 
@@ -1113,6 +1116,7 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
             auto var_indices = uses_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
             parents = container_forest_->GetParents(stmtlst);
+            parents.emplace_back(stmtlst);
 
             for (auto &j : parents) {
                 if (stmtlst_parent_.GetParent(j).type ==
@@ -1138,6 +1142,7 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
             auto var_indices = uses_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
             parents = container_forest_->GetParents(stmtlst);
+            parents.emplace_back(stmtlst);
 
             for (auto &j : parents) {
                 if (stmtlst_parent_.GetParent(j).type ==
@@ -1168,12 +1173,17 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
 
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
         parents = container_forest_->GetParents(stmtlst);
+        parents.emplace_back(stmtlst);
 
         for (auto &j : parents) {
+            auto stmt = stmtlst_parent_.GetParent(j);
+            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
+                continue;
+            }
             all_var.insert(all_var.end(), var_indices.begin(),
                            var_indices.end());
             for (int i = 0; i < var_indices.size(); i++) {
-                all_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                all_stmt.emplace_back(stmt.index);
             }
         }
     }
