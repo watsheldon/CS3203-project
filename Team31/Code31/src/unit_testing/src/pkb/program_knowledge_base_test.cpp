@@ -42,6 +42,8 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
             PolishNotationNode(ExprNodeType::kConstant, 3)});
     be.notations = std::vector<PN>{pn0, pn1, pn2, pn3};
 
+    QueryToken v1 = QueryToken(QueryTokenType::WORD, "v1");
+
     ProgramKnowledgeBase pkb(be);
     pkb.SetIndex(Index<SetEntityType::kProc>(1),
                  Index<SetEntityType::kStmtLst>(1));
@@ -57,6 +59,11 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     pkb.SetLst(Index<SetEntityType::kStmtLst>(3), std::vector<int>{5, 8});
     pkb.SetLst(Index<SetEntityType::kStmtLst>(4), std::vector<int>{6, 7});
     pkb.SetLst(Index<SetEntityType::kStmtLst>(5), std::vector<int>{9});
+
+    pkb.SetRel(Index<SetEntityType::kStmt>(7), Index<SetEntityType::kVar>(0));
+    pkb.SetRel(Index<SetEntityType::kStmt>(8), Index<SetEntityType::kVar>(2));
+    //pkb.SetRel(Index<SetEntityType::kStmt>(9), Index<SetEntityType::kVar>(3));
+
     pkb.Compile();
     SECTION("ExistFollows") {
         REQUIRE(pkb.ExistFollows(false, Index<ArgPos::kFirst>(1),
@@ -106,6 +113,8 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                         .first.size() == 6);
         REQUIRE(pkb.GetFollowsPairs(false, StmtType::kAll, StmtType::kAll)
                         .first.size() == 5);
+    SECTION("GetPattern") { 
+        REQUIRE(pkb.GetPattern(v1) == std::set<int>{7});
     }
 }
 
