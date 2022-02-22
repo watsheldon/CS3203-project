@@ -1271,11 +1271,12 @@ ProgramKnowledgeBase::GetPatternPair(std::vector<QueryToken> tokens,
         return {};
     }
 
-    std::vector<int> assign_stmt;
+    std::set<int> assign_stmt_set;
     std::vector<int> assign_var;
-    assign_stmt = GetPattern(tokens, partial_match);
+    std::vector<int> assign_stmt;
+    assign_stmt_set = GetPattern(tokens, partial_match);
 
-    for (auto &i : assign_stmt) {
+    for (auto &i : assign_stmt_set) {
         assign_var.emplace_back(*GetModifies(i).begin());
     }
     return {assign_stmt, assign_var};
