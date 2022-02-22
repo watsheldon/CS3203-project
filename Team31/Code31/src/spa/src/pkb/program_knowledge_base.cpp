@@ -658,10 +658,15 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
     for (auto &i : direct_modifying_stmt) {
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
         parents = container_forest_->GetParents(stmtlst);
-        std::transform(
-                parents.begin(), parents.end(),
-                std::inserter(container_stmt, container_stmt.begin()),
-                [this](int i) { return stmtlst_parent_.GetParent(i).index; });
+        parents.emplace_back(stmtlst);
+
+        for (int i = 0; i < parents.size(); i++) {
+            if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
+                stmtlst_parent_.GetParent(i).type != PType::kIf) {
+                continue;
+            }
+            container_stmt.emplace(stmtlst_parent_.GetParent(i).index);
+        }
     }
 
     if (type == StmtType::kAll) {
@@ -719,10 +724,15 @@ std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
     for (auto &i : direct_modifying_stmt) {
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
         parents = container_forest_->GetParents(stmtlst);
-        std::transform(
-                parents.begin(), parents.end(),
-                std::inserter(container_stmt, container_stmt.begin()),
-                [this](int i) { return stmtlst_parent_.GetParent(i).index; });
+        parents.emplace_back(stmtlst);
+
+        for (int i = 0; i < parents.size(); i++) {
+            if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
+                stmtlst_parent_.GetParent(i).type != PType::kIf) {
+                continue;
+            }
+            container_stmt.emplace(stmtlst_parent_.GetParent(i).index);
+        }
     }
 
     if (type == StmtType::kAll) {
@@ -945,10 +955,15 @@ std::set<int> ProgramKnowledgeBase::GetUses(
     for (auto &i : direct_uses_stmt) {
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
         parents = container_forest_->GetParents(stmtlst);
-        std::transform(
-                parents.begin(), parents.end(),
-                std::inserter(container_stmt, container_stmt.begin()),
-                [this](int i) { return stmtlst_parent_.GetParent(i).index; });
+        parents.emplace_back(stmtlst);
+
+        for (int i = 0; i < parents.size(); i++) {
+            if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
+                stmtlst_parent_.GetParent(i).type != PType::kIf) {
+                continue;
+            }
+            container_stmt.emplace(stmtlst_parent_.GetParent(i).index);
+        }
     }
 
     if (type == StmtType::kAll) {
@@ -1009,10 +1024,17 @@ std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
     for (auto &i : direct_modifying_stmt) {
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
         parents = container_forest_->GetParents(stmtlst);
-        std::transform(
-                parents.begin(), parents.end(),
-                std::inserter(container_stmt, container_stmt.begin()),
-                [this](int i) { return stmtlst_parent_.GetParent(i).index; });
+        parents.emplace_back(stmtlst);
+
+        for (int i = 0; i < parents.size(); i++) {
+            if (stmtlst_parent_.GetParent(i).type !=
+                        StmtlstParentStore::ParentType::kWhile &&
+                stmtlst_parent_.GetParent(i).type !=
+                        StmtlstParentStore::ParentType::kIf) {
+                continue;
+            }
+            container_stmt.emplace(stmtlst_parent_.GetParent(i).index);
+        }
     }
 
     if (type == StmtType::kAll) {
