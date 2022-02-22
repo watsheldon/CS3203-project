@@ -1364,12 +1364,16 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {
     switch (et) {
         case QueryEntityType::kProc:
             results.resize(proc_name_.size());
+            break;
         case QueryEntityType::kVar:
             results.resize(var_name_.size());
+            break;
         case QueryEntityType::kConst:
             results.resize(const_value_.size());
+            break;
         case QueryEntityType::kStmt:
             results.resize(stmt_count_);
+            break;
         default:
             results.resize(0);
     }
@@ -1390,15 +1394,17 @@ void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names),
                            [this](int i) { return proc_name_.GetName(i); });
-
+            break;
         case QueryEntityType::kVar:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names),
                            [this](int i) { return var_name_.GetName(i); });
+            break;
         case QueryEntityType::kConst:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names),
                            [this](int i) { return const_value_.GetValue(i); });
+            break;
         default:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names),
