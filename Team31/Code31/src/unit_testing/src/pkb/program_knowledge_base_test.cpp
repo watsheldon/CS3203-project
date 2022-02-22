@@ -104,6 +104,11 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     pkb.SetRel(Index<SetEntityType::kStmt>(7), Index<SetEntityType::kVar>(1));
     pkb.SetRel(Index<SetEntityType::kStmt>(8), Index<SetEntityType::kVar>(2));
     pkb.SetRel(Index<SetEntityType::kStmt>(9), Index<SetEntityType::kVar>(3));
+    pkb.SetRel(Index<SetEntityType::kStmt>(7), std::vector<int>{1, 3});
+    pkb.SetRel(Index<SetEntityType::kStmt>(8), std::vector<int>{2, 3});
+    pkb.SetRel(Index<SetEntityType::kStmt>(9), std::vector<int>{3});
+    pkb.SetRel(Index<SetEntityType::kStmt>(3), std::vector<int>{3});
+    pkb.SetRel(Index<SetEntityType::kStmt>(6), std::vector<int>{2});
 
     pkb.Compile();
     SECTION("ExistFollows") {
@@ -200,6 +205,16 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetPatternPair(queryToken4, true) == pairTest);
         REQUIRE(pkb.GetPatternPair(queryToken3, true) == pairTest2);
         REQUIRE(pkb.GetPatternPair() == pairTest3);
+    }
+
+    SECTION("Uses") {
+        REQUIRE(pkb.ExistUses(7, 1) == true);
+        REQUIRE(pkb.ExistUses(7, 3) == true);
+        REQUIRE(pkb.ExistUses(8, 2) == true);
+        REQUIRE(pkb.ExistUses(5, 1) == true);
+        REQUIRE(pkb.ExistUses(2, 1) == false);
+        REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(8)) ==
+                std::set<int>{2, 3});
     }
 }
 
