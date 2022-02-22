@@ -283,6 +283,17 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.NameToIndex(QueryEntityType::kVar, "v1") == 1);
         REQUIRE(pkb.NameToIndex(QueryEntityType::kProc, "a") == 0);
         REQUIRE(pkb.NameToIndex(QueryEntityType::kProc, "p1") == 1);
+    SECTION("GetEntity") {
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kAssign) ==
+                std::vector<int>{7, 8, 9});
+        REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kConst) ==
+                std::vector<int>{1, 2, 3});
+        REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kProc) ==
+                std::vector<int>{1});
+        REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kStmt) ==
+                std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+        REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kVar) ==
+                std::vector<int>{1, 2, 3});
     }
 }
 
