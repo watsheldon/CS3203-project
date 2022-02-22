@@ -145,16 +145,16 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     size_t stmt_count_;     // store number of stmt
     size_t stmtlst_count_;  // store number of stmtlst
 
+    CallProcedureStore call_proc_;
     StmtlstParentStore stmtlst_parent_;
+    StmtlstStatementsStore stmtlst_stmt_;
+    ModifiesRelationshipStore modifies_rel_;
+    UsesRelationshipStore uses_rel_;
+    PolishNotationStore polish_notation_;
     ProcedureNameStore proc_name_;
     VariableNameStore var_name_;
     ConstantValueStore const_value_;
-    StmtlstStatementsStore stmtlst_stmt_;
     TypeStatementsStore type_stmt_;
-    ModifiesRelationshipStore modifies_rel_;
-    UsesRelationshipStore uses_rel_;
-    CallProcedureStore call_proc_;
-    PolishNotationStore polish_notation_;
 
     std::unique_ptr<ContainerForest> container_forest_;
 
