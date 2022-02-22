@@ -509,12 +509,13 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     }
 
     if (type == StmtType::kAssign || type == StmtType::kPrint) {
+        std::vector<int> var_indices;
+        var_indices = uses_rel_.GetVarIndex(stmt_no);
         if (var_index == 0) {
-            return uses_rel_.GetVarIndex(stmt_no).size() > 0;
+            return var_indices.size() > 0;
         }
 
-        return std::binary_search(uses_rel_.GetVarIndex(stmt_no).begin(),
-                                  uses_rel_.GetVarIndex(stmt_no).end(),
+        return std::binary_search(var_indices.begin(), var_indices.end(),
                                   var_index);
     }
 
@@ -573,7 +574,6 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
     }
 
     if (type == StmtType::kAssign || type == StmtType::kRead) {
-        // use a temp
         return {modifies_rel_.GetVarIndex(stmt_no.value)};
     }
 
@@ -703,13 +703,13 @@ std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
     }
 
     if (type == StmtType::kAssign) {
-        return {type_stmt_.GetStatements(StmtType::kAssign).begin(),
-                type_stmt_.GetStatements(StmtType::kAssign).end()};
+        auto assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+        return {assign_stmt.begin(), assign_stmt.end()};
     }
 
     if (type == StmtType::kRead) {
-        return {type_stmt_.GetStatements(StmtType::kRead).begin(),
-                type_stmt_.GetStatements(StmtType::kRead).end()};
+        auto read_stmt = type_stmt_.GetStatements(StmtType::kRead);
+        return {read_stmt.begin(), read_stmt.end()};
     }
 
     std::set<int> container_stmt;
@@ -808,9 +808,9 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
             parents = container_forest_->GetParents(stmtlst);
             for (auto &j : parents) {
-                if (stmtlst_parent_.GetParent(j).type ==
-                    StmtlstParentStore::kIf) {
-                    if_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                auto stmt = stmtlst_parent_.GetParent(j);
+                if (stmt.type == StmtlstParentStore::kIf) {
+                    if_stmt.emplace_back(stmt.index);
                     if_var.emplace_back(var_index);
                 }
             }
@@ -827,9 +827,9 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
             parents = container_forest_->GetParents(stmtlst);
             for (auto &j : parents) {
-                if (stmtlst_parent_.GetParent(j).type ==
-                    StmtlstParentStore::kWhile) {
-                    while_stmt.emplace_back(stmtlst_parent_.GetParent(j).index);
+                auto stmt = stmtlst_parent_.GetParent(j);
+                if (stmt.type == StmtlstParentStore::kWhile) {
+                    while_stmt.emplace_back(stmt.index);
                     while_var.emplace_back(var_index);
                 }
             }
@@ -1119,14 +1119,13 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
             parents.emplace_back(stmtlst);
 
             for (auto &j : parents) {
-                if (stmtlst_parent_.GetParent(j).type ==
-                    StmtlstParentStore::kIf) {
+                auto stmt = stmtlst_parent_.GetParent(j);
+                if (stmt.type == StmtlstParentStore::kIf) {
                     if_var.insert(if_var.end(), var_indices.begin(),
                                   var_indices.end());
 
                     for (int i = 0; i < var_indices.size(); i++) {
-                        if_stmt.emplace_back(
-                                stmtlst_parent_.GetParent(j).index);
+                        if_stmt.emplace_back(stmt.index);
                     }
                 }
             }
@@ -1145,14 +1144,13 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
             parents.emplace_back(stmtlst);
 
             for (auto &j : parents) {
-                if (stmtlst_parent_.GetParent(j).type ==
-                    StmtlstParentStore::kWhile) {
+                auto stmt = stmtlst_parent_.GetParent(j);
+                if (stmt.type == StmtlstParentStore::kWhile) {
                     while_var.insert(while_var.end(), var_indices.begin(),
                                      var_indices.end());
 
                     for (int i = 0; i < var_indices.size(); i++) {
-                        while_stmt.emplace_back(
-                                stmtlst_parent_.GetParent(j).index);
+                        while_stmt.emplace_back(stmt.index);
                     }
                 }
             }
