@@ -228,15 +228,24 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     }
     SECTION("GetModifies") {
         REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(3)).empty());
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(4))==std::set<int>{1,2,3});
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(10))==std::set<int>{2});
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),StmtType::kRead)==std::set<int>{2});
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),StmtType::kPrint).empty());
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),StmtType::kAll)==std::set<int>{1,2,4,5,7});
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(3),StmtType::kWhile)==std::set<int>{1});
-        REQUIRE(pkb.GetModifies(StmtType::kAll)==std::set<int>{ 1, 2, 4, 5, 7, 8, 9, 10 });
-        //pairs can have duplication
-        REQUIRE(pkb.GetModifiesStmtVar(StmtType::kAll).second.size()==13);
+        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(4)) ==
+                std::set<int>{1, 2, 3});
+        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(10)) ==
+                std::set<int>{2});
+        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),
+                                StmtType::kRead) == std::set<int>{2});
+        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),
+                                StmtType::kPrint)
+                        .empty());
+        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),
+                                StmtType::kAll) ==
+                std::set<int>{1, 2, 4, 5, 7});
+        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(3),
+                                StmtType::kWhile) == std::set<int>{1});
+        REQUIRE(pkb.GetModifies(StmtType::kAll) ==
+                std::set<int>{1, 2, 4, 5, 7, 8, 9, 10});
+        // pairs can have duplication
+        REQUIRE(pkb.GetModifiesStmtVar(StmtType::kAll).second.size() == 13);
     }
 }
 
