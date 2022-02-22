@@ -769,10 +769,9 @@ std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
     std::vector<int> parents, direct_modifying_stmt;
 
     direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-    direct_modifying_stmt.insert(
-            direct_modifying_stmt.end(),
-            type_stmt_.GetStatements(StmtType::kRead).begin(),
-            type_stmt_.GetStatements(StmtType::kRead).end());
+    auto read_stmt = type_stmt_.GetStatements(StmtType::kRead);
+    direct_modifying_stmt.insert(direct_modifying_stmt.end(), read_stmt.begin(),
+                                 read_stmt.end());
 
     for (auto &i : direct_modifying_stmt) {
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
@@ -847,10 +846,9 @@ ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
     std::vector<int> parents, direct_modifying_stmt;
 
     direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-    direct_modifying_stmt.insert(
-            direct_modifying_stmt.end(),
-            type_stmt_.GetStatements(StmtType::kRead).begin(),
-            type_stmt_.GetStatements(StmtType::kRead).end());
+    auto read_stmt = type_stmt_.GetStatements(StmtType::kRead);
+    direct_modifying_stmt.insert(direct_modifying_stmt.end(), read_stmt.begin(),
+                                 read_stmt.end());
 
     if (type == StmtType::kIf) {
         std::vector<int> if_stmt;
@@ -927,8 +925,10 @@ std::set<int> ProgramKnowledgeBase::GetUses(
     }
 
     if (type == StmtType::kAssign || type == StmtType::kPrint) {
-        return {uses_rel_.GetVarIndex(stmt_no.value).begin(),
-                uses_rel_.GetVarIndex(stmt_no.value).end()};
+        std::vector<int> var_indices;
+        var_indices = uses_rel_.GetVarIndex(stmt_no.value);
+
+        return {var_indices.begin(), var_indices.end()};
     }
 
     auto first_stmt = stmt_no.value + 1;
@@ -959,8 +959,8 @@ std::set<int> ProgramKnowledgeBase::GetUses(
     std::set<int> results;
 
     for (auto i = first_assign; i != second_assign; i++) {
-        results.insert(uses_rel_.GetVarIndex(*i).begin(),
-                       uses_rel_.GetVarIndex(*i).end());
+        auto var_indices = uses_rel_.GetVarIndex(*i);
+        results.insert(var_indices.begin(), var_indices.end());
     }
 
     const auto &print_stmts = type_stmt_.GetStatements(StmtType::kPrint);
@@ -970,8 +970,8 @@ std::set<int> ProgramKnowledgeBase::GetUses(
             std::upper_bound(first_print, print_stmts.end(), last_stmt);
 
     for (auto i = first_print; i != second_print; i++) {
-        results.insert(uses_rel_.GetVarIndex(*i).begin(),
-                       uses_rel_.GetVarIndex(*i).end());
+        auto var_indices = uses_rel_.GetVarIndex(*i);
+        results.insert(var_indices.begin(), var_indices.end());
     }
     return results;
 }
@@ -1057,27 +1057,26 @@ std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
 
     if (type == StmtType::kAssign) {
         std::set<int> assign_stmt;
+        auto all_assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
         std::copy_if(
-                type_stmt_.GetStatements(StmtType::kAssign).begin(),
-                type_stmt_.GetStatements(StmtType::kAssign).end(),
+                all_assign_stmt.begin(), all_assign_stmt.end(),
                 std::inserter(assign_stmt, assign_stmt.begin()),
                 [this](int i) { return uses_rel_.GetVarIndex(i).size() > 0; });
         return assign_stmt;
     }
 
     if (type == StmtType::kPrint) {
-        return {type_stmt_.GetStatements(StmtType::kPrint).begin(),
-                type_stmt_.GetStatements(StmtType::kPrint).end()};
+        auto print_stmt = type_stmt_.GetStatements(StmtType::kPrint);
+        return {print_stmt.begin(), print_stmt.end()};
     }
 
     std::set<int> container_stmt;
     std::vector<int> parents, direct_modifying_stmt;
 
     direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-    direct_modifying_stmt.insert(
-            direct_modifying_stmt.end(),
-            type_stmt_.GetStatements(StmtType::kPrint).begin(),
-            type_stmt_.GetStatements(StmtType::kPrint).end());
+    auto print_stmt = type_stmt_.GetStatements(StmtType::kPrint);
+    direct_modifying_stmt.insert(direct_modifying_stmt.end(),
+                                 print_stmt.begin(), print_stmt.end());
 
     for (auto &i : direct_modifying_stmt) {
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
@@ -1130,9 +1129,9 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
         std::vector<int> assign_stmt_pair;
 
         for (auto &i : assign_stmt) {
-            assign_var.insert(assign_var.end(),
-                              uses_rel_.GetVarIndex(i).begin(),
-                              uses_rel_.GetVarIndex(i).end());
+            auto var_indices = uses_rel_.GetVarIndex(i);
+            assign_var.insert(assign_var.end(), var_indices.begin(),
+                              var_indices.end());
             for (int i = 0; i < uses_rel_.GetVarIndex(i).size(); i++) {
                 assign_stmt_pair.emplace_back(i);
             }
@@ -1156,10 +1155,9 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     std::vector<int> parents, direct_modifying_stmt;
 
     direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-    direct_modifying_stmt.insert(
-            direct_modifying_stmt.end(),
-            type_stmt_.GetStatements(StmtType::kPrint).begin(),
-            type_stmt_.GetStatements(StmtType::kPrint).end());
+    auto print_stmt = type_stmt_.GetStatements(StmtType::kPrint);
+    direct_modifying_stmt.insert(direct_modifying_stmt.end(),
+                                 print_stmt.begin(), print_stmt.end());
 
     if (type == StmtType::kIf) {
         std::vector<int> if_stmt;
