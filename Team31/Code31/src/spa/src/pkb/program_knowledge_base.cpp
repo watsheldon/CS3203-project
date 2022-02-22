@@ -660,8 +660,8 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
         parents = container_forest_->GetParents(stmtlst);
         parents.emplace_back(stmtlst);
 
-        for (int i = 0; i < parents.size(); i++) {
-            auto stmt = stmtlst_parent_.GetParent(i);
+        for (auto &j : parents) {
+            auto stmt = stmtlst_parent_.GetParent(j);
             if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
@@ -726,8 +726,8 @@ std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
         parents = container_forest_->GetParents(stmtlst);
         parents.emplace_back(stmtlst);
 
-        for (int i = 0; i < parents.size(); i++) {
-            auto stmt = stmtlst_parent_.GetParent(i);
+        for (auto &j : parents) {
+            auto stmt = stmtlst_parent_.GetParent(j);
             if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
@@ -962,8 +962,8 @@ std::set<int> ProgramKnowledgeBase::GetUses(
         parents = container_forest_->GetParents(stmtlst);
         parents.emplace_back(stmtlst);
 
-        for (int i = 0; i < parents.size(); i++) {
-            auto stmt = stmtlst_parent_.GetParent(i);
+        for (auto &j : parents) {
+            auto stmt = stmtlst_parent_.GetParent(j);
             if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
@@ -1031,8 +1031,8 @@ std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
         parents = container_forest_->GetParents(stmtlst);
         parents.emplace_back(stmtlst);
 
-        for (int i = 0; i < parents.size(); i++) {
-            auto stmt = stmtlst_parent_.GetParent(i);
+        for (auto &j : parents) {
+            auto stmt = stmtlst_parent_.GetParent(j);
             if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
