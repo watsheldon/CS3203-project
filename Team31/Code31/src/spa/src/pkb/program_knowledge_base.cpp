@@ -15,9 +15,9 @@ namespace spa {
 ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
         : stmt_count_(init.assigns.size() + init.ifs.size() +
                       init.whiles.size() + init.calls.size() +
-                      init.reads.size() + init.prints.size() - STMT_TYPE_COUNT),
+                      init.reads.size() + init.prints.size()),
           stmtlst_count_(init.procedures.size() + init.whiles.size() +
-                         init.ifs.size() * 2 - 4),
+                         init.ifs.size() * 2 - 1),
           call_proc_(stmt_count_, init.procedures.size() - 1),
           stmtlst_parent_(init.procedures.size() - 1, stmt_count_,
                           stmtlst_count_),
@@ -106,10 +106,10 @@ bool ProgramKnowledgeBase::ExistParent(bool transitive,
     assert(compiled);
     int parent = parent_stmt.value;
     int child = child_stmt.value;
-    if (child >= parent || parent > stmt_count_ - 1 || child > stmt_count_) {
+    if (child <= parent || parent > stmt_count_ - 1 || child > stmt_count_) {
         return false;
     }
-    if (type_stmt_.GetType(parent) != StmtType::kWhile ||
+    if (type_stmt_.GetType(parent) != StmtType::kWhile &&
         type_stmt_.GetType(parent) != StmtType::kIf) {
         return false;
     }
@@ -1191,7 +1191,7 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(
-            stmtlst_parent_, stmtlst_stmt_, stmt_count_);
+            stmtlst_parent_, stmtlst_stmt_, stmtlst_count_);
     compiled = true;
 }
 

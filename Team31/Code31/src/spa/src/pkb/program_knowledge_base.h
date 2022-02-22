@@ -122,7 +122,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
   private:
     bool compiled = false;
-    const int STMT_TYPE_COUNT = 6;
 
     size_t stmt_count_;     // store number of stmt
     size_t stmtlst_count_;  // store number of stmtlst
