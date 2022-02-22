@@ -20,11 +20,12 @@ TestWrapper::TestWrapper() {
 void TestWrapper::parse(std::string filename) {
     spa::SourceProcessor processor(filename);
     auto pkb = processor.Parse();
-    if (pkb)
-        qps_.use(std::move(pkb));
+    if (pkb) {
+        qps_.Use(std::move(pkb));
+    }
 }
 
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string> &results) {
-    qps_.evaluate(query, results);
+    qps_.Evaluate(query, results);
 }
