@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
-#define SPA_SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
+#ifndef SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
+#define SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
 
 #include "condition_clause.h"
 #include "qps/query_token.h"
@@ -42,4 +42,4 @@ class PatternWildWild : public PatternClause {
             const KnowledgeBase* knowledge_base) const override;
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
+#endif  // SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_

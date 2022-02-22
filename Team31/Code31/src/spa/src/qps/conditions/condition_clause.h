@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_
-#define SPA_SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_
+#ifndef SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_
+#define SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_
 
 #include <utility>
 
@@ -13,4 +13,4 @@ class ConditionClause {
             const KnowledgeBase* knowledge_base) const = 0;
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_
+#endif  // SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_

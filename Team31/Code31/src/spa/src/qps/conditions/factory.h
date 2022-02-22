@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_CONDITIONS_FACTORY_H_
-#define SPA_SRC_SPA_SRC_QPS_CONDITIONS_FACTORY_H_
+#ifndef SRC_SPA_SRC_QPS_CONDITIONS_FACTORY_H_
+#define SRC_SPA_SRC_QPS_CONDITIONS_FACTORY_H_
 
 #include <string>
 
@@ -44,4 +44,4 @@ class Factory {
     std::unique_ptr<ConditionClause> Build();
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_QPS_CONDITIONS_FACTORY_H_
+#endif  // SRC_SPA_SRC_QPS_CONDITIONS_FACTORY_H_

@@ -17,4 +17,4 @@ class SelectClause {
     std::string getSelectSynonym() { return this->synonym; }
 };
 }  // namespace spa
-#endif  // INC_21S2_CP_SPA_TEAM_31_TEAM31_CODE31_SRC_SPA_SRC_QPS_SELECT_H_
+#endif  // SRC_SPA_SRC_QPS_SELECT_H_

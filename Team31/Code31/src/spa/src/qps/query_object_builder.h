@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_QUERY_OBJECT_BUILDER_H_
-#define SPA_SRC_SPA_SRC_QPS_QUERY_OBJECT_BUILDER_H_
+#ifndef SRC_SPA_SRC_QPS_QUERY_OBJECT_BUILDER_H_
+#define SRC_SPA_SRC_QPS_QUERY_OBJECT_BUILDER_H_
 
 #include <utility>
 #include <vector>
@@ -27,4 +27,4 @@ class QueryObjectBuilder {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_QPS_QUERY_OBJECT_BUILDER_H_
+#endif  // SRC_SPA_SRC_QPS_QUERY_OBJECT_BUILDER_H_

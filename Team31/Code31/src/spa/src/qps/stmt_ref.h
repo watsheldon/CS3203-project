@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_STMT_REF_H_
-#define SPA_SRC_SPA_SRC_QPS_STMT_REF_H_
+#ifndef SRC_SPA_SRC_QPS_STMT_REF_H_
+#define SRC_SPA_SRC_QPS_STMT_REF_H_
 
 #include "synonym.h"
 
@@ -15,4 +15,4 @@ struct Stmtref {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_QPS_STMT_REF_H_
+#endif  // SRC_SPA_SRC_QPS_STMT_REF_H_

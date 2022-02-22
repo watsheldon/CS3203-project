@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_CONDITIONS_MODIFIES_CLAUSE_H_
-#define SPA_SRC_SPA_SRC_QPS_CONDITIONS_MODIFIES_CLAUSE_H_
+#ifndef SRC_SPA_SRC_QPS_CONDITIONS_MODIFIES_CLAUSE_H_
+#define SRC_SPA_SRC_QPS_CONDITIONS_MODIFIES_CLAUSE_H_
 
 #include <string>
 #include "condition_clause.h"
@@ -42,4 +42,4 @@ class ModifiesSynWild : public ModifiesClause {
             const KnowledgeBase* knowledge_base) const override;
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_QPS_CONDITIONS_MODIFIES_CLAUSE_H_
+#endif  // SRC_SPA_SRC_QPS_CONDITIONS_MODIFIES_CLAUSE_H_

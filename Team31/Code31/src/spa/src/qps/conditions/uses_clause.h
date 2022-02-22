@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_USES_MODIFIES_CLAUSE_H_
-#define SPA_SRC_SPA_SRC_QPS_USES_MODIFIES_CLAUSE_H_
+#ifndef SRC_SPA_SRC_QPS_USES_MODIFIES_CLAUSE_H_
+#define SRC_SPA_SRC_QPS_USES_MODIFIES_CLAUSE_H_
 
 #include "qps/conditions/condition_clause.h"
 
@@ -43,4 +43,4 @@ class UsesSynWild : public UsesClause {
 };
 }  // namespace spa
 
-#endif  // SPA_SRC_SPA_SRC_QPS_USES_MODIFIES_CLAUSE_H_
+#endif  // SRC_SPA_SRC_QPS_USES_MODIFIES_CLAUSE_H_

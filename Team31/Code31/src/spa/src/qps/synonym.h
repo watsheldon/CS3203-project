@@ -1,5 +1,5 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
-#define SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
+#ifndef SRC_SPA_SRC_QPS_SYNONYM_H_
+#define SRC_SPA_SRC_QPS_SYNONYM_H_
 
 #include <string_view>
 namespace spa {
@@ -51,4 +51,4 @@ struct Synonym {
     void RefCountSetter(int num) { count++; }
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
+#endif  // SRC_SPA_SRC_QPS_SYNONYM_H_

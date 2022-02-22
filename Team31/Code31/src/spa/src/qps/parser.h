@@ -25,4 +25,4 @@ class Parser {
 };
 }  // namespace spa
 
-#endif  // SPA_TEAM31_CODE31_SRC_SPA_SRC_QPS_PARSER_H_
+#endif  // SRC_SPA_SRC_QPS_PARSER_H_
