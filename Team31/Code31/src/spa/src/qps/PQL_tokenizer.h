@@ -18,8 +18,10 @@ class PQLTokenizer {
 
   public:
     explicit PQLTokenizer(const std::filesystem::path &inputFile);
+    explicit PQLTokenizer(std::string_view str);
     PQLTokenizer &operator()(std::string_view str);
     PQLTokenizer &operator>>(std::string &token);
+    std::string Next();
 };
 }  // namespace spa
-#endif  // INC_21S2_CP_SPA_TEAM_31_TEAM31_CODE31_SRC_SPA_SRC_QPS_PQL_TOKENIZER_H_
+#endif  // SRC_SPA_SRC_QPS_PQL_TOKENIZER_H_
