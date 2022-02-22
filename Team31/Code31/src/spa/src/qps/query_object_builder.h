@@ -1,12 +1,12 @@
 #ifndef SRC_SPA_SRC_QPS_QUERY_OBJECT_BUILDER_H_
 #define SRC_SPA_SRC_QPS_QUERY_OBJECT_BUILDER_H_
 
+#include <memory>
 #include <utility>
 #include <vector>
 
 #include "conditions/condition_clause.h"
 #include "query_object.h"
-#include "select_cl.h"
 #include "synonym.h"
 
 namespace spa {
@@ -23,7 +23,7 @@ class QueryObjectBuilder {
     QueryObjectBuilder& SetSelect(std::unique_ptr<Synonym> sel);
     QueryObjectBuilder& SetConditions(
             std::vector<std::unique_ptr<ConditionClause>>& cons);
-    QueryObject build();
+    std::unique_ptr<QueryObject> Build();
 };
 }  // namespace spa
 

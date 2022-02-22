@@ -2,13 +2,15 @@
 
 #include <cassert>
 #include <map>
+#include <memory>
 
 #include "conditions/condition_clause.h"
 #include "conditions/factory.h"
 
 namespace spa {
 
-QueryObject Generator::Generate(const std::vector<QueryToken> &tokens) {
+std::unique_ptr<QueryObject> Generator::Generate(
+        const std::vector<QueryToken> &tokens) {
     std::map<std::string, std::unique_ptr<Synonym>> map;
     Mode curr_mode_;
     DeclarationType curr_type_;
@@ -46,7 +48,7 @@ QueryObject Generator::Generate(const std::vector<QueryToken> &tokens) {
                     // do not insert means repeated synonym
                     if (!pair.second) {
                         query_object_builder_.SetIsValid(false);
-                        return query_object_builder_.build();
+                        return {};
                     }
                     synonyms_.emplace_back(std::move(ptr));
                 }
@@ -55,7 +57,7 @@ QueryObject Generator::Generate(const std::vector<QueryToken> &tokens) {
                     if (it == map.end()) {
                         // this synonym is not declared before
                         query_object_builder_.SetIsValid(false);
-                        return query_object_builder_.build();
+                        return {};
                     }
                     auto &[name, synonym] = *it;
                     // todo: not sure syntax
@@ -128,7 +130,7 @@ QueryObject Generator::Generate(const std::vector<QueryToken> &tokens) {
                 break;
         }
     }
-    return query_object_builder_.build();
+    return query_object_builder_.Build();
 }
 
 DeclarationType Generator::TypeConvert(QueryTokenType type) {

@@ -2,6 +2,7 @@
 #define SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 
 #include <vector>
+#include <memory>
 
 #include "PQL_validator.h"
 #include "ent_ref.h"
@@ -31,7 +32,8 @@ class Generator {
     // Declaration of repeated synonyms
 
   public:
-    static QueryObject Generate(const std::vector<QueryToken>& tokens);
+    static std::unique_ptr<QueryObject> Generate(
+            const std::vector<QueryToken>& tokens);
     //    bool GenerateDeclarations();
     //    bool GenerateSelect();
     //    bool GenerateSuchThat();

@@ -1,6 +1,12 @@
 #include "query_object_builder.h"
 
+#include <memory>
 #include <utility>
+#include <vector>
+
+#include "conditions/condition_clause.h"
+#include "query_object.h"
+#include "synonym.h"
 
 namespace spa {
 QueryObjectBuilder& QueryObjectBuilder::SetIsValid(bool isValid) {
@@ -26,9 +32,10 @@ QueryObjectBuilder& QueryObjectBuilder::SetConditions(
     return *this;
 }
 
-QueryObject QueryObjectBuilder::build() {
-    return {isValidQuery_, std::move(synonyms_), std::move(select_),
-            std::move(conditions_)};
+std::unique_ptr<QueryObject> QueryObjectBuilder::Build() {
+    return std::make_unique<QueryObject>(isValidQuery_, std::move(synonyms_),
+                                         std::move(select_),
+                                         std::move(conditions_));
 }
 
 }  // namespace spa
