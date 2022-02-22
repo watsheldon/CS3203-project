@@ -72,15 +72,10 @@ void Tokenizer::ExtractInto(std::string &token) {
         if (token.length() == 1) {
             return;
         }
-        if (std::isalnum(token[1])) {
-            return KeepFirstOf(token, 1);
+        if (token[1] == '=') {
+            return KeepFirstOf(token, 2);
         }
-        if (token[1] != '=') {
-            token.resize(0);
-            error = true;
-            return;
-        }
-        return KeepFirstOf(token, 2);
+        return KeepFirstOf(token, 1);
     }
 
     // this should not be reached unless an illegal character is present
