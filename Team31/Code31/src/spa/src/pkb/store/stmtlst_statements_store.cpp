@@ -108,7 +108,7 @@ std::vector<int> StmtlstStatementsStore::GetFollows(
 std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
     std::vector<int> followees;
     for (auto &stmtlst : stmtlst_to_statements_) {
-        for (int i = 0; i < stmtlst.size() - 1; ++i) {
+        for (int i = 0; i < (int)stmtlst.size() - 1; ++i) {
             followees.emplace_back(stmtlst[i]);
         }
     }
@@ -136,8 +136,9 @@ std::vector<int> StmtlstStatementsStore::GetFollows(
 void StmtlstStatementsStore::AddPairs(
         const std::vector<int> &stmtlst,
         std::pair<std::vector<int>, std::vector<int>> &results) const {
-    for (int i = 0; i < stmtlst.size() - 1; ++i) {
-        for (int j = i + 1; j < stmtlst.size(); ++j) {
+    int size = (int)stmtlst.size();
+    for (int i = 0; i < size - 1; ++i) {
+        for (int j = i + 1; j < size; ++j) {
             results.first.emplace_back(stmtlst[i]);
             results.second.emplace_back(stmtlst[j]);
         }
@@ -155,7 +156,7 @@ std::pair<std::vector<int>, std::vector<int>>
 StmtlstStatementsStore::GetNonTransitivePairs() const {
     std::pair<std::vector<int>, std::vector<int>> results;
     for (auto &stmtlst : stmtlst_to_statements_) {
-        for (int i = 0; i < stmtlst.size() - 1; ++i) {
+        for (int i = 0; i < (int)stmtlst.size() - 1; ++i) {
             results.first.emplace_back(stmtlst[i]);
             results.second.emplace_back(stmtlst[i + 1]);
         }
@@ -164,7 +165,7 @@ StmtlstStatementsStore::GetNonTransitivePairs() const {
 }
 std::pair<std::vector<int>, std::vector<int>>
 StmtlstStatementsStore::GetFollowsPairs(bool transitive) const {
-    if (!transitive) {
+    if (transitive) {
         return GetTransitivePairs();
     }
     return GetNonTransitivePairs();

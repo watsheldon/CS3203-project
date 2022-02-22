@@ -40,5 +40,17 @@ TEST_CASE("pkb/store/StmtlstStatementsStore") {
         REQUIRE(sss.GetFollows(false, Index<ArgPos::kSecond>(6)) ==
                 std::vector<int>{5});
     }
+    SECTION("GetFollowsWildcard") {
+        REQUIRE(sss.GetFollowsWildcard() ==
+                std::vector<int>{3, 4, 10, 6, 8, 9});
+    }
+    SECTION("GetFollowedByWildcard") {
+        REQUIRE(sss.GetFollowedByWildcard() ==
+                std::vector<int>{1, 3, 4, 5, 7, 8});
+    }
+    SECTION("GetFollowsPairs") {
+        REQUIRE(sss.GetFollowsPairs(false).second.size() == 6);
+        REQUIRE(sss.GetFollowsPairs(true).second.size() == 10);
+    }
 }
 }  // namespace spa
