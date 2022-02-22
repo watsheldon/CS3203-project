@@ -27,8 +27,8 @@ QueryObjectBuilder& QueryObjectBuilder::SetConditions(
 }
 
 QueryObject QueryObjectBuilder::build() {
-    return QueryObject(isValidQuery_, std::move(synonyms_), std::move(select_),
-                       std::move(conditions_));
+    return {isValidQuery_, std::move(synonyms_), std::move(select_),
+            std::move(conditions_)};
 }
 
 }  // namespace spa

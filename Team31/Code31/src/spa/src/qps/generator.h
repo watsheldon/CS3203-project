@@ -1,7 +1,6 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 #define SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 
-#include <filesystem>
 #include <map>
 #include <memory>
 #include <vector>
@@ -34,10 +33,10 @@ class Generator {
     // Declaration of repeated synonyms
 
   public:
-    QueryObject Generate(const std::vector<QueryToken>& tokens);
-    bool GenerateDeclarations();
-    bool GenerateSelect();
-    bool GenerateSuchThat();
+    static QueryObject Generate(const std::vector<QueryToken>& tokens);
+    //    bool GenerateDeclarations();
+    //    bool GenerateSelect();
+    //    bool GenerateSuchThat();
     static DeclarationType TypeConvert(QueryTokenType type);
 };
 }  // namespace spa

@@ -80,10 +80,12 @@ QueryObject Generator::Generate(const std::vector<QueryToken> &tokens) {
             case QueryTokenType::LEFTBRACKET:
             case QueryTokenType::THAT:
                 break;
-            case QueryTokenType::RIGHTBRACKET:
+            case QueryTokenType::RIGHTBRACKET: {
                 // todo:factory build (syntax of unique_ptr)
-                conditions.emplace_back(factory.Build());
+                auto cond = factory.Build();
+                conditions.emplace_back(std::move(cond));
                 break;
+            }
             case QueryTokenType::UNDERSCORE:
                 if (curr_mode_ == Mode::kParent) {
                 }
@@ -154,22 +156,22 @@ DeclarationType Generator::TypeConvert(QueryTokenType type) {
             assert(false);
     }
 }
-bool Generator::GenerateDeclarations() {
-    DeclarationType curr_type_;
-    //    if (comma) {
-    //        addSynonym()
-    //    }
-    //    isValid
-    return false;
-}
-bool Generator::GenerateSelect() {
-    std::string value;
-    //    checkMapContains(value);
-    //    isValid;
-    //    setSelect()
-    return false;
-}
-bool Generator::GenerateSuchThat() { return false; }
+// bool Generator::GenerateDeclarations() {
+//     DeclarationType curr_type_;
+//     //    if (comma) {
+//     //        addSynonym()
+//     //    }
+//     //    isValid
+//     return false;
+// }
+// bool Generator::GenerateSelect() {
+//     std::string value;
+//     //    checkMapContains(value);
+//     //    isValid;
+//     //    setSelect()
+//     return false;
+// }
+// bool Generator::GenerateSuchThat() { return false; }
 }  // namespace spa
 
 // namespace spa
