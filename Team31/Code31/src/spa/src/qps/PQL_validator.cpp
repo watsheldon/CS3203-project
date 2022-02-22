@@ -2,12 +2,13 @@
 
 #include <memory>
 #include <vector>
+#include <string_view>
 
 #include "query_token.h"
 
 namespace spa {
 
-std::vector<QueryToken> PQLValidator::Validate(const std::string& value) {
+std::vector<QueryToken> PQLValidator::Validate(std::string_view value) {
     tokens_.clear();
     tokenizer_(value);
     fetchToken();

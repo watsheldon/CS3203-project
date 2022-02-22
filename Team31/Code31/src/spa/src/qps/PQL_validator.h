@@ -2,6 +2,7 @@
 #define SRC_SPA_SRC_QPS_PQL_VALIDATOR_H_
 
 #include <filesystem>
+#include <string_view>
 
 #include "PQL_tokenizer.h"
 #include "query_object.h"
@@ -11,7 +12,7 @@
 namespace spa {
 class PQLValidator {
   public:
-    std::vector<QueryToken> Validate(const std::string& value);
+    std::vector<QueryToken> Validate(std::string_view value);
 
   private:
     // a number of length greater than 1 starting with 0 is not a constant

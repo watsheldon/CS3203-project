@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <string_view>
 
 #include "PQL_tokenizer.h"
 #include "PQL_validator.h"
@@ -13,7 +14,7 @@
 namespace spa {
 class Parser {
   public:
-    QueryObject Parse(const std::string& query);
+    QueryObject Parse(std::string_view query);
 
   private:
     PQLValidator validator_;
