@@ -42,7 +42,42 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
             PolishNotationNode(ExprNodeType::kConstant, 3)});
     be.notations = std::vector<PN>{pn0, pn1, pn2, pn3};
 
-    QueryToken v1 = QueryToken(QueryTokenType::WORD, "v1");
+    QueryToken token1 = QueryToken(QueryTokenType::WORD, "v1");
+    QueryToken token2 = QueryToken(QueryTokenType::WORD, "v2");
+    QueryToken token3 = QueryToken(QueryTokenType::WORD, "v3");
+
+    // _"v1"_
+    auto queryToken1 =
+            std::vector<QueryToken>{QueryToken(QueryTokenType::WORD, "v1")};
+    //_"1"_
+    auto queryToken2 =
+            std::vector<QueryToken>{QueryToken(QueryTokenType::INTEGER, "1")};
+
+    // _"v1+1"_
+    auto queryToken3 =
+            std::vector<QueryToken>{QueryToken(QueryTokenType::WORD, "v1"),
+                                    QueryToken(QueryTokenType::PLUS),
+                                    QueryToken(QueryTokenType::INTEGER, "1")};
+
+    // _"v1+1*v3"_
+    auto queryToken4 =
+            std::vector<QueryToken>{QueryToken(QueryTokenType::WORD, "v1"),
+                                    QueryToken(QueryTokenType::PLUS),
+                                    QueryToken(QueryTokenType::INTEGER, "1"),
+                                    QueryToken(QueryTokenType::TIMES),
+                                    QueryToken(QueryTokenType::WORD, "v3")};
+
+    // _"1*v3"_
+    auto queryToken5 =
+            std::vector<QueryToken>{QueryToken(QueryTokenType::INTEGER, "1"),
+                                    QueryToken(QueryTokenType::TIMES),
+                                    QueryToken(QueryTokenType::WORD, "v3")};
+
+    // _"v3*1"_
+    auto queryToken6 =
+            std::vector<QueryToken>{QueryToken(QueryTokenType::WORD, "v3"),
+                                    QueryToken(QueryTokenType::TIMES),
+                                    QueryToken(QueryTokenType::INTEGER, "1")};
 
     ProgramKnowledgeBase pkb(be);
     pkb.SetIndex(Index<SetEntityType::kProc>(1),
@@ -60,9 +95,15 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     pkb.SetLst(Index<SetEntityType::kStmtLst>(4), std::vector<int>{6, 7});
     pkb.SetLst(Index<SetEntityType::kStmtLst>(5), std::vector<int>{9});
 
-    pkb.SetRel(Index<SetEntityType::kStmt>(7), Index<SetEntityType::kVar>(0));
+    pkb.SetIndex(Index<SetEntityType::kStmt>(7),
+                 Index<SetEntityType::kNotation>(1));
+    pkb.SetIndex(Index<SetEntityType::kStmt>(8),
+                 Index<SetEntityType::kNotation>(2));
+    pkb.SetIndex(Index<SetEntityType::kStmt>(9),
+                 Index<SetEntityType::kNotation>(3));
+    pkb.SetRel(Index<SetEntityType::kStmt>(7), Index<SetEntityType::kVar>(1));
     pkb.SetRel(Index<SetEntityType::kStmt>(8), Index<SetEntityType::kVar>(2));
-    //pkb.SetRel(Index<SetEntityType::kStmt>(9), Index<SetEntityType::kVar>(3));
+    pkb.SetRel(Index<SetEntityType::kStmt>(9), Index<SetEntityType::kVar>(3));
 
     pkb.Compile();
     SECTION("ExistFollows") {
@@ -113,8 +154,26 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                         .first.size() == 6);
         REQUIRE(pkb.GetFollowsPairs(false, StmtType::kAll, StmtType::kAll)
                         .first.size() == 5);
-    SECTION("GetPattern") { 
-        REQUIRE(pkb.GetPattern(v1) == std::set<int>{7});
+    }
+    SECTION("GetPattern") {
+        std::pair<std::vector<int>, std::vector<int>> pairTest = {{7}, {1}};
+        std::pair<std::vector<int>, std::vector<int>> pairTest2 = {{}, {}};
+        std::pair<std::vector<int>, std::vector<int>> pairTest3 = {{7, 8, 9},
+                                                                   {1, 2, 3}};
+        REQUIRE(pkb.GetPattern(token1) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern(token2) == std::set<int>{8});
+        REQUIRE(pkb.GetPattern(token3) == std::set<int>{9});
+        REQUIRE(pkb.GetPattern(queryToken1, true) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern(queryToken2, true) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern(queryToken3, true) == std::set<int>{});
+        REQUIRE(pkb.GetPattern(queryToken4, true) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern(queryToken5, true) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern(queryToken6, true) == std::set<int>{});
+        REQUIRE(pkb.GetPattern(token1, queryToken4, true) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern(token2, queryToken4, true) == std::set<int>{});
+        REQUIRE(pkb.GetPatternPair(queryToken4, true) == pairTest);
+        REQUIRE(pkb.GetPatternPair(queryToken3, true) == pairTest2);
+        REQUIRE(pkb.GetPatternPair() == pairTest3);
     }
 }
 
