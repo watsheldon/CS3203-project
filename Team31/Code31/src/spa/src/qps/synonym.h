@@ -17,31 +17,6 @@ enum class DeclarationType {
     PROCEDURE,
 };
 
-std::string_view keyword(DeclarationType type) {
-    switch (type) {
-        case DeclarationType::STMT:
-            return "stmt";
-        case DeclarationType::READ:
-            return "read";
-        case DeclarationType::PRINT:
-            return "print";
-        case DeclarationType::CALL:
-            return "call";
-        case DeclarationType::WHILE:
-            return "while";
-        case DeclarationType::IF:
-            return "if";
-        case DeclarationType::ASSIGN:
-            return "assign";
-        case DeclarationType::VARIABLE:
-            return "variable";
-        case DeclarationType::CONSTANT:
-            return "constant";
-        case DeclarationType::PROCEDURE:
-            return "procedure";
-    }
-}
-
 struct Synonym {
     const DeclarationType type;
     int count = 0;
