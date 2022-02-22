@@ -462,7 +462,7 @@ bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
             GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
 
     if (follow_vec.size() == 1) {
-        last_stmt = follow_vec.front();
+        last_stmt = *follow_vec.begin();
     } else {
         int stmtlst =
                 type == StmtType::kWhile
@@ -525,7 +525,7 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
             GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
 
     if (follow_vec.size() == 1) {
-        last_stmt = follow_vec.front();
+        last_stmt = *follow_vec.begin();
     } else {
         int stmtlst =
                 type == StmtType::kWhile
@@ -584,7 +584,7 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
                                  StmtType::kAll);
 
     if (follow_vec.size() == 1) {
-        last_stmt = follow_vec.front();
+        last_stmt = *follow_vec.begin();
     } else {
         int stmtlst = type == StmtType::kWhile
                               ? stmtlst_parent_.GetWhileStmtLst(stmt_no.value)
@@ -885,7 +885,7 @@ std::set<int> ProgramKnowledgeBase::GetUses(
                                  StmtType::kAll);
 
     if (follow_vec.size() == 1) {
-        last_stmt = follow_vec.front();
+        last_stmt = *follow_vec.begin();
     } else {
         int stmtlst = type == StmtType::kWhile
                               ? stmtlst_parent_.GetWhileStmtLst(stmt_no.value)
