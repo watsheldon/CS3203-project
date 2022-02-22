@@ -9,37 +9,59 @@ class UsesIntIdent : public UsesClause {
   public:
     UsesIntIdent(int first, std::string second);
     std::pair<ResultTable, bool> Execute(
-            const KnowledgeBase* knowledge_base) const override;
+            KnowledgeBase *knowledge_base) const override;
+
+  private:
+    const int first_;
+    const std::string second_;
 };
 class UsesIntSyn : public UsesClause {
   public:
-    UsesIntSyn(int first, Synonym* second);
+    UsesIntSyn(int first, Synonym *second);
     std::pair<ResultTable, bool> Execute(
-            const KnowledgeBase* knowledge_base) const override;
+            KnowledgeBase *knowledge_base) const override;
+
+  private:
+    const int first_;
+    Synonym *const second_;
 };
 class UsesIntWild : public UsesClause {
   public:
     explicit UsesIntWild(int first);
     std::pair<ResultTable, bool> Execute(
-            const KnowledgeBase* knowledge_base) const override;
+            KnowledgeBase *knowledge_base) const override;
+
+  private:
+    const int first_;
 };
 class UsesSynIdent : public UsesClause {
   public:
-    UsesSynIdent(Synonym* first, std::string second);
+    UsesSynIdent(Synonym *first, std::string second);
     std::pair<ResultTable, bool> Execute(
-            const KnowledgeBase* knowledge_base) const override;
+            KnowledgeBase *knowledge_base) const override;
+
+  private:
+    Synonym *const first_;
+    const std::string second_;
 };
 class UsesSynSyn : public UsesClause {
   public:
-    UsesSynSyn(Synonym* first, Synonym* second);
+    UsesSynSyn(Synonym *first, Synonym *second);
     std::pair<ResultTable, bool> Execute(
-            const KnowledgeBase* knowledge_base) const override;
+            KnowledgeBase *knowledge_base) const override;
+
+  private:
+    Synonym *const first_;
+    Synonym *const second_;
 };
 class UsesSynWild : public UsesClause {
   public:
-    UsesSynWild(Synonym* first);
+    explicit UsesSynWild(Synonym *first);
     std::pair<ResultTable, bool> Execute(
-            const KnowledgeBase* knowledge_base) const override;
+            KnowledgeBase *knowledge_base) const override;
+
+  private:
+    Synonym *const first_;
 };
 }  // namespace spa
 

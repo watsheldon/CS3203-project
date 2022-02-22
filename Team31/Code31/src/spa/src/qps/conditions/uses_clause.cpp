@@ -1,34 +1,40 @@
 #include "uses_clause.h"
 
+#include <utility>
+
 namespace spa {
-UsesIntIdent::UsesIntIdent(int first, std::string second) {}
+UsesIntIdent::UsesIntIdent(int first, std::string second)
+        : first_(first), second_(std::move(second)) {}
 std::pair<ResultTable, bool> UsesIntIdent::Execute(
-        const KnowledgeBase *knowledge_base) const {
+        KnowledgeBase *knowledge_base) const {
     return {ResultTable(true), true};
 }
-UsesIntSyn::UsesIntSyn(int first, Synonym *second) {}
+UsesIntSyn::UsesIntSyn(int first, Synonym *second)
+        : first_(first), second_(second) {}
 std::pair<ResultTable, bool> UsesIntSyn::Execute(
-        const KnowledgeBase *knowledge_base) const {
+        KnowledgeBase *knowledge_base) const {
     return {ResultTable(true), true};
 }
-UsesIntWild::UsesIntWild(int first) {}
+UsesIntWild::UsesIntWild(int first) : first_(first) {}
 std::pair<ResultTable, bool> UsesIntWild::Execute(
-        const KnowledgeBase *knowledge_base) const {
+        KnowledgeBase *knowledge_base) const {
     return {ResultTable(true), true};
 }
-UsesSynIdent::UsesSynIdent(Synonym *first, std::string second) {}
+UsesSynIdent::UsesSynIdent(Synonym *first, std::string second)
+        : first_(first), second_(std::move(second)) {}
 std::pair<ResultTable, bool> UsesSynIdent::Execute(
-        const KnowledgeBase *knowledge_base) const {
+        KnowledgeBase *knowledge_base) const {
     return {ResultTable(true), true};
 }
-UsesSynSyn::UsesSynSyn(Synonym *first, Synonym *second) {}
+UsesSynSyn::UsesSynSyn(Synonym *first, Synonym *second)
+        : first_(first), second_(second) {}
 std::pair<ResultTable, bool> UsesSynSyn::Execute(
-        const KnowledgeBase *knowledge_base) const {
+        KnowledgeBase *knowledge_base) const {
     return {ResultTable(true), true};
 }
-UsesSynWild::UsesSynWild(Synonym *first) {}
+UsesSynWild::UsesSynWild(Synonym *first) : first_(first) {}
 std::pair<ResultTable, bool> UsesSynWild::Execute(
-        const KnowledgeBase *knowledge_base) const {
+        KnowledgeBase *knowledge_base) const {
     return {ResultTable(true), true};
 }
 }  // namespace spa

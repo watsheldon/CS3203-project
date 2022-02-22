@@ -1,5 +1,5 @@
 #include "condition_clause.h"
 
-#include <utility>
-
-namespace spa {}
+namespace spa {
+ConditionClause::~ConditionClause() = default;
+}
