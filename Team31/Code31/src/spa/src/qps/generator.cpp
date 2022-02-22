@@ -1,6 +1,7 @@
+#include "generator.h"
+
 #include <cassert>
 
-#include "generator.h"
 #include "conditions/condition_clause.h"
 #include "conditions/factory.h"
 

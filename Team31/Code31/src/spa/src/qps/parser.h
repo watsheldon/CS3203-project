@@ -6,9 +6,9 @@
 
 #include "PQL_tokenizer.h"
 #include "PQL_validator.h"
+#include "generator.h"
 #include "query_object.h"
 #include "query_token.h"
-#include "generator.h"
 
 namespace spa {
 class Parser {

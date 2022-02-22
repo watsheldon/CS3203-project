@@ -2,6 +2,7 @@
 #define SRC_SPA_SRC_QPS_CONDITIONS_FOLLOWS_CLAUSE_H_
 
 #include <string>
+
 #include "condition_clause.h"
 namespace spa {
 class FollowsClause : public ConditionClause {};
