@@ -19,7 +19,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
 
     // v+1*x
     PolishNotation pn0(std::vector<PolishNotationNode>{});
-    // v+1*x
+    // v1+1*v3
     PolishNotation pn1(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
             PolishNotationNode(OperatorType::kPlus),
@@ -85,6 +85,27 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.ExistParent(Index<ArgPos::kSecond>(2)));
         REQUIRE_FALSE(pkb.ExistParent(Index<ArgPos::kSecond>(10)));
         REQUIRE(pkb.ExistParent());
+    }
+    SECTION("GetFollows") {
+        REQUIRE(pkb.GetFollows(false, Index<ArgPos::kFirst>(1),
+                               StmtType::kRead) == std::set<int>{10});
+        REQUIRE(pkb.GetFollows(true, Index<ArgPos::kFirst>(1),
+                               StmtType::kAll) == std::set<int>{10});
+        REQUIRE(pkb.GetFollows(true, Index<ArgPos::kSecond>(4),
+                               StmtType::kAll) == std::set<int>{2, 3});
+        REQUIRE(pkb.GetFollows(true, Index<ArgPos::kSecond>(8),
+                               StmtType::kWhile) == std::set<int>{5});
+    }
+    SECTION("GetFollowsWildcard") {
+        REQUIRE(pkb.GetFollows(ArgPos::kFirst, StmtType::kAssign).empty());
+        REQUIRE(pkb.GetFollows(ArgPos::kSecond, StmtType::kAssign) ==
+                std::set<int>{7, 8});
+    }
+    SECTION("GetFollowsPairs") {
+        REQUIRE(pkb.GetFollowsPairs(true, StmtType::kAll, StmtType::kAll)
+                        .first.size() == 6);
+        REQUIRE(pkb.GetFollowsPairs(false, StmtType::kAll, StmtType::kAll)
+                        .first.size() == 5);
     }
 }
 
