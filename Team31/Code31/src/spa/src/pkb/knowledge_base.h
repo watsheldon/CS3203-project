@@ -11,11 +11,13 @@
 #include "common/index.h"
 #include "common/polish_notation.h"
 #include "pkb/secondary_structure/container_node.h"
+#include "pkb/store/stmtlst_parent_store.h"
 #include "qps/query_token.h"
 
 namespace spa {
 
 using PN = spa::PolishNotation;
+using PType = spa::StmtlstParentStore::ParentType;
 
 struct BasicEntities {
     std::vector<std::string> procedures;

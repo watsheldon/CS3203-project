@@ -135,9 +135,9 @@ bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kSecond> child_stmt) {
     int stmtlst_index = stmtlst_stmt_.GetStmtlst(child_stmt.value);
     return child_stmt.value <= stmt_count_ &&
            (stmtlst_parent_.GetParent(stmtlst_index).type ==
-                    StmtlstParentStore::ParentType::kIf ||
+                    PType::kIf ||
             stmtlst_parent_.GetParent(stmtlst_index).type ==
-                    StmtlstParentStore::ParentType::kWhile);
+                    PType::kWhile);
 }
 bool ProgramKnowledgeBase::ExistParent() {
     assert(compiled);
@@ -147,12 +147,9 @@ bool ProgramKnowledgeBase::ExistParent() {
 
 std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
                                                StmtType return_type) {
-    std::vector<int> results;
-    if (return_pos == ArgPos::kFirst) {
-        results = stmtlst_stmt_.GetFollowedByWildcard();
-    } else {
-        results = stmtlst_stmt_.GetFollowsWildcard();
-    }
+    auto results = return_pos == ArgPos::kFirst
+                           ? stmtlst_stmt_.GetFollowedByWildcard()
+                           : stmtlst_stmt_.GetFollowsWildcard();
     std::set<int> filtered_results;
     std::copy_if(results.begin(), results.end(),
                  std::inserter(filtered_results, filtered_results.end()),
@@ -256,14 +253,14 @@ std::set<int> ProgramKnowledgeBase::GetAllChildren(StmtType return_type) {
     }
     std::vector<int> results = type_stmt_.GetStatements(return_type);
     std::vector<int> filtered_results;
-    std::copy_if(results.begin(), results.end(),
-                 std::back_inserter(filtered_results), [this](int i) {
-                     int stmtlst_index = stmtlst_stmt_.GetStmtlst(i);
-                     StmtlstParentStore::ParentType type =
-                             stmtlst_parent_.GetParent(stmtlst_index).type;
-                     return type == StmtlstParentStore::ParentType::kIf ||
-                            type == StmtlstParentStore::ParentType::kWhile;
-                 });
+    for(auto& i: results) {
+        int stmtlst_index = stmtlst_stmt_.GetStmtlst(i);
+        PType type =
+                stmtlst_parent_.GetParent(stmtlst_index).type;
+        if (type != PType::kIf &&
+                    type != PType::kWhile) continue;
+        filtered_results.emplace_back(i);
+    }
     return {filtered_results.begin(), filtered_results.end()};
 }
 std::set<int> ProgramKnowledgeBase::GetParent(ArgPos return_pos,
@@ -340,29 +337,27 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
     }
 
     int stmtlst_index = stmtlst_stmt_.GetStmtlst(child_stmt.value);
-    StmtlstParentStore::ParentType type =
+    PType type =
             stmtlst_parent_.GetParent(stmtlst_index).type;
-    if (type != StmtlstParentStore::ParentType::kIf &&
-        type != StmtlstParentStore::ParentType::kWhile) {
+    if (type != PType::kIf &&
+        type != PType::kWhile) {
         return {};
     }
     std::vector<int> results;
     int direct_parent = stmtlst_parent_.GetParent(stmtlst_index).index;
-    if (!transitive) {
-        results = {direct_parent};
-    } else {
+    if (transitive) {
         std::vector<int> stmtlsts =
                 container_forest_->GetParents(stmtlst_index);
         for (auto &i : stmtlsts) {
-            if (stmtlst_parent_.GetParent(i).type !=
-                        StmtlstParentStore::ParentType::kWhile &&
-                stmtlst_parent_.GetParent(i).type !=
-                        StmtlstParentStore::ParentType::kIf)
+            if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
+                stmtlst_parent_.GetParent(i).type != PType::kIf)
                 continue;
             int indirect_parent = stmtlst_parent_.GetParent(i).index;
             results.emplace_back(indirect_parent);
         }
         results.emplace_back(direct_parent);
+    } else {
+        results = {direct_parent};
     }
 
     if (return_type == StmtType::kAll) {
@@ -383,11 +378,8 @@ void ProgramKnowledgeBase::GetTransitiveParentPairs(
         std::vector<int> follower = stmtlst_stmt_.GetFollows(
                 false, Index<ArgPos::kFirst>(while_stmt));
         int end;
-        if (follower.empty()) {
-            end = static_cast<int>(stmt_count_) + 1;
-        } else {
-            end = follower[0];
-        }
+        (follower.empty()) ? (end = static_cast<int>(stmt_count_) + 1)
+                           : (end = follower[0]);
         for (int i = while_stmt + 1; i < end; ++i) {
             results.first.emplace_back(while_stmt);
             results.second.emplace_back(i);
@@ -397,11 +389,8 @@ void ProgramKnowledgeBase::GetTransitiveParentPairs(
         std::vector<int> follower =
                 stmtlst_stmt_.GetFollows(false, Index<ArgPos::kFirst>(if_stmt));
         int end;
-        if (follower.empty()) {
-            end = static_cast<int>(stmt_count_) + 1;
-        } else {
-            end = follower[0];
-        }
+        (follower.empty()) ? (end = static_cast<int>(stmt_count_) + 1)
+                           : (end = follower[0]);
         for (int i = if_stmt + 1; i < end; ++i) {
             results.first.emplace_back(if_stmt);
             results.second.emplace_back(i);
