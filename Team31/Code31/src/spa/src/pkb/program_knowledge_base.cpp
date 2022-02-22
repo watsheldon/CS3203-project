@@ -661,7 +661,7 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
         parents.emplace_back(stmtlst);
 
         for (int i = 0; i < parents.size(); i++) {
-            auto stmt = stmtlst_parent_.GetParent(i);
+            auto stmt = stmtlst_parent_.GetParent(parents[i]);
             if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
@@ -1032,7 +1032,7 @@ std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
         parents.emplace_back(stmtlst);
 
         for (int i = 0; i < parents.size(); i++) {
-            auto stmt = stmtlst_parent_.GetParent(i);
+            auto stmt = stmtlst_parent_.GetParent(parents[i]);
             if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
                 continue;
             }
