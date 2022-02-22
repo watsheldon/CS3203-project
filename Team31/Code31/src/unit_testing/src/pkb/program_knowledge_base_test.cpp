@@ -162,10 +162,22 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                               StmtType::kAll) == std::set<int>{5,8,9});
         REQUIRE(pkb.GetParent(true, Index<ArgPos::kFirst>(4),
                               StmtType::kAll) == std::set<int>{5,6,7,8,9});
-        //REQUIRE(pkb.GetParent(true, Index<ArgPos::kSecond>(4),
-        //StmtType::kAll) == std::set<int>{2, 3});
-        //REQUIRE(pkb.GetParent(true, Index<ArgPos::kSecond>(8),
-        //StmtType::kWhile) == std::set<int>{5});
+        REQUIRE(pkb.GetParent(false, Index<ArgPos::kSecond>(7),
+                              StmtType::kWhile) == std::set<int>{5});
+        REQUIRE(pkb.GetParent(true, Index<ArgPos::kSecond>(3),
+                              StmtType::kIf).empty());
+    }
+    SECTION("GetParentWildcard") {
+        REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kAssign).size()==0);
+        REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kWhile)== std::set<int>{1,5});
+        REQUIRE(pkb.GetParent(ArgPos::kSecond, StmtType::kAll) ==
+                std::set<int>{2,3,4,5,6,7,8,9});
+    }
+    SECTION("GetParentPairs") {
+        REQUIRE(pkb.GetParentPairs(true, StmtType::kAll, StmtType::kAll)
+                        .first.size() == 15);
+        REQUIRE(pkb.GetParentPairs(false, StmtType::kAll, StmtType::kAll)
+                        .first.size() == 8);
     }
 
     SECTION("GetPattern") {
