@@ -7,6 +7,7 @@
 #include <list>
 #include <memory>
 #include <numeric>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -68,23 +69,31 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
                      Index<ArgPos::kSecond> child_stmt) override;
+    bool ExistParent(Index<ArgPos::kFirst> parent_stmt) override;
+    bool ExistParent(Index<ArgPos::kSecond> child_stmt) override;
+    bool ExistParent() override;
 
-    std::vector<int> GetFollows(bool transitive,
-                                Index<ArgPos::kFirst> first_stmt,
-                                StmtType return_type) override;
+    std::set<int> GetFollows(ArgPos return_pos, StmtType return_type) override;
 
-    std::vector<int> GetFollows(bool transitive,
-                                Index<ArgPos::kSecond> second_stmt,
-                                StmtType return_type) override;
-    std::vector<std::pair<int, int>> GetFollowsPairs(
+    std::set<int> GetFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
+                             StmtType return_type) override;
+
+    std::set<int> GetFollows(bool transitive,
+                             Index<ArgPos::kSecond> second_stmt,
+                             StmtType return_type) override;
+    std::pair<std::vector<int>, std::vector<int>> GetFollowsPairs(
             bool transitive, StmtType first_type,
             StmtType second_type) override;
 
-    std::vector<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
-                               StmtType return_type) override;
+    std::set<int> GetParent(ArgPos return_pos, StmtType return_type) override;
+    std::set<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
+                            StmtType return_type) override;
 
-    std::vector<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
-                               StmtType return_type) override;
+    std::set<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
+                            StmtType return_type) override;
+    std::pair<std::vector<int>, std::vector<int>> GetParentPairs(
+            bool transitive, StmtType parent_type,
+            StmtType child_type) override;
 
     bool ExistModifies(int stmt_no, int var_index) override;
     bool ExistUses(int stmt_no, int var_index) override;
@@ -128,8 +137,20 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::unique_ptr<ContainerForest> container_forest_;
 
-    bool ContainsUnseenVarConst(std::vector<QueryToken> tokens);
-    PolishNotation ConvertFromQueryTokens(std::vector<QueryToken> tokens);
+    bool ContainsUnseenVarConst(const std::vector<QueryToken> &tokens);
+    PolishNotation ConvertFromQueryTokens(
+            const std::vector<QueryToken> &tokens);
+
+    std::set<int> GetAllParents(StmtType return_type);
+    std::set<int> GetAllChildren(StmtType return_type);
+    void GetNonTransitiveParentFirst(StmtType parent_type, int parent,
+                                     std::vector<int> &results) const;
+    void GetTransitiveParentFirst(std::vector<int> parent_follower, int parent,
+                                  std::vector<int> &results) const;
+    void GetTransitiveParentPairs(
+            std::pair<std::vector<int>, std::vector<int>> &results);
+    void GetNonTransitiveParentPairs(
+            std::pair<std::vector<int>, std::vector<int>> &results);
 };
 
 }  // namespace spa

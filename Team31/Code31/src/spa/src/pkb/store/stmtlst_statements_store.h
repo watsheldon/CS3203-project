@@ -18,7 +18,7 @@ struct StmtProperties {
 class StmtlstStatementsStore {
   public:
     StmtlstStatementsStore(size_t stmtlst, size_t stmt);
-    void Set(int stmtlst_index, std::vector<int> &&stmtlst);
+    void Set(int stmtlst_index, std::vector<int>&& stmtlst);
     [[nodiscard]] int GetStmtlst(int stmt_no) const;
     [[nodiscard]] int GetStmtRelativePos(int stmt_no) const;
     [[nodiscard]] StmtProperties GetStmtProperties(int stmt_no) const;
@@ -33,24 +33,21 @@ class StmtlstStatementsStore {
             bool transitive, Index<ArgPos::kFirst> first_stmt) const;
     [[nodiscard]] std::vector<int> GetFollows(
             bool transitive, Index<ArgPos::kSecond> second_stmt) const;
-    [[nodiscard]] std::vector<std::pair<int, int>> GetFollowsPairs(
+    [[nodiscard]] std::pair<std::vector<int>, std::vector<int>> GetFollowsPairs(
             bool transitive) const;
+    [[nodiscard]] std::vector<int> GetFollowsWildcard() const;
+    [[nodiscard]] std::vector<int> GetFollowedByWildcard() const;
 
   private:
     std::vector<std::vector<int>> stmtlst_to_statements_;
     std::vector<StmtProperties> statement_to_stmtlst_;
     [[nodiscard]] inline size_t GetStmtlstSize(int stmt_no) const;
-    [[nodiscard]] std::vector<int> GetFollowsWildcard() const;
-    [[nodiscard]] std::vector<int> GetFollowsFirst(
-            bool transitive, Index<ArgPos::kFirst> first_stmt) const;
-    [[nodiscard]] std::vector<int> GetFollowedByWildcard() const;
-    [[nodiscard]] std::vector<int> GetFollowedBySecond(
-            bool transitive, Index<ArgPos::kSecond> second_stmt) const;
-    void AddPairs(const std::vector<int> &stmtlst,
-                  std::vector<std::pair<int, int>> result) const;
-    [[nodiscard]] std::vector<std::pair<int, int>> GetTransitivePairs() const;
-    [[nodiscard]] std::vector<std::pair<int, int>> GetNonTransitivePairs()
-            const;
+    void AddPairs(const std::vector<int>& stmtlst,
+                  std::pair<std::vector<int>, std::vector<int>>& results) const;
+    [[nodiscard]] std::pair<std::vector<int>, std::vector<int>>
+    GetTransitivePairs() const;
+    [[nodiscard]] std::pair<std::vector<int>, std::vector<int>>
+    GetNonTransitivePairs() const;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_PKB_STORE_STMTLST_STATEMENTS_STORE_H_

@@ -84,11 +84,13 @@ std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
             followers.emplace_back(stmtlst[i]);
         }
     }
-    std::sort(followers.begin(), followers.end());
     return followers;
 }
-std::vector<int> StmtlstStatementsStore::GetFollowsFirst(
+std::vector<int> StmtlstStatementsStore::GetFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt) const {
+    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
+        return {};
+    }
     int pos = GetStmtRelativePos(first_stmt.value);
     int index = GetStmtlst(first_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
@@ -99,16 +101,6 @@ std::vector<int> StmtlstStatementsStore::GetFollowsFirst(
     auto last = stmts.end();
     return {first, last};
 }
-std::vector<int> StmtlstStatementsStore::GetFollows(
-        bool transitive, Index<ArgPos::kFirst> first_stmt) const {
-    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
-        return {};
-    }
-    if (first_stmt.value == 0) {  // (_,outputs)
-        return GetFollowsWildcard();
-    }
-    return GetFollowsFirst(transitive, first_stmt);
-}
 
 std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
     std::vector<int> followees;
@@ -117,11 +109,13 @@ std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
             followees.emplace_back(stmtlst[i]);
         }
     }
-    std::sort(followees.begin(), followees.end());
     return followees;
 }
-std::vector<int> StmtlstStatementsStore::GetFollowedBySecond(
+std::vector<int> StmtlstStatementsStore::GetFollows(
         bool transitive, Index<ArgPos::kSecond> second_stmt) const {
+    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
+        return {};
+    }
     int pos = GetStmtRelativePos(second_stmt.value);
     int index = GetStmtlst(second_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
@@ -132,46 +126,38 @@ std::vector<int> StmtlstStatementsStore::GetFollowedBySecond(
     auto last = stmts.begin() + pos;
     return {first, last};
 }
-std::vector<int> StmtlstStatementsStore::GetFollows(
-        bool transitive, Index<ArgPos::kSecond> second_stmt) const {
-    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
-        return {};
-    }
-    if (second_stmt.value == 0) {  // (outputs, _)
-        return GetFollowedByWildcard();
-    }
-    return GetFollowedBySecond(transitive, second_stmt);
-}
 
 void StmtlstStatementsStore::AddPairs(
         const std::vector<int> &stmtlst,
-        std::vector<std::pair<int, int>> results) const {
+        std::pair<std::vector<int>, std::vector<int>> &results) const {
     for (int i = 0; i < stmtlst.size() - 1; ++i) {
         for (int j = i + 1; j < stmtlst.size(); ++j) {
-            results.emplace_back(std::make_pair(stmtlst[i], stmtlst[j]));
+            results.first.emplace_back(stmtlst[i]);
+            results.second.emplace_back(stmtlst[j]);
         }
     }
 }
-std::vector<std::pair<int, int>> StmtlstStatementsStore::GetTransitivePairs()
-        const {
-    std::vector<std::pair<int, int>> results;
+std::pair<std::vector<int>, std::vector<int>>
+StmtlstStatementsStore::GetTransitivePairs() const {
+    std::pair<std::vector<int>, std::vector<int>> results;
     for (auto &stmtlst : stmtlst_to_statements_) {
         AddPairs(stmtlst, results);
     }
     return results;
 }
-std::vector<std::pair<int, int>> StmtlstStatementsStore::GetNonTransitivePairs()
-        const {
-    std::vector<std::pair<int, int>> results;
+std::pair<std::vector<int>, std::vector<int>>
+StmtlstStatementsStore::GetNonTransitivePairs() const {
+    std::pair<std::vector<int>, std::vector<int>> results;
     for (auto &stmtlst : stmtlst_to_statements_) {
         for (int i = 0; i < stmtlst.size() - 1; ++i) {
-            results.emplace_back(std::make_pair(stmtlst[i], stmtlst[i + 1]));
+            results.first.emplace_back(stmtlst[i]);
+            results.second.emplace_back(stmtlst[i + 1]);
         }
     }
     return results;
 }
-std::vector<std::pair<int, int>> StmtlstStatementsStore::GetFollowsPairs(
-        bool transitive) const {
+std::pair<std::vector<int>, std::vector<int>>
+StmtlstStatementsStore::GetFollowsPairs(bool transitive) const {
     if (!transitive) {
         return GetTransitivePairs();
     }

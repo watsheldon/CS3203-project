@@ -2,6 +2,7 @@
 #define SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_
 
 #include <list>
+#include <set>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -10,11 +11,13 @@
 #include "common/index.h"
 #include "common/polish_notation.h"
 #include "pkb/secondary_structure/container_node.h"
+#include "pkb/store/stmtlst_parent_store.h"
 #include "qps/query_token.h"
 
 namespace spa {
 
 using PN = spa::PolishNotation;
+using PType = spa::StmtlstParentStore::ParentType;
 
 struct BasicEntities {
     std::vector<std::string> procedures;
@@ -109,21 +112,40 @@ class KnowledgeBase {
     virtual bool ExistFollows() = 0;
 
     /**
-     * Check if Parent or Parents* relationships between container stmt# and
-     * another stmt# exist
+     * Check if Parent or Parents* (parent_stmt, child_stmt) exists
      */
     virtual bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
                              Index<ArgPos::kSecond> child_stmt) = 0;
+    /**
+     * Check if Parent or Parent* (parent_stmt, _) exists
+     */
+    virtual bool ExistParent(Index<ArgPos::kFirst> parent_stmt) = 0;
+    /**
+     * Check if Parent or Parent* (_, child_stmt) exists
+     */
+    virtual bool ExistParent(Index<ArgPos::kSecond> child_stmt) = 0;
+    /**
+     * Check if Parent or Parent* (_,_)
+     */
+    virtual bool ExistParent() = 0;
 
+    /**
+     * Gets a list of stmt# that satisfy Follows/Follows*(stmt#, _) or
+     * Follows/Follows*(_, stmt#)
+     */
+    virtual std::set<int> GetFollows(ArgPos return_pos,
+                                     StmtType return_type) = 0;
+    std::set<int> GetFollows(ArgPos return_pos) {
+        return GetFollows(return_pos, StmtType::kAll);
+    }
     /**
      * Gets a list of stmt# that appear after the given stmt#
      * at the same nesting level.
      */
-    virtual std::vector<int> GetFollows(bool transitive,
-                                        Index<ArgPos::kFirst> stmt_no,
-                                        StmtType return_type) = 0;
-    std::vector<int> GetFollows(bool transitive,
-                                Index<ArgPos::kFirst> stmt_no) {
+    virtual std::set<int> GetFollows(bool transitive,
+                                     Index<ArgPos::kFirst> stmt_no,
+                                     StmtType return_type) = 0;
+    std::set<int> GetFollows(bool transitive, Index<ArgPos::kFirst> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
     }
 
@@ -131,43 +153,57 @@ class KnowledgeBase {
      * Gets a list of stmt# that appear before the given stmt#
      * at the same nesting level
      */
-    virtual std::vector<int> GetFollows(bool transitive,
-                                        Index<ArgPos::kSecond> stmt_no,
-                                        StmtType return_type) = 0;
-    std::vector<int> GetFollows(bool transitive,
-                                Index<ArgPos::kSecond> stmt_no) {
+    virtual std::set<int> GetFollows(bool transitive,
+                                     Index<ArgPos::kSecond> stmt_no,
+                                     StmtType return_type) = 0;
+    std::set<int> GetFollows(bool transitive, Index<ArgPos::kSecond> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
     }
 
     /**
      * Gets a list of stmt# pairs that exist in Follows relationship
      */
-    virtual std::vector<std::pair<int, int>> GetFollowsPairs(
+    virtual std::pair<std::vector<int>, std::vector<int>> GetFollowsPairs(
             bool transitive, StmtType first_type, StmtType second_type) = 0;
 
     /**
-     * Gets a list of stmt# that
-     * are direct or indirect parents of (contain)
-     * the given stmt# if get_pos is kFirst
+     * Gets a list of stmt# that satisfy Parent/Parent*(stmt#, _) or
+     * Parent/Parent*(_, stmt#)
      */
-    virtual std::vector<int> GetParent(bool transitive,
-                                       Index<ArgPos::kFirst> stmt_no,
-                                       StmtType return_type) = 0;
-    std::vector<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no) {
-        return GetParent(transitive, stmt_no, StmtType::kAll);
+    virtual std::set<int> GetParent(ArgPos return_pos,
+                                    StmtType return_type) = 0;
+    std::set<int> GetParent(ArgPos return_pos) {
+        return GetParent(return_pos, StmtType::kAll);
+    }
+    /**
+     * Gets a list of stmt# that
+     * are direct or indirect children of (are nested in) the given stmt#
+     */
+    virtual std::set<int> GetParent(bool transitive,
+                                    Index<ArgPos::kFirst> parent_stmt,
+                                    StmtType return_type) = 0;
+    std::set<int> GetParent(bool transitive,
+                            Index<ArgPos::kFirst> parent_stmt) {
+        return GetParent(transitive, parent_stmt, StmtType::kAll);
     }
 
     /**
-     * Gets a list of stmt# that are direct or indirect children of
-     * (are nested in) the given stmt#.
+     * Gets a list of stmt# that are direct or indirect parents of
+     * (contain) the given stmt#.
      */
-    virtual std::vector<int> GetParent(bool transitive,
-                                       Index<ArgPos::kSecond> stmt_no,
-                                       StmtType return_type) = 0;
-    std::vector<int> GetParent(bool transitive,
-                               Index<ArgPos::kSecond> stmt_no) {
-        return GetParent(transitive, stmt_no, StmtType::kAll);
+    virtual std::set<int> GetParent(bool transitive,
+                                    Index<ArgPos::kSecond> child_stmt,
+                                    StmtType return_type) = 0;
+    std::set<int> GetParent(bool transitive,
+                            Index<ArgPos::kSecond> child_stmt) {
+        return GetParent(transitive, child_stmt, StmtType::kAll);
     }
+
+    /**
+     * Gets a list of stmt# pairs that exist in Parent/Parent* relationship
+     */
+    virtual std::pair<std::vector<int>, std::vector<int>> GetParentPairs(
+            bool transitive, StmtType parent_type, StmtType child_type) = 0;
 
     /**
      * Check if modifies relationships between stmt# and its variable
