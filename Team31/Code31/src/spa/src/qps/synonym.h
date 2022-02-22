@@ -1,54 +1,33 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
-#define SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
+#ifndef SRC_SPA_SRC_QPS_SYNONYM_H_
+#define SRC_SPA_SRC_QPS_SYNONYM_H_
 
+#include <cassert>
 #include <string_view>
+
 namespace spa {
-
-enum class DeclarationType {
-    STMT,
-    READ,
-    PRINT,
-    CALL,
-    WHILE,
-    IF,
-    ASSIGN,
-    VARIABLE,
-    CONSTANT,
-    PROCEDURE,
-};
-
-std::string_view keyword(DeclarationType type) {
-    switch (type) {
-        case DeclarationType::STMT:
-            return "stmt";
-        case DeclarationType::READ:
-            return "read";
-        case DeclarationType::PRINT:
-            return "print";
-        case DeclarationType::CALL:
-            return "call";
-        case DeclarationType::WHILE:
-            return "while";
-        case DeclarationType::IF:
-            return "if";
-        case DeclarationType::ASSIGN:
-            return "assign";
-        case DeclarationType::VARIABLE:
-            return "variable";
-        case DeclarationType::CONSTANT:
-            return "constant";
-        case DeclarationType::PROCEDURE:
-            return "procedure";
-    }
-}
-
 struct Synonym {
-    const DeclarationType type;
-    int count = 0;
+    const enum Type {
+        kStmtAny,
+        kStmtRead,
+        kStmtPrint,
+        kStmtCall,
+        kStmtWhile,
+        kStmtIf,
+        kStmtAssign,
+        kVar,
+        kConst,
+        kProc,
+        kNone
+    } type;
+    explicit Synonym(Type t) : type(t) { assert(t != kNone); }
+    void IncRef() { ++ref_count_; }
+    void IncResolved() { ++resolved_count_; }
+    [[nodiscard]] int GetRef() const { return ref_count_; }
+    [[nodiscard]] int GetResolved() const { return resolved_count_; }
 
-  public:
-    explicit Synonym(DeclarationType t) : type(t) {}
-    void RefCountSetter(int num) { count++; }
+  private:
+    int ref_count_ = 0;
+    int resolved_count_ = 0;
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_QPS_SYNONYM_H_
+#endif  // SRC_SPA_SRC_QPS_SYNONYM_H_

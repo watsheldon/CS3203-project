@@ -1,46 +1,41 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 #define SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 
-#include <filesystem>
-#include <map>
 #include <memory>
 #include <vector>
 
 #include "PQL_validator.h"
-#include "ent_ref.h"
 #include "query_object.h"
-#include "query_object_builder.h"
 #include "query_token.h"
-#include "stmt_ref.h"
 #include "synonym.h"
 
 namespace spa {
 
-enum class Mode {
-    kDeclaration,
-    kSelect,
-    kCondition,
-    kExpression,
-
-};
 class Generator {
-    // class generator does the semantic checks on queries
-    // Undeclared synonyms
-    // Ambiguous wildcard
-    // Declaration of repeated synonyms
+  public:
+    static std::unique_ptr<QueryObject> Generate(
+            const std::vector<QueryToken>& tokens);
 
   private:
-    PQLValidator validator_;
-    std::shared_ptr<std::vector<QueryToken>> tokens;
-    std::map<std::string, std::unique_ptr<Synonym>> map;
-
-  public:
-    Generator(std::filesystem::path &filePath);
-    QueryObject Generate();
-    bool GenerateDeclarations();
-    bool GenerateSelect();
-    bool GenerateSuchThat();
-    DeclarationType TypeConvert(QueryTokenType type);
+    enum class Mode {
+        kDeclaration = 0,
+        kSelect,
+        kParent,
+        kFollows,
+        kUses,
+        kModifies,
+        kPattern,
+        kExpression,
+        kIdentifier,
+        kZero,
+        kFirst,
+        kSecond,
+    };
+    static constexpr Synonym::Type TokenToSynType(QueryTokenType type);
+    static constexpr Mode TokenToClauseMode(QueryTokenType type);
+    static constexpr bool UnsuitableFirstSynType(Mode mode, Synonym::Type type);
+    static constexpr bool UnsuitableSecondSynType(Mode mode,
+                                                  Synonym::Type type);
 };
 }  // namespace spa
 #endif  // SPA_SRC_SPA_SRC_QPS_GENERATOR_H_

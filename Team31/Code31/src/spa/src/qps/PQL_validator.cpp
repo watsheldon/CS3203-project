@@ -1,19 +1,18 @@
 #include "PQL_validator.h"
 
-#include <memory>
+#include <string_view>
 #include <vector>
 
 #include "query_token.h"
 
 namespace spa {
-PQLValidator::PQLValidator(const std::filesystem::path &filepath)
-        : tokenizer_(filepath),
-          tokens_(std::make_shared<std::vector<QueryToken>>()) {}
 
-std::shared_ptr<std::vector<QueryToken>> PQLValidator::Validate() {
+std::vector<QueryToken> PQLValidator::Validate(std::string_view value) {
+    tokens_.clear();
+    tokenizer_(value);
     fetchToken();
     bool valid_query = Query();
-    return valid_query ? tokens_ : nullptr;
+    return valid_query ? std::move(tokens_) : std::vector<QueryToken>();
 }
 
 bool PQLValidator::Query() {
@@ -35,21 +34,21 @@ void PQLValidator::fetchToken() { tokenizer_ >> curr_token_; }
 
 bool PQLValidator::accept(QueryTokenType type) {
     if (curr_token_.empty()) return false;
-    if (type < QueryTokenType::WORD) {
+    if (type < QueryTokenType::kWord) {
         auto target = Keyword(type);
         if (curr_token_ != target) return false;
-        tokens_->emplace_back(type);
+        tokens_.emplace_back(type);
         fetchToken();
         return true;
     }
-    if (type == QueryTokenType::WORD) {
+    if (type == QueryTokenType::kWord) {
         if (!std::isalpha(curr_token_[0])) return false;
-        tokens_->emplace_back(type, curr_token_);
+        tokens_.emplace_back(type, curr_token_);
         fetchToken();
         return true;
     }
     if (IsConstant()) {
-        tokens_->emplace_back(type, curr_token_);
+        tokens_.emplace_back(type, curr_token_);
         fetchToken();
         return true;
     }
@@ -64,137 +63,137 @@ bool PQLValidator::expect(QueryTokenType type) {
 }
 
 bool PQLValidator::parseDeclaration() {
-    if (accept(QueryTokenType::STMT)) {
+    if (accept(QueryTokenType::kDeclStmt)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::READ)) {
+    if (accept(QueryTokenType::kDeclRead)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::PRINT)) {
+    if (accept(QueryTokenType::kDeclPrint)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::CALL)) {
+    if (accept(QueryTokenType::kDeclCall)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::WHILE)) {
+    if (accept(QueryTokenType::kDeclWhile)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::IF)) {
+    if (accept(QueryTokenType::kDeclIf)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::ASSIGN)) {
+    if (accept(QueryTokenType::kDeclAssign)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::VARIABLE)) {
+    if (accept(QueryTokenType::kDeclVariable)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::CONSTANT)) {
+    if (accept(QueryTokenType::kDeclConstant)) {
         return parseSynonym();
     }
-    if (accept(QueryTokenType::PROCEDURE)) {
+    if (accept(QueryTokenType::kDeclProcedure)) {
         return parseSynonym();
     }
     return false;
 }
 
 bool PQLValidator::parseSynonym() {
-    if (!accept(QueryTokenType::WORD)) return false;
-    while (!accept(QueryTokenType::SEMICOLON)) {
-        if (!accept(QueryTokenType::COMMA)) return false;
-        if (!accept(QueryTokenType::WORD)) return false;
+    if (!accept(QueryTokenType::kWord)) return false;
+    while (!accept(QueryTokenType::kSemicolon)) {
+        if (!accept(QueryTokenType::kComma)) return false;
+        if (!accept(QueryTokenType::kWord)) return false;
     }
     return true;
 }
 
 bool PQLValidator::parseSelect() {
-    if (!accept(QueryTokenType::SELECT)) return false;
-    if (!accept(QueryTokenType::WORD)) return false;
+    if (!accept(QueryTokenType::kKeywordSelect)) return false;
+    if (!accept(QueryTokenType::kWord)) return false;
     return true;
 }
 
 bool PQLValidator::parseSuchThat() {
-    if (!accept(QueryTokenType::SUCH)) return false;
-    if (!accept(QueryTokenType::THAT)) return false;
-    if (accept(QueryTokenType::FOLLOWS)) {
-        accept(QueryTokenType::TIMES);
+    if (!accept(QueryTokenType::kKeywordSuch)) return false;
+    if (!accept(QueryTokenType::kKeywordThat)) return false;
+    if (accept(QueryTokenType::kKeywordFollows)) {
+        accept(QueryTokenType::kOperatorTimes);
         return parseFollows();
     }
-    if (accept(QueryTokenType::PARENT)) {
-        accept(QueryTokenType::TIMES);
+    if (accept(QueryTokenType::kKeywordParent)) {
+        accept(QueryTokenType::kOperatorTimes);
         return parseParent();
     }
-    if (accept(QueryTokenType::USES_S)) {
-        return parseUsesS();
+    if (accept(QueryTokenType::kKeywordUses)) {
+        return parseUses();
     }
-    if (accept(QueryTokenType::MODIFIES_S)) {
-        return parseModifiesS();
+    if (accept(QueryTokenType::kKeywordModifies)) {
+        return parseModifies();
     }
     return false;
 }
 
 bool PQLValidator::parseFollows() {
-    return expect(QueryTokenType::LEFTBRACKET) && parseStmtRef() &&
-           expect(QueryTokenType::COMMA) && parseStmtRef() &&
-           expect(QueryTokenType::RIGHTBRACKET);
+    return expect(QueryTokenType::kBracketL) && parseStmtRef() &&
+           expect(QueryTokenType::kComma) && parseStmtRef() &&
+           expect(QueryTokenType::kBracketR);
 }
 
 bool PQLValidator::parseParent() {
-    return expect(QueryTokenType::LEFTBRACKET) && parseStmtRef() &&
-           expect(QueryTokenType::COMMA) && parseStmtRef() &&
-           expect(QueryTokenType::RIGHTBRACKET);
+    return expect(QueryTokenType::kBracketL) && parseStmtRef() &&
+           expect(QueryTokenType::kComma) && parseStmtRef() &&
+           expect(QueryTokenType::kBracketR);
 }
 
-bool PQLValidator::parseUsesS() {
-    return expect(QueryTokenType::LEFTBRACKET) && parseUsesModifiesStmtRef() &&
-           expect(QueryTokenType::COMMA) && parseEntRef() &&
-           expect(QueryTokenType::RIGHTBRACKET);
+bool PQLValidator::parseUses() {
+    return expect(QueryTokenType::kBracketL) && parseUsesModifiesStmtRef() &&
+           expect(QueryTokenType::kComma) && parseEntRef() &&
+           expect(QueryTokenType::kBracketR);
 }
-bool PQLValidator::parseModifiesS() {
-    return expect(QueryTokenType::LEFTBRACKET) && parseUsesModifiesStmtRef() &&
-           expect(QueryTokenType::COMMA) && parseEntRef() &&
-           expect(QueryTokenType::RIGHTBRACKET);
+bool PQLValidator::parseModifies() {
+    return expect(QueryTokenType::kBracketL) && parseUsesModifiesStmtRef() &&
+           expect(QueryTokenType::kComma) && parseEntRef() &&
+           expect(QueryTokenType::kBracketR);
 }
 
 // The first argument for Modifies and Uses cannot be UNDERSCORE
 // as it is unclear whether _ refers to a statement or procedure
 bool PQLValidator::parseUsesModifiesStmtRef() {
-    return expect(QueryTokenType::WORD) || accept(QueryTokenType::INTEGER);
+    return expect(QueryTokenType::kWord) || accept(QueryTokenType::kInteger);
 }
 bool PQLValidator::parsePattern() {
-    if (!accept(QueryTokenType::PATTERN)) return false;
-    if (!accept(QueryTokenType::WORD)) return false;
-    if (!accept(QueryTokenType::LEFTBRACKET)) return false;
+    if (!accept(QueryTokenType::kKeywordPattern)) return false;
+    if (!accept(QueryTokenType::kWord)) return false;
+    if (!accept(QueryTokenType::kBracketL)) return false;
     if (!parseEntRef()) return false;
-    if (!accept(QueryTokenType::COMMA)) return false;
+    if (!accept(QueryTokenType::kComma)) return false;
     parseExpressionSpec();
-    if (!accept(QueryTokenType::RIGHTBRACKET)) return false;
+    if (!accept(QueryTokenType::kBracketR)) return false;
     return true;
 }
 bool PQLValidator::parseStmtRef() {
-    return parseSynonym() || expect(QueryTokenType::UNDERSCORE) ||
-           accept(QueryTokenType::INTEGER);
+    return parseSynonym() || expect(QueryTokenType::kUnderscore) ||
+           accept(QueryTokenType::kInteger);
 }
 
 bool PQLValidator::parseEntRef() {
-    return parseSynonym() || expect(QueryTokenType::UNDERSCORE) ||
+    return parseSynonym() || expect(QueryTokenType::kUnderscore) ||
            parseIdentifier();
 }
 
 bool PQLValidator::parseIdentifier() {
-    return expect(QueryTokenType::DOUBLEQUOTE) &&
-           expect(QueryTokenType::WORD) && expect(QueryTokenType::DOUBLEQUOTE);
+    return expect(QueryTokenType::kQuote) && expect(QueryTokenType::kWord) &&
+           expect(QueryTokenType::kQuote);
 }
 bool PQLValidator::parseExpressionSpec() {
-    if (accept(QueryTokenType::UNDERSCORE)) {
-        return expect(QueryTokenType::DOUBLEQUOTE) && parseFactor() &&
-               expect(QueryTokenType::DOUBLEQUOTE) &&
-               expect(QueryTokenType::UNDERSCORE);
+    if (accept(QueryTokenType::kUnderscore)) {
+        return expect(QueryTokenType::kQuote) && parseFactor() &&
+               expect(QueryTokenType::kQuote) &&
+               expect(QueryTokenType::kUnderscore);
     }
-    return expect(QueryTokenType::DOUBLEQUOTE) && parseFactor() &&
-           expect(QueryTokenType::DOUBLEQUOTE);
+    return expect(QueryTokenType::kQuote) && parseFactor() &&
+           expect(QueryTokenType::kQuote);
 }
 bool PQLValidator::parseFactor() {
-    return accept(QueryTokenType::INTEGER) || expect(QueryTokenType::WORD);
+    return accept(QueryTokenType::kInteger) || expect(QueryTokenType::kWord);
 }
 
 }  // namespace spa

@@ -3,19 +3,11 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
-#include <fstream>
+#include <ios>
+#include <string>
+#include <string_view>
 
 namespace spa {
-PQLTokenizer::PQLTokenizer(const std::filesystem::path &inputFile) {
-    std::ifstream query(inputFile);
-    buffer_ << query.rdbuf();
-}
-
-PQLTokenizer::PQLTokenizer(std::string_view str) {
-    buffer_.str(str.data());
-    error = false;
-}
-
 // keep chars of token until pred is not met
 void PQLTokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
     auto last = std::find_if_not(token.begin() + 1, token.end(), pred);

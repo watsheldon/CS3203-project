@@ -42,42 +42,42 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
             PolishNotationNode(ExprNodeType::kConstant, 3)});
     be.notations = std::vector<PN>{pn0, pn1, pn2, pn3};
 
-    QueryToken token1 = QueryToken(QueryTokenType::WORD, "v1");
-    QueryToken token2 = QueryToken(QueryTokenType::WORD, "v2");
-    QueryToken token3 = QueryToken(QueryTokenType::WORD, "v3");
+    QueryToken token1 = QueryToken(QueryTokenType::kWord, "v1");
+    QueryToken token2 = QueryToken(QueryTokenType::kWord, "v2");
+    QueryToken token3 = QueryToken(QueryTokenType::kWord, "v3");
 
     // _"v1"_
     auto queryToken1 =
-            std::vector<QueryToken>{QueryToken(QueryTokenType::WORD, "v1")};
+            std::vector<QueryToken>{QueryToken(QueryTokenType::kWord, "v1")};
     //_"1"_
     auto queryToken2 =
-            std::vector<QueryToken>{QueryToken(QueryTokenType::INTEGER, "1")};
+            std::vector<QueryToken>{QueryToken(QueryTokenType::kInteger, "1")};
 
     // _"v1+1"_
     auto queryToken3 =
-            std::vector<QueryToken>{QueryToken(QueryTokenType::WORD, "v1"),
-                                    QueryToken(QueryTokenType::PLUS),
-                                    QueryToken(QueryTokenType::INTEGER, "1")};
+            std::vector<QueryToken>{QueryToken(QueryTokenType::kWord, "v1"),
+                                    QueryToken(QueryTokenType::kOperatorPlus),
+                                    QueryToken(QueryTokenType::kInteger, "1")};
 
     // _"v1+1*v3"_
     auto queryToken4 =
-            std::vector<QueryToken>{QueryToken(QueryTokenType::WORD, "v1"),
-                                    QueryToken(QueryTokenType::PLUS),
-                                    QueryToken(QueryTokenType::INTEGER, "1"),
-                                    QueryToken(QueryTokenType::TIMES),
-                                    QueryToken(QueryTokenType::WORD, "v3")};
+            std::vector<QueryToken>{QueryToken(QueryTokenType::kWord, "v1"),
+                                    QueryToken(QueryTokenType::kOperatorPlus),
+                                    QueryToken(QueryTokenType::kInteger, "1"),
+                                    QueryToken(QueryTokenType::kOperatorTimes),
+                                    QueryToken(QueryTokenType::kWord, "v3")};
 
     // _"1*v3"_
     auto queryToken5 =
-            std::vector<QueryToken>{QueryToken(QueryTokenType::INTEGER, "1"),
-                                    QueryToken(QueryTokenType::TIMES),
-                                    QueryToken(QueryTokenType::WORD, "v3")};
+            std::vector<QueryToken>{QueryToken(QueryTokenType::kInteger, "1"),
+                                    QueryToken(QueryTokenType::kOperatorTimes),
+                                    QueryToken(QueryTokenType::kWord, "v3")};
 
     // _"v3*1"_
     auto queryToken6 =
-            std::vector<QueryToken>{QueryToken(QueryTokenType::WORD, "v3"),
-                                    QueryToken(QueryTokenType::TIMES),
-                                    QueryToken(QueryTokenType::INTEGER, "1")};
+            std::vector<QueryToken>{QueryToken(QueryTokenType::kWord, "v3"),
+                                    QueryToken(QueryTokenType::kOperatorTimes),
+                                    QueryToken(QueryTokenType::kInteger, "1")};
 
     ProgramKnowledgeBase pkb(be);
     pkb.SetIndex(Index<SetEntityType::kProc>(1),

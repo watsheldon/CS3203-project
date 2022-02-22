@@ -1401,7 +1401,7 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
     bool contains_unseen = false;
     for (const auto &token : tokens) {
         switch (token.type) {
-            case QueryTokenType::WORD: {
+            case QueryTokenType::kWord: {
                 int var_index = var_name_.GetIndex(token.value);
                 if (var_index == 0) {
                     contains_unseen = true;
@@ -1411,7 +1411,7 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::INTEGER: {
+            case QueryTokenType::kInteger: {
                 int const_index = const_value_.GetIndex(token.value);
                 if (const_index == 0) {
                     contains_unseen = true;
@@ -1421,37 +1421,37 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::PLUS: {
+            case QueryTokenType::kOperatorPlus: {
                 PolishNotationNode node(OperatorType::kPlus);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::MINUS: {
+            case QueryTokenType::kOperatorMinus: {
                 PolishNotationNode node(OperatorType::kMinus);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::TIMES: {
+            case QueryTokenType::kOperatorTimes: {
                 PolishNotationNode node(OperatorType::kTimes);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::DIVIDE: {
+            case QueryTokenType::kOperatorDivide: {
                 PolishNotationNode node(OperatorType::kDivide);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::MODULO: {
+            case QueryTokenType::kOperatorModulo: {
                 PolishNotationNode node(OperatorType::kModulo);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::LEFTBRACKET: {
+            case QueryTokenType::kBracketL: {
                 PolishNotationNode node(ExprNodeType::kBracketL);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::RIGHTBRACKET: {
+            case QueryTokenType::kBracketR: {
                 PolishNotationNode node(ExprNodeType::kBracketR);
                 expr.emplace_back(node);
                 break;
