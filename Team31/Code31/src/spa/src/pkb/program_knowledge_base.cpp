@@ -1277,6 +1277,9 @@ ProgramKnowledgeBase::GetPatternPair(std::vector<QueryToken> tokens,
         auto index = Index<QueryEntityType::kStmt>(i);
         assign_var.emplace_back(*GetModifies(index).begin());
     }
+
+    assign_stmt.assign(assign_stmt_set.begin(), assign_stmt_set.end());
+
     return {assign_stmt, assign_var};
 }
 
