@@ -1,5 +1,5 @@
-#ifndef SRC_SPA_SRC_SOURCE_AST_CONSTANT_H_
-#define SRC_SPA_SRC_SOURCE_AST_CONSTANT_H_
+#ifndef SRC_SPA_SRC_SOURCE_AST_CONSTANT_NODE_H_
+#define SRC_SPA_SRC_SOURCE_AST_CONSTANT_NODE_H_
 
 #include "indexed_node.h"
 
@@ -9,4 +9,4 @@ class ConstantNode : public IndexedNode<ConstantNode> {};
 
 }  // namespace spa
 
-#endif  // SRC_SPA_SRC_SOURCE_AST_CONSTANT_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_CONSTANT_NODE_H_

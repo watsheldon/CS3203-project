@@ -1,5 +1,5 @@
-#ifndef SRC_SPA_SRC_SOURCE_AST_CONDITION_H_
-#define SRC_SPA_SRC_SOURCE_AST_CONDITION_H_
+#ifndef SRC_SPA_SRC_SOURCE_AST_CONDITION_NODE_H_
+#define SRC_SPA_SRC_SOURCE_AST_CONDITION_NODE_H_
 
 #include <set>
 
@@ -20,4 +20,4 @@ class ConditionNode : public AbstractSyntaxTreeNode {
 };
 }  // namespace spa
 
-#endif  // SRC_SPA_SRC_SOURCE_AST_CONDITION_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_CONDITION_NODE_H_

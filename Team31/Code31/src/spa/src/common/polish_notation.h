@@ -1,5 +1,5 @@
-#ifndef SRC_SPA_SRC_POLISH_NOTATION_H_
-#define SRC_SPA_SRC_POLISH_NOTATION_H_
+#ifndef SRC_SPA_SRC_COMMON_POLISH_NOTATION_H_
+#define SRC_SPA_SRC_COMMON_POLISH_NOTATION_H_
 
 #include <vector>
 
@@ -21,4 +21,4 @@ class PolishNotation {
 
 }  // namespace spa
 
-#endif  // SRC_SPA_SRC_POLISH_NOTATION_H_
+#endif  // SRC_SPA_SRC_COMMON_POLISH_NOTATION_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_SPA_SRC_SOURCE_AST_PROCEDURE_H_
-#define SRC_SPA_SRC_SOURCE_AST_PROCEDURE_H_
+#ifndef SRC_SPA_SRC_SOURCE_AST_PROCEDURE_NODE_H_
+#define SRC_SPA_SRC_SOURCE_AST_PROCEDURE_NODE_H_
 
 #include "indexed_node.h"
 #include "stmt_lst_parent.h"
@@ -21,4 +21,4 @@ class ProcedureNode : public IndexedNode<ProcedureNode>,
 };
 }  // namespace spa
 
-#endif  // SRC_SPA_SRC_SOURCE_AST_PROCEDURE_H_
+#endif  // SRC_SPA_SRC_SOURCE_AST_PROCEDURE_NODE_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_INDEX_H_
-#define SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_INDEX_H_
+#ifndef SRC_SPA_SRC_COMMON_INDEX_H_
+#define SRC_SPA_SRC_COMMON_INDEX_H_
 
 #include <type_traits>
 
@@ -20,4 +20,4 @@ struct Index : IndexBase<decltype(EnumVal), EnumVal> {
 };
 }  // namespace spa
 
-#endif  // SRC_SPA_SRC_PKB_KNOWLEDGE_BASE_H_INDEX_H_
+#endif  // SRC_SPA_SRC_COMMON_INDEX_H_
