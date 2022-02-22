@@ -1,6 +1,5 @@
 #include "PQL_validator.h"
 
-#include <memory>
 #include <vector>
 #include <string_view>
 

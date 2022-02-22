@@ -1,8 +1,6 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 #define SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 
-#include <map>
-#include <memory>
 #include <vector>
 
 #include "PQL_validator.h"

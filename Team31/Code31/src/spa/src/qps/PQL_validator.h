@@ -1,7 +1,6 @@
 #ifndef SRC_SPA_SRC_QPS_PQL_VALIDATOR_H_
 #define SRC_SPA_SRC_QPS_PQL_VALIDATOR_H_
 
-#include <filesystem>
 #include <string_view>
 
 #include "PQL_tokenizer.h"

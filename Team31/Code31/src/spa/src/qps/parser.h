@@ -1,8 +1,6 @@
 #ifndef SRC_SPA_SRC_QPS_PARSER_H_
 #define SRC_SPA_SRC_QPS_PARSER_H_
 
-#include <filesystem>
-#include <fstream>
 #include <string_view>
 
 #include "PQL_tokenizer.h"

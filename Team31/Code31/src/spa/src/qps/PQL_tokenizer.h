@@ -1,7 +1,6 @@
 #ifndef SRC_SPA_SRC_QPS_PQL_TOKENIZER_H_
 #define SRC_SPA_SRC_QPS_PQL_TOKENIZER_H_
 
-#include <filesystem>
 #include <sstream>
 #include <string_view>
 
