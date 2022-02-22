@@ -1,0 +1,1 @@
+procedure while{while(!(while!=0)){print while;}}
