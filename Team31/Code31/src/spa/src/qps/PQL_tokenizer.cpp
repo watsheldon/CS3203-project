@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <ios>
+#include <string>
+#include <string_view>
 
 namespace spa {
 
