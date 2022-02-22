@@ -173,7 +173,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                         .empty());
     }
     SECTION("GetParentWildcard") {
-        REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kAssign).size() == 0);
+        REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kAssign).empty());
         REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kWhile) ==
                 std::set<int>{1, 5});
         REQUIRE(pkb.GetParent(ArgPos::kSecond, StmtType::kAll) ==
@@ -196,12 +196,12 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetPattern(token3) == std::set<int>{9});
         REQUIRE(pkb.GetPattern(queryToken1, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken2, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(queryToken3, true) == std::set<int>{});
+        REQUIRE(pkb.GetPattern(queryToken3, true).empty());
         REQUIRE(pkb.GetPattern(queryToken4, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken5, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(queryToken6, true) == std::set<int>{});
+        REQUIRE(pkb.GetPattern(queryToken6, true).empty());
         REQUIRE(pkb.GetPattern(token1, queryToken4, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(token2, queryToken4, true) == std::set<int>{});
+        REQUIRE(pkb.GetPattern(token2, queryToken4, true).empty());
         REQUIRE(pkb.GetPatternPair(queryToken4, true) == pairTest);
         REQUIRE(pkb.GetPatternPair(queryToken3, true) == pairTest2);
         REQUIRE(pkb.GetPatternPair() == pairTest3);
