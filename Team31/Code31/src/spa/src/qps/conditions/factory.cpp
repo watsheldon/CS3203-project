@@ -169,23 +169,24 @@ std::unique_ptr<ConditionClause> Factory::BuildPattern() {
     assert(assign_);
     if (first_syn_) {
         if (second_exprs_.empty()) {
-            return std::make_unique<PatternSynWild>(first_syn_);
+            return std::make_unique<PatternSynWild>(assign_, first_syn_);
         }
-        return std::make_unique<PatternSynExpr>(
-                first_syn_, std::move(second_exprs_), is_trans_partial_);
+        return std::make_unique<PatternSynExpr>(assign_, first_syn_,
+                                                std::move(second_exprs_),
+                                                is_trans_partial_);
     }
     if (first_ident_.empty()) {
         if (second_exprs_.empty()) {
-            return std::make_unique<ParentWildWild>();
+            return std::make_unique<PatternWildWild>(assign_);
         }
-        return std::make_unique<PatternWildExpr>(std::move(second_exprs_),
-                                                 is_trans_partial_);
+        return std::make_unique<PatternWildExpr>(
+                assign_, std::move(second_exprs_), is_trans_partial_);
     }
     if (second_exprs_.empty()) {
-        return std::make_unique<PatternIdentWild>(first_ident_);
+        return std::make_unique<PatternIdentWild>(assign_, first_ident_);
     }
     return std::make_unique<PatternIdentExpr>(
-            first_ident_, std::move(second_exprs_), is_trans_partial_);
+            assign_, first_ident_, std::move(second_exprs_), is_trans_partial_);
 }
 void Factory::Reset() {
     rel_ = Relationship::kNone;
