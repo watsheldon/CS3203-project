@@ -17,7 +17,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     be.ifs = std::vector<int>{4};
     be.assigns = std::vector<int>{7, 8, 9};
 
-    // v+1*x
+    // dummy pn
     PolishNotation pn0(std::vector<PolishNotationNode>{});
     // v1+1*v3
     PolishNotation pn1(std::vector<PolishNotationNode>{
@@ -155,6 +155,19 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetFollowsPairs(false, StmtType::kAll, StmtType::kAll)
                         .first.size() == 5);
     }
+    SECTION("GetParent") {
+        REQUIRE(pkb.GetParent(true, Index<ArgPos::kFirst>(1),
+                              StmtType::kRead) == std::set<int>{2});
+        REQUIRE(pkb.GetParent(false, Index<ArgPos::kFirst>(4),
+                              StmtType::kAll) == std::set<int>{5,8,9});
+        REQUIRE(pkb.GetParent(true, Index<ArgPos::kFirst>(4),
+                              StmtType::kAll) == std::set<int>{5,6,7,8,9});
+        //REQUIRE(pkb.GetParent(true, Index<ArgPos::kSecond>(4),
+        //StmtType::kAll) == std::set<int>{2, 3});
+        //REQUIRE(pkb.GetParent(true, Index<ArgPos::kSecond>(8),
+        //StmtType::kWhile) == std::set<int>{5});
+    }
+
     SECTION("GetPattern") {
         std::pair<std::vector<int>, std::vector<int>> pairTest = {{7}, {1}};
         std::pair<std::vector<int>, std::vector<int>> pairTest2 = {{}, {}};
