@@ -11,6 +11,11 @@ PQLTokenizer::PQLTokenizer(const std::filesystem::path &inputFile) {
     buffer_ << query.rdbuf();
 }
 
+PQLTokenizer::PQLTokenizer(std::string_view str) {
+    buffer_.str(str.data());
+    error = false;
+}
+
 // keep chars of token until pred is not met
 void PQLTokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
     auto last = std::find_if_not(token.begin() + 1, token.end(), pred);
@@ -59,6 +64,11 @@ PQLTokenizer &PQLTokenizer::operator()(std::string_view str) {
     buffer_.str(str.data());
     error = false;
     return *this;
+}
+std::string PQLTokenizer::Next() {
+    std::string token;
+    ExtractInto(token);
+    return token;
 }
 
 }  // namespace spa
