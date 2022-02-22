@@ -1465,5 +1465,12 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
     }
     return {PolishNotation(expr), contains_unseen};
 }
+int ProgramKnowledgeBase::NameToIndex(QueryEntityType et,
+                                      const std::string &name) {
+    assert(compiled);
+    assert(et == QueryEntityType::kVar || et == QueryEntityType::kProc);
+    return (et == QueryEntityType::kVar) ? var_name_.GetIndex(name)
+                                         : proc_name_.GetIndex(name);
+}
 
 }  // namespace spa

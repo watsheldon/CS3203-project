@@ -135,6 +135,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     void IndexToName(QueryEntityType et, const std::vector<int> &index_list,
                      std::list<std::string> &names) override;
+    int NameToIndex(QueryEntityType et, const std::string &name) override;
 
     // mark the end of source processor
     void Compile() override;
