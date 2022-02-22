@@ -210,16 +210,19 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     }
 
     SECTION("Uses") {
-        std::pair<std::vector<int>, std::vector<int>> pairTest = {{4,4,4,4,4,4}, {1,3,2,3,3,2}};
+        std::pair<std::vector<int>, std::vector<int>> pairTest = {
+                {4, 4, 4, 4, 4, 4}, {1, 3, 2, 3, 3, 2}};
         REQUIRE(pkb.ExistUses(7, 1));
         REQUIRE(pkb.ExistUses(7, 3));
         REQUIRE(pkb.ExistUses(8, 2));
         REQUIRE(pkb.ExistUses(5, 1));
         REQUIRE_FALSE(pkb.ExistUses(2, 1));
+        REQUIRE_FALSE(pkb.ExistUses(200, 1));
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(7)) ==
                 std::set<int>{1, 3});
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(8)) ==
                 std::set<int>{2, 3});
+        REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(800)).empty());
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(9)) ==
                 std::set<int>{3});
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(5)) ==
@@ -233,7 +236,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetUses(StmtType::kAll) ==
                 std::set<int>{1, 5, 4, 3, 6, 7, 8, 9});
         REQUIRE(pkb.GetUses(StmtType::kIf) == std::set<int>{4});
-        //pair can contain duplicates
+        // pair can contain duplicates
         REQUIRE(pkb.GetUsesStmtVar(StmtType::kIf) == pairTest);
     }
 
@@ -243,9 +246,10 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE_FALSE(pkb.ExistModifies(3, 0));
         REQUIRE(pkb.ExistModifies(1, 0));
         REQUIRE(pkb.ExistModifies(4, 1));
+        REQUIRE_FALSE(pkb.ExistModifies(700, 2));
     }
     SECTION("GetModifies") {
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(3)).empty());
+        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(300)).empty());
         REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(4)) ==
                 std::set<int>{1, 2, 3});
         REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(10)) ==

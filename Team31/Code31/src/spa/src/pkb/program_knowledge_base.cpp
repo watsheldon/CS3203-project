@@ -497,6 +497,9 @@ ProgramKnowledgeBase::GetParentPairs(bool transitive, StmtType parent_type,
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
     assert(compiled);
     assert(stmt_no != 0);
+    if (stmt_no > stmt_count_) {
+        return false;
+    }
     StmtType type = type_stmt_.GetType(stmt_no);
 
     if (type == StmtType::kPrint || type == StmtType::kCall) {
@@ -554,6 +557,9 @@ bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
 bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     assert(compiled);
     assert(stmt_no != 0);
+    if (stmt_no > stmt_count_) {
+        return false;
+    }
 
     StmtType type = type_stmt_.GetType(stmt_no);
 
@@ -619,6 +625,9 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
     assert(stmt_no.value != 0);
+    if (stmt_no.value > stmt_count_) {
+        return {};
+    }
 
     StmtType type = type_stmt_.GetType(stmt_no.value);
 
@@ -917,7 +926,9 @@ std::set<int> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
     assert(stmt_no.value != 0);
-
+    if (stmt_no.value > stmt_count_) {
+        return {};
+    }
     StmtType type = type_stmt_.GetType(stmt_no.value);
 
     if (type == StmtType::kRead || type == StmtType::kCall) {
