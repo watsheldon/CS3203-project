@@ -298,6 +298,12 @@ class KnowledgeBase {
                              std::list<std::string> &names) = 0;
 
     /**
+     * Converts a string of variable or procedure name to its respective index.
+     * Returns 0 if the name not found.
+     */
+    virtual int NameToIndex(QueryEntityType et, const std::string &name) = 0;
+
+    /**
      * Prevents any further updates to the KnowledgeBase and compile all
      * indirect relationships for faster lookup.
      */
