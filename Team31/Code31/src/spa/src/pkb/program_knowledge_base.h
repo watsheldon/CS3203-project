@@ -111,18 +111,23 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::pair<std::vector<int>, std::vector<int>> GetUsesStmtVar(
             StmtType type) override;
 
-    // ( _, " ")
+    // ( _, " "), (_ , _" "_)
     std::set<int> GetPattern(std::vector<QueryToken> tokens,
-                             ArgPos token_pos) override;
-    // (" ", " ")
-    std::set<int> GetPattern(std::vector<QueryToken> first_tokens,
-                             std::vector<QueryToken> second_tokens) override;
-    // (v, " ")
-    std::pair<std::vector<int>, std::vector<int>> GetPattern(
-            std::vector<QueryToken> tokens) override;
+                             bool partial_match) override;
+
+    //(" ", _)
+    std::set<int> GetPattern(QueryToken token) override;
+
+    // (" ", " ") , (" ", _" "_)
+    std::set<int> GetPattern(QueryToken first_token,
+                             std::vector<QueryToken> second_tokens,
+                             bool partial_match) override;
+    // (v, " ")  , (v, _" "_)
+    std::pair<std::vector<int>, std::vector<int>> GetPatternPair(
+            std::vector<QueryToken> tokens, bool partial_match) override;
 
     // (v, _)
-    std::pair<std::vector<int>, std::vector<int>> GetPattern() override;
+    std::pair<std::vector<int>, std::vector<int>> GetPatternPair() override;
 
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;

@@ -1188,76 +1188,103 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     return {all_stmt, all_var};
 }
 
-// ( _, " ") , (" ", _)
->>>>>>> cf48cba (change method signature)
+// ( _, " "), (_, _" "_)
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
-                                               ArgPos token_pos){
-    if (token_pos == ArgPos::kSecond) {
-        std::vector<int> assign_stmt;
-        std::set<int> results_stmt;
-        assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+                                               bool partial_match) {
+    assert(compiled);
+    if (ContainsUnseenVarConst(tokens)) {
+        return {};
+    }
+
+    std::vector<int> assign_stmt;
+    assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    PN converted_pn = (ConvertFromQueryTokens(tokens));
+
+    if (partial_match) {
+        std::set<int> partial_match_stmt;
+
         for (auto &i : assign_stmt) {
             PN pn = polish_notation_.GetNotation(
                     polish_notation_.GetPolishIndex(i));
-            if (pn.Contains(fromquerytokenTOpolishNotation)) {
-                results_stmt.emplace(i);
+            if (pn.Contains(converted_pn)) {
+                partial_match_stmt.emplace(i);
             }
         }
-        return results_stmt;
+        return partial_match_stmt;
     }
-    
-    assert(token_pos == ArgPos::kFirst);
-    //get variable index from " " then getModifies(var_index, kAssign) to get
 
+    assert(partial_match == false);
+    std::set<int> full_match_stmt;
+
+    for (auto &i : assign_stmt) {
+        PN pn = polish_notation_.GetNotation(
+                polish_notation_.GetPolishIndex(i));
+        if (pn.operator==(converted_pn)) {
+            full_match_stmt.emplace(i);
+        }
+    }
+
+    return full_match_stmt;
 }
 
-// (" ", " ")
+// (" ", _)
+std::set<int> ProgramKnowledgeBase::GetPattern(QueryToken token) {
+    assert(compiled);
+    int var_index = var_name_.GetIndex(token.value);
+    if (var_index == 0) {
+        return {};
+    }
+    return GetModifies(var_index, StmtType::kAssign);
+}
+
+// (" ", " ") , (" ", _" "_)
 std::set<int> ProgramKnowledgeBase::GetPattern(
-        std::vector<QueryToken> first_tokens,
-        std::vector<QueryToken> second_tokens) {
+        QueryToken first_token, std::vector<QueryToken> second_tokens,
+        bool partial_match) {
+    assert(compiled);
+    if (ContainsUnseenVarConst(second_tokens)) {
+        return {};
+    }
+
+    int var_index = var_name_.GetIndex(first_token.value);
+    if (var_index == 0) {
+        return {};
+    }
+
+    std::set<int> assign_stmt;
+    std::set<int> filtered_assign_stmt;
+    assign_stmt = GetPattern(second_tokens, partial_match);
+
+    for (auto &i : assign_stmt) {
+        if (ExistModifies(i, var_index)) {
+            filtered_assign_stmt.emplace(i);
+        }
+    }
+    return filtered_assign_stmt;
+}
+// (v, " ") , (v, _" "_)
+std::pair<std::vector<int>, std::vector<int>>
+ProgramKnowledgeBase::GetPatternPair(std::vector<QueryToken> tokens,
+                                     bool partial_match) {
+    assert(compiled);
+    if (ContainsUnseenVarConst(tokens)) {
+        return {};
+    }
 
     std::vector<int> assign_stmt;
-    std::set<int> results_stmt;
-    assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    std::vector<int> assign_var;
+    assign_stmt = GetPattern(tokens, partial_match);
+
     for (auto &i : assign_stmt) {
-        PN pn = polish_notation_.GetNotation(
-                polish_notation_.GetPolishIndex(i));
-        if (pn.Contains(fromquerytokenTOpolishNotation)) {
-            results_stmt.emplace(i);
-        }
+        assign_var.emplace_back(*GetModifies(i).begin());
     }
-
-}
-// (v, " ")
-std::pair<std::vector<int>, std::vector<int>> ProgramKnowledgeBase::GetPattern(
-    std::vector<QueryToken> tokens) {
-
-    std::vector<int> assign_stmt, results_stmt;
-    //std::set<int> results_stmt;
-    assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-    for (auto &i : assign_stmt) {
-        PN pn = polish_notation_.GetNotation(
-                polish_notation_.GetPolishIndex(i));
-        if (pn.Contains(fromquerytokenTOpolishNotation)) {
-            results_stmt.emplace_back(i);
-        }
-    }
-
-    std::set<int> results_var_dup;
-    for (auto &i : results_stmt) {
-        results_var_dup.emplace(modifies_rel_.GetVarIndex(i));
-    }
-
-    std::vector<int> results_var;
-    results_var.assign(results_var_dup.begin(), results_var_dup.end());
-
-    return {results_stmt, results_var};
+    return {assign_stmt, assign_var};
 }
 
 // (v, _)
 std::pair<std::vector<int>, std::vector<int>>
-ProgramKnowledgeBase::GetPattern() {
-    return GetUses(StmtType::kAssign);
+ProgramKnowledgeBase::GetPatternPair() {
+    return GetModifiesStmtVar(StmtType::kAssign);
 }
 
 void ProgramKnowledgeBase::Compile() {
