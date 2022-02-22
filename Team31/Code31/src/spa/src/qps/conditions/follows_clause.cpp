@@ -3,51 +3,42 @@
 namespace spa {
 FollowsIntInt::FollowsIntInt(int first, int second, bool transitive)
         : first_(first), second_(second), transitive_(transitive) {}
-std::pair<ResultTable, bool> FollowsIntInt::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsIntInt::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 FollowsIntSyn::FollowsIntSyn(int first, Synonym *second, bool transitive)
         : first_(first), second_(second), transitive_(transitive) {}
-std::pair<ResultTable, bool> FollowsIntSyn::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsIntSyn::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 FollowsIntWild::FollowsIntWild(int first) : first_(first) {}
-std::pair<ResultTable, bool> FollowsIntWild::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsIntWild::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 FollowsSynInt::FollowsSynInt(Synonym *first, int second, bool transitive)
         : first_(first), second_(second), transitive_(transitive) {}
-std::pair<ResultTable, bool> FollowsSynInt::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsSynInt::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 FollowsSynSyn::FollowsSynSyn(Synonym *first, Synonym *second, bool transitive)
         : first_(first), second_(second), transitive_(transitive) {}
-std::pair<ResultTable, bool> FollowsSynSyn::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsSynSyn::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 FollowsSynWild::FollowsSynWild(Synonym *first) : first_(first) {}
-std::pair<ResultTable, bool> FollowsSynWild::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsSynWild::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 FollowsWildInt::FollowsWildInt(int second) : second_(second) {}
-std::pair<ResultTable, bool> FollowsWildInt::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsWildInt::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 FollowsWildSyn::FollowsWildSyn(Synonym *second) : second_(second) {}
-std::pair<ResultTable, bool> FollowsWildSyn::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsWildSyn::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 FollowsWildWild::FollowsWildWild() = default;
-std::pair<ResultTable, bool> FollowsWildWild::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable FollowsWildWild::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 }  // namespace spa

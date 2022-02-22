@@ -9,8 +9,7 @@ class ModifiesClause : public ConditionClause {};
 class ModifiesIntIdent : public ModifiesClause {
   public:
     ModifiesIntIdent(int first, std::string second);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const int first_;
@@ -19,8 +18,7 @@ class ModifiesIntIdent : public ModifiesClause {
 class ModifiesIntSyn : public ModifiesClause {
   public:
     ModifiesIntSyn(int first, Synonym *second);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const int first_;
@@ -29,8 +27,7 @@ class ModifiesIntSyn : public ModifiesClause {
 class ModifiesIntWild : public ModifiesClause {
   public:
     explicit ModifiesIntWild(int first);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const int first_;
@@ -38,8 +35,7 @@ class ModifiesIntWild : public ModifiesClause {
 class ModifiesSynIdent : public ModifiesClause {
   public:
     ModifiesSynIdent(Synonym *first, std::string second);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     Synonym *const first_;
@@ -48,8 +44,7 @@ class ModifiesSynIdent : public ModifiesClause {
 class ModifiesSynSyn : public ModifiesClause {
   public:
     ModifiesSynSyn(Synonym *first, Synonym *second);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     Synonym *const first_;
@@ -58,8 +53,7 @@ class ModifiesSynSyn : public ModifiesClause {
 class ModifiesSynWild : public ModifiesClause {
   public:
     explicit ModifiesSynWild(Synonym *first);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     Synonym *const first_;

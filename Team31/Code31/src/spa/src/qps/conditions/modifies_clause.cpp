@@ -3,36 +3,30 @@
 namespace spa {
 ModifiesIntIdent::ModifiesIntIdent(int first, std::string second)
         : first_(first), second_(std::move(second)) {}
-std::pair<ResultTable, bool> ModifiesIntIdent::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable ModifiesIntIdent::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 ModifiesIntSyn::ModifiesIntSyn(int first, Synonym *second)
         : first_(first), second_(second) {}
-std::pair<ResultTable, bool> ModifiesIntSyn::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable ModifiesIntSyn::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 ModifiesIntWild::ModifiesIntWild(int first) : first_(first) {}
-std::pair<ResultTable, bool> ModifiesIntWild::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable ModifiesIntWild::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 ModifiesSynIdent::ModifiesSynIdent(Synonym *first, std::string second)
         : first_(first), second_(std::move(second)) {}
-std::pair<ResultTable, bool> ModifiesSynIdent::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable ModifiesSynIdent::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 ModifiesSynSyn::ModifiesSynSyn(Synonym *first, Synonym *second)
         : first_(first), second_(second) {}
-std::pair<ResultTable, bool> ModifiesSynSyn::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable ModifiesSynSyn::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 ModifiesSynWild::ModifiesSynWild(Synonym *first) : first_(first) {}
-std::pair<ResultTable, bool> ModifiesSynWild::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable ModifiesSynWild::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 }  // namespace spa

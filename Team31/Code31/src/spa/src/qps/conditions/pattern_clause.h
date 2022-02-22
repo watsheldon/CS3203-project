@@ -9,8 +9,7 @@ class PatternIdentExpr : public PatternClause {
   public:
     PatternIdentExpr(std::string first, std::vector<QueryToken> &&second,
                      bool partial);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const std::string first_;
@@ -20,8 +19,7 @@ class PatternIdentExpr : public PatternClause {
 class PatternIdentWild : public PatternClause {
   public:
     explicit PatternIdentWild(std::string first);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const std::string first_;
@@ -30,8 +28,7 @@ class PatternSynExpr : public PatternClause {
   public:
     PatternSynExpr(Synonym *first, std::vector<QueryToken> &&second,
                    bool partial);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     Synonym *const first_;
@@ -41,8 +38,7 @@ class PatternSynExpr : public PatternClause {
 class PatternSynWild : public PatternClause {
   public:
     explicit PatternSynWild(Synonym *first);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     Synonym *const first_;
@@ -50,8 +46,7 @@ class PatternSynWild : public PatternClause {
 class PatternWildExpr : public PatternClause {
   public:
     explicit PatternWildExpr(std::vector<QueryToken> &&second, bool partial);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const std::vector<QueryToken> second_;
@@ -60,8 +55,7 @@ class PatternWildExpr : public PatternClause {
 class PatternWildWild : public PatternClause {
   public:
     PatternWildWild();
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_

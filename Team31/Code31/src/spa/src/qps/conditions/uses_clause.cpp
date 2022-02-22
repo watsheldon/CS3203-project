@@ -5,36 +5,30 @@
 namespace spa {
 UsesIntIdent::UsesIntIdent(int first, std::string second)
         : first_(first), second_(std::move(second)) {}
-std::pair<ResultTable, bool> UsesIntIdent::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable UsesIntIdent::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 UsesIntSyn::UsesIntSyn(int first, Synonym *second)
         : first_(first), second_(second) {}
-std::pair<ResultTable, bool> UsesIntSyn::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable UsesIntSyn::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 UsesIntWild::UsesIntWild(int first) : first_(first) {}
-std::pair<ResultTable, bool> UsesIntWild::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable UsesIntWild::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 UsesSynIdent::UsesSynIdent(Synonym *first, std::string second)
         : first_(first), second_(std::move(second)) {}
-std::pair<ResultTable, bool> UsesSynIdent::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable UsesSynIdent::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 UsesSynSyn::UsesSynSyn(Synonym *first, Synonym *second)
         : first_(first), second_(second) {}
-std::pair<ResultTable, bool> UsesSynSyn::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable UsesSynSyn::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 UsesSynWild::UsesSynWild(Synonym *first) : first_(first) {}
-std::pair<ResultTable, bool> UsesSynWild::Execute(
-        KnowledgeBase *knowledge_base) const {
-    return {ResultTable(true), true};
+ResultTable UsesSynWild::Execute(KnowledgeBase *knowledge_base) const {
+    return ResultTable(true);
 }
 }  // namespace spa
