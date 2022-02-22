@@ -137,8 +137,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::unique_ptr<ContainerForest> container_forest_;
 
-    bool ContainsUnseenVarConst(std::vector<QueryToken> tokens);
-    PolishNotation ConvertFromQueryTokens(std::vector<QueryToken> tokens);
+    bool ContainsUnseenVarConst(const std::vector<QueryToken> &tokens);
+    PolishNotation ConvertFromQueryTokens(
+            const std::vector<QueryToken> &tokens);
 
     std::set<int> GetAllParents(StmtType return_type);
     std::set<int> GetAllChildren(StmtType return_type);

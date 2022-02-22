@@ -565,8 +565,8 @@ void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
 }
 
 bool ProgramKnowledgeBase::ContainsUnseenVarConst(
-        std::vector<QueryToken> tokens) {
-    for (auto token : tokens) {
+        const std::vector<QueryToken> &tokens) {
+    for (const auto &token : tokens) {
         switch (token.type) {
             case QueryTokenType::WORD: {
                 if (var_name_.GetIndex(token.value) == 0) {
@@ -588,9 +588,9 @@ bool ProgramKnowledgeBase::ContainsUnseenVarConst(
 }
 
 PolishNotation ProgramKnowledgeBase::ConvertFromQueryTokens(
-        std::vector<QueryToken> tokens) {
+        const std::vector<QueryToken> &tokens) {
     std::vector<PolishNotationNode> expr;
-    for (auto token : tokens) {
+    for (const auto &token : tokens) {
         switch (token.type) {
             case QueryTokenType::WORD: {
                 int var_index = var_name_.GetIndex(token.value);
