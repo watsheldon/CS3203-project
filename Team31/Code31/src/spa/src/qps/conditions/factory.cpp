@@ -11,19 +11,19 @@
 namespace spa {
 void Factory::SetRelationship(QueryTokenType type) {
     switch (type) {
-        case QueryTokenType::PARENT:
+        case QueryTokenType::kKeywordParent:
             rel_ = Relationship::kParent;
             return;
-        case QueryTokenType::FOLLOWS:
+        case QueryTokenType::kKeywordFollows:
             rel_ = Relationship::kFollows;
             return;
-        case QueryTokenType::USES:
+        case QueryTokenType::kKeywordUses:
             rel_ = Relationship::kUses;
             return;
-        case QueryTokenType::MODIFIES:
+        case QueryTokenType::kKeywordModifies:
             rel_ = Relationship::kModifies;
             return;
-        case QueryTokenType::PATTERN:
+        case QueryTokenType::kKeywordPattern:
             rel_ = Relationship::kPattern;
             return;
         default:

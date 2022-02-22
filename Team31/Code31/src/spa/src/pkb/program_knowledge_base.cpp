@@ -1247,13 +1247,13 @@ bool ProgramKnowledgeBase::ContainsUnseenVarConst(
         const std::vector<QueryToken> &tokens) {
     for (const auto &token : tokens) {
         switch (token.type) {
-            case QueryTokenType::WORD: {
+            case QueryTokenType::kWord: {
                 if (var_name_.GetIndex(token.value) == 0) {
                     return true;
                 }
                 break;
             }
-            case QueryTokenType::INTEGER: {
+            case QueryTokenType::kInteger: {
                 if (const_value_.GetIndex(token.value) == 0) {
                     return true;
                 }
@@ -1271,51 +1271,51 @@ PolishNotation ProgramKnowledgeBase::ConvertFromQueryTokens(
     std::vector<PolishNotationNode> expr;
     for (const auto &token : tokens) {
         switch (token.type) {
-            case QueryTokenType::WORD: {
+            case QueryTokenType::kWord: {
                 int var_index = var_name_.GetIndex(token.value);
                 assert(var_index > 0);
                 PolishNotationNode node(ExprNodeType::kVariable, var_index);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::INTEGER: {
+            case QueryTokenType::kInteger: {
                 int const_index = const_value_.GetIndex(token.value);
                 assert(const_index > 0);
                 PolishNotationNode node(ExprNodeType::kConstant, const_index);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::PLUS: {
+            case QueryTokenType::kOperatorPlus: {
                 PolishNotationNode node(OperatorType::kPlus);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::MINUS: {
+            case QueryTokenType::kOperatorMinus: {
                 PolishNotationNode node(OperatorType::kMinus);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::TIMES: {
+            case QueryTokenType::kOperatorTimes: {
                 PolishNotationNode node(OperatorType::kTimes);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::DIVIDE: {
+            case QueryTokenType::kOperatorDivide: {
                 PolishNotationNode node(OperatorType::kDivide);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::MODULO: {
+            case QueryTokenType::kOperatorModulo: {
                 PolishNotationNode node(OperatorType::kModulo);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::LEFTBRACKET: {
+            case QueryTokenType::kBracketL: {
                 PolishNotationNode node(ExprNodeType::kBracketL);
                 expr.emplace_back(node);
                 break;
             }
-            case QueryTokenType::RIGHTBRACKET: {
+            case QueryTokenType::kBracketR: {
                 PolishNotationNode node(ExprNodeType::kBracketR);
                 expr.emplace_back(node);
                 break;

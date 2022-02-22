@@ -5,102 +5,101 @@
 namespace spa {
 enum class QueryTokenType {
     // Design entities
-    STMT,
-    READ,
-    PRINT,
-    CALL,
-    WHILE,
-    IF,
-    ASSIGN,
-    VARIABLE,
-    CONSTANT,
-    PROCEDURE,
-    SELECT,
-    SUCH,
-    THAT,
-    PATTERN,
-    FOLLOWS,
-    PARENT,
-    USES,
-    MODIFIES,
-    SEMICOLON,     // ;
-    COMMA,         // ,
-    UNDERSCORE,    // _
-    DOUBLEQUOTE,   // "
-    PLUS,          // +
-    MINUS,         // ,
-    TIMES,         // *
-    DIVIDE,        // /
-    MODULO,        // %
-    LEFTBRACKET,   // (
-    RIGHTBRACKET,  // )
-
-    WORD,
-    INTEGER,
+    kDeclStmt,
+    kDeclRead,
+    kDeclPrint,
+    kDeclCall,
+    kDeclWhile,
+    kDeclIf,
+    kDeclAssign,
+    kDeclVariable,
+    kDeclConstant,
+    kDeclProcedure,
+    kKeywordSelect,
+    kKeywordSuch,
+    kKeywordThat,
+    kKeywordPattern,
+    kKeywordFollows,
+    kKeywordParent,
+    kKeywordUses,
+    kKeywordModifies,
+    kSemicolon,       // ;
+    kComma,           // ,
+    kUnderscore,      // _
+    kQuote,           // "
+    kOperatorPlus,    // +
+    kOperatorMinus,   // ,
+    kOperatorTimes,   // *
+    kOperatorDivide,  // /
+    kOperatorModulo,  // %
+    kBracketL,        // (
+    kBracketR,        // )
+    kWord,
+    kInteger,
 };
 
 inline std::string_view Keyword(QueryTokenType token_type) {
     switch (token_type) {
-        case QueryTokenType::STMT:
+        case QueryTokenType::kDeclStmt:
             return "stmt";
-        case QueryTokenType::READ:
+        case QueryTokenType::kDeclRead:
             return "read";
-        case QueryTokenType::PRINT:
+        case QueryTokenType::kDeclPrint:
             return "print";
-        case QueryTokenType::CALL:
+        case QueryTokenType::kDeclCall:
             return "call";
-        case QueryTokenType::WHILE:
+        case QueryTokenType::kDeclWhile:
             return "while";
-        case QueryTokenType::IF:
+        case QueryTokenType::kDeclIf:
             return "if";
-        case QueryTokenType::ASSIGN:
+        case QueryTokenType::kDeclAssign:
             return "assign";
-        case QueryTokenType::VARIABLE:
+        case QueryTokenType::kDeclVariable:
             return "variable";
-        case QueryTokenType::CONSTANT:
+        case QueryTokenType::kDeclConstant:
             return "constant";
-        case QueryTokenType::PROCEDURE:
+        case QueryTokenType::kDeclProcedure:
             return "procedure";
-        case QueryTokenType::SELECT:
+        case QueryTokenType::kKeywordSelect:
             return "Select";
-        case QueryTokenType::PATTERN:
+        case QueryTokenType::kKeywordPattern:
             return "pattern";
-        case QueryTokenType::FOLLOWS:
+        case QueryTokenType::kKeywordFollows:
             return "Follows";
-        case QueryTokenType::PARENT:
+        case QueryTokenType::kKeywordParent:
             return "Parent";
-        case QueryTokenType::USES:
+        case QueryTokenType::kKeywordUses:
             return "Uses";
-        case QueryTokenType::MODIFIES:
+        case QueryTokenType::kKeywordModifies:
             return "Modifies";
-        case QueryTokenType::SEMICOLON:
+        case QueryTokenType::kSemicolon:
             return ";";
-        case QueryTokenType::COMMA:
+        case QueryTokenType::kComma:
             return ",";
-        case QueryTokenType::UNDERSCORE:
+        case QueryTokenType::kUnderscore:
             return "_";
-        case QueryTokenType::DOUBLEQUOTE:
+        case QueryTokenType::kQuote:
             return "\"";
-        case QueryTokenType::PLUS:
+        case QueryTokenType::kOperatorPlus:
             return "+";
-        case QueryTokenType::MINUS:
+        case QueryTokenType::kOperatorMinus:
             return "-";
-        case QueryTokenType::TIMES:
+        case QueryTokenType::kOperatorTimes:
             return "*";
-        case QueryTokenType::DIVIDE:
+        case QueryTokenType::kOperatorDivide:
             return "/";
-        case QueryTokenType::MODULO:
+        case QueryTokenType::kOperatorModulo:
             return "%";
-        case QueryTokenType::LEFTBRACKET:
+        case QueryTokenType::kBracketL:
             return "(";
-        case QueryTokenType::RIGHTBRACKET:
+        case QueryTokenType::kBracketR:
             return ")";
-        case QueryTokenType::SUCH:
+        case QueryTokenType::kKeywordSuch:
             return "such";
-        case QueryTokenType::THAT:
+        case QueryTokenType::kKeywordThat:
             return "that";
-        case QueryTokenType::WORD:
-        case QueryTokenType::INTEGER:
+        case QueryTokenType::kWord:
+        case QueryTokenType::kInteger:
             return "";
     }
 };

@@ -21,26 +21,26 @@ std::unique_ptr<QueryObject> Generator::Generate(
 
     for (const auto &[type, value] : tokens) {
         switch (type) {
-            case QueryTokenType::STMT:
-            case QueryTokenType::READ:
-            case QueryTokenType::PRINT:
-            case QueryTokenType::CALL:
-            case QueryTokenType::WHILE:
-            case QueryTokenType::IF:
-            case QueryTokenType::ASSIGN:
-            case QueryTokenType::VARIABLE:
-            case QueryTokenType::CONSTANT:
-            case QueryTokenType::PROCEDURE:
+            case QueryTokenType::kDeclStmt:
+            case QueryTokenType::kDeclRead:
+            case QueryTokenType::kDeclPrint:
+            case QueryTokenType::kDeclCall:
+            case QueryTokenType::kDeclWhile:
+            case QueryTokenType::kDeclIf:
+            case QueryTokenType::kDeclAssign:
+            case QueryTokenType::kDeclVariable:
+            case QueryTokenType::kDeclConstant:
+            case QueryTokenType::kDeclProcedure:
                 curr_mode_ = Mode::kDeclaration;
                 curr_type_ = TypeConvert(type);
                 break;
-            case QueryTokenType::SELECT:
+            case QueryTokenType::kKeywordSelect:
                 curr_mode_ = Mode::kSelect;
                 break;
-            case QueryTokenType::PATTERN:
+            case QueryTokenType::kKeywordPattern:
                 curr_mode_ = Mode::kPattern;
                 break;
-            case QueryTokenType::WORD:
+            case QueryTokenType::kWord:
                 if (curr_mode_ == Mode::kDeclaration) {
                     std::unique_ptr<Synonym> ptr =
                             std::make_unique<Synonym>(curr_type_);
@@ -74,22 +74,22 @@ std::unique_ptr<QueryObject> Generator::Generate(
                 }
                 if (curr_mode_ == Mode::kPattern) {
                 }
-            case QueryTokenType::COMMA:
-            case QueryTokenType::SEMICOLON:
-            case QueryTokenType::PLUS:
-            case QueryTokenType::MINUS:
-            case QueryTokenType::DIVIDE:
-            case QueryTokenType::MODULO:
-            case QueryTokenType::LEFTBRACKET:
-            case QueryTokenType::THAT:
+            case QueryTokenType::kComma:
+            case QueryTokenType::kSemicolon:
+            case QueryTokenType::kOperatorPlus:
+            case QueryTokenType::kOperatorMinus:
+            case QueryTokenType::kOperatorDivide:
+            case QueryTokenType::kOperatorModulo:
+            case QueryTokenType::kBracketL:
+            case QueryTokenType::kKeywordThat:
                 break;
-            case QueryTokenType::RIGHTBRACKET: {
+            case QueryTokenType::kBracketR: {
                 // todo:factory build (syntax of unique_ptr)
                 auto cond = factory.Build();
                 conditions.emplace_back(std::move(cond));
                 break;
             }
-            case QueryTokenType::UNDERSCORE:
+            case QueryTokenType::kUnderscore:
                 if (curr_mode_ == Mode::kParent) {
                 }
                 if (curr_mode_ == Mode::kFollows) {
@@ -100,33 +100,33 @@ std::unique_ptr<QueryObject> Generator::Generate(
                 }
                 if (curr_mode_ == Mode::kExpression) {
                 }
-            case QueryTokenType::TIMES:
+            case QueryTokenType::kOperatorTimes:
                 if (curr_mode_ == Mode::kFollows ||
                     curr_mode_ == Mode::kParent) {
                     factory.SetTrans(true);
                 }
                 break;
-            case QueryTokenType::SUCH:
+            case QueryTokenType::kKeywordSuch:
                 break;
-            case QueryTokenType::FOLLOWS:
+            case QueryTokenType::kKeywordFollows:
                 curr_mode_ = Mode::kFollows;
                 factory.SetRelationship(type);
                 break;
-            case QueryTokenType::PARENT:
+            case QueryTokenType::kKeywordParent:
                 curr_mode_ = Mode::kParent;
                 factory.SetRelationship(type);
                 break;
-            case QueryTokenType::USES:
+            case QueryTokenType::kKeywordUses:
                 curr_mode_ = Mode::kUses;
                 factory.SetRelationship(type);
                 break;
-            case QueryTokenType::MODIFIES:
+            case QueryTokenType::kKeywordModifies:
                 curr_mode_ = Mode::kModifies;
                 factory.SetRelationship(type);
                 break;
-            case QueryTokenType::DOUBLEQUOTE:
+            case QueryTokenType::kQuote:
                 break;
-            case QueryTokenType::INTEGER:
+            case QueryTokenType::kInteger:
                 break;
         }
     }
@@ -135,25 +135,25 @@ std::unique_ptr<QueryObject> Generator::Generate(
 
 DeclarationType Generator::TypeConvert(QueryTokenType type) {
     switch (type) {
-        case QueryTokenType::STMT:
+        case QueryTokenType::kDeclStmt:
             return DeclarationType::STMT;
-        case QueryTokenType::READ:
+        case QueryTokenType::kDeclRead:
             return DeclarationType::READ;
-        case QueryTokenType::PRINT:
+        case QueryTokenType::kDeclPrint:
             return DeclarationType::PRINT;
-        case QueryTokenType::CALL:
+        case QueryTokenType::kDeclCall:
             return DeclarationType::CALL;
-        case QueryTokenType::WHILE:
+        case QueryTokenType::kDeclWhile:
             return DeclarationType::WHILE;
-        case QueryTokenType::IF:
+        case QueryTokenType::kDeclIf:
             return DeclarationType::IF;
-        case QueryTokenType::ASSIGN:
+        case QueryTokenType::kDeclAssign:
             return DeclarationType::ASSIGN;
-        case QueryTokenType::VARIABLE:
+        case QueryTokenType::kDeclVariable:
             return DeclarationType::VARIABLE;
-        case QueryTokenType::CONSTANT:
+        case QueryTokenType::kDeclConstant:
             return DeclarationType::CONSTANT;
-        case QueryTokenType::PROCEDURE:
+        case QueryTokenType::kDeclProcedure:
             return DeclarationType::PROCEDURE;
         default:
             assert(false);
