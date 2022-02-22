@@ -19,7 +19,11 @@ namespace spa {
 enum class Mode {
     kDeclaration,
     kSelect,
-    kCondition,
+    kParent,
+    kFollows,
+    kUses,
+    kModifies,
+    kPattern,
     kExpression,
 
 };
@@ -29,18 +33,12 @@ class Generator {
     // Ambiguous wildcard
     // Declaration of repeated synonyms
 
-  private:
-    PQLValidator validator_;
-    std::shared_ptr<std::vector<QueryToken>> tokens;
-    std::map<std::string, std::unique_ptr<Synonym>> map;
-
   public:
-    Generator(std::filesystem::path &filePath);
-    QueryObject Generate();
+    QueryObject Generate(const std::vector<QueryToken>& tokens);
     bool GenerateDeclarations();
     bool GenerateSelect();
     bool GenerateSuchThat();
-    DeclarationType TypeConvert(QueryTokenType type);
+    static DeclarationType TypeConvert(QueryTokenType type);
 };
 }  // namespace spa
 #endif  // SPA_SRC_SPA_SRC_QPS_GENERATOR_H_

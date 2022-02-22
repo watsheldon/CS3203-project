@@ -1,17 +1,21 @@
+#include <cassert>
+
 #include "generator.h"
+#include "conditions/condition_clause.h"
+#include "conditions/factory.h"
 
 namespace spa {
-Generator::Generator(std::filesystem::path &filepath) : validator_(filepath) {}
 
-QueryObject Generator::Generate() {
-    tokens = validator_.Validate();
+QueryObject Generator::Generate(const std::vector<QueryToken> &tokens) {
+    std::map<std::string, std::unique_ptr<Synonym>> map;
     Mode curr_mode_;
     DeclarationType curr_type_;
-    ConditionClause curr_condition_;
     std::vector<std::unique_ptr<Synonym>> synonyms_;
+    std::vector<std::unique_ptr<ConditionClause>> conditions;
+    Factory factory;
     QueryObjectBuilder query_object_builder_;
 
-    for (const auto &[type, value] : *tokens) {
+    for (const auto &[type, value] : tokens) {
         switch (type) {
             case QueryTokenType::STMT:
             case QueryTokenType::READ:
@@ -29,9 +33,8 @@ QueryObject Generator::Generate() {
             case QueryTokenType::SELECT:
                 curr_mode_ = Mode::kSelect;
                 break;
-            case QueryTokenType::THAT:
             case QueryTokenType::PATTERN:
-                curr_mode_ = Mode::kCondition;
+                curr_mode_ = Mode::kPattern;
                 break;
             case QueryTokenType::WORD:
                 if (curr_mode_ == Mode::kDeclaration) {
@@ -53,9 +56,19 @@ QueryObject Generator::Generate() {
                         return query_object_builder_.build();
                     }
                     auto &[name, synonym] = *it;
-                    // query_object_builder_.SetSelect(synonyms_.get());
+                    // todo: not sure syntax
+                    query_object_builder_.SetSelect(std::move(synonym));
                 }
-                if (curr_mode_ == Mode::kCondition) {
+                // todo: check the synonym type in diff relationship
+                if (curr_mode_ == Mode::kParent) {
+                }
+                if (curr_mode_ == Mode::kFollows) {
+                }
+                if (curr_mode_ == Mode::kUses) {
+                }
+                if (curr_mode_ == Mode::kModifies) {
+                }
+                if (curr_mode_ == Mode::kPattern) {
                 }
             case QueryTokenType::COMMA:
             case QueryTokenType::SEMICOLON:
@@ -64,15 +77,50 @@ QueryObject Generator::Generate() {
             case QueryTokenType::DIVIDE:
             case QueryTokenType::MODULO:
             case QueryTokenType::LEFTBRACKET:
+            case QueryTokenType::THAT:
+                break;
             case QueryTokenType::RIGHTBRACKET:
-                // Todo: for future iterations, deal with expression mode
+                // todo:factory build (syntax of unique_ptr)
+                conditions.emplace_back(factory.Build());
                 break;
             case QueryTokenType::UNDERSCORE:
-                if (curr_mode_ == Mode::kCondition) {
+                if (curr_mode_ == Mode::kParent) {
+                }
+                if (curr_mode_ == Mode::kFollows) {
+                }
+                if (curr_mode_ == Mode::kUses) {
+                }
+                if (curr_mode_ == Mode::kModifies) {
                 }
                 if (curr_mode_ == Mode::kExpression) {
                 }
             case QueryTokenType::TIMES:
+                if (curr_mode_ == Mode::kFollows ||
+                    curr_mode_ == Mode::kParent) {
+                    factory.SetTrans(true);
+                }
+                break;
+            case QueryTokenType::SUCH:
+                break;
+            case QueryTokenType::FOLLOWS:
+                curr_mode_ = Mode::kFollows;
+                factory.SetRelationship(type);
+                break;
+            case QueryTokenType::PARENT:
+                curr_mode_ = Mode::kParent;
+                factory.SetRelationship(type);
+                break;
+            case QueryTokenType::USES:
+                curr_mode_ = Mode::kUses;
+                factory.SetRelationship(type);
+                break;
+            case QueryTokenType::MODIFIES:
+                curr_mode_ = Mode::kModifies;
+                factory.SetRelationship(type);
+                break;
+            case QueryTokenType::DOUBLEQUOTE:
+                break;
+            case QueryTokenType::INTEGER:
                 break;
         }
     }
@@ -101,6 +149,8 @@ DeclarationType Generator::TypeConvert(QueryTokenType type) {
             return DeclarationType::CONSTANT;
         case QueryTokenType::PROCEDURE:
             return DeclarationType::PROCEDURE;
+        default:
+            assert(false);
     }
 }
 bool Generator::GenerateDeclarations() {
