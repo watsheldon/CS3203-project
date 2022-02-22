@@ -1346,44 +1346,28 @@ void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
     }
 }
 
-bool ProgramKnowledgeBase::ContainsUnseenVarConst(
-        const std::vector<QueryToken> &tokens) {
-    for (const auto &token : tokens) {
-        switch (token.type) {
-            case QueryTokenType::WORD: {
-                if (var_name_.GetIndex(token.value) == 0) {
-                    return true;
-                }
-                break;
-            }
-            case QueryTokenType::INTEGER: {
-                if (const_value_.GetIndex(token.value) == 0) {
-                    return true;
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
-    return false;
-}
-
-PolishNotation ProgramKnowledgeBase::ConvertFromQueryTokens(
+std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
         const std::vector<QueryToken> &tokens) {
     std::vector<PolishNotationNode> expr;
+    bool contains_unseen = false;
     for (const auto &token : tokens) {
         switch (token.type) {
             case QueryTokenType::WORD: {
                 int var_index = var_name_.GetIndex(token.value);
-                assert(var_index > 0);
+                if (var_index == 0) {
+                    contains_unseen = true;
+                    break;
+                }
                 PolishNotationNode node(ExprNodeType::kVariable, var_index);
                 expr.emplace_back(node);
                 break;
             }
             case QueryTokenType::INTEGER: {
                 int const_index = const_value_.GetIndex(token.value);
-                assert(const_index > 0);
+                if (const_index = 0) {
+                    contains_unseen = true;
+                    break;
+                }
                 PolishNotationNode node(ExprNodeType::kConstant, const_index);
                 expr.emplace_back(node);
                 break;
@@ -1426,8 +1410,11 @@ PolishNotation ProgramKnowledgeBase::ConvertFromQueryTokens(
             default:
                 assert(false);
         }
+        if (contains_unseen) {
+            break;
+        }
     }
-    return PolishNotation(expr);
+    return std::make_pair(PolishNotation(expr), contains_unseen);
 }
 
 }  // namespace spa

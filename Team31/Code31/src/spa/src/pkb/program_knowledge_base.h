@@ -10,6 +10,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -158,8 +159,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::unique_ptr<ContainerForest> container_forest_;
 
-    bool ContainsUnseenVarConst(const std::vector<QueryToken> &tokens);
-    PolishNotation ConvertFromQueryTokens(
+    std::pair<PolishNotation, bool> ConvertFromQueryTokens(
             const std::vector<QueryToken> &tokens);
 
     std::set<int> GetAllParents(StmtType return_type);
