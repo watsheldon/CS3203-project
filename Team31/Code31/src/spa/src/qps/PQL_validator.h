@@ -6,7 +6,6 @@
 #include "PQL_tokenizer.h"
 #include "query_object.h"
 #include "query_token.h"
-#include "select_cl.h"
 
 namespace spa {
 class PQLValidator {
