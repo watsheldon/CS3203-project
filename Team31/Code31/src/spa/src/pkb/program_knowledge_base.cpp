@@ -1234,7 +1234,9 @@ std::set<int> ProgramKnowledgeBase::GetPattern(QueryToken token) {
     if (var_index == 0) {
         return {};
     }
-    return GetModifies(var_index, StmtType::kAssign);
+
+    return GetModifies(Index<QueryEntityType::kVar>(var_index),
+                       StmtType::kAssign);
 }
 
 // (" ", " ") , (" ", _" "_)
@@ -1277,7 +1279,8 @@ ProgramKnowledgeBase::GetPatternPair(std::vector<QueryToken> tokens,
     assign_stmt_set = GetPattern(tokens, partial_match);
 
     for (auto &i : assign_stmt_set) {
-        assign_var.emplace_back(*GetModifies(i).begin());
+        assign_var.emplace_back(
+                *GetModifies(Index<QueryEntityType::kStmt>(i)).begin());
     }
     return {assign_stmt, assign_var};
 }
