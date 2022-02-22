@@ -193,17 +193,17 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         std::pair<std::vector<int>, std::vector<int>> pairTest2 = {{}, {}};
         std::pair<std::vector<int>, std::vector<int>> pairTest3 = {{7, 8, 9},
                                                                    {1, 2, 3}};
-        REQUIRE(pkb.GetPattern(token1) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(token2) == std::set<int>{8});
-        REQUIRE(pkb.GetPattern(token3) == std::set<int>{9});
+        REQUIRE(pkb.GetPattern(1) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern(2) == std::set<int>{8});
+        REQUIRE(pkb.GetPattern(3) == std::set<int>{9});
         REQUIRE(pkb.GetPattern(queryToken1, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken2, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken3, true).empty());
         REQUIRE(pkb.GetPattern(queryToken4, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken5, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken6, true).empty());
-        REQUIRE(pkb.GetPattern(token1, queryToken4, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(token2, queryToken4, true).empty());
+        REQUIRE(pkb.GetPattern(1, queryToken4, true) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern(2, queryToken4, true).empty());
         REQUIRE(pkb.GetPatternPair(queryToken4, true) == pairTest);
         REQUIRE(pkb.GetPatternPair(queryToken3, true) == pairTest2);
         REQUIRE(pkb.GetPatternPair() == pairTest3);
@@ -287,10 +287,8 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     SECTION("GetEntity") {
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kAssign) ==
                 std::vector<int>{7, 8, 9});
-        REQUIRE(pkb.GetAllEntityIndices(StmtType::kCall) ==
-                std::vector<int>{});
-        REQUIRE(pkb.GetAllEntityIndices(StmtType::kIf) ==
-                std::vector<int>{4});
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kCall) == std::vector<int>{});
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kIf) == std::vector<int>{4});
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kPrint) ==
                 std::vector<int>{3, 6});
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kRead) ==
@@ -306,6 +304,6 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kVar) ==
                 std::vector<int>{1, 2, 3});
     }
-    }
+}
 
 }  // namespace spa
