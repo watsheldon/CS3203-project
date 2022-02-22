@@ -1192,13 +1192,14 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
                                                bool partial_match) {
     assert(compiled);
-    if (ContainsUnseenVarConst(tokens)) {
+    auto converted_token = ConvertFromQueryTokens(tokens);
+    if (converted_token.second) {
         return {};
     }
 
     std::vector<int> assign_stmt;
     assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-    PN converted_pn = (ConvertFromQueryTokens(tokens));
+    PN converted_pn = converted_token.first;
 
     if (partial_match) {
         std::set<int> partial_match_stmt;
@@ -1244,9 +1245,6 @@ std::set<int> ProgramKnowledgeBase::GetPattern(
         QueryToken first_token, std::vector<QueryToken> second_tokens,
         bool partial_match) {
     assert(compiled);
-    if (ContainsUnseenVarConst(second_tokens)) {
-        return {};
-    }
 
     int var_index = var_name_.GetIndex(first_token.value);
     if (var_index == 0) {
@@ -1269,9 +1267,6 @@ std::pair<std::vector<int>, std::vector<int>>
 ProgramKnowledgeBase::GetPatternPair(std::vector<QueryToken> tokens,
                                      bool partial_match) {
     assert(compiled);
-    if (ContainsUnseenVarConst(tokens)) {
-        return {};
-    }
 
     std::set<int> assign_stmt_set;
     std::vector<int> assign_var;
@@ -1414,7 +1409,7 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
             break;
         }
     }
-    return std::make_pair(PolishNotation(expr), contains_unseen);
+    return {PolishNotation(expr), contains_unseen};
 }
 
 }  // namespace spa
