@@ -9,8 +9,8 @@
 #include <numeric>
 #include <set>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
