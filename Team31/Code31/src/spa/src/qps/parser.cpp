@@ -5,9 +5,8 @@
 #include "generator.h"
 
 namespace spa {
-QueryObject Parser::parse(const std::string& value) {
-    PQLValidator validator;
-    auto tokens = validator.Validate(value);
-    return generator_.Generate(tokens);
+QueryObject Parser::Parse(const std::string& query) {
+    auto tokens = validator_.Validate(query);
+    return Generator::Generate(tokens);
 }
 }  // namespace spa

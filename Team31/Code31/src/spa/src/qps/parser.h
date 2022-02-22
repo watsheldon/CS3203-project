@@ -12,16 +12,11 @@
 
 namespace spa {
 class Parser {
-  private:
-    Generator generator_;
-
   public:
-    QueryObject parse(const std::string& value);
-    //        QueryObject parseQuery(const std::string& inputFile);
-    //        Declaration parseDeclaration(std::vector<Token> tokenList);
-    //        Select parseSelect(std::vector<Token> tokenList, int startPos,
-    //        Declaration declaration); bool checkIdent(std::string s);
-    //        DeclarationType getType(Token token);
+    QueryObject Parse(const std::string& query);
+
+  private:
+    PQLValidator validator_;
 };
 }  // namespace spa
 
