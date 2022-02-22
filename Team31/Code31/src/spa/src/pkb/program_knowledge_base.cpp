@@ -134,10 +134,8 @@ bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kSecond> child_stmt) {
     assert(compiled);
     int stmtlst_index = stmtlst_stmt_.GetStmtlst(child_stmt.value);
     return child_stmt.value <= stmt_count_ &&
-           (stmtlst_parent_.GetParent(stmtlst_index).type ==
-                    PType::kIf ||
-            stmtlst_parent_.GetParent(stmtlst_index).type ==
-                    PType::kWhile);
+           (stmtlst_parent_.GetParent(stmtlst_index).type == PType::kIf ||
+            stmtlst_parent_.GetParent(stmtlst_index).type == PType::kWhile);
 }
 bool ProgramKnowledgeBase::ExistParent() {
     assert(compiled);
@@ -253,12 +251,10 @@ std::set<int> ProgramKnowledgeBase::GetAllChildren(StmtType return_type) {
     }
     std::vector<int> results = type_stmt_.GetStatements(return_type);
     std::vector<int> filtered_results;
-    for(auto& i: results) {
+    for (auto &i : results) {
         int stmtlst_index = stmtlst_stmt_.GetStmtlst(i);
-        PType type =
-                stmtlst_parent_.GetParent(stmtlst_index).type;
-        if (type != PType::kIf &&
-                    type != PType::kWhile) continue;
+        PType type = stmtlst_parent_.GetParent(stmtlst_index).type;
+        if (type != PType::kIf && type != PType::kWhile) continue;
         filtered_results.emplace_back(i);
     }
     return {filtered_results.begin(), filtered_results.end()};
@@ -337,10 +333,8 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
     }
 
     int stmtlst_index = stmtlst_stmt_.GetStmtlst(child_stmt.value);
-    PType type =
-            stmtlst_parent_.GetParent(stmtlst_index).type;
-    if (type != PType::kIf &&
-        type != PType::kWhile) {
+    PType type = stmtlst_parent_.GetParent(stmtlst_index).type;
+    if (type != PType::kIf && type != PType::kWhile) {
         return {};
     }
     std::vector<int> results;
