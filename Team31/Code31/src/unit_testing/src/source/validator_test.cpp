@@ -1,4 +1,4 @@
-#include "source/source_processor.h"
+#include "source/validator.h"
 
 #include "catch.hpp"
 
