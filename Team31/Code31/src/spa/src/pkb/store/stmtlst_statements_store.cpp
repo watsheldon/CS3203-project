@@ -92,6 +92,9 @@ std::vector<int> StmtlstStatementsStore::GetFollows(
         return {};
     }
     int pos = GetStmtRelativePos(first_stmt.value);
+    if (pos + 1 == GetStmtlstSize(first_stmt.value)) {
+        return {};
+    }
     int index = GetStmtlst(first_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
     if (!transitive) {
@@ -117,6 +120,9 @@ std::vector<int> StmtlstStatementsStore::GetFollows(
         return {};
     }
     int pos = GetStmtRelativePos(second_stmt.value);
+    if (pos == 0) {
+        return {};
+    }
     int index = GetStmtlst(second_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
     if (!transitive) {
