@@ -1204,7 +1204,7 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
         std::set<int> partial_match_stmt;
 
         for (auto &i : assign_stmt) {
-            PN pn = polish_notation_.GetNotation(
+            const PN &pn = polish_notation_.GetNotation(
                     polish_notation_.GetPolishIndex(i));
             if (pn.Contains(converted_pn)) {
                 partial_match_stmt.emplace(i);
@@ -1217,9 +1217,9 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
     std::set<int> full_match_stmt;
 
     for (auto &i : assign_stmt) {
-        PN pn = polish_notation_.GetNotation(
+        const PN &pn = polish_notation_.GetNotation(
                 polish_notation_.GetPolishIndex(i));
-        if (pn.operator==(converted_pn)) {
+        if (pn == converted_pn) {
             full_match_stmt.emplace(i);
         }
     }
@@ -1279,8 +1279,8 @@ ProgramKnowledgeBase::GetPatternPair(std::vector<QueryToken> tokens,
     assign_stmt_set = GetPattern(tokens, partial_match);
 
     for (auto &i : assign_stmt_set) {
-        assign_var.emplace_back(
-                *GetModifies(Index<QueryEntityType::kStmt>(i)).begin());
+        auto index = Index<QueryEntityType::kStmt>(i);
+        assign_var.emplace_back(*GetModifies(index).begin());
     }
     return {assign_stmt, assign_var};
 }
