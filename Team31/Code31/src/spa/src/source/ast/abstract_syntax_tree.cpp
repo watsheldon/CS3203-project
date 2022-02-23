@@ -236,7 +236,7 @@ void AbstractSyntaxTree::build_tree() {
                     assign->SetExpr(expr.get());
                     stmt_lst_path.top()->AddStatement(assign);
                     expressions_.emplace_back(std::move(expr));
-                    assign->SetRhsIndex(expressions_.size() - 1);
+                    assign->SetRhsIndex(expressions_.size());
                 } else {
                     assert(false);
                 }
