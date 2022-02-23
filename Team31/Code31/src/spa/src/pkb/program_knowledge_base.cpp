@@ -1375,6 +1375,11 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(StmtType st) {
     assert(compiled);
+    if(st==StmtType::kAll){
+        std::vector<int> results(stmt_count_);
+        std::iota(results.begin(), results.end(), 1);
+        return results;
+    }
     return type_stmt_.GetStatements(st);
 }
 

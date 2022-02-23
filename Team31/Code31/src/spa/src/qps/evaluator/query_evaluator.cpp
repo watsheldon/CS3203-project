@@ -174,7 +174,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
         case Synonym::kStmtPrint: {
             auto prints = domain == domains_.end()
                                   ? knowledge_base_->GetAllEntityIndices(
-                                            StmtType::kRead)
+                                            StmtType::kPrint)
                                   : std::vector<int>(domain->second.begin(),
                                                      domain->second.end());
             knowledge_base_->IndexToName(QueryEntityType::kStmt, prints, list);
