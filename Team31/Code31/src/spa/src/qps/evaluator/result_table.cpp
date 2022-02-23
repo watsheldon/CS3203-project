@@ -18,6 +18,8 @@ ResultTable::ResultTable(Synonym *synonym_1, Column &&column_1,
         : has_result(!column_1.empty()),
           first_(std::make_unique<VariableColumn>(synonym_1,
                                                   std::move(column_1))),
+          second_(std::make_unique<VariableColumn>(synonym_2,
+                                                   std::move(column_2))),
           type(kDouble) {}
 ResultTable::DomainPair ResultTable::Update(const ResultTable &other) {
     assert(type != kDouble);

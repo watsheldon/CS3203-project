@@ -26,7 +26,7 @@ class PQLValidator {
     bool parseSuchThat();
     bool parsePattern();
 
-    bool parseSynonym();
+    bool parseMultipleSynonym();
     bool parseStmtRef();
     bool parseUsesModifiesStmtRef();
     bool parseEntRef();

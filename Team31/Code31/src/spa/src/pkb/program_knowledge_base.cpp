@@ -148,6 +148,9 @@ std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
     auto results = return_pos == ArgPos::kFirst
                            ? stmtlst_stmt_.GetFollowedByWildcard()
                            : stmtlst_stmt_.GetFollowsWildcard();
+    if (return_type == StmtType::kAll) {
+        return {results.begin(), results.end()};
+    }
     std::set<int> filtered_results;
     std::copy_if(results.begin(), results.end(),
                  std::inserter(filtered_results, filtered_results.end()),

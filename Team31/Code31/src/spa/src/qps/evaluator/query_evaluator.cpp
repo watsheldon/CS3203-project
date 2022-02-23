@@ -16,6 +16,7 @@ QueryEvaluator::QueryEvaluator(std::unique_ptr<KnowledgeBase> knowledge_base_)
         : knowledge_base_(std::move(knowledge_base_)) {}
 void QueryEvaluator::Evaluate(const QueryObject& query,
                               std::list<std::string>& list) {
+    Clear();
     std::queue<const ConditionClause*> queue;
     const auto& clauses = query.clauses;
     std::for_each(clauses.begin(), clauses.end(),
@@ -247,5 +248,11 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
         default:
             assert(false);
     }
+}
+void QueryEvaluator::Clear() {
+    domains_.clear();
+    vartables_.clear();
+    vartable_map_.clear();
+    update_queue_.clear();
 }
 }  // namespace spa

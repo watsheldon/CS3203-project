@@ -22,7 +22,7 @@ bool PQLValidator::Query() {
     if (!parseSelect()) return false;
     parseSuchThat();
     parsePattern();
-    return true;
+    return curr_token_.empty();
 }
 
 bool PQLValidator::IsConstant() {
@@ -64,39 +64,39 @@ bool PQLValidator::expect(QueryTokenType type) {
 
 bool PQLValidator::parseDeclaration() {
     if (accept(QueryTokenType::kDeclStmt)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclRead)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclPrint)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclCall)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclWhile)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclIf)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclAssign)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclVariable)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclConstant)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     if (accept(QueryTokenType::kDeclProcedure)) {
-        return parseSynonym();
+        return parseMultipleSynonym();
     }
     return false;
 }
 
-bool PQLValidator::parseSynonym() {
+bool PQLValidator::parseMultipleSynonym() {
     if (!accept(QueryTokenType::kWord)) return false;
     while (!accept(QueryTokenType::kSemicolon)) {
         if (!accept(QueryTokenType::kComma)) return false;
@@ -170,13 +170,14 @@ bool PQLValidator::parsePattern() {
     return true;
 }
 bool PQLValidator::parseStmtRef() {
-    return parseSynonym() || expect(QueryTokenType::kUnderscore) ||
+    return accept(QueryTokenType::kWord) ||
+           accept(QueryTokenType::kUnderscore) ||
            accept(QueryTokenType::kInteger);
 }
 
 bool PQLValidator::parseEntRef() {
-    return parseSynonym() || expect(QueryTokenType::kUnderscore) ||
-           parseIdentifier();
+    return accept(QueryTokenType::kWord) ||
+           accept(QueryTokenType::kUnderscore) || parseIdentifier();
 }
 
 bool PQLValidator::parseIdentifier() {

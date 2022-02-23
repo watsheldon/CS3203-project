@@ -82,12 +82,16 @@ std::unique_ptr<QueryObject> Generator::Generate(
                 } else if (mode.top() >= Mode::kParent &&
                            mode.top() <= Mode::kPattern) {
                     mode.pop();
-                    conditions.emplace_back(factory.Build());
+                    std::unique_ptr<ConditionClause> clause = factory.Build();
+                    if (clause == nullptr) return {};
+                    conditions.emplace_back(std::move(clause));
                 } else if (mode.top() == Mode::kSecond) {
                     mode.pop();
                     assert(mode.top() == Mode::kPattern);
                     mode.pop();
-                    conditions.emplace_back(factory.Build());
+                    std::unique_ptr<ConditionClause> clause = factory.Build();
+                    if (clause == nullptr) return {};
+                    conditions.emplace_back(std::move(clause));
                 } else {
                     assert(false);
                 }
@@ -147,10 +151,12 @@ std::unique_ptr<QueryObject> Generator::Generate(
                 if (mode.top() == Mode::kFirst) {
                     mode.pop();
                     auto value = std::stoi(name);
+                    if (value == 0) return {};
                     factory.SetFirst(value);
                 } else if (mode.top() == Mode::kSecond) {
                     mode.pop();
                     auto value = std::stoi(name);
+                    if (value == 0) return {};
                     factory.SetSecond(value);
                 } else if (mode.top() == Mode::kExpression) {
                     expression.emplace_back(token);
@@ -265,7 +271,8 @@ constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
                                                  Synonym::Type type) {
     switch (mode) {
         case Mode::kParent:
-            return type != Synonym::kStmtIf && type != Synonym::kStmtWhile;
+            return type != Synonym::kStmtIf && type != Synonym::kStmtWhile &&
+                   type != Synonym::kStmtAny;
         case Mode::kFollows:
             return type > Synonym::kStmtAssign;
         case Mode::kUses:

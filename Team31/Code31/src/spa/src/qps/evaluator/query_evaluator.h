@@ -29,6 +29,7 @@ class QueryEvaluator {
     bool UpdateSingle(const VariableColumn &column);
     bool Propagate();
     bool UpdateDouble(ResultTable &result_table);
+    void Clear();
 };
 }  // namespace spa
 

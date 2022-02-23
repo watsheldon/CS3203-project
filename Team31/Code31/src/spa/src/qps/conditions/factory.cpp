@@ -79,8 +79,10 @@ std::unique_ptr<ConditionClause> Factory::BuildParent() {
                                                   is_trans_partial_);
         }
         if (second_syn_) {
-            return std::make_unique<ParentSynSyn>(first_syn_, second_syn_,
-                                                  is_trans_partial_);
+            return first_syn_ != second_syn_
+                           ? std::make_unique<ParentSynSyn>(
+                                     first_syn_, second_syn_, is_trans_partial_)
+                           : nullptr;
         }
         return std::make_unique<ParentSynWild>(first_syn_);
     }
@@ -112,8 +114,10 @@ std::unique_ptr<ConditionClause> Factory::BuildFollows() {
                                                    is_trans_partial_);
         }
         if (second_syn_) {
-            return std::make_unique<FollowsSynSyn>(first_syn_, second_syn_,
-                                                   is_trans_partial_);
+            return first_syn_ != second_syn_
+                           ? std::make_unique<FollowsSynSyn>(
+                                     first_syn_, second_syn_, is_trans_partial_)
+                           : nullptr;
         }
         return std::make_unique<FollowsSynWild>(first_syn_);
     }
