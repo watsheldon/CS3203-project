@@ -24,8 +24,8 @@ void QueryEvaluator::Evaluate(const QueryObject& query,
     // each synonym, overload the operator< since that's what stl uses by
     // default, then change to a priority queue
     while (!queue.empty()) {
-        auto [vartable, valid] = queue.front()->Execute(knowledge_base_.get());
-        if (!valid || !UpdateResult(vartable)) {
+        auto vartable = queue.front()->Execute(knowledge_base_.get());
+        if (!vartable.has_result || !UpdateResult(vartable)) {
             return;
         }
         queue.pop();

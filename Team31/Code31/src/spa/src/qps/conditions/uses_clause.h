@@ -8,8 +8,7 @@ class UsesClause : public ConditionClause {};
 class UsesIntIdent : public UsesClause {
   public:
     UsesIntIdent(int first, std::string second);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const int first_;
@@ -18,8 +17,7 @@ class UsesIntIdent : public UsesClause {
 class UsesIntSyn : public UsesClause {
   public:
     UsesIntSyn(int first, Synonym *second);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const int first_;
@@ -28,8 +26,7 @@ class UsesIntSyn : public UsesClause {
 class UsesIntWild : public UsesClause {
   public:
     explicit UsesIntWild(int first);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     const int first_;
@@ -37,8 +34,7 @@ class UsesIntWild : public UsesClause {
 class UsesSynIdent : public UsesClause {
   public:
     UsesSynIdent(Synonym *first, std::string second);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     Synonym *const first_;
@@ -47,8 +43,7 @@ class UsesSynIdent : public UsesClause {
 class UsesSynSyn : public UsesClause {
   public:
     UsesSynSyn(Synonym *first, Synonym *second);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     Synonym *const first_;
@@ -57,8 +52,7 @@ class UsesSynSyn : public UsesClause {
 class UsesSynWild : public UsesClause {
   public:
     explicit UsesSynWild(Synonym *first);
-    std::pair<ResultTable, bool> Execute(
-            KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
     Synonym *const first_;
