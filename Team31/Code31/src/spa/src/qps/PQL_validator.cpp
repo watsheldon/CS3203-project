@@ -20,8 +20,8 @@ bool PQLValidator::Query() {
     while (parseDeclaration()) {
     }
     if (!parseSelect()) return false;
-    if (!parseSuchThat()) return false;
-    if (!parsePattern()) return false;
+    parseSuchThat();
+    parsePattern();
     return true;
 }
 

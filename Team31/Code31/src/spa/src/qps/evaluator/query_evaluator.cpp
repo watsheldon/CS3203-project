@@ -242,6 +242,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
                                  : std::vector<int>(domain->second.begin(),
                                                     domain->second.end());
             knowledge_base_->IndexToName(QueryEntityType::kProc, procs, list);
+            return;
         }
         default:
             assert(false);

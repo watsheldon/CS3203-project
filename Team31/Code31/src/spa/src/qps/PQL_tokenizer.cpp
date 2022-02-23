@@ -53,6 +53,7 @@ PQLTokenizer &PQLTokenizer::operator>>(std::string &token) {
     return *this;
 }
 PQLTokenizer &PQLTokenizer::operator()(std::string_view str) {
+    buffer_.clear();
     buffer_.str(str.data());
     error = false;
     return *this;
