@@ -19,13 +19,19 @@ Tokenizer::Tokenizer(std::string_view str) {
     error = false;
 }
 Tokenizer &Tokenizer::operator()(std::string_view str) {
+    buffer_.clear();
     buffer_.str(str.data());
     error = false;
     return *this;
 }
 std::string Tokenizer::Next() {
     std::string token;
-    ExtractInto(token);
+    if (peek_.empty()) {
+        ExtractInto(token);
+    } else {
+        token = peek_;
+        peek_.clear();
+    }
     return token;
 }
 void Tokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
@@ -82,7 +88,18 @@ void Tokenizer::ExtractInto(std::string &token) {
     error = true;
 }
 Tokenizer &Tokenizer::operator>>(std::string &token) {
-    ExtractInto(token);
+    if (peek_.empty()) {
+        ExtractInto(token);
+    } else {
+        token = peek_;
+        peek_.clear();
+    }
     return *this;
+}
+std::string Tokenizer::Peek() {
+    if (peek_.empty()) {
+        ExtractInto(peek_);
+    }
+    return peek_;
 }
 }  // namespace spa

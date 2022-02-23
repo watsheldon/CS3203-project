@@ -33,6 +33,7 @@ class Tokenizer {
      * @return the next valid token if success, empty string otherwise
      */
     std::string Next();
+    std::string Peek();
 
     /**
      * The stream operator to retrieve the next token.
@@ -46,6 +47,7 @@ class Tokenizer {
     static constexpr char kSpecialPaired[] = "&|";
     std::stringstream buffer_;
     bool error = false;  // triggered by either EOF or unrecognized token
+    std::string peek_;
 
     void KeepWhile(std::string &token, int (*pred)(int));
     void KeepFirstOf(std::string &token, long len);

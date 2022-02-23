@@ -67,6 +67,9 @@ bool Validator::StmtLst() {
     return valid;
 }
 bool Validator::Stmt() {
+    if (tokenizer_.Peek() == Keyword(SourceTokenType::kAssignEqual)) {
+        return expect(SourceTokenType::kName) && Assign();
+    }
     if (accept(SourceTokenType::kKeywordRead)) {
         return Read();
     }
@@ -81,9 +84,6 @@ bool Validator::Stmt() {
     }
     if (accept(SourceTokenType::kKeywordIf)) {
         return If();
-    }
-    if (accept(SourceTokenType::kName)) {
-        return Assign();
     }
     return false;
 }
