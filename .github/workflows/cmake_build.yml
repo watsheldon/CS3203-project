@@ -36,7 +36,12 @@ jobs:
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
 
-      - name: Run tests
-        working-directory: ${{runner.workspace}}/build
+      - name: Run unit tests
+        working-directory: ${{runner.workspace}}/build/src/unit_testing
         shell: bash
-        run: ctest -C $BUILD_TYPE
+        run: ./unit_testing
+
+      - name: Run integration tests
+        working-directory: ${{runner.workspace}}/build/src/integration_testing
+        shell: bash
+        run: ./integration_testing
