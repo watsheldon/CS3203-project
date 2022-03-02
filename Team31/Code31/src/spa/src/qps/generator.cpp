@@ -269,6 +269,7 @@ constexpr Generator::Mode Generator::TokenToClauseMode(QueryTokenType type) {
 }
 constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
                                                  Synonym::Type type) {
+    assert(type != Synonym::kNone);
     switch (mode) {
         case Mode::kParent:
             return type != Synonym::kStmtIf && type != Synonym::kStmtWhile &&
@@ -287,6 +288,7 @@ constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
 }
 constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
                                                   Synonym::Type type) {
+    assert(type != Synonym::kNone);
     switch (mode) {
         case Mode::kParent:
         case Mode::kFollows:
