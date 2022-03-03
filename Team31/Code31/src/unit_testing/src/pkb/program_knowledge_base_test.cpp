@@ -8,7 +8,7 @@ namespace spa {
 TEST_CASE("pkb/ProgramKnowledgeBase") {
     BasicEntities be;
     be.procedures = std::vector<std::string>{"", "p1"};
-    be.variables = std::vector<std::string>{"", "v1", "v2", "v3"};
+    be.variables = std::vector<std::string>{"", "v1", "v2", "v3", "v4"};
     be.constants = std::vector<std::string>{"", "1", "2", "3"};
     be.reads = std::vector<int>{2, 10};
     be.prints = std::vector<int>{3, 6};
@@ -111,6 +111,8 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     pkb.SetRel(Index<SetEntityType::kStmt>(9), std::vector<int>{3});
     pkb.SetRel(Index<SetEntityType::kStmt>(3), std::vector<int>{3});
     pkb.SetRel(Index<SetEntityType::kStmt>(6), std::vector<int>{2});
+    pkb.SetRel(Index<SetEntityType::kStmt>(5), std::vector<int>{4});
+    pkb.SetRel(Index<SetEntityType::kStmt>(4), std::vector<int>{4});
 
     pkb.Compile();
     SECTION("ExistFollows") {
@@ -216,6 +218,8 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.ExistUses(7, 3));
         REQUIRE(pkb.ExistUses(8, 2));
         REQUIRE(pkb.ExistUses(5, 1));
+        REQUIRE(pkb.ExistUses(4, 4));
+        REQUIRE(pkb.ExistUses(5, 4));
         REQUIRE_FALSE(pkb.ExistUses(2, 1));
         REQUIRE_FALSE(pkb.ExistUses(200, 1));
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(7)) ==
@@ -226,13 +230,17 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(9)) ==
                 std::set<int>{3});
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(5)) ==
-                std::set<int>{1, 2, 3});
-        REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(4)) ==
-                std::set<int>{1, 2, 3});
+                std::set<int>{1, 2, 3, 4});
+        REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(1)) ==
+                std::set<int>{1, 2, 3, 4});
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kVar>(1),
                             StmtType::kAssign) == std::set<int>{7});
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kVar>(3),
                             StmtType::kWhile) == std::set<int>{1, 5});
+        REQUIRE(pkb.GetUses(Index<QueryEntityType::kVar>(4), StmtType::kAll) ==
+                std::set<int>{1, 4, 5});
+        REQUIRE(pkb.GetUses(Index<QueryEntityType::kVar>(4), StmtType::kIf) ==
+                std::set<int>{4});
         REQUIRE(pkb.GetUses(StmtType::kAll) ==
                 std::set<int>{1, 5, 4, 3, 6, 7, 8, 9});
         REQUIRE(pkb.GetUses(StmtType::kIf) == std::set<int>{4});
@@ -302,7 +310,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kStmt) ==
                 std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kVar) ==
-                std::vector<int>{1, 2, 3});
+                std::vector<int>{1, 2, 3, 4});
     }
 }
 

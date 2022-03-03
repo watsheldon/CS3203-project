@@ -581,7 +581,7 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
                                   var_index);
     }
 
-    auto first_stmt = stmt_no + 1;
+    auto first_stmt = stmt_no;
     int last_stmt;
 
     auto follow_vec =
@@ -594,27 +594,13 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
                 type == StmtType::kWhile
                         ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
                         : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
-        int grandchild = container_forest_->GetRightmostGrandchild(stmt_no);
+        int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
         auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
         last_stmt = grandchild_stmt.back();
     }
 
     if (var_index == 0) {
-        const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
-        auto first_assign = std::lower_bound(assign_stmts.begin(),
-                                             assign_stmts.end(), first_stmt);
-        if (first_assign != assign_stmts.end() && *first_assign <= last_stmt) {
-            return true;
-        }
-
-        const auto &print_stmts = type_stmt_.GetStatements(StmtType::kPrint);
-        auto first_print = std::lower_bound(print_stmts.begin(),
-                                            print_stmts.end(), first_stmt);
-        if (first_print != print_stmts.end() && *first_print <= last_stmt) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     auto using_stmt = uses_rel_.GetStmtNo(var_index);
@@ -972,6 +958,9 @@ std::set<int> ProgramKnowledgeBase::GetUses(
 
     std::set<int> results;
 
+    auto conditional_var = uses_rel_.GetVarIndex(stmt_no.value);
+    results.insert(conditional_var.begin(), conditional_var.end());
+
     for (auto i = first_assign; i != second_assign; i++) {
         auto var_indices = uses_rel_.GetVarIndex(*i);
         results.insert(var_indices.begin(), var_indices.end());
@@ -987,6 +976,28 @@ std::set<int> ProgramKnowledgeBase::GetUses(
         auto var_indices = uses_rel_.GetVarIndex(*i);
         results.insert(var_indices.begin(), var_indices.end());
     }
+
+    const auto &while_stmts = type_stmt_.GetStatements(StmtType::kWhile);
+    auto first_while = std::lower_bound(while_stmts.begin(), while_stmts.end(),
+                                        first_stmt);
+    auto second_while =
+            std::upper_bound(first_while, while_stmts.end(), last_stmt);
+
+    for (auto i = first_while; i != second_while; i++) {
+        auto var_indices = uses_rel_.GetVarIndex(*i);
+        results.insert(var_indices.begin(), var_indices.end());
+    }
+
+    const auto &if_stmts = type_stmt_.GetStatements(StmtType::kIf);
+    auto first_if =
+            std::lower_bound(if_stmts.begin(), if_stmts.end(), first_stmt);
+    auto second_if = std::upper_bound(first_if, if_stmts.end(), last_stmt);
+
+    for (auto i = first_if; i != second_if; i++) {
+        auto var_indices = uses_rel_.GetVarIndex(*i);
+        results.insert(var_indices.begin(), var_indices.end());
+    }
+
     return results;
 }
 
@@ -1166,18 +1177,18 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     }
 
     std::set<int> container_stmt;
-    std::vector<int> parents, direct_modifying_stmt;
+    std::vector<int> parents, direct_uses_stmt;
 
-    direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    direct_uses_stmt = type_stmt_.GetStatements(StmtType::kAssign);
     auto print_stmt = type_stmt_.GetStatements(StmtType::kPrint);
-    direct_modifying_stmt.insert(direct_modifying_stmt.end(),
-                                 print_stmt.begin(), print_stmt.end());
+    direct_uses_stmt.insert(direct_uses_stmt.end(), print_stmt.begin(),
+                            print_stmt.end());
 
     if (type == StmtType::kIf) {
         std::vector<int> if_stmt;
         std::vector<int> if_var;
 
-        for (auto &i : direct_modifying_stmt) {
+        for (auto &i : direct_uses_stmt) {
             auto var_indices = uses_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
             parents = container_forest_->GetParents(stmtlst);
@@ -1202,7 +1213,7 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
         std::vector<int> while_var;
         std::vector<int> while_stmt;
 
-        for (auto &i : direct_modifying_stmt) {
+        for (auto &i : direct_uses_stmt) {
             auto var_indices = uses_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
             parents = container_forest_->GetParents(stmtlst);
@@ -1227,7 +1238,7 @@ ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     std::vector<int> all_stmt;
     std::vector<int> all_var;
 
-    for (auto &i : direct_modifying_stmt) {
+    for (auto &i : direct_uses_stmt) {
         auto var_indices = uses_rel_.GetVarIndex(i);
         all_var.insert(all_var.end(), var_indices.begin(), var_indices.end());
         for (int i = 0; i < var_indices.size(); i++) {
