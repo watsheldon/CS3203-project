@@ -25,24 +25,34 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Create Build Environment
-        run: cmake -E make_directory ${{runner.workspace}}/build
+        run: cmake -E make_directory ${{ runner.temp }}/build
 
       - name: Configure CMake
         shell: bash
-        working-directory: ${{runner.workspace}}/build
+        working-directory: ${{ runner.temp }}/build
         run: cmake $GITHUB_WORKSPACE/Team31/Code31/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
       - name: Build Project
-        working-directory: ${{runner.workspace}}/build
+        working-directory: ${{ runner.temp }}/build
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
 
       - name: Run unit tests
-        working-directory: ${{runner.workspace}}/build/src/unit_testing
+        working-directory: Team31/Tests31
         shell: bash
-        run: ./unit_testing
+        run: |
+             if [ "$RUNNER_OS" == "Windows" ]; then
+                 $RUNNER_TEMP/build/src/unit_testing/$BUILD_TYPE/unit_testing.exe
+             else
+                 $RUNNER_TEMP/build/src/unit_testing/unit_testing
+             fi
 
       - name: Run integration tests
-        working-directory: ${{runner.workspace}}/build/src/integration_testing
+        working-directory: Team31/Tests31
         shell: bash
-        run: ./integration_testing
+        run: |
+             if [ "$RUNNER_OS" == "Windows" ]; then
+                 $RUNNER_TEMP/build/src/integration_testing/$BUILD_TYPE/integration_testing.exe
+             else
+                 $RUNNER_TEMP/build/src/integration_testing/integration_testing
+             fi
