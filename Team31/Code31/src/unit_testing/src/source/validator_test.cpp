@@ -161,7 +161,7 @@ TEST_CASE("source/Validator") {
                                    bracer_token,
                                    bracer_token};
 
-        std::filesystem::path path1 = "../../../../Tests31/source_1.txt";
+        std::filesystem::path path1 = "source_1.txt";
         Validator validator1(path1);
         auto tokens = validator1.Validate();
         REQUIRE(*tokens == tokens1);
@@ -179,7 +179,7 @@ TEST_CASE("source/Validator") {
                 bracel_token,    print_token,      name_token_while,
                 semicolon_token, bracer_token,     bracer_token};
 
-        std::filesystem::path path2 = "../../../../Tests31/source_2.txt";
+        std::filesystem::path path2 = "source_2.txt";
         Validator validator2(path2);
         auto tokens = validator2.Validate();
         REQUIRE(*tokens == tokens2);
