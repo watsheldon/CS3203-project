@@ -1,0 +1,33 @@
+name: Create Submission Archive
+
+on:
+  push:
+    tags:
+      - 'iter*'
+
+env:
+  ZIP_NAME: Team31-${{ github.ref_name }}.zip
+
+jobs:
+  archive:
+    name: Create submission archive
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Remove irrelevant files
+        run: find . -name '.[!.]*' -exec rm -rf -- {} +
+
+      - name: Test submission requirements
+        run: python3 check-submission.py
+
+      - name: Create archive
+        working-directory: ${{ runner.workspace }}
+        run: zip -r $ZIP_NAME ${{ github.event.repository.name }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ runner.workspace }}/${{ env.ZIP_NAME }}
+          generate_release_notes: false
