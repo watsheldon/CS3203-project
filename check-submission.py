@@ -9,12 +9,12 @@ import glob
 
 def check_compliance(compliance, sub_dir_files, path):
     sub_dirs = {}
-    
+
     # check which category is it in
     for cat, req in compliance.items():
         # Sort out the 3 files
         for f in sub_dir_files:
-    
+
             if type(req)==str and f==req:
                 sub_dirs[cat] = os.path.join(path, f)
             elif type(req)==set and f in req:
@@ -25,7 +25,7 @@ def check_compliance(compliance, sub_dir_files, path):
     if len(missing_cats) != 0:
         for cat in missing_cats:
             print(f"[Failed] - Missing {cat}: {compliance[cat]}")
-        sys.exit()
+        sys.exit(1)
 
     return sub_dirs
 
@@ -33,7 +33,7 @@ def is_empty(dir_name, base_path):
     if dir_name in os.listdir(base_path):
         if len(os.listdir(os.path.join(base_path, dir_name))) != 0:
             print("[Failed] - Directory {} should be empty, but its not.".format(dir_name))
-            sys.exit()
+            sys.exit(1)
     print("[Passed] - Directory {} is clean.".format(dir_name))
 
 print("This script will check for basic compliance with the submission requirements.")
@@ -44,11 +44,11 @@ print("-"*80)
 files = [f for f in os.listdir('.') if re.match(r'Team[0-9][0-9]', f)]
 if len(files) > 1:
     print("[Failed] - This script cannot be executed with multiple teams' folders.")
-    sys.exit()
+    sys.exit(1)
 
 if len(files) == 0:
     print("[Failed] - This script cannot find the Team folder, please make sure it exist and named correctly.")
-    sys.exit()
+    sys.exit(1)
 
 # Single Team folder
 team_folder = files[0]
@@ -56,7 +56,7 @@ team_no_str = team_folder[4:]
 team_no = int(team_no_str)
 if team_no < 1:
     print("[Failed] - Team number must be valid.")
-    sys.exit()
+    sys.exit(1)
 
 print("[Passed] - Single team folder detected, Team number is {}.".format(team_no) )
 
@@ -70,7 +70,7 @@ for f in root_files:
 sub_dir_files = [ f for f in os.listdir(os.path.join(team_folder)) ]
 if len(sub_dir_files) < 2 or len(sub_dir_files) > 3:
     print("[Failed] - Must only contain 2 - 3 items: Tests dir and Code dir, and a report pdf if submission requires")
-    sys.exit()
+    sys.exit(1)
 
 sub_dirs_compliance = {
     "code" : "Code{}".format(team_no_str),
@@ -127,14 +127,20 @@ for query in test_sub_dirs["queries"]:
 allowed_hidden_files = {'.gitignore', '.gitattributes'}
 allowed_hidden_dirs = {'.git'}
 # Now we check for hidden files
+has_hidden = False
 for root, dirnames, filenames in os.walk("."):
     for filename in filenames:
         if filename.startswith(".") and not filename in allowed_hidden_files:
             print("[Failed] - Hidden file {} should not exist.".format(os.path.join(root, filename)))
+            has_hidden = True
 
     for dir in dirnames:
         if dir.startswith(".") and not dir in allowed_hidden_dirs:
             print("[Failed] - Hidden dir {} should not exist.".format(os.path.join(root, dir)))
+            has_hidden = True
+
+if has_hidden:
+    sys.exit(1)
 
 # Now we have established correct subdirs
 print("-"*80)
