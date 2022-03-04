@@ -1404,18 +1404,20 @@ void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
     switch (et) {
         case QueryEntityType::kProc:
             std::transform(index_list.begin(), index_list.end(),
-                           std::back_inserter(names),
-                           [this](int i) { return proc_name_.GetName(i); });
+                           std::back_inserter(names), [this](int i) {
+                               return proc_name_.GetNameValue(i);
+                           });
             break;
         case QueryEntityType::kVar:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names),
-                           [this](int i) { return var_name_.GetName(i); });
+                           [this](int i) { return var_name_.GetNameValue(i); });
             break;
         case QueryEntityType::kConst:
             std::transform(index_list.begin(), index_list.end(),
-                           std::back_inserter(names),
-                           [this](int i) { return const_value_.GetValue(i); });
+                           std::back_inserter(names), [this](int i) {
+                               return const_value_.GetNameValue(i);
+                           });
             break;
         default:
             std::transform(index_list.begin(), index_list.end(),

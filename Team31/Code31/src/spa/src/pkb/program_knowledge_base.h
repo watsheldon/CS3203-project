@@ -18,14 +18,12 @@
 #include "common/polish_notation_node.h"
 #include "knowledge_base.h"
 #include "pkb/store/call_procedure_store.h"
-#include "pkb/store/constant_value_store.h"
 #include "pkb/store/modifies_relationship_store.h"
+#include "pkb/store/name_value_store.h"
 #include "pkb/store/polish_notation_store.h"
-#include "pkb/store/procedure_name_store.h"
 #include "pkb/store/stmtlst_statements_store.h"
 #include "pkb/store/type_statements_store.h"
 #include "pkb/store/uses_relationship_store.h"
-#include "pkb/store/variable_name_store.h"
 #include "secondary_structure/container_forest.h"
 #include "store/stmtlst_parent_store.h"
 
@@ -152,9 +150,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     ModifiesRelationshipStore modifies_rel_;
     UsesRelationshipStore uses_rel_;
     PolishNotationStore polish_notation_;
-    ProcedureNameStore proc_name_;
-    VariableNameStore var_name_;
-    ConstantValueStore const_value_;
+    NameValueStore proc_name_;
+    NameValueStore var_name_;
+    NameValueStore const_value_;
     TypeStatementsStore type_stmt_;
 
     std::unique_ptr<ContainerForest> container_forest_;
