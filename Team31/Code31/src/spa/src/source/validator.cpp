@@ -1,5 +1,6 @@
 #include "validator.h"
 
+#include <cassert>
 #include <memory>
 
 #include "token.h"
@@ -123,64 +124,106 @@ bool Validator::If() {
 }
 bool Validator::Assign() {
     return expect(SourceTokenType::kAssignEqual) &&  // =
-           Expr() &&                                 // expr
+           ArithmeticExpr() &&                       // expr
            expect(SourceTokenType::kSemicolon);      // ;
 }
-bool Validator::CondExpr() {
-    if (accept(SourceTokenType::kCondNot)) {
-        return expect(SourceTokenType::kBracketL) &&  // (
-               CondExpr() &&                          // cond_expr
-               expect(SourceTokenType::kBracketR);    // )
-    }
+bool Validator::ArithmeticExpr(bool has_left /*= false */) {
     if (accept(SourceTokenType::kBracketL)) {
-        if (!(CondExpr() &&  // cond_expr
-              expect(SourceTokenType::kBracketR))) {
-            return false;
-        }
-        if (accept(SourceTokenType::kCondAnd) ||
-            accept(SourceTokenType::kCondOr)) {
-            return expect(SourceTokenType::kBracketL) &&  // (
-                   CondExpr() &&                          // cond_expr
-                   expect(SourceTokenType::kBracketR);    // )
-        }
+        if (!Group()) return false;
+    } else if (!VarConst()) {
         return false;
     }
-    return RelExpr();
+    if (has_left) return true;
+    while (ArithOpr()) {
+        if (!ArithmeticExpr(true)) return false;
+    }
+    return true;
 }
-bool Validator::RelExpr() {
-    return Expr() &&                              // rel_factor
-           (accept(SourceTokenType::kRelGt) ||    // >
-            accept(SourceTokenType::kRelGeq) ||   // >=
-            accept(SourceTokenType::kRelLt) ||    // <
-            accept(SourceTokenType::kRelLeq) ||   // <=
-            accept(SourceTokenType::kRelEq) ||    // ==
-            accept(SourceTokenType::kRelNeq)) &&  // !=
-           Expr();                                // rel_factor
+bool Validator::Group() {
+    return ArithmeticExpr() && expect(SourceTokenType::kBracketR);
 }
-bool Validator::Factor() {
-    if (accept(SourceTokenType::kName) || accept(SourceTokenType::kInteger)) {
-        return true;
+bool Validator::CondExpr() {
+    auto prefix_type = CondPrefix();
+    switch (prefix_type) {
+        case kInvalid:
+            return false;
+        case kArithmetic:
+            return RelInfix();
+        case kSingular:
+            return true;
+        case kBracketed:
+            return CondInfix();
+        default:
+            assert(false);
+    }
+}
+Validator::CondExprSubTypes Validator::CondPrefix() {
+    if (VarConst()) {
+        return RelationalExpr();
+    }
+    if (accept(SourceTokenType::kCondNot)) {
+        return WithBrackets([this] { return CondExpr(); }) ? kSingular
+                                                           : kInvalid;
     }
     if (accept(SourceTokenType::kBracketL)) {
-        return Expr() && expect(SourceTokenType::kBracketR);
+        auto prefix_type = CondPrefix();
+        switch (prefix_type) {
+            case kInvalid:
+            case kBracketed:
+                return kInvalid;
+            case kArithmetic:
+            case kSingular:
+                if (!accept(SourceTokenType::kBracketR)) return kInvalid;
+                return prefix_type == kArithmetic ? kArithmetic : kBracketed;
+            default:
+                assert(false);
+        }
     }
-    return false;
+    return kInvalid;
 }
-bool Validator::Term() {
-    if (!Factor()) return false;
-    while (accept(SourceTokenType::kOperatorTimes) ||
-           accept(SourceTokenType::kOperatorDivide) ||
-           accept(SourceTokenType::kOperatorModulo)) {
-        Factor();
+Validator::CondExprSubTypes Validator::RelationalExpr() {
+    while (ArithOpr()) {
+        if (!ArithmeticExpr(true)) {
+            return kInvalid;
+        }
     }
-    return true;
+    if (RelOpr()) {
+        if (!ArithmeticExpr()) {
+            return kInvalid;
+        }
+        return kSingular;
+    }
+    return kArithmetic;
 }
-bool Validator::Expr() {
-    if (!Term()) return false;
-    while (accept(SourceTokenType::kOperatorPlus) ||
-           accept(SourceTokenType::kOperatorMinus)) {
-        Term();
+bool Validator::RelInfix() { return RelOpr() && ArithmeticExpr(); }
+bool Validator::CondInfix() {
+    if (!accept(SourceTokenType::kCondAnd) &&
+        !accept(SourceTokenType::kCondOr)) {
+        return false;
     }
-    return true;
+    return expect(SourceTokenType::kBracketL) && CondExpr() &&
+           expect(SourceTokenType::kBracketR);
+}
+bool Validator::AcceptAnyOf(const SourceTokenType *begin,
+                            const SourceTokenType *end) {
+    return std::any_of(begin, end,
+                       [this](SourceTokenType type) { return accept(type); });
+}
+bool Validator::ArithOpr() {
+    return AcceptAnyOf(kArithmeticOpr.begin(), kArithmeticOpr.end());
+}
+bool Validator::RelOpr() {
+    return AcceptAnyOf(kRelationalOpr.begin(), kRelationalOpr.end());
+}
+bool Validator::VarConst() {
+    return accept(SourceTokenType::kName) || accept(SourceTokenType::kInteger);
+}
+bool Validator::WithBrackets(const std::function<bool()> &body) {
+    return accept(SourceTokenType::kBracketL) &&          // '('
+           body() && accept(SourceTokenType::kBracketR);  // ')'
+}
+bool Validator::WithBraces(const std::function<bool()> &body) {
+    return accept(SourceTokenType::kBraceL) &&          // '{'
+           body() && accept(SourceTokenType::kBraceR);  // '}'
 }
 }  // namespace spa
