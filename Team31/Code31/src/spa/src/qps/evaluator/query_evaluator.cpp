@@ -12,10 +12,11 @@
 #include "qps/synonym.h"
 
 namespace spa {
-QueryEvaluator::QueryEvaluator(std::unique_ptr<KnowledgeBase> knowledge_base_)
-        : knowledge_base_(std::move(knowledge_base_)) {}
+QueryEvaluator::QueryEvaluator(std::unique_ptr<KnowledgeBase> knowledge_base)
+        : knowledge_base_(std::move(knowledge_base)) {}
 void QueryEvaluator::Evaluate(const QueryObject& query,
                               std::list<std::string>& list) {
+    if (!knowledge_base_) return;
     Clear();
     std::queue<const ConditionClause*> queue;
     const auto& clauses = query.clauses;

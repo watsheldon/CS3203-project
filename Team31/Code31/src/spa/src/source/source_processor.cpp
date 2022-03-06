@@ -13,6 +13,7 @@ SourceProcessor::SourceProcessor(const std::string &filename)
 std::unique_ptr<KnowledgeBase> SourceProcessor::Parse() {
     Validator validator(source_path_);
     auto tokens = validator.Validate();
+    if (!tokens) return {};
     auto ast = std::make_unique<AbstractSyntaxTree>(std::move(tokens));
     DesignAbstractionExtractor dae;
     return dae.Extract(std::move(ast));

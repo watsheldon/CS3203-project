@@ -14,7 +14,7 @@ namespace spa {
 class Synonym;
 class QueryEvaluator {
   public:
-    explicit QueryEvaluator(std::unique_ptr<KnowledgeBase> knowledge_base_);
+    explicit QueryEvaluator(std::unique_ptr<KnowledgeBase> knowledge_base);
     void Evaluate(const QueryObject &query, std::list<std::string> &list);
 
   private:

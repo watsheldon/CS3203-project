@@ -16,6 +16,7 @@ void QueryProcessingSubsystem::Use(std::unique_ptr<KnowledgeBase> pkb_ptr) {
 
 void QueryProcessingSubsystem::Evaluate(std::string_view query_string,
                                         std::list<std::string> &list) {
+    if (!evaluator_) return;
     auto tokens = validator_.Validate(query_string);
 
     // there are only tokens if the query is syntactically correct
