@@ -1,12 +1,16 @@
 #ifndef SRC_SPA_SRC_SOURCE_TOKEN_H_
 #define SRC_SPA_SRC_SOURCE_TOKEN_H_
 
+#include <array>
 #include <string>
+#include <string_view>
 #include <utility>
+
+#include "common/map.h"
 
 namespace spa {
 enum class SourceTokenType {
-    kKeywordProcedure,
+    kKeywordProcedure = 1,
     kKeywordRead,
     kKeywordPrint,
     kKeywordCall,
@@ -37,70 +41,31 @@ enum class SourceTokenType {
     kName,
     kInteger,
 };
-
-constexpr std::string_view Keyword(SourceTokenType token_type) {
-    switch (token_type) {
-        case SourceTokenType::kKeywordProcedure:
-            return "procedure";
-        case SourceTokenType::kKeywordRead:
-            return "read";
-        case SourceTokenType::kKeywordPrint:
-            return "print";
-        case SourceTokenType::kKeywordCall:
-            return "call";
-        case SourceTokenType::kKeywordWhile:
-            return "while";
-        case SourceTokenType::kKeywordIf:
-            return "if";
-        case SourceTokenType::kKeywordThen:
-            return "then";
-        case SourceTokenType::kKeywordElse:
-            return "else";
-        case SourceTokenType::kBracketL:
-            return "(";
-        case SourceTokenType::kBracketR:
-            return ")";
-        case SourceTokenType::kBraceL:
-            return "{";
-        case SourceTokenType::kBraceR:
-            return "}";
-        case SourceTokenType::kAssignEqual:
-            return "=";
-        case SourceTokenType::kOperatorPlus:
-            return "+";
-        case SourceTokenType::kOperatorMinus:
-            return "-";
-        case SourceTokenType::kOperatorTimes:
-            return "*";
-        case SourceTokenType::kOperatorDivide:
-            return "/";
-        case SourceTokenType::kOperatorModulo:
-            return "%";
-        case SourceTokenType::kCondNot:
-            return "!";
-        case SourceTokenType::kCondAnd:
-            return "&&";
-        case SourceTokenType::kCondOr:
-            return "||";
-        case SourceTokenType::kRelLt:
-            return "<";
-        case SourceTokenType::kRelLeq:
-            return "<=";
-        case SourceTokenType::kRelEq:
-            return "==";
-        case SourceTokenType::kRelNeq:
-            return "!=";
-        case SourceTokenType::kRelGt:
-            return ">";
-        case SourceTokenType::kRelGeq:
-            return ">=";
-        case SourceTokenType::kSemicolon:
-            return ";";
-        case SourceTokenType::kName:
-        case SourceTokenType::kInteger:
-            return "";
-    }
+using namespace std::literals::string_view_literals;
+static constexpr const std::array<std::string_view, 30> kTypeStringMap{
+        {"procedure"sv, "read"sv, "print"sv, "call"sv, "while"sv, "if"sv,
+         "then"sv,      "else"sv, "("sv,     ")"sv,    "{"sv,     "}"sv,
+         "="sv,         "+"sv,    "-"sv,     "*"sv,    "/"sv,     "%"sv,
+         "!"sv,         "&&"sv,   "||"sv,    "<"sv,    "<="sv,    "=="sv,
+         "!="sv,        ">"sv,    ">="sv,    ";"sv,    {},        {}}};
+constexpr std::string_view GetSourceKeyword(
+        SourceTokenType token_type) noexcept {
+    return kTypeStringMap[static_cast<int>(token_type) - 1];
 }
+using NameTokenPair = std::pair<std::string_view, spa::SourceTokenType>;
+static constexpr const auto kStringTypeMap = []() constexpr {
+    std::array<NameTokenPair, kTypeStringMap.size() - 2> result{};
+    for (int i = static_cast<int>(SourceTokenType::kKeywordProcedure);
+         i <= static_cast<int>(SourceTokenType::kSemicolon); ++i) {
+        result[i - 1].second = SourceTokenType{i};
+        result[i - 1].first = GetSourceKeyword(result[i - 1].second);
+    }
+    return result;
+}
+();
+constexpr const auto StringToSourceType =
+        Map<std::string_view, SourceTokenType, kStringTypeMap.size()>{
+                kStringTypeMap};
 
 struct Token {
     const SourceTokenType type;

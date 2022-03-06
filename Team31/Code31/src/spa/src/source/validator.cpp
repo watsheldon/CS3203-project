@@ -36,7 +36,7 @@ inline void Validator::fetchToken() { tokenizer_ >> curr_token_; }
 bool Validator::accept(SourceTokenType type) {
     if (curr_token_.empty()) return false;
     if (type < SourceTokenType::kName) {
-        auto target = Keyword(type);
+        auto target = GetSourceKeyword(type);
         if (curr_token_ != target) return false;
         tokens_->emplace_back(type);
         fetchToken();
@@ -67,7 +67,8 @@ bool Validator::StmtLst() {
     return valid;
 }
 bool Validator::Stmt() {
-    if (tokenizer_.Peek() == Keyword(SourceTokenType::kAssignEqual)) {
+    if (StringToSourceType.at(tokenizer_.Peek()) ==
+        SourceTokenType::kAssignEqual) {
         return expect(SourceTokenType::kName) && Assign();
     }
     if (accept(SourceTokenType::kKeywordRead)) {
