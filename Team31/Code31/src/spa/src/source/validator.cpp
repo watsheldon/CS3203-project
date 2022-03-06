@@ -15,26 +15,18 @@ std::unique_ptr<std::vector<Token>> Validator::Validate() {
     return valid_program ? std::move(tokens_) : nullptr;
 }
 bool Validator::Procedure() {
-    return expect(SourceTokenType::kName) &&    // proc_name
-           expect(SourceTokenType::kBraceL) &&  // {
-           StmtLst() &&                         //
-           expect(SourceTokenType::kBraceR);    // }
-}
-bool Validator::expect(SourceTokenType type) {
-    if (!accept(type)) {
-        return false;
-    }
-    return true;
+    return Accept(SourceTokenType::kName) &&  // proc_name
+           WithBraces([this] { return StmtLst(); });
 }
 bool Validator::Program() {
     bool valid = false;
-    while (accept(SourceTokenType::kKeywordProcedure)) {
+    while (Accept(SourceTokenType::kKeywordProcedure)) {
         valid = Procedure();
     }
     return valid;
 }
 inline void Validator::fetchToken() { tokenizer_ >> curr_token_; }
-bool Validator::accept(SourceTokenType type) {
+bool Validator::Accept(SourceTokenType type) {
     if (curr_token_.empty()) return false;
     if (type < SourceTokenType::kName) {
         auto target = GetSourceKeyword(type);
@@ -70,65 +62,65 @@ bool Validator::StmtLst() {
 bool Validator::Stmt() {
     if (StringToSourceType.at(tokenizer_.Peek()) ==
         SourceTokenType::kAssignEqual) {
-        return expect(SourceTokenType::kName) && Assign();
+        return Accept(SourceTokenType::kName) && Assign();
     }
-    if (accept(SourceTokenType::kKeywordRead)) {
+    if (Accept(SourceTokenType::kKeywordRead)) {
         return Read();
     }
-    if (accept(SourceTokenType::kKeywordPrint)) {
+    if (Accept(SourceTokenType::kKeywordPrint)) {
         return Print();
     }
-    if (accept(SourceTokenType::kKeywordCall)) {
+    if (Accept(SourceTokenType::kKeywordCall)) {
         return Call();
     }
-    if (accept(SourceTokenType::kKeywordWhile)) {
+    if (Accept(SourceTokenType::kKeywordWhile)) {
         return While();
     }
-    if (accept(SourceTokenType::kKeywordIf)) {
+    if (Accept(SourceTokenType::kKeywordIf)) {
         return If();
     }
     return false;
 }
 bool Validator::Read() {
-    return expect(SourceTokenType::kName)  // var_name
-           && expect(SourceTokenType::kSemicolon);
+    return Accept(SourceTokenType::kName)  // var_name
+           && Accept(SourceTokenType::kSemicolon);
 }
 bool Validator::Print() {
-    return expect(SourceTokenType::kName)  // var_name
-           && expect(SourceTokenType::kSemicolon);
+    return Accept(SourceTokenType::kName)  // var_name
+           && Accept(SourceTokenType::kSemicolon);
 }
 bool Validator::Call() {
-    return expect(SourceTokenType::kName)  // proc_name
-           && expect(SourceTokenType::kSemicolon);
+    return Accept(SourceTokenType::kName)  // proc_name
+           && Accept(SourceTokenType::kSemicolon);
 }
 bool Validator::While() {
-    return expect(SourceTokenType::kBracketL) &&  // (
+    return Accept(SourceTokenType::kBracketL) &&  // (
            CondExpr() &&                          // cond_expr
-           expect(SourceTokenType::kBracketR) &&  // )
-           expect(SourceTokenType::kBraceL) &&    // {
+           Accept(SourceTokenType::kBracketR) &&  // )
+           Accept(SourceTokenType::kBraceL) &&    // {
            StmtLst() &&                           // stmtLst
-           expect(SourceTokenType::kBraceR);      // }
+           Accept(SourceTokenType::kBraceR);      // }
 }
 bool Validator::If() {
-    return expect(SourceTokenType::kBracketL) &&     // (
+    return Accept(SourceTokenType::kBracketL) &&     // (
            CondExpr() &&                             // cond_expr
-           expect(SourceTokenType::kBracketR) &&     // )
-           expect(SourceTokenType::kKeywordThen) &&  // then
-           expect(SourceTokenType::kBraceL) &&       // {
+           Accept(SourceTokenType::kBracketR) &&     // )
+           Accept(SourceTokenType::kKeywordThen) &&  // then
+           Accept(SourceTokenType::kBraceL) &&       // {
            StmtLst() &&                              // stmtLst
-           expect(SourceTokenType::kBraceR) &&       // }
-           expect(SourceTokenType::kKeywordElse) &&  // else
-           expect(SourceTokenType::kBraceL) &&       // {
+           Accept(SourceTokenType::kBraceR) &&       // }
+           Accept(SourceTokenType::kKeywordElse) &&  // else
+           Accept(SourceTokenType::kBraceL) &&       // {
            StmtLst() &&                              // stmtLst
-           expect(SourceTokenType::kBraceR);         // }
+           Accept(SourceTokenType::kBraceR);         // }
 }
 bool Validator::Assign() {
-    return expect(SourceTokenType::kAssignEqual) &&  // =
+    return Accept(SourceTokenType::kAssignEqual) &&  // =
            ArithmeticExpr() &&                       // expr
-           expect(SourceTokenType::kSemicolon);      // ;
+           Accept(SourceTokenType::kSemicolon);      // ;
 }
 bool Validator::ArithmeticExpr(bool has_left /*= false */) {
-    if (accept(SourceTokenType::kBracketL)) {
+    if (Accept(SourceTokenType::kBracketL)) {
         if (!Group()) return false;
     } else if (!VarConst()) {
         return false;
@@ -140,7 +132,7 @@ bool Validator::ArithmeticExpr(bool has_left /*= false */) {
     return true;
 }
 bool Validator::Group() {
-    return ArithmeticExpr() && expect(SourceTokenType::kBracketR);
+    return ArithmeticExpr() && Accept(SourceTokenType::kBracketR);
 }
 bool Validator::CondExpr() {
     auto prefix_type = CondPrefix();
@@ -161,11 +153,11 @@ Validator::CondExprSubTypes Validator::CondPrefix() {
     if (VarConst()) {
         return RelationalExpr();
     }
-    if (accept(SourceTokenType::kCondNot)) {
+    if (Accept(SourceTokenType::kCondNot)) {
         return WithBrackets([this] { return CondExpr(); }) ? kSingular
                                                            : kInvalid;
     }
-    if (accept(SourceTokenType::kBracketL)) {
+    if (Accept(SourceTokenType::kBracketL)) {
         auto prefix_type = CondPrefix();
         switch (prefix_type) {
             case kInvalid:
@@ -173,7 +165,7 @@ Validator::CondExprSubTypes Validator::CondPrefix() {
                 return kInvalid;
             case kArithmetic:
             case kSingular:
-                if (!accept(SourceTokenType::kBracketR)) return kInvalid;
+                if (!Accept(SourceTokenType::kBracketR)) return kInvalid;
                 return prefix_type == kArithmetic ? kArithmetic : kBracketed;
             default:
                 assert(false);
@@ -197,17 +189,17 @@ Validator::CondExprSubTypes Validator::RelationalExpr() {
 }
 bool Validator::RelInfix() { return RelOpr() && ArithmeticExpr(); }
 bool Validator::CondInfix() {
-    if (!accept(SourceTokenType::kCondAnd) &&
-        !accept(SourceTokenType::kCondOr)) {
+    if (!Accept(SourceTokenType::kCondAnd) &&
+        !Accept(SourceTokenType::kCondOr)) {
         return false;
     }
-    return expect(SourceTokenType::kBracketL) && CondExpr() &&
-           expect(SourceTokenType::kBracketR);
+    return Accept(SourceTokenType::kBracketL) && CondExpr() &&
+           Accept(SourceTokenType::kBracketR);
 }
 bool Validator::AcceptAnyOf(const SourceTokenType *begin,
                             const SourceTokenType *end) {
     return std::any_of(begin, end,
-                       [this](SourceTokenType type) { return accept(type); });
+                       [this](SourceTokenType type) { return Accept(type); });
 }
 bool Validator::ArithOpr() {
     return AcceptAnyOf(kArithmeticOpr.begin(), kArithmeticOpr.end());
@@ -216,14 +208,14 @@ bool Validator::RelOpr() {
     return AcceptAnyOf(kRelationalOpr.begin(), kRelationalOpr.end());
 }
 bool Validator::VarConst() {
-    return accept(SourceTokenType::kName) || accept(SourceTokenType::kInteger);
+    return Accept(SourceTokenType::kName) || Accept(SourceTokenType::kInteger);
 }
 bool Validator::WithBrackets(const std::function<bool()> &body) {
-    return accept(SourceTokenType::kBracketL) &&          // '('
-           body() && accept(SourceTokenType::kBracketR);  // ')'
+    return Accept(SourceTokenType::kBracketL) &&          // '('
+           body() && Accept(SourceTokenType::kBracketR);  // ')'
 }
 bool Validator::WithBraces(const std::function<bool()> &body) {
-    return accept(SourceTokenType::kBraceL) &&          // '{'
-           body() && accept(SourceTokenType::kBraceR);  // '}'
+    return Accept(SourceTokenType::kBraceL) &&          // '{'
+           body() && Accept(SourceTokenType::kBraceR);  // '}'
 }
 }  // namespace spa

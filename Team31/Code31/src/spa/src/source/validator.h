@@ -52,8 +52,7 @@ class Validator {
      * the rest of the char are also digits.
      */
     bool IsConstant() const;
-    bool accept(SourceTokenType type);
-    bool expect(SourceTokenType type);
+    bool Accept(SourceTokenType type);
     void fetchToken();
     bool Stmt();
     bool ArithmeticExpr(bool has_left = false);
