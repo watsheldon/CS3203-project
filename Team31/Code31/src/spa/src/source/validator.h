@@ -40,9 +40,7 @@ class Validator {
     bool Program();
     bool Procedure();
     bool StmtLst();
-    bool Read();
-    bool Print();
-    bool Call();
+    bool NameSemiColon();
     bool While();
     bool If();
     bool Assign();
@@ -52,8 +50,8 @@ class Validator {
      * the rest of the char are also digits.
      */
     bool IsConstant() const;
+    void FetchToken();
     bool Accept(SourceTokenType type);
-    void fetchToken();
     bool Stmt();
     bool ArithmeticExpr(bool has_left = false);
     bool Group();
@@ -66,8 +64,7 @@ class Validator {
     bool ArithOpr();
     bool RelOpr();
     bool VarConst();
-    bool WithBrackets(const std::function<bool()> &body);
-    bool WithBraces(const std::function<bool()> &body);
+    bool Condition();
 };
 }  // namespace spa
 
