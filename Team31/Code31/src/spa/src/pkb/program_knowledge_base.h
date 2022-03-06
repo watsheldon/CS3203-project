@@ -160,6 +160,19 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::pair<PolishNotation, bool> ConvertFromQueryTokens(
             const std::vector<QueryToken> &tokens);
 
+    int GetContainerLastStmt(StmtType type, int stmt_no);
+    std::pair<std::vector<int>::const_iterator,
+              std::vector<int>::const_iterator>
+    GetStmtBound(StmtType type, int first_stmt, int second_stmt);
+    void AppendVarIndicesModifies(std::pair<std::vector<int>::const_iterator,
+                                            std::vector<int>::const_iterator>
+                                          bound,
+                                  std::set<int> &result);
+    void AppendVarIndicesUses(std::pair<std::vector<int>::const_iterator,
+                                        std::vector<int>::const_iterator>
+                                      bound,
+                              std::set<int> &result);
+
     std::set<int> GetAllParents(StmtType return_type);
     std::set<int> GetAllChildren(StmtType return_type);
     void GetNonTransitiveParentFirst(StmtType parent_type, int parent,

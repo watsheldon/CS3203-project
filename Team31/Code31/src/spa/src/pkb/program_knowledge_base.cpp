@@ -514,23 +514,8 @@ bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
                var_index == modifies_rel_.GetVarIndex(stmt_no);
     }
 
-    auto first_stmt = stmt_no + 1;
-    int last_stmt;
-
-    auto follow_vec =
-            GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
-
-    if (follow_vec.size() == 1) {
-        last_stmt = *follow_vec.begin();
-    } else {
-        int stmtlst =
-                type == StmtType::kWhile
-                        ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
-                        : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
-        int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
-        auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
-        last_stmt = grandchild_stmt.back();
-    }
+    int first_stmt = stmt_no + 1;
+    int last_stmt = GetContainerLastStmt(type, stmt_no);
 
     if (var_index == 0) {
         const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
@@ -581,23 +566,8 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
                                   var_index);
     }
 
-    auto first_stmt = stmt_no;
-    int last_stmt;
-
-    auto follow_vec =
-            GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
-
-    if (follow_vec.size() == 1) {
-        last_stmt = *follow_vec.begin();
-    } else {
-        int stmtlst =
-                type == StmtType::kWhile
-                        ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
-                        : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
-        int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
-        auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
-        last_stmt = grandchild_stmt.back();
-    }
+    int first_stmt = stmt_no;
+    int last_stmt = GetContainerLastStmt(type, stmt_no);
 
     if (var_index == 0) {
         return true;
@@ -628,46 +598,13 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
         return {modifies_rel_.GetVarIndex(stmt_no.value)};
     }
 
-    auto first_stmt = stmt_no.value + 1;
-    int last_stmt;
-
-    auto follow_vec = GetFollows(false, Index<ArgPos::kFirst>(stmt_no.value),
-                                 StmtType::kAll);
-
-    if (follow_vec.size() == 1) {
-        last_stmt = *follow_vec.begin();
-    } else {
-        int stmtlst = type == StmtType::kWhile
-                              ? stmtlst_parent_.GetWhileStmtLst(stmt_no.value)
-                              : stmtlst_parent_.GetIfStmtLst(stmt_no.value)
-                                        .else_index;
-        int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
-        auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
-        last_stmt = grandchild_stmt.back();
-    }
-
-    const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
-    auto first_assign = std::lower_bound(assign_stmts.begin(),
-                                         assign_stmts.end(), first_stmt);
-
-    auto second_assign =
-            std::upper_bound(first_assign, assign_stmts.end(), last_stmt);
-
     std::set<int> results;
-
-    for (auto i = first_assign; i != second_assign; i++) {
-        results.emplace(modifies_rel_.GetVarIndex(*i));
-    }
-
-    const auto &read_stmts = type_stmt_.GetStatements(StmtType::kRead);
-    auto first_read =
-            std::lower_bound(read_stmts.begin(), read_stmts.end(), first_stmt);
-    auto second_read =
-            std::upper_bound(first_read, read_stmts.end(), last_stmt);
-
-    for (auto i = first_read; i != second_read; i++) {
-        results.emplace(modifies_rel_.GetVarIndex(*i));
-    }
+    int first_stmt = stmt_no.value + 1;
+    int last_stmt = GetContainerLastStmt(type, stmt_no.value);
+    auto assign_bound = GetStmtBound(StmtType::kAssign, first_stmt, last_stmt);
+    AppendVarIndicesModifies(assign_bound, results);
+    auto read_bound = GetStmtBound(StmtType::kRead, first_stmt, last_stmt);
+    AppendVarIndicesModifies(read_bound, results);
 
     return results;
 }
@@ -704,20 +641,11 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
     }
 
     std::set<int> container_stmt;
-    std::vector<int> parents;
 
     for (auto &i : direct_modifying_stmt) {
-        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-        parents = container_forest_->GetParents(stmtlst);
-        parents.emplace_back(stmtlst);
-
-        for (auto &j : parents) {
-            auto stmt = stmtlst_parent_.GetParent(j);
-            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
-                continue;
-            }
-            container_stmt.emplace(stmt.index);
-        }
+        auto parents =
+                GetParent(true, Index<ArgPos::kSecond>(i), StmtType::kAll);
+        container_stmt.insert(parents.begin(), parents.end());
     }
 
     if (type == StmtType::kAll) {
@@ -772,17 +700,9 @@ std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
                                  read_stmt.end());
 
     for (auto &i : direct_modifying_stmt) {
-        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-        parents = container_forest_->GetParents(stmtlst);
-        parents.emplace_back(stmtlst);
-
-        for (auto &j : parents) {
-            auto stmt = stmtlst_parent_.GetParent(j);
-            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
-                continue;
-            }
-            container_stmt.emplace(stmt.index);
-        }
+        auto parents =
+                GetParent(true, Index<ArgPos::kSecond>(i), StmtType::kAll);
+        container_stmt.insert(parents.begin(), parents.end());
     }
 
     if (type == StmtType::kAll) {
@@ -931,71 +851,17 @@ std::set<int> ProgramKnowledgeBase::GetUses(
         return {var_indices.begin(), var_indices.end()};
     }
 
-    auto first_stmt = stmt_no.value + 1;
-    int last_stmt;
-
-    auto follow_vec = GetFollows(false, Index<ArgPos::kFirst>(stmt_no.value),
-                                 StmtType::kAll);
-
-    if (follow_vec.size() == 1) {
-        last_stmt = *follow_vec.begin();
-    } else {
-        int stmtlst = type == StmtType::kWhile
-                              ? stmtlst_parent_.GetWhileStmtLst(stmt_no.value)
-                              : stmtlst_parent_.GetIfStmtLst(stmt_no.value)
-                                        .else_index;
-        int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
-        auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
-        last_stmt = grandchild_stmt.back();
-    }
-
-    const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
-    auto first_assign = std::lower_bound(assign_stmts.begin(),
-                                         assign_stmts.end(), first_stmt);
-
-    auto second_assign =
-            std::upper_bound(first_assign, assign_stmts.end(), last_stmt);
-
     std::set<int> results;
-
     auto conditional_var = uses_rel_.GetVarIndex(stmt_no.value);
     results.insert(conditional_var.begin(), conditional_var.end());
+    std::vector<StmtType> stmtType = {StmtType::kAssign, StmtType::kPrint,
+                                      StmtType::kWhile, StmtType::kIf};
+    int first_stmt = stmt_no.value + 1;
+    int last_stmt = GetContainerLastStmt(type, stmt_no.value);
 
-    for (auto i = first_assign; i != second_assign; i++) {
-        auto var_indices = uses_rel_.GetVarIndex(*i);
-        results.insert(var_indices.begin(), var_indices.end());
-    }
-
-    const auto &print_stmts = type_stmt_.GetStatements(StmtType::kPrint);
-    auto first_print = std::lower_bound(print_stmts.begin(), print_stmts.end(),
-                                        first_stmt);
-    auto second_print =
-            std::upper_bound(first_print, print_stmts.end(), last_stmt);
-
-    for (auto i = first_print; i != second_print; i++) {
-        auto var_indices = uses_rel_.GetVarIndex(*i);
-        results.insert(var_indices.begin(), var_indices.end());
-    }
-
-    const auto &while_stmts = type_stmt_.GetStatements(StmtType::kWhile);
-    auto first_while = std::lower_bound(while_stmts.begin(), while_stmts.end(),
-                                        first_stmt);
-    auto second_while =
-            std::upper_bound(first_while, while_stmts.end(), last_stmt);
-
-    for (auto i = first_while; i != second_while; i++) {
-        auto var_indices = uses_rel_.GetVarIndex(*i);
-        results.insert(var_indices.begin(), var_indices.end());
-    }
-
-    const auto &if_stmts = type_stmt_.GetStatements(StmtType::kIf);
-    auto first_if =
-            std::lower_bound(if_stmts.begin(), if_stmts.end(), first_stmt);
-    auto second_if = std::upper_bound(first_if, if_stmts.end(), last_stmt);
-
-    for (auto i = first_if; i != second_if; i++) {
-        auto var_indices = uses_rel_.GetVarIndex(*i);
-        results.insert(var_indices.begin(), var_indices.end());
+    for (auto &i : stmtType) {
+        auto bound = GetStmtBound(i, first_stmt, last_stmt);
+        AppendVarIndicesUses(bound, results);
     }
 
     return results;
@@ -1036,17 +902,9 @@ std::set<int> ProgramKnowledgeBase::GetUses(
     std::vector<int> parents;
 
     for (auto &i : direct_uses_stmt) {
-        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-        parents = container_forest_->GetParents(stmtlst);
-        parents.emplace_back(stmtlst);
-
-        for (auto &j : parents) {
-            auto stmt = stmtlst_parent_.GetParent(j);
-            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
-                continue;
-            }
-            container_stmt.emplace(stmt.index);
-        }
+        auto parents =
+                GetParent(true, Index<ArgPos::kSecond>(i), StmtType::kAll);
+        container_stmt.insert(parents.begin(), parents.end());
     }
 
     if (type == StmtType::kAll) {
@@ -1096,30 +954,21 @@ std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
     }
 
     std::set<int> container_stmt;
-    std::vector<int> parents, direct_modifying_stmt;
+    std::vector<int> parents, direct_uses_stmt;
 
-    direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    direct_uses_stmt = type_stmt_.GetStatements(StmtType::kAssign);
     auto print_stmt = type_stmt_.GetStatements(StmtType::kPrint);
-    direct_modifying_stmt.insert(direct_modifying_stmt.end(),
-                                 print_stmt.begin(), print_stmt.end());
+    direct_uses_stmt.insert(direct_uses_stmt.end(), print_stmt.begin(),
+                            print_stmt.end());
 
-    for (auto &i : direct_modifying_stmt) {
-        int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-        parents = container_forest_->GetParents(stmtlst);
-        parents.emplace_back(stmtlst);
-
-        for (auto &j : parents) {
-            auto stmt = stmtlst_parent_.GetParent(j);
-            if (stmt.type != PType::kWhile && stmt.type != PType::kIf) {
-                continue;
-            }
-            container_stmt.emplace(stmt.index);
-        }
+    for (auto &i : direct_uses_stmt) {
+        auto parents =
+                GetParent(true, Index<ArgPos::kSecond>(i), StmtType::kAll);
+        container_stmt.insert(parents.begin(), parents.end());
     }
 
     if (type == StmtType::kAll) {
-        container_stmt.insert(direct_modifying_stmt.begin(),
-                              direct_modifying_stmt.end());
+        container_stmt.insert(direct_uses_stmt.begin(), direct_uses_stmt.end());
         return container_stmt;
     }
 
@@ -1502,6 +1351,60 @@ int ProgramKnowledgeBase::NameToIndex(QueryEntityType et,
     assert(et == QueryEntityType::kVar || et == QueryEntityType::kProc);
     return (et == QueryEntityType::kVar) ? var_name_.GetIndex(name)
                                          : proc_name_.GetIndex(name);
+}
+
+int ProgramKnowledgeBase::GetContainerLastStmt(StmtType type, int stmt_no) {
+    int last_stmt;
+
+    auto follow_vec =
+            GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
+
+    if (follow_vec.size() == 1) {
+        last_stmt = *follow_vec.begin() - 1;
+        return last_stmt;
+    }
+
+    int stmtlst = type == StmtType::kWhile
+                          ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
+                          : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
+    int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
+    auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
+    last_stmt = grandchild_stmt.back();
+
+    return last_stmt;
+}
+
+std::pair<std::vector<int>::const_iterator, std::vector<int>::const_iterator>
+ProgramKnowledgeBase::GetStmtBound(StmtType type, int first_stmt,
+                                   int last_stmt) {
+    std::vector<int>::const_iterator first, second;
+
+    const auto &type_stmts = type_stmt_.GetStatements(type);
+    first = std::lower_bound(type_stmts.begin(), type_stmts.end(), first_stmt);
+    second = std::upper_bound(first, type_stmts.end(), last_stmt);
+
+    return {first, second};
+}
+
+void ProgramKnowledgeBase::AppendVarIndicesModifies(
+        std::pair<std::vector<int>::const_iterator,
+                  std::vector<int>::const_iterator>
+                bound,
+        std::set<int> &results) {
+    for (auto i = bound.first; i != bound.second; i++) {
+        results.emplace(modifies_rel_.GetVarIndex(*i));
+    }
+}
+
+void ProgramKnowledgeBase::AppendVarIndicesUses(
+        std::pair<std::vector<int>::const_iterator,
+                  std::vector<int>::const_iterator>
+                bound,
+        std::set<int> &results) {
+    for (auto i = bound.first; i != bound.second; i++) {
+        auto var_indices = uses_rel_.GetVarIndex(*i);
+        results.insert(var_indices.begin(), var_indices.end());
+    }
 }
 
 }  // namespace spa
