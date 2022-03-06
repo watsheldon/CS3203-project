@@ -59,7 +59,6 @@ class Validator {
     CondExprSubTypes CondPrefix();
     CondExprSubTypes RelationalExpr();
     bool CondInfix();
-    bool AcceptAnyOf(const SourceTokenType *begin, const SourceTokenType *end);
     bool RelInfix();
     bool ArithOpr();
     bool RelOpr();

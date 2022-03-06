@@ -171,16 +171,13 @@ bool Validator::CondInfix() {
     }
     return Condition();
 }
-bool Validator::AcceptAnyOf(const SourceTokenType *begin,
-                            const SourceTokenType *end) {
-    return std::any_of(begin, end,
+bool Validator::ArithOpr() {
+    return std::any_of(kArithmeticOpr.begin(), kArithmeticOpr.end(),
                        [this](SourceTokenType type) { return Accept(type); });
 }
-bool Validator::ArithOpr() {
-    return AcceptAnyOf(kArithmeticOpr.begin(), kArithmeticOpr.end());
-}
 bool Validator::RelOpr() {
-    return AcceptAnyOf(kRelationalOpr.begin(), kRelationalOpr.end());
+    return std::any_of(kRelationalOpr.begin(), kRelationalOpr.end(),
+                       [this](SourceTokenType type) { return Accept(type); });
 }
 bool Validator::VarConst() {
     return Accept(SourceTokenType::kName) || Accept(SourceTokenType::kInteger);
