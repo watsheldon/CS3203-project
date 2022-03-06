@@ -1,0 +1,56 @@
+1 - comment
+
+Select a
+
+5000
+2 - comment
+assigna;
+Select a
+
+5000
+3 - comment
+assign a; a1;
+Select a
+
+5000
+4 - comment
+assign a_1;
+Select a
+
+5000
+5 - comment
+stmt s; assign s;
+Select s
+
+5000
+6 - comment
+stmt s;
+Select s;
+
+5000
+7 - comment
+stmt s; assign a; variable v; constant c;
+Select s such that Follows(a, c)
+
+5000
+8 - comment
+stmt s; assign a; variable v; constant c;
+Select s such that Follows*(a, c)
+
+5000
+9 - comment
+stmt s; assign a; variable v; constant c;
+Select s such that Parent(v, c)
+
+5000
+10 - comment
+stmt s; assign a; variable v; constant c;
+Select s such that Parent*(c, a)
+
+5000
+11 - comment
+stmt s;
+Select s such that Uses(_, _)
+
+5000
+

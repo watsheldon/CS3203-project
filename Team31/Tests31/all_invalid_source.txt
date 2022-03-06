@@ -1,0 +1,24 @@
+procedure AllInvalid{
+	read number;
+	sum=0;
+	while(!(number>0)){
+		digit=number%10;
+		while((a==0)&&(b<=0)){
+			while((a!=b)||(b>=c)){
+				a=b;
+			}
+		}
+		sum=sum+digit;
+		number=number/10;
+	}
+	call Haha233test1;
+	print sum;
+}
+
+procedure Haha233test1{
+	if( CS3203<(6*100) ) then{
+		read read;
+	} else{
+ 	print Haha233test1;
+	}
+}

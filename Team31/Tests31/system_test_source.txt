@@ -1,0 +1,52 @@
+procedure sumalphabet {
+    call init;
+    sum = 0;
+    call sumfirst10;
+    sum = sum + temp;
+    print sum;
+}
+
+procedure init {
+    a = 0; b = 1; c = 2; d = 3; e = 4;
+    f = 5; g = 6; h = 7; i = 8; j = 9;
+    k = 10; l = 11; m = 12; n = 13; o = 14;
+    p = 15; q = 16; r = 17; s = 18; t = 19;
+    u = 20; v = 21; w = 22; x = 23; y = 24;
+    read z;
+
+}
+
+procedure sumfirst10 {
+    if ((a < b) && (c == d)) then {  
+        temp1 = a + b;
+        temp2 = c + d;
+    } else {
+        temp1 = a + c;
+        temp2 = b + d;
+    }
+    temp = temp1 + temp2 + e;
+    call sumnext5;
+}
+
+procedure sumnext5 {
+    if (g < h) then {
+        temp3 = f * 2 + (g - f);
+    }
+    else {
+        if (g <= i) then {
+            temp3 = g * 2;       
+            temp3 = temp3 - (g - f);
+            read procedure;
+            print while;
+        } else {
+            temp3 = f + g + 0;
+            print k;
+        }
+        print procedure;
+    }
+    temp4 = i - h + 2 * (i / h) * h;
+    f = g;
+    temp = temp + (temp4 + j % f * 3);
+    
+}
+

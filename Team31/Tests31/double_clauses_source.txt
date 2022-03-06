@@ -1,0 +1,22 @@
+procedure DoubleClauses {
+  v1 = a;
+  y = b + 5;
+  read v1;
+  read read;
+  print v1;
+  while (a >= 6) {
+      a = 0;
+      a = a * 8;
+      a = a + a + a;
+    }
+  print y;
+  if (a < z) then {
+    a = 1;
+    read a;
+    b = a;
+  } else {
+    print pn;
+    print a;
+    v1 = v1 + 6;
+  }
+}
