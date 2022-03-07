@@ -43,6 +43,7 @@ BasicEntities AbstractSyntaxTree::getInitEntities() const {
     std::for_each(
             expressions_.begin(), expressions_.end(),
             [&entities](auto &p) { entities.notations.emplace_back(*p); });
+    entities.proc_call_graph = call_edges_;
     return std::move(entities);
 }
 void AbstractSyntaxTree::build_tree() {

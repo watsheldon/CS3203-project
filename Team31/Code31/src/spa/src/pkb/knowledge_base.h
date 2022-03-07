@@ -32,6 +32,7 @@ struct BasicEntities {
     // each notation is unique
     // notations may not have the same size as assigns
     std::vector<PN> notations;
+    std::vector<std::set<int>> proc_call_graph;
 };
 
 class KnowledgeBase {
