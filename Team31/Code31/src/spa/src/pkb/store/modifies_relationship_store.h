@@ -1,7 +1,7 @@
 #ifndef SRC_SPA_SRC_PKB_STORE_MODIFIES_RELATIONSHIP_STORE_H_
 #define SRC_SPA_SRC_PKB_STORE_MODIFIES_RELATIONSHIP_STORE_H_
 
-#include <vector>
+#include "index_bimap.h"
 
 namespace spa {
 class ModifiesRelationshipStore {
@@ -12,8 +12,7 @@ class ModifiesRelationshipStore {
     [[nodiscard]] int GetVarIndex(int stmt_no) const;
 
   private:
-    std::vector<int> stmt_to_var_;
-    std::vector<std::vector<int>> var_to_stmtlst_;
+    IndexBimap<std::vector<int>> stmt_var_;
 };
 }  // namespace spa
 
