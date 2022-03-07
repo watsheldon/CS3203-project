@@ -1,7 +1,6 @@
 #include "type_statements_store.h"
 
 #include <cassert>
-#include <vector>
 
 namespace spa {
 TypeStatementsStore::TypeStatementsStore(

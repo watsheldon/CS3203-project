@@ -2,24 +2,19 @@
 
 namespace spa {
 NameValueStore::NameValueStore(std::vector<std::string>&& names)
-        : index_to_name_(std::move(names)) {
-    for (int i = 1; i < index_to_name_.size(); ++i) {
-        name_to_index_.emplace(index_to_name_[i], i);
-    }
-}
+        : IndexBimap<std::string>(
+                  std::forward<std::vector<std::string>>(names)) {}
 
 const std::string& NameValueStore::GetNameValue(int index) const {
-    return index_to_name_[index];
+    return IndexBimap<std::string>::GetVal(index);
 }
 int NameValueStore::GetIndex(const std::string& name) const {
-    auto iter = name_to_index_.find(name);
-    if (iter == name_to_index_.end()) {
-        return 0;
-    }
-    return iter->second;
+    return IndexBimap<std::string>::GetKey(name);
 }
 const std::vector<std::string>& NameValueStore::GetAllNamesValues() const {
-    return index_to_name_;
+    return IndexBimap<std::string>::GetAllVals();
 }
-size_t NameValueStore::size() const { return index_to_name_.size() - 1; }
+size_t NameValueStore::size() const {
+    return IndexBimap<std::string>::GetValsSize();
+}
 }  // namespace spa

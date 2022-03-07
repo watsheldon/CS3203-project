@@ -1,10 +1,11 @@
 #include "polish_notation_store.h"
+
 namespace spa {
 PolishNotationStore::PolishNotationStore(size_t stmt_count,
-                                         std::vector<PN>&& pn)
+                                         std::vector<PN>&& pns)
         : stmt_to_index_(stmt_count + 1),
-          index_to_stmt_(pn.size()),
-          index_to_pn_(std::move(pn)) {}
+          index_to_stmt_(pns.size()),
+          index_to_pn_(std::move(pns)) {}
 
 void PolishNotationStore::Set(int stmt_no, int polish_index) {
     stmt_to_index_[stmt_no] = polish_index;

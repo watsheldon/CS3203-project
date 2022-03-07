@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include "common/entity_type_enum.h"
-
 namespace spa {
 class ModifiesRelationshipStore {
   public:

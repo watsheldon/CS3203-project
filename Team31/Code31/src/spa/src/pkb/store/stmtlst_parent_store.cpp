@@ -1,10 +1,5 @@
 #include "stmtlst_parent_store.h"
 
-#include <cstddef>
-
-#include "common/entity_type_enum.h"
-#include "common/index.h"
-
 namespace spa {
 StmtlstParentStore::StmtlstParentStore(size_t proc_count, size_t stmt_count,
                                        size_t stmtlst_count)

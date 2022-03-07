@@ -3,12 +3,14 @@
 
 #include <vector>
 
-#include "pkb/knowledge_base.h"
+#include "common/polish_notation.h"
 
 namespace spa {
+using PN = spa::PolishNotation;
+
 class PolishNotationStore {
   public:
-    explicit PolishNotationStore(size_t stmt_count, std::vector<PN> &&pn);
+    explicit PolishNotationStore(size_t stmt_count, std::vector<PN> &&pns);
     void Set(int stmt_no, int polish_index);
     [[nodiscard]] const PN &GetNotation(int polish_index) const;
     [[nodiscard]] int GetPolishStmt(int polish_index) const;

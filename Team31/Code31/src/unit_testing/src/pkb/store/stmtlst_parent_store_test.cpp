@@ -21,6 +21,8 @@ TEST_CASE("pkb/store/StmtlstParentStore") {
         REQUIRE(sps.GetParent(2).index == 2);
     }
     SECTION("GetParentIf") {
+        REQUIRE(sps.GetParent(4).type == StmtlstParentStore::ParentType::kIf);
+        REQUIRE(sps.GetParent(4).index == 5);
         REQUIRE(sps.GetParent(5).type == StmtlstParentStore::ParentType::kIf);
         REQUIRE(sps.GetParent(5).index == 5);
     }

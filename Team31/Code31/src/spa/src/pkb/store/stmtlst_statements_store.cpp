@@ -1,19 +1,13 @@
 #include "stmtlst_statements_store.h"
 
 #include <algorithm>
-#include <cassert>
-#include <utility>
-#include <vector>
-
-#include "common/entity_type_enum.h"
-#include "common/index.h"
-#include "pkb/knowledge_base.h"
 
 namespace spa {
 StmtlstStatementsStore::StmtlstStatementsStore(size_t stmtlst_count,
                                                size_t stmt_count)
         : stmtlst_to_statements_(stmtlst_count + 1),
           statement_to_stmtlst_(stmt_count + 1) {}
+
 void StmtlstStatementsStore::Set(int stmtlst_index,
                                  std::vector<int> &&stmtlst) {
     for (int i = 0; i < stmtlst.size(); ++i) {
@@ -25,16 +19,20 @@ void StmtlstStatementsStore::Set(int stmtlst_index,
 int StmtlstStatementsStore::GetStmtlst(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no].stmtlst_index;
 }
+
 int StmtlstStatementsStore::GetStmtRelativePos(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no].pos_in_stmtlst;
 }
+
 size_t StmtlstStatementsStore::GetStmtlstSize(int stmt_no) const {
     return stmtlst_to_statements_[statement_to_stmtlst_[stmt_no].stmtlst_index]
             .size();
 }
+
 StmtProperties StmtlstStatementsStore::GetStmtProperties(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no];
 }
+
 std::vector<int> StmtlstStatementsStore::GetStatements(
         int stmtlst_index) const {
     return stmtlst_to_statements_[stmtlst_index];
@@ -55,6 +53,7 @@ bool StmtlstStatementsStore::ExistFollows(
                                    GetStmtRelativePos(first_stmt.value) ==
                            1));
 }
+
 bool StmtlstStatementsStore::ExistFollows(
         Index<ArgPos::kFirst> first_stmt) const {
     if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
@@ -63,6 +62,7 @@ bool StmtlstStatementsStore::ExistFollows(
     return GetStmtRelativePos(first_stmt.value) <
            GetStmtlstSize(first_stmt.value) - 1;
 }
+
 bool StmtlstStatementsStore::ExistFollows(
         Index<ArgPos::kSecond> second_stmt) const {
     // boundary check
@@ -71,6 +71,7 @@ bool StmtlstStatementsStore::ExistFollows(
     }
     return GetStmtRelativePos(second_stmt.value) > 0;
 }
+
 bool StmtlstStatementsStore::ExistFollows() const {
     return std::any_of(stmtlst_to_statements_.begin() + 1,
                        stmtlst_to_statements_.end(),
@@ -86,6 +87,7 @@ std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
     }
     return followers;
 }
+
 std::vector<int> StmtlstStatementsStore::GetFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt) const {
     if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
@@ -114,6 +116,7 @@ std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
     }
     return followees;
 }
+
 std::vector<int> StmtlstStatementsStore::GetFollows(
         bool transitive, Index<ArgPos::kSecond> second_stmt) const {
     if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
@@ -133,9 +136,8 @@ std::vector<int> StmtlstStatementsStore::GetFollows(
     return {first, last};
 }
 
-void StmtlstStatementsStore::AddPairs(
-        const std::vector<int> &stmtlst,
-        std::pair<std::vector<int>, std::vector<int>> &results) const {
+void StmtlstStatementsStore::AddPairs(const std::vector<int> &stmtlst,
+                                      PairVec<int> &results) const {
     int size = (int)stmtlst.size();
     for (int i = 0; i < size - 1; ++i) {
         for (int j = i + 1; j < size; ++j) {
@@ -144,17 +146,17 @@ void StmtlstStatementsStore::AddPairs(
         }
     }
 }
-std::pair<std::vector<int>, std::vector<int>>
-StmtlstStatementsStore::GetTransitivePairs() const {
-    std::pair<std::vector<int>, std::vector<int>> results;
+
+PairVec<int> StmtlstStatementsStore::GetTransitivePairs() const {
+    PairVec<int> results;
     for (auto &stmtlst : stmtlst_to_statements_) {
         AddPairs(stmtlst, results);
     }
     return results;
 }
-std::pair<std::vector<int>, std::vector<int>>
-StmtlstStatementsStore::GetNonTransitivePairs() const {
-    std::pair<std::vector<int>, std::vector<int>> results;
+
+PairVec<int> StmtlstStatementsStore::GetNonTransitivePairs() const {
+    PairVec<int> results;
     for (auto &stmtlst : stmtlst_to_statements_) {
         for (int i = 0; i < (int)stmtlst.size() - 1; ++i) {
             results.first.emplace_back(stmtlst[i]);
@@ -163,12 +165,11 @@ StmtlstStatementsStore::GetNonTransitivePairs() const {
     }
     return results;
 }
-std::pair<std::vector<int>, std::vector<int>>
-StmtlstStatementsStore::GetFollowsPairs(bool transitive) const {
+
+PairVec<int> StmtlstStatementsStore::GetFollowsPairs(bool transitive) const {
     if (transitive) {
         return GetTransitivePairs();
     }
     return GetNonTransitivePairs();
 }
-
 }  // namespace spa
