@@ -192,9 +192,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetAllChildren(StmtType return_type);
     void GetNonTransitiveParentFirst(StmtType parent_type, int parent,
                                      std::vector<int> &results) const;
-    void GetTransitiveParentFirst(std::vector<int> parent_follower,
-                                  StmtType parent_type, int parent,
-                                  std::vector<int> &results) const;
+    void GetTransitiveParentFirst(StmtType parent_type, int parent,
+                                  std::vector<int> &results);
     void GetTransitiveParentPairs(
             std::pair<std::vector<int>, std::vector<int>> &results);
     void GetNonTransitiveParentPairs(

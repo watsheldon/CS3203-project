@@ -133,6 +133,8 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                                 Index<ArgPos::kSecond>(3)));
         REQUIRE(pkb.ExistParent(true, Index<ArgPos::kFirst>(4),
                                 Index<ArgPos::kSecond>(7)));
+        REQUIRE_FALSE(pkb.ExistParent(true, Index<ArgPos::kFirst>(4),
+                                Index<ArgPos::kSecond>(10)));
         REQUIRE(pkb.ExistParent(false, Index<ArgPos::kFirst>(4),
                                 Index<ArgPos::kSecond>(8)));
         REQUIRE_FALSE(pkb.ExistParent(true, Index<ArgPos::kFirst>(2),

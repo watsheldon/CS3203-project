@@ -100,49 +100,6 @@ bool ProgramKnowledgeBase::ExistFollows() {
     return stmtlst_stmt_.ExistFollows();
 }
 
-bool ProgramKnowledgeBase::ExistParent(bool transitive,
-                                       Index<ArgPos::kFirst> parent_stmt,
-                                       Index<ArgPos::kSecond> child_stmt) {
-    assert(compiled);
-    int parent = parent_stmt.value;
-    int child = child_stmt.value;
-    if (child <= parent || parent > stmt_count_ - 1 || child > stmt_count_) {
-        return false;
-    }
-    if (type_stmt_.GetType(parent) != StmtType::kWhile &&
-        type_stmt_.GetType(parent) != StmtType::kIf) {
-        return false;
-    }
-
-    if (transitive) {
-        std::vector<int> parent_follower =
-                stmtlst_stmt_.GetFollows(false, parent_stmt);
-        return parent_follower.empty() || child_stmt.value < parent_follower[0];
-    }
-    int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
-    return stmtlst_parent_.GetWhileStmtLst(parent) == stmtlst_index ||
-           stmtlst_parent_.GetIfStmtLst(parent).then_index == stmtlst_index ||
-           stmtlst_parent_.GetIfStmtLst(parent).else_index == stmtlst_index;
-}
-bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt) {
-    assert(compiled);
-    return parent_stmt.value < stmt_count_ &&
-           (type_stmt_.GetType(parent_stmt.value) == StmtType::kIf ||
-            type_stmt_.GetType(parent_stmt.value) == StmtType::kWhile);
-}
-bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kSecond> child_stmt) {
-    assert(compiled);
-    int stmtlst_index = stmtlst_stmt_.GetStmtlst(child_stmt.value);
-    return child_stmt.value <= stmt_count_ &&
-           (stmtlst_parent_.GetParent(stmtlst_index).type == PType::kIf ||
-            stmtlst_parent_.GetParent(stmtlst_index).type == PType::kWhile);
-}
-bool ProgramKnowledgeBase::ExistParent() {
-    assert(compiled);
-    return !type_stmt_.GetStatements(StmtType::kWhile).empty() ||
-           !type_stmt_.GetStatements(StmtType::kIf).empty();
-}
-
 std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
                                                StmtType return_type) {
     auto results = return_pos == ArgPos::kFirst
@@ -218,6 +175,48 @@ ProgramKnowledgeBase::GetFollowsPairs(bool transitive, StmtType first_type,
     return filtered_results;
 }
 
+bool ProgramKnowledgeBase::ExistParent(bool transitive,
+                                       Index<ArgPos::kFirst> parent_stmt,
+                                       Index<ArgPos::kSecond> child_stmt) {
+    assert(compiled);
+    int parent = parent_stmt.value;
+    int child = child_stmt.value;
+    if (child <= parent || parent > stmt_count_ - 1 || child > stmt_count_) {
+        return false;
+    }
+    StmtType parent_type = type_stmt_.GetType(parent);
+    if (parent_type != StmtType::kWhile && parent_type != StmtType::kIf) {
+        return false;
+    }
+
+    if (transitive) {
+        int last_stmt = GetContainerLastStmt(parent_type, parent);
+        return child_stmt.value <= last_stmt;
+    }
+    int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
+    return stmtlst_parent_.GetWhileStmtLst(parent) == stmtlst_index ||
+           stmtlst_parent_.GetIfStmtLst(parent).then_index == stmtlst_index ||
+           stmtlst_parent_.GetIfStmtLst(parent).else_index == stmtlst_index;
+}
+bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt) {
+    assert(compiled);
+    return parent_stmt.value < stmt_count_ &&
+           (type_stmt_.GetType(parent_stmt.value) == StmtType::kIf ||
+            type_stmt_.GetType(parent_stmt.value) == StmtType::kWhile);
+}
+bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kSecond> child_stmt) {
+    assert(compiled);
+    int stmtlst_index = stmtlst_stmt_.GetStmtlst(child_stmt.value);
+    return child_stmt.value <= stmt_count_ &&
+           (stmtlst_parent_.GetParent(stmtlst_index).type == PType::kIf ||
+            stmtlst_parent_.GetParent(stmtlst_index).type == PType::kWhile);
+}
+bool ProgramKnowledgeBase::ExistParent() {
+    assert(compiled);
+    return !type_stmt_.GetStatements(StmtType::kWhile).empty() ||
+           !type_stmt_.GetStatements(StmtType::kIf).empty();
+}
+
 std::set<int> ProgramKnowledgeBase::GetAllParents(StmtType return_type) {
     if (return_type != StmtType::kAll && return_type != StmtType::kWhile &&
         return_type != StmtType::kIf) {
@@ -286,33 +285,11 @@ void ProgramKnowledgeBase::GetNonTransitiveParentFirst(
     std::vector<int> else_vector = stmtlst_stmt_.GetStatements(else_index);
     results.insert(results.end(), else_vector.begin(), else_vector.end());
 }
-void ProgramKnowledgeBase::GetTransitiveParentFirst(
-        std::vector<int> parent_follower, StmtType parent_type, int parent,
-        std::vector<int> &results) const {
-    int size = 0;
-    if (parent_follower.empty()) {
-        std::vector<int> stmtlsts;
-        if (parent_type == StmtType::kWhile) {
-            int stmtlst = stmtlst_parent_.GetWhileStmtLst(parent);
-            stmtlsts = container_forest_->GetChildren(stmtlst);
-            stmtlsts.emplace_back(stmtlst);
-        } else {
-            int then_stmtlst = stmtlst_parent_.GetIfStmtLst(parent).then_index;
-            int else_stmtlst = stmtlst_parent_.GetIfStmtLst(parent).else_index;
-            stmtlsts = container_forest_->GetChildren(then_stmtlst);
-            auto else_vector = container_forest_->GetChildren(else_stmtlst);
-            stmtlsts.insert(stmtlsts.end(), else_vector.begin(),
-                            else_vector.end());
-            stmtlsts.emplace_back(then_stmtlst);
-            stmtlsts.emplace_back(else_stmtlst);
-        }
-        for (auto &i : stmtlsts) {
-            size += (int)stmtlst_stmt_.GetStatements(i).size();
-        }
-    } else {
-        size = parent_follower[0] - parent - 1;
-    }
-
+void ProgramKnowledgeBase::GetTransitiveParentFirst(StmtType parent_type,
+                                                    int parent,
+                                                    std::vector<int> &results) {
+    int last_stmt = GetContainerLastStmt(parent_type, parent);
+    int size = last_stmt - parent;
     results.resize(size);
     std::iota(results.begin(), results.end(), parent + 1);
 }
@@ -331,8 +308,7 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
 
     std::vector<int> results;
     if (transitive) {
-        GetTransitiveParentFirst(stmtlst_stmt_.GetFollows(false, parent_stmt),
-                                 parent_type, parent_stmt.value, results);
+        GetTransitiveParentFirst(parent_type, parent_stmt.value, results);
     } else {
         GetNonTransitiveParentFirst(parent_type, parent_stmt.value, results);
     }
@@ -1411,7 +1387,6 @@ int ProgramKnowledgeBase::NameToIndex(QueryEntityType et,
 
 int ProgramKnowledgeBase::GetContainerLastStmt(StmtType type, int stmt_no) {
     int last_stmt;
-
     auto follow_vec =
             GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
 
