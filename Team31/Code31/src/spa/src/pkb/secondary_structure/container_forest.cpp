@@ -45,15 +45,15 @@ bool ContainerForest::IsParentT(const int parent, const int child) const {
     }
     return false;
 }
-std::vector<int> ContainerForest::GetParents(const int child) const {
+std::vector<int> ContainerForest::GetAncestryTrace(const int child) const {
     assert(child != 0);
-    std::vector<int> parents;
+    std::vector<int> ancestry = {child};
     int parent = stmtlsts_[child].GetParent();
     while (parent != 0) {
-        parents.emplace_back(parent);
+        ancestry.emplace_back(parent);
         parent = stmtlsts_[parent].GetParent();
     }
-    return parents;
+    return ancestry;
 }
 std::vector<int> ContainerForest::GetChildren(const int parent) const {
     assert(parent != 0);

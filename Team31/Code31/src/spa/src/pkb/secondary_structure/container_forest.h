@@ -15,7 +15,7 @@ class ContainerForest {
                     const StmtlstStatementsStore &stmtlst_stmts_store,
                     std::size_t stmtlst_count);
     [[nodiscard]] bool IsParentT(int parent, int child) const;
-    [[nodiscard]] std::vector<int> GetParents(int child) const;
+    [[nodiscard]] std::vector<int> GetAncestryTrace(int child) const;
     [[nodiscard]] std::vector<int> GetChildren(int parent) const;
     /**
      * Retrieves index of the last stmtLst nested within the given stmtLst. If

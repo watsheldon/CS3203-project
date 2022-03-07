@@ -331,20 +331,18 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
         return {};
     }
     std::vector<int> results;
-    int direct_parent = stmtlst_parent_.GetParent(stmtlst_index).index;
     if (transitive) {
         std::vector<int> stmtlsts =
-                container_forest_->GetParents(stmtlst_index);
+                container_forest_->GetAncestryTrace(stmtlst_index);
         for (auto &i : stmtlsts) {
             if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
                 stmtlst_parent_.GetParent(i).type != PType::kIf)
                 continue;
-            int indirect_parent = stmtlst_parent_.GetParent(i).index;
-            results.emplace_back(indirect_parent);
+            int parent = stmtlst_parent_.GetParent(i).index;
+            results.emplace_back(parent);
         }
-        results.emplace_back(direct_parent);
     } else {
-        results = {direct_parent};
+        results = {stmtlst_parent_.GetParent(stmtlst_index).index};
     }
 
     if (return_type == StmtType::kAll) {
@@ -725,7 +723,7 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
     }
 
     std::set<int> container_stmt;
-    std::vector<int> parents, direct_modifying_stmt;
+    std::vector<int> direct_modifying_stmt;
 
     direct_modifying_stmt = type_stmt_.GetStatements(StmtType::kAssign);
     auto read_stmt = type_stmt_.GetStatements(StmtType::kRead);
@@ -739,7 +737,7 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
         for (auto &i : direct_modifying_stmt) {
             int var_index = modifies_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-            parents = container_forest_->GetParents(stmtlst);
+            auto parents = container_forest_->GetAncestryTrace(stmtlst);
             for (auto &j : parents) {
                 auto stmt = stmtlst_parent_.GetParent(j);
                 if (stmt.type == StmtlstParentStore::kIf) {
@@ -758,7 +756,7 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
         for (auto &i : direct_modifying_stmt) {
             int var_index = modifies_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-            parents = container_forest_->GetParents(stmtlst);
+            auto parents = container_forest_->GetAncestryTrace(stmtlst);
             for (auto &j : parents) {
                 auto stmt = stmtlst_parent_.GetParent(j);
                 if (stmt.type == StmtlstParentStore::kWhile) {
@@ -780,8 +778,8 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
         int var_index = modifies_rel_.GetVarIndex(i);
         all_var.emplace_back(var_index);
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-        parents = container_forest_->GetParents(stmtlst);
-        parents.emplace_back(stmtlst);
+
+        auto parents = container_forest_->GetAncestryTrace(stmtlst);
 
         for (auto &j : parents) {
             auto stmt = stmtlst_parent_.GetParent(j);
@@ -989,7 +987,7 @@ PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     }
 
     std::set<int> container_stmt;
-    std::vector<int> parents, direct_uses_stmt;
+    std::vector<int> direct_uses_stmt;
 
     direct_uses_stmt = type_stmt_.GetStatements(StmtType::kAssign);
     auto print_stmt = type_stmt_.GetStatements(StmtType::kPrint);
@@ -1003,8 +1001,7 @@ PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
         for (auto &i : direct_uses_stmt) {
             auto var_indices = uses_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-            parents = container_forest_->GetParents(stmtlst);
-            parents.emplace_back(stmtlst);
+            auto parents = container_forest_->GetAncestryTrace(stmtlst);
 
             for (auto &j : parents) {
                 auto stmt = stmtlst_parent_.GetParent(j);
@@ -1028,8 +1025,7 @@ PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
         for (auto &i : direct_uses_stmt) {
             auto var_indices = uses_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-            parents = container_forest_->GetParents(stmtlst);
-            parents.emplace_back(stmtlst);
+            auto parents = container_forest_->GetAncestryTrace(stmtlst);
 
             for (auto &j : parents) {
                 auto stmt = stmtlst_parent_.GetParent(j);
@@ -1058,8 +1054,7 @@ PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
         }
 
         int stmtlst = stmtlst_stmt_.GetStmtlst(i);
-        parents = container_forest_->GetParents(stmtlst);
-        parents.emplace_back(stmtlst);
+        auto parents = container_forest_->GetAncestryTrace(stmtlst);
 
         for (auto &j : parents) {
             auto stmt = stmtlst_parent_.GetParent(j);
