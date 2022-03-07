@@ -9,12 +9,12 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
                       init.reads.size() + init.prints.size()),
           stmtlst_count_(init.procedures.size() + init.whiles.size() +
                          init.ifs.size() * 2 - 1),
-          call_proc_(stmt_count_, init.procedures.size() - 1),
           stmtlst_parent_(init.procedures.size() - 1, stmt_count_,
                           stmtlst_count_),
           stmtlst_stmt_(stmtlst_count_, stmt_count_),
           modifies_rel_(stmt_count_, init.variables.size() - 1),
           uses_rel_(stmt_count_, init.variables.size() - 1),
+          call_proc_(stmt_count_, std::move(init.proc_call_graph)),
           polish_notation_(stmt_count_, std::move(init.notations)),
           name_value_(std::move(init.procedures), std::move(init.variables),
                       std::move(init.constants)),

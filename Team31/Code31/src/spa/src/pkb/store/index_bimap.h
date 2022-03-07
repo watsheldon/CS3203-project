@@ -2,6 +2,7 @@
 #define SRC_SPA_SRC_PKB_STORE_INDEX_BIMAP_H_
 
 #include <map>
+#include <set>
 #include <utility>
 
 #include "common/aliases.h"
