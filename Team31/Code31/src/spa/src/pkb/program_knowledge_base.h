@@ -8,7 +8,7 @@
 #include <utility>
 
 #include "knowledge_base.h"
-#include "pkb/store/call_procedure_store.h"
+#include "pkb/store/calls_relationship_store.h"
 #include "pkb/store/modifies_relationship_store.h"
 #include "pkb/store/name_value_store.h"
 #include "pkb/store/polish_notation_store.h"
@@ -145,7 +145,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     size_t stmt_count_;     // store number of stmt
     size_t stmtlst_count_;  // store number of stmtlst
 
-    CallProcedureStore call_proc_;
+    CallsRelationshipStore call_proc_;
     StmtlstParentStore stmtlst_parent_;
     StmtlstStatementsStore stmtlst_stmt_;
     ModifiesRelationshipStore modifies_rel_;
