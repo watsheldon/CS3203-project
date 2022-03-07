@@ -1207,6 +1207,29 @@ ProgramKnowledgeBase::GetPatternPair() {
     return GetModifiesStmtVar(StmtType::kAssign);
 }
 
+bool ProgramKnowledgeBase::ExistCalls(bool transitive,
+                                      Index<ArgPos::kFirst> first_proc,
+                                      Index<ArgPos::kSecond> second_proc) {}
+bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kFirst> first_proc) {
+    assert(compiled);
+}
+bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kSecond> second_proc) {
+    assert(compiled);
+    return !call_proc_.GetCalls(second_proc.value).empty();
+}
+bool ProgramKnowledgeBase::ExistCalls() {
+    assert(compiled);
+    return !type_stmt_.GetStatements(StmtType::kCall).empty();
+}
+std::set<int> ProgramKnowledgeBase::GetCalls(ArgPos return_pos) {}
+std::set<int> ProgramKnowledgeBase::GetCalls(bool transitive,
+                                             Index<ArgPos::kFirst> first_proc) {
+}
+std::set<int> ProgramKnowledgeBase::GetCalls(
+        bool transitive, Index<ArgPos::kSecond> second_proc) {}
+std::pair<std::vector<int>, std::vector<int>>
+ProgramKnowledgeBase::GetCallsPairs(bool transitive) {}
+
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(

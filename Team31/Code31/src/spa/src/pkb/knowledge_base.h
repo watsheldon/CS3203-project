@@ -282,6 +282,44 @@ class KnowledgeBase {
     virtual std::pair<std::vector<int>, std::vector<int>> GetPatternPair() = 0;
 
     /**
+     * Check if Calls or Calls* (first_proc, second_proc) exist
+     */
+    virtual bool ExistCalls(bool transitive, Index<ArgPos::kFirst> first_proc,
+                            Index<ArgPos::kSecond> second_proc) = 0;
+    /**
+     * Check if Calls or Calls* (first_proc, _) exist
+     */
+    virtual bool ExistCalls(Index<ArgPos::kFirst> first_proc) = 0;
+    /**
+     * Check if Calls or Calls* (_, second_proc) exist
+     */
+    virtual bool ExistCalls(Index<ArgPos::kSecond> second_proc) = 0;
+    /**
+     * Check if Calls or Calls* (_, _) exist
+     */
+    virtual bool ExistCalls() = 0;
+
+    /**
+     * Gets a list of procedures that satisfy Calls/Calls*(procedure, _) or
+     * Calls/Calls*(_, procedure)
+     */
+    virtual std::set<int> GetCalls(ArgPos return_pos) = 0;
+    /**
+     * Gets a list of procedures that is called by the given procedure
+     */
+    virtual std::set<int> GetCalls(bool transitive,
+                                   Index<ArgPos::kFirst> first_proc) = 0;
+    /**
+     * Gets a list of procedures that call the given procedure
+     */
+    virtual std::set<int> GetCalls(bool transitive,
+                                   Index<ArgPos::kSecond> second_proc) = 0;
+    /**
+     * Gets a list of procedure pairs that exist in Calls/Calls*
+     */
+    virtual std::pair<std::vector<int>, std::vector<int>> GetCallsPairs(
+            bool transitive) = 0;
+    /**
      * Gets all indices of the given entity type or stmt type
      */
     virtual std::vector<int> GetAllEntityIndices(QueryEntityType et) = 0;
