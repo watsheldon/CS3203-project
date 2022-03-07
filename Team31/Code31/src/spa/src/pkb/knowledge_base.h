@@ -282,10 +282,15 @@ class KnowledgeBase {
     virtual std::pair<std::vector<int>, std::vector<int>> GetPatternPair() = 0;
 
     /**
-     * Check if Calls or Calls* (first_proc, second_proc) exist
+     * Check if Calls (first_proc, second_proc) exist
      */
-    virtual bool ExistCalls(bool transitive, Index<ArgPos::kFirst> first_proc,
+    virtual bool ExistCalls(Index<ArgPos::kFirst> first_proc,
                             Index<ArgPos::kSecond> second_proc) = 0;
+    /**
+     * Check if Calls* (first_proc, second_proc) exist
+     */
+    virtual bool ExistCallsT(Index<ArgPos::kFirst> first_proc,
+                             Index<ArgPos::kSecond> second_proc) = 0;
     /**
      * Check if Calls or Calls* (first_proc, _) exist
      */
@@ -307,18 +312,19 @@ class KnowledgeBase {
     /**
      * Gets a list of procedures that is called by the given procedure
      */
-    virtual std::set<int> GetCalls(bool transitive,
-                                   Index<ArgPos::kFirst> first_proc) = 0;
+    virtual std::set<int> GetCalls(Index<ArgPos::kFirst> first_proc) = 0;
+    virtual std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) = 0;
     /**
      * Gets a list of procedures that call the given procedure
      */
-    virtual std::set<int> GetCalls(bool transitive,
-                                   Index<ArgPos::kSecond> second_proc) = 0;
+    virtual std::set<int> GetCalls(Index<ArgPos::kSecond> second_proc) = 0;
+    virtual std::set<int> GetCallsT(Index<ArgPos::kSecond> second_proc) = 0;
     /**
      * Gets a list of procedure pairs that exist in Calls/Calls*
      */
-    virtual std::pair<std::vector<int>, std::vector<int>> GetCallsPairs(
-            bool transitive) = 0;
+    virtual std::pair<std::vector<int>, std::vector<int>> GetCallsPairs() = 0;
+    virtual std::pair<std::vector<int>, std::vector<int>> GetCallsTPairs() = 0;
+
     /**
      * Gets all indices of the given entity type or stmt type
      */

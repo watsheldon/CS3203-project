@@ -1207,9 +1207,13 @@ ProgramKnowledgeBase::GetPatternPair() {
     return GetModifiesStmtVar(StmtType::kAssign);
 }
 
-bool ProgramKnowledgeBase::ExistCalls(bool transitive,
-                                      Index<ArgPos::kFirst> first_proc,
+bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kFirst> first_proc,
                                       Index<ArgPos::kSecond> second_proc) {
+    assert(compiled);
+    return false;
+}
+bool ProgramKnowledgeBase::ExistCallsT(Index<ArgPos::kFirst> first_proc,
+                                       Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
     return false;
 }
@@ -1229,18 +1233,32 @@ std::set<int> ProgramKnowledgeBase::GetCalls(ArgPos return_pos) {
     assert(compiled);
     return std::set<int>{};
 }
-std::set<int> ProgramKnowledgeBase::GetCalls(bool transitive,
-                                             Index<ArgPos::kFirst> first_proc) {
+std::set<int> ProgramKnowledgeBase::GetCalls(Index<ArgPos::kFirst> first_proc) {
+    assert(compiled);
+    return std::set<int>{};
+}
+std::set<int> ProgramKnowledgeBase::GetCallsT(
+        Index<ArgPos::kFirst> first_proc) {
     assert(compiled);
     return std::set<int>{};
 }
 std::set<int> ProgramKnowledgeBase::GetCalls(
-        bool transitive, Index<ArgPos::kSecond> second_proc) {
+        Index<ArgPos::kSecond> second_proc) {
+    assert(compiled);
+    return std::set<int>{};
+}
+std::set<int> ProgramKnowledgeBase::GetCallsT(
+        Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
     return std::set<int>{};
 }
 std::pair<std::vector<int>, std::vector<int>>
-ProgramKnowledgeBase::GetCallsPairs(bool transitive) {
+ProgramKnowledgeBase::GetCallsPairs() {
+    assert(compiled);
+    return std::pair<std::vector<int>, std::vector<int>>{};
+}
+std::pair<std::vector<int>, std::vector<int>>
+ProgramKnowledgeBase::GetCallsTPairs() {
     assert(compiled);
     return std::pair<std::vector<int>, std::vector<int>>{};
 }

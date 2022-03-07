@@ -128,18 +128,20 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     // (v, _)
     std::pair<std::vector<int>, std::vector<int>> GetPatternPair() override;
 
-    bool ExistCalls(bool transitive, Index<ArgPos::kFirst> first_proc,
+    bool ExistCalls(Index<ArgPos::kFirst> first_proc,
                     Index<ArgPos::kSecond> second_proc) override;
+    bool ExistCallsT(Index<ArgPos::kFirst> first_proc,
+                     Index<ArgPos::kSecond> second_proc) override;
     bool ExistCalls(Index<ArgPos::kFirst> first_proc) override;
     bool ExistCalls(Index<ArgPos::kSecond> second_proc) override;
     bool ExistCalls() override;
     std::set<int> GetCalls(ArgPos return_pos) override;
-    std::set<int> GetCalls(bool transitive,
-                           Index<ArgPos::kFirst> first_proc) override;
-    std::set<int> GetCalls(bool transitive,
-                           Index<ArgPos::kSecond> second_proc) override;
-    std::pair<std::vector<int>, std::vector<int>> GetCallsPairs(
-            bool transitive) override;
+    std::set<int> GetCalls(Index<ArgPos::kFirst> first_proc) override;
+    std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) override;
+    std::set<int> GetCalls(Index<ArgPos::kSecond> second_proc) override;
+    std::set<int> GetCallsT(Index<ArgPos::kSecond> second_proc) override;
+    std::pair<std::vector<int>, std::vector<int>> GetCallsPairs() override;
+    std::pair<std::vector<int>, std::vector<int>> GetCallsTPairs() override;
 
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
