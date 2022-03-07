@@ -11,7 +11,7 @@ CallsRelationshipStore::CallsRelationshipStore(
     }
 }
 void CallsRelationshipStore::Set(int call_stmt, int proc_index) {
-    call_stmts_.Set(call_stmt, std::move(std::vector<int>(proc_index)));
+    call_stmts_.Set(call_stmt, std::move(std::vector<int>{proc_index}));
 }
 const std::vector<int>& CallsRelationshipStore::GetCallerProcs(
         int callee) const {
