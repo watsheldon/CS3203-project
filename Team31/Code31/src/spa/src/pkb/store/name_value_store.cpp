@@ -1,20 +1,40 @@
 #include "name_value_store.h"
 
-namespace spa {
-NameValueStore::NameValueStore(std::vector<std::string>&& names)
-        : IndexBimap<std::string>(
-                  std::forward<std::vector<std::string>>(names)) {}
+#include <cassert>
+#include <utility>
 
-const std::string& NameValueStore::GetNameValue(int index) const {
-    return IndexBimap<std::string>::GetVal(index);
+namespace spa {
+NameValueStore::NameValueStore(std::vector<std::string> &&proc_names,
+                               std::vector<std::string> &&var_names,
+                               std::vector<std::string> &&const_values) {
+    name_val_store_.emplace_back(
+            std::move(IndexBimap<std::string>(std::move(proc_names))));
+    name_val_store_.emplace_back(
+            std::move(IndexBimap<std::string>(std::move(var_names))));
+    name_val_store_.emplace_back(
+            std::move(IndexBimap<std::string>(std::move(const_values))));
 }
-int NameValueStore::GetIndex(const std::string& name) const {
-    return IndexBimap<std::string>::GetKey(name);
+
+const std::string &NameValueStore::GetNameValue(int index,
+                                                QueryEntityType type) const {
+    assert(type != QueryEntityType::kStmt);
+    return name_val_store_[static_cast<int>(type)].GetVal(index);
 }
-const std::vector<std::string>& NameValueStore::GetAllNamesValues() const {
-    return IndexBimap<std::string>::GetAllVals();
+
+int NameValueStore::GetIndex(const std::string &name,
+                             QueryEntityType type) const {
+    assert(type != QueryEntityType::kStmt);
+    return name_val_store_[static_cast<int>(type)].GetKey(name);
 }
-size_t NameValueStore::size() const {
-    return IndexBimap<std::string>::GetValsSize();
+
+const std::vector<std::string> &NameValueStore::GetAllNamesValues(
+        QueryEntityType type) const {
+    assert(type != QueryEntityType::kStmt);
+    return name_val_store_[static_cast<int>(type)].GetAllVals();
+}
+
+size_t NameValueStore::GetSize(QueryEntityType type) const {
+    assert(type != QueryEntityType::kStmt);
+    return name_val_store_[static_cast<int>(type)].GetValsSize();
 }
 }  // namespace spa

@@ -4,13 +4,11 @@
 #include <list>
 #include <set>
 #include <string>
-#include <type_traits>
-#include <vector>
 
+#include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "common/polish_notation.h"
-#include "pkb/secondary_structure/container_node.h"
 #include "pkb/store/stmtlst_parent_store.h"
 #include "qps/query_token.h"
 
@@ -164,8 +162,8 @@ class KnowledgeBase {
     /**
      * Gets a list of stmt# pairs that exist in Follows relationship
      */
-    virtual std::pair<std::vector<int>, std::vector<int>> GetFollowsPairs(
-            bool transitive, StmtType first_type, StmtType second_type) = 0;
+    virtual PairVec<int> GetFollowsPairs(bool transitive, StmtType first_type,
+                                         StmtType second_type) = 0;
 
     /**
      * Gets a list of stmt# that satisfy Parent/Parent*(stmt#, _) or
@@ -203,8 +201,8 @@ class KnowledgeBase {
     /**
      * Gets a list of stmt# pairs that exist in Parent/Parent* relationship
      */
-    virtual std::pair<std::vector<int>, std::vector<int>> GetParentPairs(
-            bool transitive, StmtType parent_type, StmtType child_type) = 0;
+    virtual PairVec<int> GetParentPairs(bool transitive, StmtType parent_type,
+                                        StmtType child_type) = 0;
 
     /**
      * Check if modifies relationships between stmt# and its variable
@@ -239,8 +237,7 @@ class KnowledgeBase {
     /**
      * For Modifies (s,v)
      */
-    virtual std::pair<std::vector<int>, std::vector<int>> GetModifiesStmtVar(
-            StmtType type) = 0;
+    virtual PairVec<int> GetModifiesStmtVar(StmtType type) = 0;
 
     /**
      * Gets a list of var_index that are used in stmt#
@@ -261,8 +258,7 @@ class KnowledgeBase {
     /**
      * For Uses (s,v)
      */
-    virtual std::pair<std::vector<int>, std::vector<int>> GetUsesStmtVar(
-            StmtType type) = 0;
+    virtual PairVec<int> GetUsesStmtVar(StmtType type) = 0;
 
     // ( _, " ") , (_ , _" "_)
     virtual std::set<int> GetPattern(std::vector<QueryToken> tokens,
@@ -276,11 +272,11 @@ class KnowledgeBase {
                                      std::vector<QueryToken> second_tokens,
                                      bool partial_match) = 0;
     // (v, " ") , (v, _" "_)
-    virtual std::pair<std::vector<int>, std::vector<int>> GetPatternPair(
-            std::vector<QueryToken> tokens, bool partial_match) = 0;
+    virtual PairVec<int> GetPatternPair(std::vector<QueryToken> tokens,
+                                        bool partial_match) = 0;
 
     // (v, _)
-    virtual std::pair<std::vector<int>, std::vector<int>> GetPatternPair() = 0;
+    virtual PairVec<int> GetPatternPair() = 0;
 
     /**
      * Check if Calls (first_proc, second_proc) exist
@@ -323,8 +319,8 @@ class KnowledgeBase {
     /**
      * Gets a list of procedure pairs that exist in Calls/Calls*
      */
-    virtual std::pair<std::vector<int>, std::vector<int>> GetCallsPairs() = 0;
-    virtual std::pair<std::vector<int>, std::vector<int>> GetCallsTPairs() = 0;
+    virtual PairVec<int> GetCallsPairs() = 0;
+    virtual PairVec<int> GetCallsTPairs() = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type

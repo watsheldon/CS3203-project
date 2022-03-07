@@ -1,7 +1,7 @@
 #ifndef SRC_SPA_SRC_COMMON_ENTITY_TYPE_ENUM_H_
 #define SRC_SPA_SRC_COMMON_ENTITY_TYPE_ENUM_H_
 
-enum class QueryEntityType { kProc, kVar, kConst, kStmt };
+enum class QueryEntityType { kProc = 0, kVar, kConst, kStmt };
 
 enum class SetEntityType { kProc, kVar, kConst, kStmt, kStmtLst, kNotation };
 

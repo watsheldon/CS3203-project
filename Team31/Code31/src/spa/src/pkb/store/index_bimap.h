@@ -3,7 +3,8 @@
 
 #include <map>
 #include <utility>
-#include <vector>
+
+#include "common/aliases.h"
 
 namespace spa {
 // A bidirectional map of (key, val) pairs where key is the index
@@ -81,8 +82,8 @@ class IndexBimap<std::vector<int>> {
     }
 
   private:
-    std::vector<std::vector<int>> key_to_val_;
-    std::vector<std::vector<int>> val_to_key_;
+    Vec2D<int> key_to_val_;
+    Vec2D<int> val_to_key_;
 };
 }  // namespace spa
 

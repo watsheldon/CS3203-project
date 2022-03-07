@@ -4,18 +4,9 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <list>
-#include <memory>
 #include <numeric>
-#include <set>
-#include <string>
 #include <utility>
-#include <vector>
 
-#include "common/entity_type_enum.h"
-#include "common/index.h"
-#include "common/polish_notation.h"
-#include "common/polish_notation_node.h"
 #include "knowledge_base.h"
 #include "pkb/store/call_procedure_store.h"
 #include "pkb/store/modifies_relationship_store.h"
@@ -25,7 +16,6 @@
 #include "pkb/store/type_statements_store.h"
 #include "pkb/store/uses_relationship_store.h"
 #include "secondary_structure/container_forest.h"
-#include "store/stmtlst_parent_store.h"
 
 namespace spa {
 
@@ -80,9 +70,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetFollows(bool transitive,
                              Index<ArgPos::kSecond> second_stmt,
                              StmtType return_type) override;
-    std::pair<std::vector<int>, std::vector<int>> GetFollowsPairs(
-            bool transitive, StmtType first_type,
-            StmtType second_type) override;
+    PairVec<int> GetFollowsPairs(bool transitive, StmtType first_type,
+                                 StmtType second_type) override;
 
     std::set<int> GetParent(ArgPos return_pos, StmtType return_type) override;
     std::set<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
@@ -90,9 +79,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::set<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
                             StmtType return_type) override;
-    std::pair<std::vector<int>, std::vector<int>> GetParentPairs(
-            bool transitive, StmtType parent_type,
-            StmtType child_type) override;
+    PairVec<int> GetParentPairs(bool transitive, StmtType parent_type,
+                                StmtType child_type) override;
 
     bool ExistModifies(int stmt_no, int var_index) override;
     bool ExistUses(int stmt_no, int var_index) override;
@@ -101,14 +89,12 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetModifies(Index<QueryEntityType::kVar> var_index,
                               StmtType type) override;
     std::set<int> GetModifies(StmtType type) override;
-    std::pair<std::vector<int>, std::vector<int>> GetModifiesStmtVar(
-            StmtType type) override;
+    PairVec<int> GetModifiesStmtVar(StmtType type) override;
     std::set<int> GetUses(Index<QueryEntityType::kStmt> stmt_no) override;
     std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
                           StmtType type) override;
     std::set<int> GetUses(StmtType type) override;
-    std::pair<std::vector<int>, std::vector<int>> GetUsesStmtVar(
-            StmtType type) override;
+    PairVec<int> GetUsesStmtVar(StmtType type) override;
 
     // ( _, " "), (_ , _" "_)
     std::set<int> GetPattern(std::vector<QueryToken> tokens,
@@ -122,11 +108,11 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                              std::vector<QueryToken> second_tokens,
                              bool partial_match) override;
     // (v, " ")  , (v, _" "_)
-    std::pair<std::vector<int>, std::vector<int>> GetPatternPair(
-            std::vector<QueryToken> tokens, bool partial_match) override;
+    PairVec<int> GetPatternPair(std::vector<QueryToken> tokens,
+                                bool partial_match) override;
 
     // (v, _)
-    std::pair<std::vector<int>, std::vector<int>> GetPatternPair() override;
+    PairVec<int> GetPatternPair() override;
 
     bool ExistCalls(Index<ArgPos::kFirst> first_proc,
                     Index<ArgPos::kSecond> second_proc) override;
@@ -140,8 +126,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) override;
     std::set<int> GetCalls(Index<ArgPos::kSecond> second_proc) override;
     std::set<int> GetCallsT(Index<ArgPos::kSecond> second_proc) override;
-    std::pair<std::vector<int>, std::vector<int>> GetCallsPairs() override;
-    std::pair<std::vector<int>, std::vector<int>> GetCallsTPairs() override;
+    PairVec<int> GetCallsPairs() override;
+    PairVec<int> GetCallsTPairs() override;
 
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
@@ -165,9 +151,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     ModifiesRelationshipStore modifies_rel_;
     UsesRelationshipStore uses_rel_;
     PolishNotationStore polish_notation_;
-    NameValueStore proc_name_;
-    NameValueStore var_name_;
-    NameValueStore const_value_;
+    NameValueStore name_value_;
     TypeStatementsStore type_stmt_;
 
     std::unique_ptr<ContainerForest> container_forest_;
@@ -176,16 +160,12 @@ class ProgramKnowledgeBase : public KnowledgeBase {
             const std::vector<QueryToken> &tokens);
 
     int GetContainerLastStmt(StmtType type, int stmt_no);
-    std::pair<std::vector<int>::const_iterator,
-              std::vector<int>::const_iterator>
-    GetStmtBound(StmtType type, int first_stmt, int second_stmt);
-    void AppendVarIndicesModifies(std::pair<std::vector<int>::const_iterator,
-                                            std::vector<int>::const_iterator>
-                                          bound,
+    Pair<std::vector<int>::const_iterator> GetStmtBound(StmtType type,
+                                                        int first_stmt,
+                                                        int second_stmt);
+    void AppendVarIndicesModifies(Pair<std::vector<int>::const_iterator> bound,
                                   std::set<int> &result);
-    void AppendVarIndicesUses(std::pair<std::vector<int>::const_iterator,
-                                        std::vector<int>::const_iterator>
-                                      bound,
+    void AppendVarIndicesUses(Pair<std::vector<int>::const_iterator> bound,
                               std::set<int> &result);
 
     std::set<int> GetAllParents(StmtType return_type);
@@ -194,10 +174,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                                      std::vector<int> &results) const;
     void GetTransitiveParentFirst(StmtType parent_type, int parent,
                                   std::vector<int> &results);
-    void GetTransitiveParentPairs(
-            std::pair<std::vector<int>, std::vector<int>> &results);
-    void GetNonTransitiveParentPairs(
-            std::pair<std::vector<int>, std::vector<int>> &results);
+    void GetTransitiveParentPairs(PairVec<int> &results);
+    void GetNonTransitiveParentPairs(PairVec<int> &results);
 };
 
 }  // namespace spa
