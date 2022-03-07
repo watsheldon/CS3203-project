@@ -4,7 +4,7 @@
 
 namespace spa {
 TEST_CASE("pkb/store/TypeStatementsStore") {
-    TypeStatementsStore tss(10, std::vector<int>{1, 10}, std::vector<int>{4, 5},
+    TypeStatementsStore tss(std::vector<int>{1, 10}, std::vector<int>{4, 5},
                             std::vector<int>{3}, std::vector<int>{2},
                             std::vector<int>{6}, std::vector<int>{7, 8, 9});
     SECTION("GetStatements") {
