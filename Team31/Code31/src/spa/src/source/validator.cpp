@@ -134,19 +134,17 @@ Validator::CondExprSubTypes Validator::CondPrefix() {
         return Condition() ? kSingular : kInvalid;
     }
     if (Accept(SourceTokenType::kBracketL)) {
-        auto prefix_type = CondPrefix();
-        switch (prefix_type) {
-            case kInvalid:
-            case kBracketed:
-                return kInvalid;
-            case kArithmetic:
-            case kSingular:
-                if (!Accept(SourceTokenType::kBracketR)) return kInvalid;
-                return prefix_type == kArithmetic ? kArithmetic : kBracketed;
-            default:
-                assert(false);
-        }
+        return CondGroup();
     }
+    return kInvalid;
+}
+Validator::CondExprSubTypes Validator::CondGroup() {
+    auto prefix_type = CondPrefix();
+    if (prefix_type == kInvalid || prefix_type == kBracketed && !CondInfix()) {
+        return kInvalid;
+    }
+    if (Accept(SourceTokenType::kBracketR))
+        return prefix_type == kSingular ? kBracketed : prefix_type;
     return kInvalid;
 }
 Validator::CondExprSubTypes Validator::RelationalExpr() {

@@ -64,6 +64,7 @@ class Validator {
     bool RelOpr();
     bool VarConst();
     bool Condition();
+    CondExprSubTypes CondGroup();
 };
 }  // namespace spa
 
