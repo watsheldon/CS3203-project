@@ -21,7 +21,7 @@
 #include "variable_node.h"
 
 namespace spa {
-AbstractSyntaxTree::AbstractSyntaxTree(UniquePtrTokens tokens)
+AbstractSyntaxTree::AbstractSyntaxTree(std::vector<Token> tokens)
         : tokens_(std::move(tokens)) {
     build_tree();
     check_tree();
@@ -54,7 +54,7 @@ void AbstractSyntaxTree::build_tree() {
     std::stack<StmtLstNode *> stmt_lst_path;
     std::vector<PolishNotationNode> curr_expr;
     int cond_depth = 0;
-    for (const auto &[type, name] : *tokens_) {
+    for (const auto &[type, name] : tokens_) {
         if (!tree_valid_) break;
         switch (type) {
             case SourceTokenType::kKeywordProcedure:

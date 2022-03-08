@@ -164,7 +164,7 @@ TEST_CASE("source/Validator") {
         std::filesystem::path path1 = "source_1.txt";
         Validator validator1(path1);
         auto tokens = validator1.Validate();
-        REQUIRE(*tokens == tokens1);
+        REQUIRE(tokens == tokens1);
     }
 
     SECTION("validate source_2 (procedure/var/keyword same name)") {
@@ -182,7 +182,7 @@ TEST_CASE("source/Validator") {
         std::filesystem::path path2 = "source_2.txt";
         Validator validator2(path2);
         auto tokens = validator2.Validate();
-        REQUIRE(*tokens == tokens2);
+        REQUIRE(tokens == tokens2);
     }
 }
 }  // namespace spa

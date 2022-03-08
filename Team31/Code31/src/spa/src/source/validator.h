@@ -1,10 +1,7 @@
 #ifndef SRC_SPA_SRC_SOURCE_VALIDATOR_H_
 #define SRC_SPA_SRC_SOURCE_VALIDATOR_H_
 
-#include <array>
 #include <filesystem>
-#include <functional>
-#include <memory>
 #include <vector>
 
 #include "common/tokenizer.h"
@@ -14,7 +11,7 @@ namespace spa {
 class Validator {
   public:
     explicit Validator(const std::filesystem::path &filepath);
-    std::unique_ptr<std::vector<Token>> Validate();
+    std::vector<Token> Validate();
 
   private:
     static constexpr char kZero = '0';
@@ -34,7 +31,7 @@ class Validator {
     };
 
     Tokenizer tokenizer_;
-    std::unique_ptr<std::vector<Token>> tokens_;
+    std::vector<Token> tokens_;
     std::string curr_token_;
 
     bool Program();

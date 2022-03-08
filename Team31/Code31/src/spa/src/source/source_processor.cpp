@@ -11,7 +11,7 @@ SourceProcessor::SourceProcessor(const std::string &filename)
 std::unique_ptr<AbstractSyntaxTree> SourceProcessor::Parse() {
     Validator validator(source_path_);
     auto tokens = validator.Validate();
-    if (!tokens) return {};
+    if (tokens.empty()) return {};
     return std::make_unique<AbstractSyntaxTree>(std::move(tokens));
 }
 }  // namespace spa

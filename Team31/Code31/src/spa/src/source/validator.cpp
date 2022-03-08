@@ -1,18 +1,18 @@
 #include "validator.h"
 
+#include <algorithm>
 #include <cassert>
-#include <memory>
 
 #include "token.h"
 
 namespace spa {
 Validator::Validator(const std::filesystem::path &filepath)
         : tokenizer_(filepath) {}
-std::unique_ptr<std::vector<Token>> Validator::Validate() {
-    tokens_ = std::make_unique<std::vector<Token>>();
+std::vector<Token> Validator::Validate() {
+    tokens_.clear();
     FetchToken();
     bool valid_program = Program();
-    return valid_program ? std::move(tokens_) : nullptr;
+    return valid_program ? std::move(tokens_) : std::vector<Token>();
 }
 bool Validator::Procedure() {
     return Accept(SourceTokenType::kName) &&  // proc_name
@@ -32,18 +32,18 @@ bool Validator::Accept(SourceTokenType type) {
     if (type < SourceTokenType::kName) {
         auto target = GetSourceKeyword(type);
         if (curr_token_ != target) return false;
-        tokens_->emplace_back(type);
+        tokens_.emplace_back(type);
         FetchToken();
         return true;
     }
     if (type == SourceTokenType::kName) {
         if (!std::isalpha(curr_token_[0])) return false;
-        tokens_->emplace_back(type, curr_token_);
+        tokens_.emplace_back(type, curr_token_);
         FetchToken();
         return true;
     }
     if (IsConstant()) {
-        tokens_->emplace_back(type, curr_token_);
+        tokens_.emplace_back(type, curr_token_);
         FetchToken();
         return true;
     }

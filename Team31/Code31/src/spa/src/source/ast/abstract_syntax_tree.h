@@ -23,13 +23,12 @@
 namespace spa {
 class AbstractSyntaxTree {
   public:
-    using UniquePtrTokens = std::unique_ptr<std::vector<Token>>;
     template <typename T, typename = std::enable_if_t<
                                   std::is_base_of_v<AbstractSyntaxTreeNode, T>>>
     using NamePtrMap = std::map<std::string, std::unique_ptr<T>>;
     template <typename T>
     using UniquePtrVec = std::vector<std::unique_ptr<T>>;
-    explicit AbstractSyntaxTree(UniquePtrTokens tokens);
+    explicit AbstractSyntaxTree(std::vector<Token> tokens);
     [[nodiscard]] BasicEntities getInitEntities() const;
     [[nodiscard]] const ProgramNode *GetRoot() const;
 
@@ -47,7 +46,7 @@ class AbstractSyntaxTree {
         kElse,
         kAssign,
     };
-    UniquePtrTokens tokens_;
+    std::vector<Token> tokens_;
     NamePtrMap<VariableNode> variables_;
     NamePtrMap<ProcedureNode> procedures_;
     NamePtrMap<ConstantNode> constants_;
