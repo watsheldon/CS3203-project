@@ -1,6 +1,7 @@
 #include "TestWrapper.h"
 
 #include "AbstractWrapper.h"
+#include "source/design_abstraction_extractor.h"
 #include "source/source_processor.h"
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
@@ -24,7 +25,12 @@ TestWrapper::~TestWrapper() = default;
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
     spa::SourceProcessor processor(filename);
-    auto pkb = processor.Parse();
+    auto ast = processor.Parse();
+    if (!ast) {
+        return;
+    }
+    spa::DesignAbstractionExtractor dae;
+    auto pkb = dae.Extract(std::move(ast));
     if (pkb) {
         qps_.Use(std::move(pkb));
     }

@@ -5,13 +5,13 @@
 #include <memory>
 #include <string>
 
-#include "pkb/knowledge_base.h"
+#include "ast/abstract_syntax_tree.h"
 
 namespace spa {
 class SourceProcessor {
   public:
     explicit SourceProcessor(const std::string &filename);
-    std::unique_ptr<spa::KnowledgeBase> Parse();
+    std::unique_ptr<AbstractSyntaxTree> Parse();
 
   private:
     std::filesystem::path source_path_;
