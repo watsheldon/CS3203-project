@@ -20,8 +20,8 @@ bool PQLValidator::Query() {
     while (parseDeclaration()) {
     }
     if (!parseSelect()) return false;
-    parseSuchThat();
-    parsePattern();
+    parseSuchThat() || parsePattern();
+    parsePattern() || parseSuchThat();
     return curr_token_.empty();
 }
 
