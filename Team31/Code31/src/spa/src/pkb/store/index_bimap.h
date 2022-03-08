@@ -68,8 +68,8 @@ class IndexBimap<std::vector<int>> {
             : key_to_val_(key_count + 1), val_to_key_(val_count + 1) {}
 
     void Set(int key, std::vector<int> &&vals) {
-        key_to_val_[key] = vals;
-        for (auto &val : vals) {
+        key_to_val_[key] = std::move(vals);
+        for (auto &val : key_to_val_[key]) {
             val_to_key_[val].emplace_back(key);
         }
     }
@@ -85,6 +85,38 @@ class IndexBimap<std::vector<int>> {
   private:
     Vec2D<int> key_to_val_;
     Vec2D<int> val_to_key_;
+};
+template <>
+class IndexBimap<std::set<int>> {
+  public:
+    IndexBimap(size_t key_count, size_t val_count)
+            : key_to_val_(key_count + 1), val_to_key_(val_count + 1) {}
+
+    void Add(int key, const std::vector<int> &vals) {
+        key_to_val_[key].insert(vals.begin(), vals.end());
+        for (auto &val : vals) {
+            val_to_key_[val].emplace(key);
+        }
+    }
+
+    void Add(int key, int val) {
+        auto [it, succ] = key_to_val_[key].emplace(val);
+        if (succ) {
+            val_to_key_[val].emplace(key);
+        }
+    }
+
+    [[nodiscard]] const std::set<int> &GetKeys(int val) const {
+        return val_to_key_[val];
+    }
+
+    [[nodiscard]] const std::set<int> &GetVals(int key) const {
+        return key_to_val_[key];
+    }
+
+  private:
+    std::vector<std::set<int>> key_to_val_;
+    std::vector<std::set<int>> val_to_key_;
 };
 }  // namespace spa
 
