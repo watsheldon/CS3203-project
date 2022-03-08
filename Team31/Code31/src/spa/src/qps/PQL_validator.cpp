@@ -186,9 +186,11 @@ bool PQLValidator::parseIdentifier() {
 }
 bool PQLValidator::parseExpressionSpec() {
     if (accept(QueryTokenType::kUnderscore)) {
-        return expect(QueryTokenType::kQuote) && parseFactor() &&
-               expect(QueryTokenType::kQuote) &&
-               expect(QueryTokenType::kUnderscore);
+        if (accept(QueryTokenType::kQuote)) {
+            return parseFactor() && accept(QueryTokenType::kQuote) &&
+                   accept(QueryTokenType::kUnderscore);
+        }
+        return true;
     }
     return expect(QueryTokenType::kQuote) && parseFactor() &&
            expect(QueryTokenType::kQuote);
