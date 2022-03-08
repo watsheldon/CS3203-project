@@ -2,8 +2,8 @@
 #define SRC_SPA_SRC_PKB_STORE_USES_RELATIONSHIP_STORE_H_
 
 #include <cstddef>
-#include <vector>
 #include <set>
+#include <vector>
 
 #include "common/bitvec2d.h"
 #include "index_bimap.h"
