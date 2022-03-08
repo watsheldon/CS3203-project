@@ -1,6 +1,5 @@
-#include "pkb/store/calls_relationship_store.h"
-
 #include "catch.hpp"
+#include "pkb/store/calls_relationship_store.h"
 
 namespace spa {
 TEST_CASE("pkb/store/CallRelationshipStore") {

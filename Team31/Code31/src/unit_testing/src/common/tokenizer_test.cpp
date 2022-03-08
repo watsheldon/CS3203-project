@@ -29,7 +29,8 @@ TEST_CASE("common/Tokenizer") {
     }
 
     SECTION("next (while statement with negate condition)") {
-        std::string_view code6{"procedure while{while(!(while!=0)){print while;}}"};
+        std::string_view code6{
+                "procedure while{while(!(while!=0)){print while;}}"};
         Tokenizer tokenizer6(code6);
         REQUIRE(tokenizer6.Next() == "procedure");
         REQUIRE(tokenizer6.Next() == "while");
@@ -55,8 +56,10 @@ TEST_CASE("common/Tokenizer") {
     SECTION("next (comprehensive tests with whitespaces)") {
         std::string_view code4{
                 "procedure sumDigits {\n\tread number;\n\tsum = 0;\nwhile ( ! "
-                "\n (\n\n\n number > 0 \t) ) \n\n{ digit = number % 10; while (a == 0 "
-                "&& b <= 0) { while (a != b || b >= c) { a = b;\n\n }\n } sum = "
+                "\n (\n\n\n number > 0 \t) ) \n\n{ digit = number % 10; while "
+                "(a == 0 "
+                "&& b <= 0) { while (a != b || b >= c) { a = b;\n\n }\n } sum "
+                "= "
                 "sum + digit; number = number / 10; }call Haha233test1; print "
                 "sum;}procedure Haha233test1 {    if (CS3203-A < 6*100 ) then "
                 "{    	read read;    } else {print Haha233test1;}}"};

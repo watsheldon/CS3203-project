@@ -134,7 +134,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.ExistParent(true, Index<ArgPos::kFirst>(4),
                                 Index<ArgPos::kSecond>(7)));
         REQUIRE_FALSE(pkb.ExistParent(true, Index<ArgPos::kFirst>(4),
-                                Index<ArgPos::kSecond>(10)));
+                                      Index<ArgPos::kSecond>(10)));
         REQUIRE(pkb.ExistParent(false, Index<ArgPos::kFirst>(4),
                                 Index<ArgPos::kSecond>(8)));
         REQUIRE_FALSE(pkb.ExistParent(true, Index<ArgPos::kFirst>(2),
@@ -214,8 +214,6 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     }
 
     SECTION("Uses") {
-        std::pair<std::vector<int>, std::vector<int>> pairTest = {
-                {4, 4, 4, 4, 4, 4}, {1, 3, 2, 3, 3, 2}};
         REQUIRE(pkb.ExistUses(7, 1));
         REQUIRE(pkb.ExistUses(7, 3));
         REQUIRE(pkb.ExistUses(8, 2));
@@ -247,7 +245,16 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                 std::set<int>{1, 5, 4, 3, 6, 7, 8, 9});
         REQUIRE(pkb.GetUses(StmtType::kIf) == std::set<int>{4});
         // pair can contain duplicates
-        REQUIRE(pkb.GetUsesStmtVar(StmtType::kIf) == pairTest);
+        std::vector<int> first = pkb.GetUsesStmtVar(StmtType::kIf).first;
+        std::vector<int> second = pkb.GetUsesStmtVar(StmtType::kIf).second;
+        std::set<std::vector<int>> results;
+        for (int i = 0; i < first.size(); i++) {
+            results.insert(std::vector<int>{first[i], second[i]});
+        }
+        std::set<std::vector<int>> expected{
+                std::vector<int>{4, 4}, std::vector<int>{4, 1},
+                std::vector<int>{4, 2}, std::vector<int>{4, 3}};
+        REQUIRE(results == expected);
     }
 
     SECTION("ExistModifies") {
@@ -277,7 +284,17 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetModifies(StmtType::kAll) ==
                 std::set<int>{1, 2, 4, 5, 7, 8, 9, 10});
         // pairs can have duplication
-        REQUIRE(pkb.GetModifiesStmtVar(StmtType::kAll).second.size() == 13);
+        std::vector<int> first = pkb.GetModifiesStmtVar(StmtType::kWhile).first;
+        std::vector<int> second =
+                pkb.GetModifiesStmtVar(StmtType::kWhile).second;
+        std::set<std::vector<int>> results;
+        for (int i = 0; i < first.size(); i++) {
+            results.insert(std::vector<int>{first[i], second[i]});
+        }
+        std::set<std::vector<int>> expected{
+                std::vector<int>{5, 1}, std::vector<int>{1, 1},
+                std::vector<int>{1, 2}, std::vector<int>{1, 3}};
+        REQUIRE(results == expected);
     }
     SECTION("IndexToName") {
         std::vector<int> list1 = {1, 2};
@@ -297,7 +314,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     SECTION("GetEntity") {
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kAssign) ==
                 std::vector<int>{7, 8, 9});
-        REQUIRE(pkb.GetAllEntityIndices(StmtType::kCall) == std::vector<int>{});
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kCall).empty());
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kIf) == std::vector<int>{4});
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kPrint) ==
                 std::vector<int>{3, 6});

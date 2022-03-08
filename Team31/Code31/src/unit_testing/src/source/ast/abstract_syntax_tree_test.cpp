@@ -1,7 +1,7 @@
 #include "source/ast/abstract_syntax_tree.h"
-#include "source/token.h"
 
 #include "catch.hpp"
+#include "source/token.h"
 
 namespace spa {
 TEST_CASE("source/ast/AbstractSyntaxTree") {
