@@ -24,8 +24,8 @@ TEST_CASE("pkb/secondary_structure/ContainerForest") {
         REQUIRE_FALSE(cf.IsParentT(3, 5));
     }
     SECTION("GetAncestryTrace") {
-        REQUIRE(cf.GetAncestryTrace(1).empty());
-        REQUIRE(cf.GetAncestryTrace(5) == std::vector<int>{2, 1});
+        REQUIRE(cf.GetAncestryTrace(1) == std::vector<int>{1});
+        REQUIRE(cf.GetAncestryTrace(5) == std::vector<int>{5, 2, 1});
     }
     SECTION("GetChildren") {
         REQUIRE(cf.GetChildren(5).empty());
