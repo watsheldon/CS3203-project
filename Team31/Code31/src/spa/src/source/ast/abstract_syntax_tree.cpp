@@ -1,10 +1,9 @@
 #include "abstract_syntax_tree.h"
 
 #include <cassert>
-#include <deque>
 #include <iterator>
 #include <memory>
-#include <stack>
+#include <string>
 #include <utility>
 
 #include "common/lazy_factory.h"
@@ -17,16 +16,15 @@
 #include "source/token.h"
 #include "statement_node.h"
 #include "stmt_lst_node.h"
-#include "stmt_lst_parent.h"
 #include "variable_node.h"
 
 namespace spa {
 AbstractSyntaxTree::AbstractSyntaxTree(std::vector<Token> tokens)
         : tokens_(std::move(tokens)) {
-    build_tree();
-    check_tree();
+    BuildTree();
+    CheckTree();
 }
-BasicEntities AbstractSyntaxTree::getInitEntities() const {
+BasicEntities AbstractSyntaxTree::GetInitEntities() const {
     if (!tree_valid_) return {};
     BasicEntities entities;
     ExtractStmtIndex(read_stmts_, entities.reads);
@@ -46,305 +44,286 @@ BasicEntities AbstractSyntaxTree::getInitEntities() const {
     entities.proc_call_graph = call_edges_;
     return std::move(entities);
 }
-void AbstractSyntaxTree::build_tree() {
-    root_ = std::make_unique<ProgramNode>();
-    tree_valid_ = true;
-    std::stack<Mode> mode_history;
-    std::deque<StmtLstParent *> parent_path;
-    std::stack<StmtLstNode *> stmt_lst_path;
-    std::vector<PolishNotationNode> curr_expr;
-    int cond_depth = 0;
-    for (const auto &[type, name] : tokens_) {
-        if (!tree_valid_) break;
-        switch (type) {
-            case SourceTokenType::kKeywordProcedure:
-                mode_history.emplace(Mode::kProc);
-                break;
-            case SourceTokenType::kKeywordRead:
-                mode_history.emplace(Mode::kRead);
-                break;
-            case SourceTokenType::kKeywordPrint:
-                mode_history.emplace(Mode::kPrint);
-                break;
-            case SourceTokenType::kKeywordCall:
-                mode_history.emplace(Mode::kCall);
-                break;
-            case SourceTokenType::kKeywordWhile:
-                mode_history.emplace(Mode::kWhile);
-                break;
-            case SourceTokenType::kKeywordIf:
-                mode_history.emplace(Mode::kIf);
-                break;
-            case SourceTokenType::kKeywordThen:
-                mode_history.emplace(Mode::kThen);
-                break;
-            case SourceTokenType::kKeywordElse:
-                mode_history.emplace(Mode::kElse);
-                break;
-            case SourceTokenType::kBracketL:
-                if (mode_history.top() == Mode::kAssign) {
-                    curr_expr.emplace_back(ExprNodeType::kBracketL);
-                } else if (mode_history.top() == Mode::kWhile ||
-                           mode_history.top() == Mode::kIf) {
-                    mode_history.emplace(Mode::kCond);
-                    conditions_.emplace_back(std::make_unique<ConditionNode>());
-                    ++cond_depth;
-                } else if (mode_history.top() == Mode::kCond) {
-                    ++cond_depth;
-                } else {
-                    assert(false);
-                }
-                break;
-            case SourceTokenType::kBracketR:
-                if (mode_history.top() == Mode::kAssign) {
-                    curr_expr.emplace_back(ExprNodeType::kBracketR);
-                } else if (mode_history.top() == Mode::kCond) {
-                    if (--cond_depth != 0) break;
-                    mode_history.pop();
-                    if (mode_history.top() == Mode::kWhile) {
-                        auto while_stmt = std::make_unique<WhileNode>();
-                        while_stmt->SetCondition(conditions_.back().get());
-                        parent_path.emplace_back(while_stmt.get());
-                        while_stmts_.emplace_back(std::move(while_stmt));
-                    } else if (mode_history.top() == Mode::kIf) {
-                        auto if_stmt = std::make_unique<IfNode>();
-                        if_stmt->SetCondition(conditions_.back().get());
-                        parent_path.emplace_back(if_stmt.get());
-                        if_stmts_.emplace_back(std::move(if_stmt));
-                        mode_history.pop();
-                    } else {
-                        assert(false);
-                    }
-                } else {
-                    assert(false);
-                }
-                break;
-            case SourceTokenType::kBraceL: {
-                mode_history.emplace(Mode::kStmtLst);
-                auto &stmt_lst = stmt_lsts_.emplace_back(
-                        std::make_unique<StmtLstNode>());
-                stmt_lst_path.emplace(stmt_lst.get());
-                break;
-            }
-            case SourceTokenType::kBraceR: {
-                assert(mode_history.top() == Mode::kStmtLst);
-                mode_history.pop();
-                parent_path.back()->AddStmtLst(stmt_lst_path.top());
-                stmt_lst_path.pop();
-                if (mode_history.top() == Mode::kWhile) {
-                    auto while_stmt =
-                            dynamic_cast<const WhileNode *>(parent_path.back());
-                    assert(while_stmt);
-                    stmt_lst_path.top()->AddStatement(while_stmt);
-                    parent_path.pop_back();
-                } else if (mode_history.top() == Mode::kThen) {
-                    auto if_stmt = dynamic_cast<IfNode *>(parent_path.back());
-                    assert(if_stmt);
-                } else if (mode_history.top() == Mode::kElse) {
-                    auto if_stmt = dynamic_cast<IfNode *>(parent_path.back());
-                    assert(if_stmt);
-                    stmt_lst_path.top()->AddStatement(if_stmt);
-                    parent_path.pop_back();
-                } else if (mode_history.top() == Mode::kProc) {
-                    auto proc =
-                            dynamic_cast<ProcedureNode *>(parent_path.back());
-                    assert(proc);
-                    root_->AddProcedure(proc);
-                    parent_path.pop_back();
-                } else {
-                    assert(false);
-                }
-                mode_history.pop();
-                break;
-            }
-            case SourceTokenType::kAssignEqual:
-                assert(mode_history.top() == Mode::kAssign);
-                curr_expr.clear();
-                break;
-            case SourceTokenType::kOperatorPlus: {
-                if (mode_history.top() == Mode::kAssign) {
-                    curr_expr.emplace_back(OperatorType::kPlus);
-                } else if (mode_history.top() == Mode::kCond) {
-                    // ignore
-                } else {
-                    assert(false);
-                }
-                break;
-            }
-            case SourceTokenType::kOperatorMinus: {
-                if (mode_history.top() == Mode::kAssign) {
-                    curr_expr.emplace_back(OperatorType::kMinus);
-                } else if (mode_history.top() == Mode::kCond) {
-                    // ignore
-                } else {
-                    assert(false);
-                }
-                break;
-            }
-            case SourceTokenType::kOperatorTimes: {
-                if (mode_history.top() == Mode::kAssign) {
-                    curr_expr.emplace_back(OperatorType::kTimes);
-                } else if (mode_history.top() == Mode::kCond) {
-                    // ignore
-                } else {
-                    assert(false);
-                }
-                break;
-            }
-            case SourceTokenType::kOperatorDivide: {
-                if (mode_history.top() == Mode::kAssign) {
-                    curr_expr.emplace_back(OperatorType::kDivide);
-                } else if (mode_history.top() == Mode::kCond) {
-                    // ignore
-                } else {
-                    assert(false);
-                }
-                break;
-            }
-            case SourceTokenType::kOperatorModulo: {
-                if (mode_history.top() == Mode::kAssign) {
-                    curr_expr.emplace_back(OperatorType::kModulo);
-                } else if (mode_history.top() == Mode::kCond) {
-                    // ignore
-                } else {
-                    assert(false);
-                }
-                break;
-            }
-            case SourceTokenType::kCondNot:
-            case SourceTokenType::kCondAnd:
-            case SourceTokenType::kCondOr:
-            case SourceTokenType::kRelLt:
-            case SourceTokenType::kRelLeq:
-            case SourceTokenType::kRelEq:
-            case SourceTokenType::kRelNeq:
-            case SourceTokenType::kRelGt:
-            case SourceTokenType::kRelGeq:
-                assert(mode_history.top() == Mode::kCond);
-                break;
-            case SourceTokenType::kSemicolon:
-                if (mode_history.top() == Mode::kRead) {
-                    stmt_lst_path.top()->AddStatement(read_stmts_.back().get());
-                } else if (mode_history.top() == Mode::kPrint) {
-                    stmt_lst_path.top()->AddStatement(
-                            print_stmts_.back().get());
-                } else if (mode_history.top() == Mode::kCall) {
-                    stmt_lst_path.top()->AddStatement(call_stmts_.back().get());
-                } else if (mode_history.top() == Mode::kAssign) {
-                    auto expr = std::make_unique<PolishNotation>(
-                            std::move(curr_expr));
-                    auto assign = assign_stmts_.back().get();
-                    assign->SetExpr(expr.get());
-                    stmt_lst_path.top()->AddStatement(assign);
-                    expressions_.emplace_back(std::move(expr));
-                    assign->SetRhsIndex(expressions_.size());
-                } else {
-                    assert(false);
-                }
-                mode_history.pop();
-                break;
-            case SourceTokenType::kName: {
-                if (mode_history.top() == Mode::kProc) {
-                    auto ptr = CreateProcedure(name);
-                    parent_path.emplace_back(ptr);
-                } else if (mode_history.top() == Mode::kRead) {
-                    auto [pair, inserted] = variables_.try_emplace(
-                            name, LazyFactory([] {
-                                return std::make_unique<VariableNode>();
-                            }));
-                    auto read = std::make_unique<ReadNode>();
-                    read->SetVariable(pair->second.get());
-                    read_stmts_.emplace_back(std::move(read));
-                } else if (mode_history.top() == Mode::kPrint) {
-                    auto [pair, success] = variables_.try_emplace(
-                            name, LazyFactory([] {
-                                return std::make_unique<VariableNode>();
-                            }));
-                    auto print = std::make_unique<PrintNode>();
-                    print->SetVariable(pair->second.get());
-                    print_stmts_.emplace_back(std::move(print));
-                } else if (mode_history.top() == Mode::kCall) {
-                    auto [pair, inserted] = procedures_.try_emplace(
-                            name, LazyFactory([] {
-                                return std::make_unique<ProcedureNode>();
-                            }));
-                    if (inserted) call_edges_.resize(procedures_.size() + 1);
-                    auto call = std::make_unique<CallNode>();
-                    auto callee = pair->second.get();
-                    call->SetProcedure(callee);
-
-                    // update the call graph
-                    auto caller =
-                            dynamic_cast<ProcedureNode *>(parent_path.front());
-                    assert(caller);
-                    call_edges_[caller->GetIndex()].emplace(callee->GetIndex());
-
-                    call_stmts_.emplace_back(std::move(call));
-                } else if (mode_history.top() == Mode::kCond) {
-                    auto [pair, success] = variables_.try_emplace(
-                            name, LazyFactory([] {
-                                return std::make_unique<VariableNode>();
-                            }));
-                    auto cond = conditions_.back().get();
-                    cond->AddVariable(pair->second.get());
-                } else {  // has to be assignment
-                    auto [pair, success] = variables_.try_emplace(
-                            name, LazyFactory([] {
-                                return std::make_unique<VariableNode>();
-                            }));
-                    auto var = pair->second.get();
-                    if (mode_history.top() != Mode::kAssign) {
-                        auto assign = std::make_unique<AssignNode>();
-                        assign->SetModifiedVar(var);
-                        assign_stmts_.emplace_back(std::move(assign));
-                        mode_history.emplace(Mode::kAssign);
-                        break;
-                    }
-                    assert(mode_history.top() == Mode::kAssign);
-                    curr_expr.emplace_back(ExprNodeType::kVariable,
-                                           var->GetIndex());
-                }
-            } break;
-            case SourceTokenType::kInteger:
-                if (mode_history.top() == Mode::kAssign) {
-                    auto [pair, success] = constants_.try_emplace(
-                            name, LazyFactory([] {
-                                return std::make_unique<ConstantNode>();
-                            }));
-                    auto constant = pair->second.get();
-                    curr_expr.emplace_back(ExprNodeType::kConstant,
-                                           constant->GetIndex());
-                } else if (mode_history.top() == Mode::kCond) {
-                    auto [pair, success] = constants_.try_emplace(
-                            name, LazyFactory([] {
-                                return std::make_unique<ConstantNode>();
-                            }));
-                    auto cond = conditions_.back().get();
-                    cond->AddConstant(pair->second.get());
-                } else {
-                    assert(false);
-                }
-                break;
-        }
+const ProgramNode *AbstractSyntaxTree::GetRoot() const {
+    return tree_valid_ ? root_.get() : nullptr;
+}
+const VariableNode *AbstractSyntaxTree::AddVariable(std::string name) {
+    auto [pair, ins] = variables_.try_emplace(
+            std::move(name),
+            LazyFactory([] { return std::make_unique<VariableNode>(); }));
+    return pair->second.get();
+}
+const ConstantNode *AbstractSyntaxTree::AddConstant(std::string name) {
+    auto [pair, ins] = constants_.try_emplace(
+            std::move(name),
+            LazyFactory([] { return std::make_unique<ConstantNode>(); }));
+    return pair->second.get();
+}
+void AbstractSyntaxTree::BracketL() {
+    if (mode_history_.top() == Mode::kAssign) {
+        curr_expr_.emplace_back(ExprNodeType::kBracketL);
+    } else if (mode_history_.top() == Mode::kWhile ||
+               mode_history_.top() == Mode::kIf) {
+        mode_history_.emplace(Mode::kCond);
+        conditions_.emplace_back(std::make_unique<ConditionNode>());
+        ++cond_depth_;
+    } else if (mode_history_.top() == Mode::kCond) {
+        ++cond_depth_;
+    } else {
+        assert(false);
     }
 }
-ProcedureNode *AbstractSyntaxTree::CreateProcedure(std::string name) {
+void AbstractSyntaxTree::BracketR() {
+    if (mode_history_.top() == Mode::kAssign) {
+        curr_expr_.emplace_back(ExprNodeType::kBracketR);
+        return;
+    }
+    assert(mode_history_.top() == Mode::kCond);
+    if (--cond_depth_ != 0) return;
+    mode_history_.pop();
+    if (mode_history_.top() == Mode::kWhile) {
+        auto while_stmt = std::make_unique<WhileNode>();
+        while_stmt->SetCondition(conditions_.back().get());
+        parent_path_.emplace_back(while_stmt.get());
+        while_stmts_.emplace_back(std::move(while_stmt));
+        return;
+    }
+    assert(mode_history_.top() == Mode::kIf);
+    auto if_stmt = std::make_unique<IfNode>();
+    if_stmt->SetCondition(conditions_.back().get());
+    parent_path_.emplace_back(if_stmt.get());
+    if_stmts_.emplace_back(std::move(if_stmt));
+    mode_history_.pop();
+}
+void AbstractSyntaxTree::BraceL() {
+    mode_history_.emplace(Mode::kStmtLst);
+    auto &stmt_lst = stmt_lsts_.emplace_back(std::make_unique<StmtLstNode>());
+    stmt_lst_path_.emplace(stmt_lst.get());
+}
+void AbstractSyntaxTree::BraceR() {
+    assert(mode_history_.top() == Mode::kStmtLst);
+    mode_history_.pop();
+    parent_path_.back()->AddStmtLst(stmt_lst_path_.top());
+    stmt_lst_path_.pop();
+    switch (mode_history_.top()) {
+        case Mode::kWhile: {
+            auto while_stmt =
+                    dynamic_cast<const WhileNode *>(parent_path_.back());
+            assert(while_stmt);
+            stmt_lst_path_.top()->AddStatement(while_stmt);
+            parent_path_.pop_back();
+            break;
+        }
+        case Mode::kThen: {
+            auto if_stmt = dynamic_cast<IfNode *>(parent_path_.back());
+            assert(if_stmt);
+            break;
+        }
+        case Mode::kElse: {
+            auto if_stmt = dynamic_cast<IfNode *>(parent_path_.back());
+            assert(if_stmt);
+            stmt_lst_path_.top()->AddStatement(if_stmt);
+            parent_path_.pop_back();
+            break;
+        }
+        case Mode::kProc: {
+            auto proc = dynamic_cast<ProcedureNode *>(parent_path_.back());
+            assert(proc);
+            root_->AddProcedure(proc);
+            parent_path_.pop_back();
+            break;
+        }
+        default:
+            assert(false);
+    }
+    mode_history_.pop();
+}
+void AbstractSyntaxTree::Semicolon() {
+    switch (mode_history_.top()) {
+        case Mode::kRead:
+            stmt_lst_path_.top()->AddStatement(read_stmts_.back().get());
+            break;
+        case Mode::kPrint:
+            stmt_lst_path_.top()->AddStatement(print_stmts_.back().get());
+            break;
+        case Mode::kCall:
+            stmt_lst_path_.top()->AddStatement(call_stmts_.back().get());
+            break;
+        case Mode::kAssign: {
+            auto expr = std::make_unique<PolishNotation>(std::move(curr_expr_));
+            auto assign = assign_stmts_.back().get();
+            assign->SetExpr(expr.get());
+            stmt_lst_path_.top()->AddStatement(assign);
+            expressions_.emplace_back(std::move(expr));
+            assign->SetRhsIndex((int)expressions_.size());
+            break;
+        }
+        default:
+            assert(false);
+    }
+    mode_history_.pop();
+}
+void AbstractSyntaxTree::Name(const std::string &name) {
+    switch (mode_history_.top()) {
+        case Mode::kStmtLst:
+            AddAssign(name);
+            break;
+        case Mode::kProc:
+            AddProcedure(name);
+            break;
+        case Mode::kRead:
+            AddRead(name);
+            break;
+        case Mode::kPrint:
+            AddPrint(name);
+            break;
+        case Mode::kCall:
+            AddCall(name);
+            break;
+        case Mode::kCond:
+            LastCondAddVar(name);
+            break;
+        case Mode::kAssign:
+            ExprAddVar(name);
+            break;
+        default:
+            assert(false);
+    }
+}
+void AbstractSyntaxTree::Constant(std::string name) {
+    auto constant = AddConstant(std::move(name));
+    if (mode_history_.top() == Mode::kAssign) {
+        curr_expr_.emplace_back(ExprNodeType::kConstant, constant->GetIndex());
+        return;
+    }
+    assert(mode_history_.top() == Mode::kCond);
+    auto last_condition = conditions_.back().get();
+    last_condition->AddConstant(constant);
+}
+void AbstractSyntaxTree::AddProcedure(std::string name) {
     auto [pair, inserted] = procedures_.try_emplace(
             std::move(name),
             LazyFactory([] { return std::make_unique<ProcedureNode>(); }));
     auto proc = pair->second.get();
     // A program cannot have two procedures with the same name.
-    if (!inserted && proc->GetStmtlst()) {
-        tree_valid_ = false;
-        return nullptr;
-    }
+    tree_valid_ = inserted || !proc->GetStmtlst();
     call_edges_.resize(procedures_.size() + 1);
-    return proc;
+    parent_path_.emplace_back(proc);
 }
-const ProgramNode *AbstractSyntaxTree::GetRoot() const {
-    return tree_valid_ ? root_.get() : nullptr;
+void AbstractSyntaxTree::AddRead(std::string name) {
+    auto variable = AddVariable(std::move(name));
+    auto read = std::make_unique<ReadNode>();
+    read->SetVariable(variable);
+    read_stmts_.emplace_back(std::move(read));
 }
-void AbstractSyntaxTree::check_tree() {
+void AbstractSyntaxTree::AddPrint(std::string name) {
+    auto variable = AddVariable(std::move(name));
+    auto print = std::make_unique<PrintNode>();
+    print->SetVariable(variable);
+    print_stmts_.emplace_back(std::move(print));
+}
+void AbstractSyntaxTree::AddCall(std::string name) {
+    auto [pair, inserted] = procedures_.try_emplace(
+            std::move(name),
+            LazyFactory([] { return std::make_unique<ProcedureNode>(); }));
+    if (inserted) call_edges_.resize(procedures_.size() + 1);
+    auto call = std::make_unique<CallNode>();
+    auto callee = pair->second.get();
+    call->SetProcedure(callee);
+
+    // update the call graph
+    auto caller = dynamic_cast<ProcedureNode *>(parent_path_.front());
+    assert(caller);
+    call_edges_[caller->GetIndex()].emplace(callee->GetIndex());
+    call_stmts_.emplace_back(std::move(call));
+}
+void AbstractSyntaxTree::AddAssign(std::string name) {
+    auto var = AddVariable(std::move(name));
+    auto assign = std::make_unique<AssignNode>();
+    assign->SetModifiedVar(var);
+    assign_stmts_.emplace_back(std::move(assign));
+    mode_history_.emplace(Mode::kAssign);
+}
+void AbstractSyntaxTree::LastCondAddVar(std::string name) {
+    const auto variable = AddVariable(std::move(name));
+    auto last_condition = conditions_.back().get();
+    last_condition->AddVariable(variable);
+}
+void AbstractSyntaxTree::ExprAddVar(std::string name) {
+    const auto variable = AddVariable(std::move(name));
+    curr_expr_.emplace_back(ExprNodeType::kVariable, variable->GetIndex());
+}
+void AbstractSyntaxTree::ParseToken(const Token &token) {
+    auto &[type, name] = token;
+    switch (type) {
+        case SourceTokenType::kKeywordProcedure:
+        case SourceTokenType::kKeywordRead:
+        case SourceTokenType::kKeywordPrint:
+        case SourceTokenType::kKeywordCall:
+        case SourceTokenType::kKeywordWhile:
+        case SourceTokenType::kKeywordIf:
+        case SourceTokenType::kKeywordThen:
+        case SourceTokenType::kKeywordElse:
+            mode_history_.emplace(KeywordToMode(type));
+            break;
+        case SourceTokenType::kBracketL:
+            BracketL();
+            break;
+        case SourceTokenType::kBracketR:
+            BracketR();
+            break;
+        case SourceTokenType::kBraceL:
+            BraceL();
+            break;
+        case SourceTokenType::kBraceR:
+            BraceR();
+            break;
+        case SourceTokenType::kAssignEqual:
+            assert(mode_history_.top() == Mode::kAssign);
+            curr_expr_.clear();
+            break;
+        case SourceTokenType::kOperatorPlus:
+        case SourceTokenType::kOperatorMinus:
+        case SourceTokenType::kOperatorTimes:
+        case SourceTokenType::kOperatorDivide:
+        case SourceTokenType::kOperatorModulo:
+            if (mode_history_.top() == Mode::kAssign)
+                curr_expr_.emplace_back(OperatorForRpn(type));
+            // nothing to do but just ensure that it is the case
+            else
+                assert(mode_history_.top() == Mode::kCond);
+            break;
+        case SourceTokenType::kCondNot:
+        case SourceTokenType::kCondAnd:
+        case SourceTokenType::kCondOr:
+        case SourceTokenType::kRelLt:
+        case SourceTokenType::kRelLeq:
+        case SourceTokenType::kRelEq:
+        case SourceTokenType::kRelNeq:
+        case SourceTokenType::kRelGt:
+        case SourceTokenType::kRelGeq:
+            assert(mode_history_.top() == Mode::kCond);
+            break;
+        case SourceTokenType::kSemicolon:
+            Semicolon();
+            break;
+        case SourceTokenType::kName:
+            Name(name);
+            break;
+        case SourceTokenType::kInteger: {
+            Constant(name);
+        } break;
+    }
+}
+void AbstractSyntaxTree::BuildTree() {
+    root_ = std::make_unique<ProgramNode>();
+    tree_valid_ = true;
+    for (const auto &token : tokens_) {
+        if (!tree_valid_) break;
+        ParseToken(token);
+    }
+}
+void AbstractSyntaxTree::CheckTree() {
     if (!tree_valid_) return;
     // A procedure cannot call a non-existing procedure.
     if (procedures_.size() != root_->GetProcedures().size()) {
@@ -354,20 +333,60 @@ void AbstractSyntaxTree::check_tree() {
     // Recursive and cyclic calls are not allowed.
     for (int i = 1; i < call_edges_.size(); ++i) {
         std::vector<bool> visited(call_edges_.size());
-        if (Cyclic(i, visited)) {
+        if (HasCycle(i, visited)) {
             tree_valid_ = false;
             break;
         }
     }
 }
-bool AbstractSyntaxTree::Cyclic(int curr, std::vector<bool> visited) {
+bool AbstractSyntaxTree::HasCycle(int curr, std::vector<bool> visited) {
     visited[curr] = true;
     for (auto i : call_edges_[curr]) {
-        if (visited[i] || Cyclic(i, visited)) {
+        if (visited[i] || HasCycle(i, visited)) {
             tree_valid_ = false;
             return true;
         }
     }
     return false;
+}
+constexpr AbstractSyntaxTree::Mode AbstractSyntaxTree::KeywordToMode(
+        SourceTokenType keyword) {
+    switch (keyword) {
+        case SourceTokenType::kKeywordProcedure:
+            return Mode::kProc;
+        case SourceTokenType::kKeywordRead:
+            return Mode::kRead;
+        case SourceTokenType::kKeywordPrint:
+            return Mode::kPrint;
+        case SourceTokenType::kKeywordCall:
+            return Mode::kCall;
+        case SourceTokenType::kKeywordWhile:
+            return Mode::kWhile;
+        case SourceTokenType::kKeywordIf:
+            return Mode::kIf;
+        case SourceTokenType::kKeywordThen:
+            return Mode::kThen;
+        case SourceTokenType::kKeywordElse:
+            return Mode::kElse;
+        default:
+            assert(false);
+    }
+}
+constexpr OperatorType AbstractSyntaxTree::OperatorForRpn(
+        SourceTokenType keyword) {
+    switch (keyword) {
+        case SourceTokenType::kOperatorPlus:
+            return OperatorType::kPlus;
+        case SourceTokenType::kOperatorMinus:
+            return OperatorType::kMinus;
+        case SourceTokenType::kOperatorTimes:
+            return OperatorType::kTimes;
+        case SourceTokenType::kOperatorDivide:
+            return OperatorType::kDivide;
+        case SourceTokenType::kOperatorModulo:
+            return OperatorType::kModulo;
+        default:
+            assert(false);
+    }
 }
 }  // namespace spa

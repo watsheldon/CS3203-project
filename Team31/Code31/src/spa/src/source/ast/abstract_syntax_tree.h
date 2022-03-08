@@ -6,6 +6,7 @@
 #include <memory>
 #include <set>
 #include <stack>
+#include <string>
 #include <vector>
 
 #include "abstract_syntax_tree_node.h"
@@ -29,7 +30,7 @@ class AbstractSyntaxTree {
     template <typename T>
     using UniquePtrVec = std::vector<std::unique_ptr<T>>;
     explicit AbstractSyntaxTree(std::vector<Token> tokens);
-    [[nodiscard]] BasicEntities getInitEntities() const;
+    [[nodiscard]] BasicEntities GetInitEntities() const;
     [[nodiscard]] const ProgramNode *GetRoot() const;
 
   private:
@@ -47,6 +48,12 @@ class AbstractSyntaxTree {
         kAssign,
     };
     std::vector<Token> tokens_;
+    std::stack<Mode> mode_history_;
+    std::deque<StmtLstParent *> parent_path_;
+    std::stack<StmtLstNode *> stmt_lst_path_;
+    std::vector<PolishNotationNode> curr_expr_;
+    int cond_depth_ = 0;
+
     NamePtrMap<VariableNode> variables_;
     NamePtrMap<ProcedureNode> procedures_;
     NamePtrMap<ConstantNode> constants_;
@@ -63,10 +70,26 @@ class AbstractSyntaxTree {
     std::vector<std::set<int>> call_edges_;
     bool tree_valid_ = false;
 
-    void build_tree();
-    ProcedureNode *CreateProcedure(std::string name);
-    void check_tree();
-    bool Cyclic(int curr, std::vector<bool> visited);
+    const VariableNode *AddVariable(std::string name);
+    const ConstantNode *AddConstant(std::string name);
+    void BracketL();
+    void BracketR();
+    void BraceL();
+    void BraceR();
+    void Semicolon();
+    void Name(const std::string &name);
+    void Constant(std::string name);
+    void AddProcedure(std::string name);
+    void AddRead(std::string name);
+    void AddPrint(std::string name);
+    void AddCall(std::string name);
+    void AddAssign(std::string name);
+    void LastCondAddVar(std::string name);
+    void ExprAddVar(std::string name);
+    void ParseToken(const Token &token);
+    void BuildTree();
+    void CheckTree();
+    bool HasCycle(int curr, std::vector<bool> visited);
     template <typename T,
               typename = std::enable_if_t<std::is_base_of_v<StatementNode, T>>>
     static void ExtractStmtIndex(const UniquePtrVec<T> &src,
@@ -83,6 +106,8 @@ class AbstractSyntaxTree {
             dst[pair.second->GetIndex()] = pair.first;
         });
     }
+    static constexpr Mode KeywordToMode(SourceTokenType keyword);
+    static constexpr OperatorType OperatorForRpn(SourceTokenType keyword);
 };
 }  // namespace spa
 

@@ -12,7 +12,7 @@
 
 namespace spa {
 std::unique_ptr<KnowledgeBase> DesignAbstractionExtractor::Extract(AST ast) {
-    pkb_ = std::make_unique<ProgramKnowledgeBase>(ast->getInitEntities());
+    pkb_ = std::make_unique<ProgramKnowledgeBase>(ast->GetInitEntities());
 
     auto ast_root = ast->GetRoot();
     assert(ast_root != nullptr);
