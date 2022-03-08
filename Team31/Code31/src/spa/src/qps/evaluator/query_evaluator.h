@@ -21,14 +21,14 @@ class QueryEvaluator {
     const std::unique_ptr<KnowledgeBase> knowledge_base_;
     std::map<const Synonym *, std::set<int>> domains_;
     std::vector<ResultTable> vartables_;
-    std::map<const Synonym *, std::vector<ResultTable *>> vartable_map_;
+    std::map<const Synonym *, std::vector<int>> vartable_map_;
     std::set<const Synonym *> update_queue_;
 
     void Populate(std::list<std::string> &list, const Synonym *selected);
     bool UpdateResult(ResultTable &result_table);
     bool UpdateSingle(const VariableColumn &column);
     bool Propagate();
-    bool UpdateDouble(ResultTable &result_table);
+    bool UpdateDouble(ResultTable &i);
     void Clear();
 };
 }  // namespace spa

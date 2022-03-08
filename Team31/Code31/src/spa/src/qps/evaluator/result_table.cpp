@@ -22,7 +22,7 @@ ResultTable::ResultTable(Synonym *synonym_1, Column &&column_1,
                                                    std::move(column_2))),
           type(kDouble) {}
 ResultTable::DomainPair ResultTable::Update(const ResultTable &other) {
-    assert(type != kDouble);
+    assert(type == kDouble);
 
     // align the first and second column according to other
     const auto &[this_1st, this_2nd] =
@@ -101,7 +101,8 @@ const ResultTable::Domain &ResultTable::Update(const Synonym *syn_a,
     assert(this_a->synonym == syn_a);
     auto common_a = Intersect(this_a->domain, domain_a);
     if (common_a.empty()) {
-        return std::move(Domain());
+        this_b->domain.clear();
+        return this_b->domain;
     }
     Column column_a, column_b;
     Domain domain_a_new, domain_b_new;

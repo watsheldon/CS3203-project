@@ -60,7 +60,7 @@ bool QueryEvaluator::UpdateSingle(const VariableColumn& column) {
     const auto& [itr, inserted] =
             domains_.try_emplace(column.synonym, column.domain);
     if (inserted) {
-        vartable_map_.emplace(column.synonym, std::vector<ResultTable*>());
+        vartable_map_.emplace(column.synonym, std::vector<int>());
         return true;
     }
     auto& [syn, syn_domain] = *itr;
@@ -84,6 +84,8 @@ bool QueryEvaluator::UpdateDouble(ResultTable& result_table) {
     if (!exist_a && !exist_b) {
         domains_.emplace(syn_a, column_a->domain);
         domains_.emplace(syn_b, column_b->domain);
+        vartable_map_[syn_a].emplace_back(vartables_.size());
+        vartable_map_[syn_b].emplace_back(vartables_.size());
         vartables_.emplace_back(std::move(result_table));
         return true;
     }
@@ -95,22 +97,29 @@ bool QueryEvaluator::UpdateDouble(ResultTable& result_table) {
         auto intersect = ResultTable::Intersect(domains_[syn_existing],
                                                 column_existing->domain);
         domains_.emplace(syn_new, result_table.Update(syn_existing, intersect));
+        if (intersect.size() < domains_[syn_existing].size()) {
+            update_queue_.emplace(syn_existing);
+        }
         domains_[syn_existing].swap(intersect);
+        vartable_map_[syn_existing].emplace_back(vartables_.size());
+        vartable_map_[syn_new].emplace_back(vartables_.size());
+        vartables_.emplace_back(std::move(result_table));
+        return !domains_[syn_existing].empty() && !domains_[syn_new].empty();
     }
     auto [syn_rare, syn_more] =
             vartable_map_[syn_a].size() < vartable_map_[syn_b].size()
                     ? std::make_pair(syn_a, syn_b)
                     : std::make_pair(syn_b, syn_a);
-    auto& rare_tables = vartable_map_[syn_rare];
     auto other = syn_more;
+    auto& rare_tables = vartable_map_[syn_rare];
     auto table_itr = std::find_if(rare_tables.begin(), rare_tables.end(),
-                                  [other](ResultTable* vt) {
-                                      auto [x, y] = vt->GetSynonyms();
+                                  [this, other](int i) {
+                                      auto [x, y] = vartables_[i].GetSynonyms();
                                       return x == other || y == other;
                                   });
     const auto& [domain_a, domain_b] =
             table_itr != rare_tables.end()
-                    ? (**table_itr).Update(result_table)
+                    ? vartables_[*table_itr].Update(result_table)
                     : result_table.Update(syn_a, domains_[syn_a], syn_b,
                                           domains_[syn_b]);
     if (domain_a.empty() || domain_b.empty()) {
@@ -125,6 +134,8 @@ bool QueryEvaluator::UpdateDouble(ResultTable& result_table) {
         update_queue_.emplace(syn_b);
     }
     if (table_itr == rare_tables.end()) {
+        vartable_map_[syn_a].emplace_back(vartables_.size());
+        vartable_map_[syn_b].emplace_back(vartables_.size());
         vartables_.emplace_back(std::move(result_table));
     }
 
@@ -134,15 +145,16 @@ bool QueryEvaluator::Propagate() {
     while (!update_queue_.empty()) {
         auto curr = update_queue_.begin();
         auto synonym = *curr;
-        for (auto table : vartable_map_[synonym]) {
-            auto [syn_a, syn_b] = table->GetSynonyms();
+        for (auto table_idx : vartable_map_[synonym]) {
+            auto [syn_a, syn_b] = vartables_[table_idx].GetSynonyms();
             auto syn_other = synonym == syn_a ? syn_b : syn_a;
-            auto domain_other = table->Update(synonym, domains_[synonym]);
+            auto domain_other =
+                    vartables_[table_idx].Update(synonym, domains_[synonym]);
             if (domain_other.empty()) {
                 return false;
             }
             if (domain_other.size() < domains_[syn_other].size()) {
-                domains_[synonym].swap(domain_other);
+                domains_[syn_other].swap(domain_other);
                 update_queue_.emplace(syn_other);
             }
         }
