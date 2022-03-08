@@ -7,6 +7,10 @@
 #include <numeric>
 #include <utility>
 
+#include "common/entity_type_enum.h"
+#include "common/index.h"
+#include "common/polish_notation.h"
+#include "common/polish_notation_node.h"
 #include "knowledge_base.h"
 #include "pkb/store/calls_relationship_store.h"
 #include "pkb/store/modifies_relationship_store.h"
