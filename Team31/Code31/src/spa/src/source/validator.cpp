@@ -23,7 +23,7 @@ bool Validator::Program() {
     while (Accept(SourceTokenType::kKeywordProcedure)) {
         valid = Procedure();
     }
-    return valid;
+    return valid && curr_token_.empty();
 }
 inline void Validator::FetchToken() { tokenizer_ >> curr_token_; }
 bool Validator::Accept(SourceTokenType type) {
