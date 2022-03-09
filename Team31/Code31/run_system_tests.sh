@@ -4,10 +4,12 @@ OUTPUT_DIR="tests"
 SOURCE_SUFFIX="_source.txt"
 QUERY_SUFFIX="_queries.txt"
 XML_EXT=".xml"
-if [ $(uname) == "Windows" ]; then
+if [ "$(uname)" == "Windows" ]; then
   autotester="${BUILD_DIR}/src/autotester/release/autotester.exe"
+  dev_null="NUL"
 else
   autotester="${BUILD_DIR}/src/autotester/autotester"
+  dev_null="/dev/null"
 fi
 
 if [[ -n $1 && -d $1 ]]; then
@@ -24,9 +26,10 @@ for source in "${simple_sources[@]}"; do
     echo "Matching file for ${source} does not exist, skipping..."
     continue
   fi
-  echo -n "Running ${source/$SOURCE_SUFFIX/}... "
-  cmd="$autotester ${source} ${queries} $OUTPUT_DIR/$(basename "$source" $SOURCE_SUFFIX)${XML_EXT}"
-  if $cmd &>/dev/null; then
+  name=$(basename "$source" $SOURCE_SUFFIX)
+  echo -n "Running ${name}... "
+  cmd="$autotester ${source} ${queries} $OUTPUT_DIR/$name${XML_EXT}"
+  if $cmd &> $dev_null; then
     echo "success"
   else
     echo "failure"
