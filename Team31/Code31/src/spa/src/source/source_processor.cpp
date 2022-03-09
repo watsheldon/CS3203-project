@@ -15,6 +15,7 @@ std::unique_ptr<KnowledgeBase> SourceProcessor::Parse() {
     auto tokens = validator.Validate();
     if (!tokens) return {};
     auto ast = std::make_unique<AbstractSyntaxTree>(std::move(tokens));
+    if (!ast) return {};
     DesignAbstractionExtractor dae;
     return dae.Extract(std::move(ast));
 }

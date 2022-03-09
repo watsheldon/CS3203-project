@@ -52,7 +52,6 @@ class Validator {
     bool IsConstant() const;
     void FetchToken();
     bool Accept(SourceTokenType type);
-    bool Stmt();
     bool ArithmeticExpr(bool has_left = false);
     bool Group();
     bool CondExpr();

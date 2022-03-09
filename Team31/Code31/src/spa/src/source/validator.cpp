@@ -20,9 +20,10 @@ bool Validator::Procedure() {
 }
 bool Validator::Program() {
     bool valid = false;
-    while (Accept(SourceTokenType::kKeywordProcedure)) {
+    do {
+        if (!Accept(SourceTokenType::kKeywordProcedure)) break;
         valid = Procedure();
-    }
+    } while (valid);
     return valid && curr_token_.empty();
 }
 inline void Validator::FetchToken() { tokenizer_ >> curr_token_; }
@@ -53,29 +54,25 @@ bool Validator::IsConstant() const {
     return curr_token_.length() == 1 || curr_token_[0] != kZero;
 }
 bool Validator::StmtLst() {
-    if (!Accept(SourceTokenType::kBraceL) || !Stmt()) return false;
-    while (Stmt())
-        ;  // get all other stmt
-    Accept(SourceTokenType::kBraceR);
-    return true;
-}
-bool Validator::Stmt() {
-    if (StringToSourceType.at(tokenizer_.Peek()) ==
-        SourceTokenType::kAssignEqual) {
-        return Accept(SourceTokenType::kName) && Assign();
-    }
-    if (Accept(SourceTokenType::kKeywordRead) ||
-        Accept(SourceTokenType::kKeywordPrint) ||
-        Accept(SourceTokenType::kKeywordCall)) {
-        return NameSemiColon();
-    }
-    if (Accept(SourceTokenType::kKeywordWhile)) {
-        return While();
-    }
-    if (Accept(SourceTokenType::kKeywordIf)) {
-        return If();
-    }
-    return false;
+    if (!Accept(SourceTokenType::kBraceL)) return false;
+    bool valid = false;
+    do {
+        if (StringToSourceType.at(tokenizer_.Peek()) ==
+            SourceTokenType::kAssignEqual) {
+            valid = Accept(SourceTokenType::kName) && Assign();
+        } else if (Accept(SourceTokenType::kKeywordRead) ||
+                   Accept(SourceTokenType::kKeywordPrint) ||
+                   Accept(SourceTokenType::kKeywordCall)) {
+            valid = NameSemiColon();
+        } else if (Accept(SourceTokenType::kKeywordWhile)) {
+            valid = While();
+        } else if (Accept(SourceTokenType::kKeywordIf)) {
+            valid = If();
+        } else {
+            break;
+        }
+    } while (valid);
+    return valid && Accept(SourceTokenType::kBraceR);
 }
 bool Validator::NameSemiColon() {
     return Accept(SourceTokenType::kName) &&
