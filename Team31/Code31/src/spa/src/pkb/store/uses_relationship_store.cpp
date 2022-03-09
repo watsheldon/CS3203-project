@@ -58,8 +58,8 @@ void UsesRelationshipStore::CompileContainers(
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt,
         const TypeStatementsStore& type_statement_store) {
-    BitVec2D if_added(num_stmts, num_vars);
-    BitVec2D while_added(num_stmts, num_vars);
+    BitVec2D if_added(num_stmts + 1, num_vars + 1);
+    BitVec2D while_added(num_stmts + 1, num_vars + 1);
     auto& [if_stmts, if_vars] = if_var_pairs_;
     for (auto i : type_statement_store.GetStatements(StmtType::kIf)) {
         auto& var_indices = GetVarIndex(i);
