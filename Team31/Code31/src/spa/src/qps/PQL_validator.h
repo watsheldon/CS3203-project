@@ -1,6 +1,7 @@
 #ifndef SRC_SPA_SRC_QPS_PQL_VALIDATOR_H_
 #define SRC_SPA_SRC_QPS_PQL_VALIDATOR_H_
 
+#include <array>
 #include <string_view>
 
 #include "PQL_tokenizer.h"
@@ -15,33 +16,41 @@ class PQLValidator {
   private:
     // a number of length greater than 1 starting with 0 is not a constant
     static constexpr char kZero = '0';
+    static constexpr const auto kDeclTypes = []() constexpr {
+        std::array<QueryTokenType, 10> result{};
+        for (int i = static_cast<int>(QueryTokenType::kDeclStmt);
+             i <= static_cast<int>(QueryTokenType::kDeclProcedure); i++) {
+            result[i] = QueryTokenType{i};
+        }
+        return result;
+    }
+    ();
 
     PQLTokenizer tokenizer_;
     std::vector<QueryToken> tokens_;
     std::string curr_token_;
 
     bool Query();
-    bool parseDeclaration();
-    bool parseSelect();
-    bool parseSuchThat();
-    bool parsePattern();
+    bool Declaration();
+    bool Select();
+    bool SuchThat();
+    bool Pattern();
+    bool With();
 
-    bool parseMultipleSynonym();
-    bool parseStmtRef();
-    bool parseUsesModifiesStmtRef();
-    bool parseEntRef();
-    bool parseExpressionSpec();
-    bool parseIdentifier();
-    bool parseFactor();
+    bool SynDecl();
+    bool MultipleSynonym();
+    bool StmtRef();
+    bool UsesModifiesStmtEntRef();
+    bool EntRef();
+    bool ExpressionSpec();
+    bool Identifier();
+    bool Factor();
 
-    bool parseFollows();
-    bool parseParent();
-    bool parseUses();
-    bool parseModifies();
+    bool FollowsParent();
+    bool UsesModifies();
     bool IsConstant();
-    void fetchToken();
-    bool accept(QueryTokenType type);
-    bool expect(QueryTokenType type);
+    void FetchToken();
+    bool Accept(QueryTokenType type);
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_PQL_VALIDATOR_H_
