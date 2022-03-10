@@ -19,10 +19,15 @@ enum class QueryTokenType {
     kKeywordSuch,
     kKeywordThat,
     kKeywordPattern,
+    kKeywordWith,
+    kKeywordAnd,
     kKeywordFollows,
     kKeywordParent,
     kKeywordUses,
     kKeywordModifies,
+    kKeywordCalls,
+    kKeywordNext,
+    kKeywordAffects,
     kSemicolon,       // ;
     kComma,           // ,
     kUnderscore,      // _
@@ -72,6 +77,12 @@ inline std::string_view Keyword(QueryTokenType token_type) {
             return "Uses";
         case QueryTokenType::kKeywordModifies:
             return "Modifies";
+        case QueryTokenType::kKeywordCalls:
+            return "Calls";
+        case QueryTokenType::kKeywordNext:
+            return "Next";
+        case QueryTokenType::kKeywordAffects:
+            return "Affects";
         case QueryTokenType::kSemicolon:
             return ";";
         case QueryTokenType::kComma:
@@ -98,6 +109,10 @@ inline std::string_view Keyword(QueryTokenType token_type) {
             return "such";
         case QueryTokenType::kKeywordThat:
             return "that";
+        case QueryTokenType::kKeywordWith:
+            return "with";
+        case QueryTokenType::kKeywordAnd:
+            return "and";
         case QueryTokenType::kWord:
         case QueryTokenType::kInteger:
             return "";
