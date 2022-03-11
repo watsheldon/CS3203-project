@@ -11,7 +11,7 @@ else
   autotester="${BUILD_DIR}/src/autotester/autotester"
   dev_null="/dev/null"
   # For WSL
-  if grep -q "Microsoft" /proc/version; then
+  if grep -q "microsoft" /proc/version; then
       autotester+=".exe"
   fi
 fi
