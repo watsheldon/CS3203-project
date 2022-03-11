@@ -1166,10 +1166,9 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
 int ProgramKnowledgeBase::NameToIndex(QueryEntityType et,
                                       const std::string &name) {
     assert(compiled);
-    assert(et == QueryEntityType::kVar || et == QueryEntityType::kProc);
-    return (et == QueryEntityType::kVar)
-                   ? name_value_.GetIndex(name, QueryEntityType::kVar)
-                   : name_value_.GetIndex(name, QueryEntityType::kProc);
+    assert(et == QueryEntityType::kVar || et == QueryEntityType::kProc ||
+           et == QueryEntityType::kConst);
+    return name_value_.GetIndex(name, et);
 }
 
 int ProgramKnowledgeBase::GetContainerLastStmt(StmtType type, int stmt_no) {
