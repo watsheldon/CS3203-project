@@ -4,15 +4,15 @@ OUTPUT_DIR="tests"
 SOURCE_SUFFIX="_source.txt"
 QUERY_SUFFIX="_queries.txt"
 XML_EXT="_analysis.xml"
+
+autotester="${BUILD_DIR}/src/autotester/autotester"
 if [ "$(uname)" == "Windows" ]; then
-  autotester="${BUILD_DIR}/src/autotester/release/autotester.exe"
   dev_null="NUL"
 else
-  autotester="${BUILD_DIR}/src/autotester/autotester"
   dev_null="/dev/null"
   # For WSL
   if grep -q "microsoft" /proc/version; then
-      autotester+=".exe"
+    autotester+=".exe"
   fi
 fi
 
