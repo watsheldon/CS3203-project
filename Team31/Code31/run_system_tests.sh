@@ -32,10 +32,14 @@ for source in "${simple_sources[@]}"; do
   fi
   name=$(basename "$source" $SOURCE_SUFFIX)
   echo -n "Running ${name}... "
-  cmd="$autotester ${source} ${queries} $OUTPUT_DIR/$name${XML_EXT}"
+  output="$OUTPUT_DIR/$name$XML_EXT"
+  cmd="$autotester $source $queries $output"
   if $cmd &>$dev_null; then
-    echo "success"
+    total_queries=$(grep -o "</query>" "$output" | wc -l)
+    failed_queries=$(grep -o "</failed>" "$output" | wc -l)
+    if [ "$failed_queries" -eq 0 ]; then color=2; else color=1; fi
+    echo -e "$(tput setaf $color)$(tput bold)$((total_queries - failed_queries))/$total_queries passed$(tput sgr 0)"
   else
-    echo "failure"
+    echo -e "$(tput setaf 1)$(tput bold)error encountered!$(tput sgr 0)"
   fi
 done
