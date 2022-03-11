@@ -10,6 +10,10 @@ if [ "$(uname)" == "Windows" ]; then
 else
   autotester="${BUILD_DIR}/src/autotester/autotester"
   dev_null="/dev/null"
+  # For WSL
+  if grep -q "Microsoft" /proc/version; then
+      autotester+=".exe"
+  fi
 fi
 
 if [[ -n $1 && -d $1 ]]; then
@@ -29,7 +33,7 @@ for source in "${simple_sources[@]}"; do
   name=$(basename "$source" $SOURCE_SUFFIX)
   echo -n "Running ${name}... "
   cmd="$autotester ${source} ${queries} $OUTPUT_DIR/$name${XML_EXT}"
-  if $cmd &> $dev_null; then
+  if $cmd &>$dev_null; then
     echo "success"
   else
     echo "failure"
