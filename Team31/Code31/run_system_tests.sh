@@ -3,7 +3,7 @@ BUILD_DIR="cmake-build-release"
 OUTPUT_DIR="tests"
 SOURCE_SUFFIX="_source.txt"
 QUERY_SUFFIX="_queries.txt"
-XML_EXT=".xml"
+XML_EXT="_analysis.xml"
 if [ "$(uname)" == "Windows" ]; then
   autotester="${BUILD_DIR}/src/autotester/release/autotester.exe"
   dev_null="NUL"
