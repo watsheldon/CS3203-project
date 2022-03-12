@@ -4,6 +4,10 @@ OUTPUT_DIR="tests"
 SOURCE_SUFFIX="_source.txt"
 QUERY_SUFFIX="_queries.txt"
 XML_EXT="_analysis.xml"
+BOLD=$(tput bold)
+NO_STYLE=$(tput sgr 0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
 
 autotester="${BUILD_DIR}/src/autotester/autotester"
 if [ "$(uname)" == "Windows" ]; then
@@ -37,9 +41,9 @@ for source in "${simple_sources[@]}"; do
   if $cmd &>$dev_null; then
     total_queries=$(grep -o "</query>" "$output" | wc -l)
     failed_queries=$(grep -o "</failed>" "$output" | wc -l)
-    if [ "$failed_queries" -eq 0 ]; then color=2; else color=1; fi
-    echo -e "$(tput setaf $color)$(tput bold)$((total_queries - failed_queries))/$total_queries passed$(tput sgr 0)"
+    if [ "$failed_queries" -eq 0 ]; then color=$GREEN; else color=$RED; fi
+    echo -e "${color}${BOLD}$((total_queries - failed_queries))/$total_queries passed${NO_STYLE}"
   else
-    echo -e "$(tput setaf 1)$(tput bold)error encountered!$(tput sgr 0)"
+    echo -e "${RED}${BOLD}error encountered!${NO_STYLE}"
   fi
 done
