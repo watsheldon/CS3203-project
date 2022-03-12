@@ -5,7 +5,7 @@ on:
     branches-ignore:
       - production
     paths:
-      - 'Team31/Code31/**'
+      - 'Team31/Code31/src/**'
   pull_request:
 
 env:
