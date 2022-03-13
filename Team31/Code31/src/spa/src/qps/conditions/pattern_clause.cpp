@@ -18,17 +18,13 @@ PatternIdentExpr::PatternIdentExpr(Synonym *const assign, std::string first,
           second_(std::move(second)),
           partial_(partial) {}
 ResultTable PatternIdentExpr::Execute(KnowledgeBase *knowledge_base) const {
-    auto index_1st = knowledge_base->NameToIndex(QueryEntityType::kVar, first_);
-    if (index_1st == 0) return ResultTable(false);
-    auto result = knowledge_base->GetPattern(index_1st, second_, partial_);
+    auto result = knowledge_base->GetPattern(first_, second_, partial_);
     return {assign_, std::move(result)};
 }
 PatternIdentWild::PatternIdentWild(Synonym *const assign, std::string first)
         : assign_(assign), first_(std::move(first)) {}
 ResultTable PatternIdentWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto index_1st = knowledge_base->NameToIndex(QueryEntityType::kVar, first_);
-    if (index_1st == 0) return ResultTable(false);
-    auto result = knowledge_base->GetPattern(index_1st);
+    auto result = knowledge_base->GetPattern(first_);
     return {assign_, std::move(result)};
 }
 

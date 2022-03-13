@@ -166,102 +166,12 @@ bool QueryEvaluator::Propagate() noexcept {
 void QueryEvaluator::Populate(std::list<std::string>& list,
                               const Synonym* selected) noexcept {
     auto domain = domains_.find(selected);
-    switch (selected->type) {
-        case Synonym::kStmtAny: {
-            auto stmt_nos = domain == domains_.end()
-                                    ? knowledge_base_->GetAllEntityIndices(
-                                              StmtType::kAll)
-                                    : std::vector<int>(domain->second.begin(),
-                                                       domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kStmt, stmt_nos,
-                                         list);
-            return;
-        }
-        case Synonym::kStmtRead: {
-            auto reads = domain == domains_.end()
-                                 ? knowledge_base_->GetAllEntityIndices(
-                                           StmtType::kRead)
-                                 : std::vector<int>(domain->second.begin(),
-                                                    domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kStmt, reads, list);
-            return;
-        }
-        case Synonym::kStmtPrint: {
-            auto prints = domain == domains_.end()
-                                  ? knowledge_base_->GetAllEntityIndices(
-                                            StmtType::kPrint)
-                                  : std::vector<int>(domain->second.begin(),
-                                                     domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kStmt, prints, list);
-            return;
-        }
-        case Synonym::kStmtCall: {
-            auto calls = domain == domains_.end()
-                                 ? knowledge_base_->GetAllEntityIndices(
-                                           StmtType::kCall)
-                                 : std::vector<int>(domain->second.begin(),
-                                                    domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kStmt, calls, list);
-            return;
-        }
-        case Synonym::kStmtWhile: {
-            auto whiles = domain == domains_.end()
-                                  ? knowledge_base_->GetAllEntityIndices(
-                                            StmtType::kWhile)
-                                  : std::vector<int>(domain->second.begin(),
-                                                     domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kStmt, whiles, list);
-            return;
-        }
-        case Synonym::kStmtIf: {
-            auto ifs = domain == domains_.end()
-                               ? knowledge_base_->GetAllEntityIndices(
-                                         StmtType::kIf)
-                               : std::vector<int>(domain->second.begin(),
-                                                  domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kStmt, ifs, list);
-            return;
-        }
-        case Synonym::kStmtAssign: {
-            auto assigns = domain == domains_.end()
-                                   ? knowledge_base_->GetAllEntityIndices(
-                                             StmtType::kAssign)
-                                   : std::vector<int>(domain->second.begin(),
-                                                      domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kStmt, assigns, list);
-            return;
-        }
-        case Synonym::kVar: {
-            auto vars = domain == domains_.end()
-                                ? knowledge_base_->GetAllEntityIndices(
-                                          QueryEntityType::kVar)
-                                : std::vector<int>(domain->second.begin(),
-                                                   domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kVar, vars, list);
-            return;
-        }
-        case Synonym::kConst: {
-            auto constants = domain == domains_.end()
-                                     ? knowledge_base_->GetAllEntityIndices(
-                                               QueryEntityType::kConst)
-                                     : std::vector<int>(domain->second.begin(),
-                                                        domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kConst, constants,
-                                         list);
-            return;
-        }
-        case Synonym::kProc: {
-            auto procs = domain == domains_.end()
-                                 ? knowledge_base_->GetAllEntityIndices(
-                                           QueryEntityType::kProc)
-                                 : std::vector<int>(domain->second.begin(),
-                                                    domain->second.end());
-            knowledge_base_->IndexToName(QueryEntityType::kProc, procs, list);
-            return;
-        }
-        default:
-            assert(false);
-    }
+    auto stmt_nos =
+            domain == domains_.end()
+                    ? knowledge_base_->GetAllEntityIndices(selected->type)
+                    : std::vector<int>(domain->second.begin(),
+                                       domain->second.end());
+    knowledge_base_->ToName(selected->type, stmt_nos, list);
 }
 void QueryEvaluator::Clear() noexcept {
     domains_.clear();

@@ -483,14 +483,14 @@ bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
     }
 
     if (type == StmtType::kAssign || type == StmtType::kRead) {
-        return var_index == 0 ||
+        return var_index == kWildCard ||
                var_index == modifies_rel_.GetVarIndex(stmt_no);
     }
 
     int first_stmt = stmt_no + 1;
     int last_stmt = GetContainerLastStmt(type, stmt_no);
 
-    if (var_index == 0) {
+    if (var_index == kWildCard) {
         const auto &assign_stmts = type_stmt_.GetStatements(StmtType::kAssign);
         auto first_assign = std::lower_bound(assign_stmts.begin(),
                                              assign_stmts.end(), first_stmt);
@@ -515,6 +515,16 @@ bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
                        });
 }
 
+bool ProgramKnowledgeBase::ExistModifies(int stmt_no,
+                                         std::string_view var_name) {
+    assert(compiled);
+    assert(stmt_no != 0);
+
+    int var_index = NameToIndex(QueryEntityType::kVar, var_name);
+
+    return ExistModifies(stmt_no, var_index);
+}
+
 bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     assert(compiled);
     assert(stmt_no != 0);
@@ -531,7 +541,7 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     if (type == StmtType::kAssign || type == StmtType::kPrint) {
         std::vector<int> var_indices;
         var_indices = uses_rel_.GetVarIndex(stmt_no);
-        if (var_index == 0) {
+        if (var_index == kWildCard) {
             return var_indices.size() > 0;
         }
 
@@ -542,7 +552,7 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     int first_stmt = stmt_no;
     int last_stmt = GetContainerLastStmt(type, stmt_no);
 
-    if (var_index == 0) {
+    if (var_index == kWildCard) {
         return true;
     }
 
@@ -551,6 +561,15 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
                        [first_stmt, last_stmt](auto i) {
                            return first_stmt <= i && i <= last_stmt;
                        });
+}
+
+bool ProgramKnowledgeBase::ExistUses(int stmt_no, std::string_view var_name) {
+    assert(compiled);
+    assert(stmt_no != 0);
+
+    int var_index = NameToIndex(QueryEntityType::kVar, var_name);
+
+    return ExistUses(stmt_no, var_index);
 }
 
 std::set<int> ProgramKnowledgeBase::GetModifies(
@@ -582,16 +601,19 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
     return results;
 }
 
-std::set<int> ProgramKnowledgeBase::GetModifies(
-        Index<QueryEntityType::kVar> var_index, StmtType type) {
+std::set<int> ProgramKnowledgeBase::GetModifies(std::string_view var_name,
+                                                StmtType type) {
     assert(compiled);
-    assert(var_index.value != 0);
+
+    int var_index = NameToIndex(QueryEntityType::kVar, var_name);
+
+    assert(var_index != 0);
 
     if (type == StmtType::kPrint || type == StmtType::kCall) {
         return {};
     }
 
-    auto direct_modifying_stmt = modifies_rel_.GetStmtNo(var_index.value);
+    auto direct_modifying_stmt = modifies_rel_.GetStmtNo(var_index);
 
     if (type == StmtType::kAssign) {
         std::set<int> assign_stmt;
@@ -839,16 +861,18 @@ std::set<int> ProgramKnowledgeBase::GetUses(
     return results;
 }
 
-std::set<int> ProgramKnowledgeBase::GetUses(
-        Index<QueryEntityType::kVar> var_index, StmtType type) {
+std::set<int> ProgramKnowledgeBase::GetUses(std::string_view var_name,
+                                            StmtType type) {
     assert(compiled);
-    assert(var_index.value != 0);
+
+    int var_index = NameToIndex(QueryEntityType::kVar, var_name);
+    assert(var_index != 0);
 
     if (type == StmtType::kRead || type == StmtType::kCall) {
         return {};
     }
 
-    auto direct_uses_stmt = uses_rel_.GetAllStmt(var_index.value);
+    auto direct_uses_stmt = uses_rel_.GetAllStmt(var_index);
     if (type == StmtType::kAll) {
         return direct_uses_stmt;
     }
@@ -913,27 +937,23 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
 }
 
 // (" ", _)
-std::set<int> ProgramKnowledgeBase::GetPattern(int var_index) {
+std::set<int> ProgramKnowledgeBase::GetPattern(std::string_view var_name) {
     assert(compiled);
-    assert(var_index != 0);
-
-    return GetModifies(Index<QueryEntityType::kVar>(var_index),
-                       StmtType::kAssign);
+    return GetModifies(var_name, StmtType::kAssign);
 }
 
 // (" ", " ") , (" ", _" "_)
 std::set<int> ProgramKnowledgeBase::GetPattern(
-        int var_index, std::vector<QueryToken> second_tokens,
+        std::string_view var_name, std::vector<QueryToken> second_tokens,
         bool partial_match) {
     assert(compiled);
-    assert(var_index != 0);
 
     std::set<int> assign_stmt;
     std::set<int> filtered_assign_stmt;
     assign_stmt = GetPattern(second_tokens, partial_match);
 
     for (auto &i : assign_stmt) {
-        if (ExistModifies(i, var_index)) {
+        if (ExistModifies(i, var_name)) {
             filtered_assign_stmt.emplace(i);
         }
     }
@@ -1064,37 +1084,78 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(StmtType st) {
     return type_stmt_.GetStatements(st);
 }
 
-void ProgramKnowledgeBase::IndexToName(QueryEntityType et,
-                                       const std::vector<int> &index_list,
-                                       std::list<std::string> &names) {
+std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(
+        const Synonym::Type synType) {
     assert(compiled);
-    switch (et) {
-        case QueryEntityType::kProc:
+    std::vector<int> results;
+    switch (synType) {
+        case Synonym::kProc:
+            return GetAllEntityIndices(QueryEntityType::kProc);
+        case Synonym::kVar:
+            return GetAllEntityIndices(QueryEntityType::kVar);
+        case Synonym::kConst:
+            return GetAllEntityIndices(QueryEntityType::kConst);
+        case Synonym::kStmtAny:
+            return GetAllEntityIndices(StmtType::kAll);
+        case Synonym::kStmtAssign:
+            return GetAllEntityIndices(StmtType::kAssign);
+        case Synonym::kStmtCall:
+            return GetAllEntityIndices(StmtType::kCall);
+        case Synonym::kStmtIf:
+            return GetAllEntityIndices(StmtType::kIf);
+        case Synonym::kStmtPrint:
+            return GetAllEntityIndices(StmtType::kPrint);
+        case Synonym::kStmtRead:
+            return GetAllEntityIndices(StmtType::kRead);
+        case Synonym::kStmtWhile:
+            return GetAllEntityIndices(StmtType::kWhile);
+        default:
+            assert(false);
+    }
+}
+
+void ProgramKnowledgeBase::ToName(const Synonym::Type syn_type,
+                                  const std::vector<int> &index_list,
+                                  std::list<std::string> &names) {
+    assert(compiled);
+    switch (syn_type) {
+        case Synonym::kProc:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names), [this](int i) {
                                return name_value_.GetNameValue(
                                        i, QueryEntityType::kProc);
                            });
             break;
-        case QueryEntityType::kVar:
+        case Synonym::kVar:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names), [this](int i) {
                                return name_value_.GetNameValue(
                                        i, QueryEntityType::kVar);
                            });
             break;
-        case QueryEntityType::kConst:
+        case Synonym::kConst:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names), [this](int i) {
                                return name_value_.GetNameValue(
                                        i, QueryEntityType::kConst);
                            });
             break;
+        case Synonym::kNone:
+            break;
         default:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names),
                            [](int i) { return std::to_string(i); });
     }
+}
+
+int ProgramKnowledgeBase::NameToIndex(QueryEntityType et,
+                                      std::string_view &name) {
+    assert(compiled);
+    assert(et == QueryEntityType::kVar || et == QueryEntityType::kProc);
+    return (et == QueryEntityType::kVar)
+                   ? name_value_.GetIndex(name.data(), QueryEntityType::kVar)
+                   : name_value_.GetIndex(name.data(), QueryEntityType::kProc);
 }
 
 std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
@@ -1168,13 +1229,6 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
         }
     }
     return {PolishNotation(expr), contains_unseen};
-}
-int ProgramKnowledgeBase::NameToIndex(QueryEntityType et,
-                                      const std::string &name) {
-    assert(compiled);
-    assert(et == QueryEntityType::kVar || et == QueryEntityType::kProc ||
-           et == QueryEntityType::kConst);
-    return name_value_.GetIndex(name, et);
 }
 
 int ProgramKnowledgeBase::GetContainerLastStmt(StmtType type, int stmt_no) {

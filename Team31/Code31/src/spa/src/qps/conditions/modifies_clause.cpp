@@ -8,10 +8,7 @@ namespace spa {
 ModifiesIntIdent::ModifiesIntIdent(int first, std::string second)
         : first_(first), second_(std::move(second)) {}
 ResultTable ModifiesIntIdent::Execute(KnowledgeBase *knowledge_base) const {
-    auto index_2nd =
-            knowledge_base->NameToIndex(QueryEntityType::kVar, second_);
-    if (index_2nd == 0) return ResultTable(false);
-    auto result = knowledge_base->ExistModifies(first_, index_2nd);
+    auto result = knowledge_base->ExistModifies(first_, second_);
     return ResultTable(result);
 }
 ModifiesIntSyn::ModifiesIntSyn(int first, Synonym *second)
@@ -23,17 +20,14 @@ ResultTable ModifiesIntSyn::Execute(KnowledgeBase *knowledge_base) const {
 }
 ModifiesIntWild::ModifiesIntWild(int first) : first_(first) {}
 ResultTable ModifiesIntWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->ExistModifies(first_, 0);
+    auto result =
+            knowledge_base->ExistModifies(first_, KnowledgeBase::kWildCard);
     return ResultTable(result);
 }
 ModifiesSynIdent::ModifiesSynIdent(Synonym *first, std::string second)
         : first_(first), second_(std::move(second)) {}
 ResultTable ModifiesSynIdent::Execute(KnowledgeBase *knowledge_base) const {
-    auto index_2nd =
-            knowledge_base->NameToIndex(QueryEntityType::kVar, second_);
-    if (index_2nd == 0) return ResultTable(false);
-    auto result = knowledge_base->GetModifies(
-            Index<QueryEntityType::kVar>(index_2nd), SynToPkbType(first_));
+    auto result = knowledge_base->GetModifies(second_, SynToPkbType(first_));
     return {first_, std::move(result)};
 }
 ModifiesSynSyn::ModifiesSynSyn(Synonym *first, Synonym *second)

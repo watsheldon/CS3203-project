@@ -4,6 +4,7 @@
 #include <list>
 #include <set>
 #include <string>
+#include <string_view>
 
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
@@ -11,6 +12,7 @@
 #include "common/polish_notation.h"
 #include "pkb/store/stmtlst_parent_store.h"
 #include "qps/query_token.h"
+#include "qps/synonym.h"
 
 namespace spa {
 
@@ -35,6 +37,7 @@ struct BasicEntities {
 
 class KnowledgeBase {
   public:
+    static const int kWildCard = 0;
     /**
      * Links procedure index with its statement list's index
      * containing stmt# (only stmt at the outermost same level) inside the
@@ -209,12 +212,14 @@ class KnowledgeBase {
      * exist
      */
 
+    virtual bool ExistModifies(int stmt_no, std::string_view var_name) = 0;
     virtual bool ExistModifies(int stmt_no, int var_index) = 0;
 
     /**
      * Check if uses relationships between stmt# and its variable
      * exist
      */
+    virtual bool ExistUses(int stmt_no, std::string_view var_name) = 0;
     virtual bool ExistUses(int stmt_no, int var_index) = 0;
 
     /**
@@ -226,7 +231,7 @@ class KnowledgeBase {
     /**
      * Gets a list of stmt# that modifies var_index
      */
-    virtual std::set<int> GetModifies(Index<QueryEntityType::kVar> var_index,
+    virtual std::set<int> GetModifies(std::string_view var_name,
                                       StmtType type) = 0;
 
     /**
@@ -247,8 +252,7 @@ class KnowledgeBase {
     /**
      * Gets a list of stmt# that uses var_index
      */
-    virtual std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
-                                  StmtType type) = 0;
+    virtual std::set<int> GetUses(std::string_view var_name, StmtType type) = 0;
 
     /**
      * Gets a list of stmt# that uses var_index
@@ -265,10 +269,10 @@ class KnowledgeBase {
                                      bool partial_match) = 0;
 
     //(" ", _)
-    virtual std::set<int> GetPattern(int var_index) = 0;
+    virtual std::set<int> GetPattern(std::string_view var_name) = 0;
 
     // (" ", " ") , (" ", _" "_)
-    virtual std::set<int> GetPattern(int var_index,
+    virtual std::set<int> GetPattern(std::string_view var_name,
                                      std::vector<QueryToken> second_tokens,
                                      bool partial_match) = 0;
     // (v, " ") , (v, _" "_)
@@ -327,6 +331,8 @@ class KnowledgeBase {
      */
     virtual std::vector<int> GetAllEntityIndices(QueryEntityType et) = 0;
     virtual std::vector<int> GetAllEntityIndices(StmtType st) = 0;
+    virtual std::vector<int> GetAllEntityIndices(
+            const Synonym::Type synType) = 0;
 
     /**
      * Converts the entities to string according to their respective indices.
@@ -334,15 +340,9 @@ class KnowledgeBase {
      * internal data structure. The statement types are using stmt# directly as
      * their indices.
      */
-    virtual void IndexToName(QueryEntityType et,
-                             const std::vector<int> &index_list,
-                             std::list<std::string> &names) = 0;
-
-    /**
-     * Converts a string of variable or procedure name to its respective index.
-     * Returns 0 if the name not found.
-     */
-    virtual int NameToIndex(QueryEntityType et, const std::string &name) = 0;
+    virtual void ToName(const Synonym::Type syn_type,
+                        const std::vector<int> &index_list,
+                        std::list<std::string> &names) = 0;
 
     /**
      * Prevents any further updates to the KnowledgeBase and compile all

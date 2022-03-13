@@ -202,31 +202,31 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         std::pair<std::vector<int>, std::vector<int>> pairTest2 = {{}, {}};
         std::pair<std::vector<int>, std::vector<int>> pairTest3 = {{7, 8, 9},
                                                                    {1, 2, 3}};
-        REQUIRE(pkb.GetPattern(1) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(2) == std::set<int>{8});
-        REQUIRE(pkb.GetPattern(3) == std::set<int>{9});
+        REQUIRE(pkb.GetPattern("v1") == std::set<int>{7});
+        REQUIRE(pkb.GetPattern("v2") == std::set<int>{8});
+        REQUIRE(pkb.GetPattern("v3") == std::set<int>{9});
         REQUIRE(pkb.GetPattern(queryToken1, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken2, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken3, true).empty());
         REQUIRE(pkb.GetPattern(queryToken4, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken5, true) == std::set<int>{7});
         REQUIRE(pkb.GetPattern(queryToken6, true).empty());
-        REQUIRE(pkb.GetPattern(1, queryToken4, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(2, queryToken4, true).empty());
+        REQUIRE(pkb.GetPattern("v1", queryToken4, true) == std::set<int>{7});
+        REQUIRE(pkb.GetPattern("v2", queryToken4, true).empty());
         REQUIRE(pkb.GetPatternPair(queryToken4, true) == pairTest);
         REQUIRE(pkb.GetPatternPair(queryToken3, true) == pairTest2);
         REQUIRE(pkb.GetPatternPair() == pairTest3);
     }
 
     SECTION("Uses") {
-        REQUIRE(pkb.ExistUses(7, 1));
-        REQUIRE(pkb.ExistUses(7, 3));
-        REQUIRE(pkb.ExistUses(8, 2));
-        REQUIRE(pkb.ExistUses(5, 1));
-        REQUIRE(pkb.ExistUses(4, 4));
-        REQUIRE(pkb.ExistUses(5, 4));
-        REQUIRE_FALSE(pkb.ExistUses(2, 1));
-        REQUIRE_FALSE(pkb.ExistUses(200, 1));
+        REQUIRE(pkb.ExistUses(7, "v1"));
+        REQUIRE(pkb.ExistUses(7, "v3"));
+        REQUIRE(pkb.ExistUses(8, "v2"));
+        REQUIRE(pkb.ExistUses(5, "v1"));
+        REQUIRE(pkb.ExistUses(4, "v4"));
+        REQUIRE(pkb.ExistUses(5, "v4"));
+        REQUIRE_FALSE(pkb.ExistUses(2, "v1"));
+        REQUIRE_FALSE(pkb.ExistUses(200, "v1"));
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(7)) ==
                 std::set<int>{1, 3});
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(8)) ==
@@ -238,14 +238,10 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                 std::set<int>{1, 2, 3, 4});
         REQUIRE(pkb.GetUses(Index<QueryEntityType::kStmt>(1)) ==
                 std::set<int>{1, 2, 3, 4});
-        REQUIRE(pkb.GetUses(Index<QueryEntityType::kVar>(1),
-                            StmtType::kAssign) == std::set<int>{7});
-        REQUIRE(pkb.GetUses(Index<QueryEntityType::kVar>(3),
-                            StmtType::kWhile) == std::set<int>{1, 5});
-        REQUIRE(pkb.GetUses(Index<QueryEntityType::kVar>(4), StmtType::kAll) ==
-                std::set<int>{1, 4, 5});
-        REQUIRE(pkb.GetUses(Index<QueryEntityType::kVar>(4), StmtType::kIf) ==
-                std::set<int>{4});
+        REQUIRE(pkb.GetUses("v1", StmtType::kAssign) == std::set<int>{7});
+        REQUIRE(pkb.GetUses("v3", StmtType::kWhile) == std::set<int>{1, 5});
+        REQUIRE(pkb.GetUses("v4", StmtType::kAll) == std::set<int>{1, 4, 5});
+        REQUIRE(pkb.GetUses("v4", StmtType::kIf) == std::set<int>{4});
         REQUIRE(pkb.GetUses(StmtType::kAll) ==
                 std::set<int>{1, 5, 4, 3, 6, 7, 8, 9});
         REQUIRE(pkb.GetUses(StmtType::kIf) == std::set<int>{4});
@@ -263,12 +259,12 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     }
 
     SECTION("ExistModifies") {
-        REQUIRE_FALSE(pkb.ExistModifies(7, 2));
-        REQUIRE(pkb.ExistModifies(9, 3));
+        REQUIRE_FALSE(pkb.ExistModifies(7, "v2"));
+        REQUIRE(pkb.ExistModifies(9, "v3"));
         REQUIRE_FALSE(pkb.ExistModifies(3, 0));
         REQUIRE(pkb.ExistModifies(1, 0));
-        REQUIRE(pkb.ExistModifies(4, 1));
-        REQUIRE_FALSE(pkb.ExistModifies(700, 2));
+        REQUIRE(pkb.ExistModifies(4, "v1"));
+        REQUIRE_FALSE(pkb.ExistModifies(700, "v2"));
     }
     SECTION("GetModifies") {
         REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(300)).empty());
@@ -276,16 +272,11 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                 std::set<int>{1, 2, 3});
         REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(10)) ==
                 std::set<int>{2});
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),
-                                StmtType::kRead) == std::set<int>{2});
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),
-                                StmtType::kPrint)
-                        .empty());
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(1),
-                                StmtType::kAll) ==
+        REQUIRE(pkb.GetModifies("v1", StmtType::kRead) == std::set<int>{2});
+        REQUIRE(pkb.GetModifies("v1", StmtType::kPrint).empty());
+        REQUIRE(pkb.GetModifies("v1", StmtType::kAll) ==
                 std::set<int>{1, 2, 4, 5, 7});
-        REQUIRE(pkb.GetModifies(Index<QueryEntityType::kVar>(3),
-                                StmtType::kWhile) == std::set<int>{1});
+        REQUIRE(pkb.GetModifies("v3", StmtType::kWhile) == std::set<int>{1});
         REQUIRE(pkb.GetModifies(StmtType::kAll) ==
                 std::set<int>{1, 2, 4, 5, 7, 8, 9, 10});
         // pairs can have duplication
@@ -301,20 +292,14 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                 std::vector<int>{1, 2}, std::vector<int>{1, 3}};
         REQUIRE(results == expected);
     }
-    SECTION("IndexToName") {
+    SECTION("ToName") {
         std::vector<int> list1 = {1, 2};
         std::list<std::string> names;
-        pkb.IndexToName(QueryEntityType::kVar, list1, names);
+        pkb.ToName(Synonym::kVar, list1, names);
         REQUIRE(names == std::list<std::string>{"v1", "v2"});
         std::list<std::string> stmts;
-        pkb.IndexToName(QueryEntityType::kStmt, list1, stmts);
+        pkb.ToName(Synonym::kStmtAny, list1, stmts);
         REQUIRE(stmts == std::list<std::string>{"1", "2"});
-    }
-    SECTION("NameToIndex") {
-        REQUIRE(pkb.NameToIndex(QueryEntityType::kVar, "a") == 0);
-        REQUIRE(pkb.NameToIndex(QueryEntityType::kVar, "v1") == 1);
-        REQUIRE(pkb.NameToIndex(QueryEntityType::kProc, "a") == 0);
-        REQUIRE(pkb.NameToIndex(QueryEntityType::kProc, "p1") == 1);
     }
     SECTION("GetEntity") {
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kAssign) ==

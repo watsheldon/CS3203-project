@@ -8,10 +8,7 @@ namespace spa {
 UsesIntIdent::UsesIntIdent(int first, std::string second)
         : first_(first), second_(std::move(second)) {}
 ResultTable UsesIntIdent::Execute(KnowledgeBase *knowledge_base) const {
-    auto index_2nd =
-            knowledge_base->NameToIndex(QueryEntityType::kVar, second_);
-    if (index_2nd == 0) return ResultTable(false);
-    auto result = knowledge_base->ExistUses(first_, index_2nd);
+    auto result = knowledge_base->ExistUses(first_, second_);
     return ResultTable(result);
 }
 UsesIntSyn::UsesIntSyn(int first, Synonym *second)
@@ -23,17 +20,13 @@ ResultTable UsesIntSyn::Execute(KnowledgeBase *knowledge_base) const {
 }
 UsesIntWild::UsesIntWild(int first) : first_(first) {}
 ResultTable UsesIntWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->ExistUses(first_, 0);
+    auto result = knowledge_base->ExistUses(first_, KnowledgeBase::kWildCard);
     return ResultTable(result);
 }
 UsesSynIdent::UsesSynIdent(Synonym *first, std::string second)
         : first_(first), second_(std::move(second)) {}
 ResultTable UsesSynIdent::Execute(KnowledgeBase *knowledge_base) const {
-    auto index_2nd =
-            knowledge_base->NameToIndex(QueryEntityType::kVar, second_);
-    if (index_2nd == 0) return ResultTable(false);
-    auto result = knowledge_base->GetUses(
-            Index<QueryEntityType::kVar>(index_2nd), SynToPkbType(first_));
+    auto result = knowledge_base->GetUses(second_, SynToPkbType(first_));
     return {first_, std::move(result)};
 }
 UsesSynSyn::UsesSynSyn(Synonym *first, Synonym *second)
