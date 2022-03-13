@@ -10,7 +10,7 @@ namespace spa {
 ContainerForest::ContainerForest(
         const spa::StmtlstParentStore& stmtlst_parent_store,
         const spa::StmtlstStatementsStore& stmtlst_stmts_store,
-        size_t stmtlst_count)
+        size_t stmtlst_count) noexcept
         : stmtlsts_(stmtlst_count + 1) {
     for (int i = 1; i < stmtlsts_.size(); ++i) {
         const auto& [type, stmt_no] = stmtlst_parent_store.GetParent(i);
@@ -30,7 +30,8 @@ ContainerForest::ContainerForest(
         stmtlsts_[sibling].SetNextSibling(i);
     }
 }
-bool ContainerForest::IsParentT(const int parent, const int child) const {
+bool ContainerForest::IsParentT(const int parent,
+                                const int child) const noexcept {
     // wildcard queries shouldn't require the use of this forest
     assert(parent != 0 && child != 0);
 
@@ -45,7 +46,8 @@ bool ContainerForest::IsParentT(const int parent, const int child) const {
     }
     return false;
 }
-std::vector<int> ContainerForest::GetAncestryTrace(const int child) const {
+std::vector<int> ContainerForest::GetAncestryTrace(
+        const int child) const noexcept {
     assert(child != 0);
     std::vector<int> ancestry = {child};
     int parent = stmtlsts_[child].GetParent();
@@ -55,7 +57,7 @@ std::vector<int> ContainerForest::GetAncestryTrace(const int child) const {
     }
     return ancestry;
 }
-std::vector<int> ContainerForest::GetChildren(const int parent) const {
+std::vector<int> ContainerForest::GetChildren(const int parent) const noexcept {
     assert(parent != 0);
     std::stack<int> path;
     std::vector<int> children;
@@ -75,7 +77,8 @@ std::vector<int> ContainerForest::GetChildren(const int parent) const {
     }
     return children;
 }
-int ContainerForest::GetRightmostGrandchild(const int grandparent) const {
+int ContainerForest::GetRightmostGrandchild(
+        const int grandparent) const noexcept {
     assert(grandparent != 0);
     auto grandchild = grandparent;
     while (stmtlsts_[grandchild].GetFirstChild()) {

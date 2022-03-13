@@ -10,8 +10,8 @@
 namespace spa {
 class SourceProcessor {
   public:
-    explicit SourceProcessor(const std::string &filename);
-    std::unique_ptr<AbstractSyntaxTree> Parse();
+    explicit SourceProcessor(const std::string &filename) noexcept;
+    std::unique_ptr<AbstractSyntaxTree> Parse() noexcept;
 
   private:
     std::filesystem::path source_path_;

@@ -15,20 +15,20 @@ class DesignAbstractionExtractor : public AstVisitor {
     using PKB = std::unique_ptr<ProgramKnowledgeBase>;
 
   public:
-    std::unique_ptr<KnowledgeBase> Extract(AST ast);
-    void Visit(const ProgramNode &program_node) override;
-    void Visit(const ProcedureNode &procedure_node) override;
-    void Visit(const StmtLstNode &stmt_lst_node) override;
-    void Visit(const AssignNode &assign_node) override;
-    void Visit(const CallNode &call_node) override;
-    void Visit(const IfNode &if_node) override;
-    void Visit(const WhileNode &while_node) override;
-    void Visit(const ReadNode &read_node) override;
-    void Visit(const PrintNode &print_node) override;
+    std::unique_ptr<KnowledgeBase> Extract(AST ast) noexcept;
+    void Visit(const ProgramNode &program_node) noexcept override;
+    void Visit(const ProcedureNode &procedure_node) noexcept override;
+    void Visit(const StmtLstNode &stmt_lst_node) noexcept override;
+    void Visit(const AssignNode &assign_node) noexcept override;
+    void Visit(const CallNode &call_node) noexcept override;
+    void Visit(const IfNode &if_node) noexcept override;
+    void Visit(const WhileNode &while_node) noexcept override;
+    void Visit(const ReadNode &read_node) noexcept override;
+    void Visit(const PrintNode &print_node) noexcept override;
 
   private:
     PKB pkb_;
-    void SetUsesFromCondition(const IfWhileNode &if_while_node);
+    void SetUsesFromCondition(const IfWhileNode &if_while_node) noexcept;
 };
 }  // namespace spa
 

@@ -4,11 +4,14 @@
 #include "visitor.h"
 
 namespace spa {
-void StmtLstNode::AddStatement(const StatementNode *statement) {
+void StmtLstNode::AddStatement(const StatementNode *statement) noexcept {
     statements_.emplace_back(statement);
 }
-const std::vector<const StatementNode *> &StmtLstNode::GetStatements() const {
+const std::vector<const StatementNode *> &StmtLstNode::GetStatements()
+        const noexcept {
     return statements_;
 }
-void StmtLstNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
+void StmtLstNode::Accept(AstVisitor &visitor) const noexcept {
+    visitor.Visit(*this);
+}
 }  // namespace spa

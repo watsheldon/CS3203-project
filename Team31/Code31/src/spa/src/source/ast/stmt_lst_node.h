@@ -11,10 +11,11 @@ namespace spa {
 class StatementNode;
 class StmtLstNode : public IndexedNode<StmtLstNode>, public Visitable {
   public:
-    void AddStatement(const StatementNode *statement);
+    StmtLstNode() noexcept = default;
+    void AddStatement(const StatementNode *statement) noexcept;
     [[nodiscard]] const std::vector<const StatementNode *> &GetStatements()
-            const;
-    void Accept(AstVisitor &visitor) const override;
+            const noexcept;
+    void Accept(AstVisitor &visitor) const noexcept override;
 
   private:
     std::vector<const StatementNode *> statements_;

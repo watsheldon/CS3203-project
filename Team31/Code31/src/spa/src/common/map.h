@@ -9,9 +9,10 @@ namespace spa {
 template <typename Key, typename Value, std::size_t Size>
 class Map {
   public:
-    constexpr explicit Map(const std::array<std::pair<Key, Value>, Size> &array)
+    constexpr explicit Map(
+            const std::array<std::pair<Key, Value>, Size> &array) noexcept
             : data_(array) {}
-    constexpr Value at(const Key &key) const {
+    constexpr Value at(const Key &key) const noexcept {
         for (const auto &[k, v] : data_) {
             if (k == key) {
                 return v;

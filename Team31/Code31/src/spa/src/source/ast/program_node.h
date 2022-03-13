@@ -10,10 +10,11 @@
 namespace spa {
 class ProgramNode : public AbstractSyntaxTreeNode, public Visitable {
   public:
-    void AddProcedure(const ProcedureNode *procedure);
+    ProgramNode() noexcept = default;
+    void AddProcedure(const ProcedureNode *procedure) noexcept;
     [[nodiscard]] const std::vector<const ProcedureNode *> &GetProcedures()
-            const;
-    void Accept(AstVisitor &visitor) const override;
+            const noexcept;
+    void Accept(AstVisitor &visitor) const noexcept override;
 
   private:
     std::vector<const ProcedureNode *> procedures_;

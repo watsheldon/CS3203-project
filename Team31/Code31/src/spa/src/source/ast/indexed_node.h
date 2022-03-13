@@ -7,8 +7,8 @@ namespace spa {
 template <typename T>
 class IndexedNode : public AbstractSyntaxTreeNode {
   public:
-    IndexedNode() : index_(++count_) {}
-    [[nodiscard]] int GetIndex() const { return index_; }
+    IndexedNode() noexcept : index_(++count_) {}
+    [[nodiscard]] int GetIndex() const noexcept { return index_; }
 
   private:
     static inline int count_ = 0;

@@ -6,9 +6,9 @@
 #include "validator.h"
 
 namespace spa {
-SourceProcessor::SourceProcessor(const std::string &filename)
+SourceProcessor::SourceProcessor(const std::string &filename) noexcept
         : source_path_(filename) {}
-std::unique_ptr<AbstractSyntaxTree> SourceProcessor::Parse() {
+std::unique_ptr<AbstractSyntaxTree> SourceProcessor::Parse() noexcept {
     Validator validator(source_path_);
     auto tokens = validator.Validate();
     if (tokens.empty()) return {};

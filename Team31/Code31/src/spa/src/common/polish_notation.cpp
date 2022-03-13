@@ -4,7 +4,8 @@
 #include <utility>
 
 namespace spa {
-PolishNotation::PolishNotation(const std::vector<PolishNotationNode>& expr) {
+PolishNotation::PolishNotation(
+        const std::vector<PolishNotationNode>& expr) noexcept {
     // Convert to reverse Polish Notation for ease of implementation
     std::vector<PolishNotationNode> pn;
     std::stack<PolishNotationNode> s;
@@ -39,11 +40,11 @@ PolishNotation::PolishNotation(const std::vector<PolishNotationNode>& expr) {
 
     expr_ = std::move(pn);
 }
-bool PolishNotation::operator==(const PolishNotation& other) const {
+bool PolishNotation::operator==(const PolishNotation& other) const noexcept {
     if (this == &other) return true;
     return expr_ == other.expr_;
 }
-bool PolishNotation::Contains(const PolishNotation& other) const {
+bool PolishNotation::Contains(const PolishNotation& other) const noexcept {
     // Use KMP algorithm for pattern matching
     auto lps = ComputeLps(other);
     auto pattern = other.expr_;
@@ -67,7 +68,7 @@ bool PolishNotation::Contains(const PolishNotation& other) const {
     return false;
 }
 
-std::vector<int> PolishNotation::GetAllVarIndices() const {
+std::vector<int> PolishNotation::GetAllVarIndices() const noexcept {
     std::vector<int> var_indices;
     for (auto node : expr_) {
         if (node.type == ExprNodeType::kVariable) {
@@ -78,13 +79,13 @@ std::vector<int> PolishNotation::GetAllVarIndices() const {
 }
 
 std::vector<int> PolishNotation::ComputeLps(
-        const PolishNotation& pattern) const {
+        const PolishNotation& pattern) noexcept {
     // Compute the longest proper prefix suffix array
     // Helper method for KMP
     auto expr = pattern.expr_;
     std::vector<int> lps(expr.size());
     lps[0] = 0;
-    size_t len = 0;
+    int len = 0;
     for (int i = 1; i < lps.size();) {
         if (expr[i] == expr[len]) {
             lps[i++] = ++len;

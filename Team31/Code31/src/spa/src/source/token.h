@@ -53,7 +53,7 @@ constexpr std::string_view GetSourceKeyword(
     return kTypeStringMap[static_cast<int>(token_type) - 1];
 }
 using NameTokenPair = std::pair<std::string_view, spa::SourceTokenType>;
-static constexpr const auto kStringTypeMap = []() constexpr {
+static constexpr const auto kStringTypeMap = []() constexpr noexcept {
     std::array<NameTokenPair, kTypeStringMap.size() - 2> result{};
     for (int i = static_cast<int>(SourceTokenType::kKeywordProcedure);
          i <= static_cast<int>(SourceTokenType::kSemicolon); ++i) {
@@ -71,10 +71,10 @@ struct Token {
     const SourceTokenType type;
     const std::string value;
 
-    explicit Token(const SourceTokenType &t) : type(t) {}
-    Token(const SourceTokenType &t, std::string v)
+    explicit Token(const SourceTokenType &t) noexcept : type(t) {}
+    Token(const SourceTokenType &t, std::string v) noexcept
             : type(t), value(std::move(v)) {}
-    bool operator==(const Token &other) const {
+    bool operator==(const Token &other) const noexcept {
         if (type != other.type) return false;
         return type < SourceTokenType::kName || value == other.value;
     }

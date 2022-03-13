@@ -14,32 +14,33 @@ class Tokenizer {
     /**
      * Constructs a new Tokenizer that reads in the file located at `filepath`.
      */
-    explicit Tokenizer(const std::filesystem::path &filepath);
+    explicit Tokenizer(const std::filesystem::path &filepath) noexcept;
     /**
      * Constructs a new Tokenizer with `str` as the initial content.
      * @param str The initial content of the Tokenizer
      */
-    explicit Tokenizer(std::string_view str);
+    explicit Tokenizer(std::string_view str) noexcept;
     /**
      * Updates the internal content of the Tokenizer and clears any error.
      * @param str The new content of the Tokenizer
      * @return The current instance of the Tokenizer
      */
-    Tokenizer &operator()(std::string_view str);
-    Tokenizer(Tokenizer &&tokenizer) = delete;
+    Tokenizer &operator()(std::string_view str) noexcept;
+    Tokenizer(Tokenizer &&) = delete;
+    Tokenizer(const Tokenizer &) = delete;
 
     /**
      * Retrieves the next token if available.
      * @return the next valid token if success, empty string otherwise
      */
-    std::string Next();
-    std::string Peek();
+    std::string Next() noexcept;
+    std::string Peek() noexcept;
 
     /**
      * The stream operator to retrieve the next token.
      * @param token to store the extracted token.
      */
-    Tokenizer &operator>>(std::string &token);
+    Tokenizer &operator>>(std::string &token) noexcept;
 
   private:
     static constexpr char kSpecialSingle[] = "%()*+-/;{}";
@@ -49,9 +50,9 @@ class Tokenizer {
     bool error = false;  // triggered by either EOF or unrecognized token
     std::string peek_;
 
-    void KeepWhile(std::string &token, int (*pred)(int));
-    void KeepFirstOf(std::string &token, long len);
-    void ExtractInto(std::string &token);
+    void KeepWhile(std::string &token, int (*pred)(int)) noexcept;
+    void KeepFirstOf(std::string &token, long len) noexcept;
+    void ExtractInto(std::string &token) noexcept;
 };
 }  // namespace spa
 

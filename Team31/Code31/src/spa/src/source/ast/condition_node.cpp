@@ -5,16 +5,18 @@
 
 namespace spa {
 
-void ConditionNode::AddVariable(const VariableNode *variable) {
+void ConditionNode::AddVariable(const VariableNode *variable) noexcept {
     variables_.emplace(variable);
 }
-void ConditionNode::AddConstant(const ConstantNode *constant) {
+void ConditionNode::AddConstant(const ConstantNode *constant) noexcept {
     constants_.emplace(constant);
 }
-const std::set<const VariableNode *> &ConditionNode::GetVariables() const {
+const std::set<const VariableNode *> &ConditionNode::GetVariables()
+        const noexcept {
     return variables_;
 }
-const std::set<const ConstantNode *> &ConditionNode::GetConstants() const {
+const std::set<const ConstantNode *> &ConditionNode::GetConstants()
+        const noexcept {
     return constants_;
 }
 }  // namespace spa

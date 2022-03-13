@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <type_traits>
+#include <utility>
 
 namespace spa {
 /**
@@ -15,7 +16,7 @@ struct LazyFactory {
     using result_type = std::invoke_result_t<const Factory &>;
     Factory factory_;
 
-    constexpr explicit LazyFactory(Factory &&factory)
+    constexpr explicit LazyFactory(Factory &&factory) noexcept
             : factory_(std::move(factory)) {}
     constexpr explicit operator result_type() const
             noexcept(std::is_nothrow_invocable_v<const Factory &>) {

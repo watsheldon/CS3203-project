@@ -13,16 +13,16 @@ class ContainerForest {
   public:
     ContainerForest(const StmtlstParentStore &stmtlst_parent_store,
                     const StmtlstStatementsStore &stmtlst_stmts_store,
-                    std::size_t stmtlst_count);
-    [[nodiscard]] bool IsParentT(int parent, int child) const;
-    [[nodiscard]] std::vector<int> GetAncestryTrace(int child) const;
-    [[nodiscard]] std::vector<int> GetChildren(int parent) const;
+                    std::size_t stmtlst_count) noexcept;
+    [[nodiscard]] bool IsParentT(int parent, int child) const noexcept;
+    [[nodiscard]] std::vector<int> GetAncestryTrace(int child) const noexcept;
+    [[nodiscard]] std::vector<int> GetChildren(int parent) const noexcept;
     /**
      * Retrieves index of the last stmtLst nested within the given stmtLst. If
      * the given stmtLst does not contain any other stmtLst, the given stmtLst
      * index will be returned instead.
      */
-    [[nodiscard]] int GetRightmostGrandchild(int grandparent) const;
+    [[nodiscard]] int GetRightmostGrandchild(int grandparent) const noexcept;
 
   private:
     std::vector<ContainerNode> stmtlsts_;

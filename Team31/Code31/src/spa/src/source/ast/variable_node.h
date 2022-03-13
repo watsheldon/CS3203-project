@@ -4,7 +4,10 @@
 #include "indexed_node.h"
 
 namespace spa {
-class VariableNode : public IndexedNode<VariableNode> {};
+class VariableNode : public IndexedNode<VariableNode> {
+  public:
+    VariableNode() noexcept = default;
+};
 }  // namespace spa
 
 #endif  // SRC_SPA_SRC_SOURCE_AST_VARIABLE_NODE_H_

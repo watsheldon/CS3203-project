@@ -1,6 +1,5 @@
 #include "design_abstraction_extractor.h"
 
-#include <cassert>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -11,24 +10,25 @@
 #include "pkb/program_knowledge_base.h"
 
 namespace spa {
-std::unique_ptr<KnowledgeBase> DesignAbstractionExtractor::Extract(AST ast) {
+std::unique_ptr<KnowledgeBase> DesignAbstractionExtractor::Extract(
+        AST ast) noexcept {
     pkb_ = std::make_unique<ProgramKnowledgeBase>(ast->GetInitEntities());
 
     auto ast_root = ast->GetRoot();
-    assert(ast_root != nullptr);
     ast_root->Accept(*this);
-
     pkb_->Compile();
     return std::move(pkb_);
 }
 
-void DesignAbstractionExtractor::Visit(const ProgramNode &program_node) {
+void DesignAbstractionExtractor::Visit(
+        const ProgramNode &program_node) noexcept {
     for (auto procedure : program_node.GetProcedures()) {
         procedure->Accept(*this);
     }
 }
 
-void DesignAbstractionExtractor::Visit(const ProcedureNode &procedure_node) {
+void DesignAbstractionExtractor::Visit(
+        const ProcedureNode &procedure_node) noexcept {
     // Links procedure with its statement list via their indices
     int procedure_index = procedure_node.GetIndex();
     auto stmt_lst = procedure_node.GetStmtlst();
@@ -39,7 +39,8 @@ void DesignAbstractionExtractor::Visit(const ProcedureNode &procedure_node) {
     stmt_lst->Accept(*this);
 }
 
-void DesignAbstractionExtractor::Visit(const StmtLstNode &stmt_lst_node) {
+void DesignAbstractionExtractor::Visit(
+        const StmtLstNode &stmt_lst_node) noexcept {
     std::vector<int> statement_indices;
     for (auto statement : stmt_lst_node.GetStatements()) {
         statement_indices.emplace_back(statement->GetIndex());
@@ -52,7 +53,7 @@ void DesignAbstractionExtractor::Visit(const StmtLstNode &stmt_lst_node) {
                  statement_indices);
 }
 
-void DesignAbstractionExtractor::Visit(const AssignNode &assign_node) {
+void DesignAbstractionExtractor::Visit(const AssignNode &assign_node) noexcept {
     int stmt_no = assign_node.GetIndex();
 
     // Extracts direct Modifies relationship from assignment statement.
@@ -72,7 +73,7 @@ void DesignAbstractionExtractor::Visit(const AssignNode &assign_node) {
                    Index<SetEntityType::kNotation>(pn_index));
 }
 
-void DesignAbstractionExtractor::Visit(const CallNode &call_node) {
+void DesignAbstractionExtractor::Visit(const CallNode &call_node) noexcept {
     // Links call statement to the procedure it calls via their indices.
     int stmt_no = call_node.GetIndex();
     auto procedure = call_node.GetProcedure();
@@ -81,7 +82,7 @@ void DesignAbstractionExtractor::Visit(const CallNode &call_node) {
                    Index<SetEntityType::kProc>(proc_index));
 }
 
-void DesignAbstractionExtractor::Visit(const IfNode &if_node) {
+void DesignAbstractionExtractor::Visit(const IfNode &if_node) noexcept {
     IfNode::IfStmtLst if_stmt_lst = if_node.GetStmtLsts();
     auto then_lst = if_stmt_lst.then_lst;
     auto else_lst = if_stmt_lst.else_lst;
@@ -101,7 +102,7 @@ void DesignAbstractionExtractor::Visit(const IfNode &if_node) {
     else_lst->Accept(*this);
 }
 
-void DesignAbstractionExtractor::Visit(const WhileNode &while_node) {
+void DesignAbstractionExtractor::Visit(const WhileNode &while_node) noexcept {
     // Links while statement to its statement list by their indices.
     auto stmt_lst = while_node.GetStmtlst();
     int stmt_lst_index = stmt_lst->GetIndex();
@@ -115,7 +116,7 @@ void DesignAbstractionExtractor::Visit(const WhileNode &while_node) {
     stmt_lst->Accept(*this);
 }
 
-void DesignAbstractionExtractor::Visit(const ReadNode &read_node) {
+void DesignAbstractionExtractor::Visit(const ReadNode &read_node) noexcept {
     // Extracts direct Modifies relationship from read statement.
     auto modified_var = read_node.GetVariable();
     int var_index = modified_var->GetIndex();
@@ -124,7 +125,7 @@ void DesignAbstractionExtractor::Visit(const ReadNode &read_node) {
                  Index<SetEntityType::kVar>(var_index));
 }
 
-void DesignAbstractionExtractor::Visit(const PrintNode &print_node) {
+void DesignAbstractionExtractor::Visit(const PrintNode &print_node) noexcept {
     // Extracts direct Uses relationship from print statement.
     auto used_var = print_node.GetVariable();
     std::vector<int> used_var_index;
@@ -134,7 +135,7 @@ void DesignAbstractionExtractor::Visit(const PrintNode &print_node) {
 }
 
 void DesignAbstractionExtractor::SetUsesFromCondition(
-        const IfWhileNode &if_while_node) {
+        const IfWhileNode &if_while_node) noexcept {
     int stmt_no = if_while_node.GetIndex();
     auto condition = if_while_node.GetCondition();
     std::vector<int> used_var_indices;

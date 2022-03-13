@@ -7,21 +7,21 @@
 #include "qps/synonym.h"
 
 namespace spa {
-ResultTable::ResultTable(bool found_result)
+ResultTable::ResultTable(bool found_result) noexcept
         : has_result(found_result), type(kBool) {}
-ResultTable::ResultTable(Synonym *synonym, Domain &&domain)
+ResultTable::ResultTable(Synonym *synonym, Domain &&domain) noexcept
         : has_result(!domain.empty()),
           first_(std::make_unique<VariableColumn>(synonym, std::move(domain))),
           type(kSingle) {}
 ResultTable::ResultTable(Synonym *synonym_1, Column &&column_1,
-                         Synonym *synonym_2, Column &&column_2)
+                         Synonym *synonym_2, Column &&column_2) noexcept
         : has_result(!column_1.empty()),
           first_(std::make_unique<VariableColumn>(synonym_1,
                                                   std::move(column_1))),
           second_(std::make_unique<VariableColumn>(synonym_2,
                                                    std::move(column_2))),
           type(kDouble) {}
-ResultTable::DomainPair ResultTable::Update(const ResultTable &other) {
+ResultTable::DomainPair ResultTable::Update(const ResultTable &other) noexcept {
     assert(type == kDouble);
 
     // align the first and second column according to other
@@ -66,7 +66,7 @@ ResultTable::DomainPair ResultTable::Update(const ResultTable &other) {
 ResultTable::DomainPair ResultTable::Update(const Synonym *syn_a,
                                             const Domain &domain_a,
                                             const Synonym *syn_b,
-                                            const Domain &domain_b) {
+                                            const Domain &domain_b) noexcept {
     auto [this_a, this_b] =
             first_->synonym == syn_a
                     ? std::make_pair(first_.get(), second_.get())
@@ -92,8 +92,8 @@ ResultTable::DomainPair ResultTable::Update(const Synonym *syn_a,
     this_a->column.swap(column_a), this_b->column.swap(column_b);
     return {this_a->domain, this_b->domain};
 }
-const ResultTable::Domain &ResultTable::Update(const Synonym *syn_a,
-                                               const Domain &domain_a) {
+const ResultTable::Domain &ResultTable::Update(
+        const Synonym *syn_a, const Domain &domain_a) noexcept {
     auto [this_a, this_b] =
             first_->synonym == syn_a
                     ? std::make_pair(first_.get(), second_.get())
@@ -117,22 +117,22 @@ const ResultTable::Domain &ResultTable::Update(const Synonym *syn_a,
     return this_b->domain;
 }
 ResultTable::Domain ResultTable::Intersect(const Domain &first,
-                                           const Domain &second) {
+                                           const Domain &second) noexcept {
     Domain intersection;
     std::set_intersection(first.begin(), first.end(), second.begin(),
                           second.end(),
                           std::inserter(intersection, intersection.begin()));
     return intersection;
 }
-const VariableColumn *ResultTable::GetFirstColumn() const {
+const VariableColumn *ResultTable::GetFirstColumn() const noexcept {
     assert(type != kBool);
     return first_.get();
 }
-const VariableColumn *ResultTable::GetSecondColumn() const {
+const VariableColumn *ResultTable::GetSecondColumn() const noexcept {
     assert(type == kDouble);
     return second_.get();
 }
-ResultTable::SynonymPair ResultTable::GetSynonyms() const {
+ResultTable::SynonymPair ResultTable::GetSynonyms() const noexcept {
     assert(type == kDouble);
     return {first_->synonym, second_->synonym};
 }

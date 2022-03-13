@@ -6,9 +6,13 @@
 #include "visitor.h"
 
 namespace spa {
-const StmtLstNode *ProcedureNode::GetStmtlst() const { return stmt_lst_; }
-void ProcedureNode::Accept(AstVisitor &visitor) const { visitor.Visit(*this); }
-void ProcedureNode::AddStmtLst(const StmtLstNode *node) {
+const StmtLstNode *ProcedureNode::GetStmtlst() const noexcept {
+    return stmt_lst_;
+}
+void ProcedureNode::Accept(AstVisitor &visitor) const noexcept {
+    visitor.Visit(*this);
+}
+void ProcedureNode::AddStmtLst(const StmtLstNode *node) noexcept {
     assert(stmt_lst_ == nullptr);
     stmt_lst_ = node;
 }

@@ -10,8 +10,8 @@
 namespace spa {
 class Validator {
   public:
-    explicit Validator(const std::filesystem::path &filepath);
-    std::vector<Token> Validate();
+    explicit Validator(const std::filesystem::path &filepath) noexcept;
+    std::vector<Token> Validate() noexcept;
 
   private:
     static constexpr char kZero = '0';
@@ -34,33 +34,33 @@ class Validator {
     std::vector<Token> tokens_;
     std::string curr_token_;
 
-    bool Program();
-    bool Procedure();
-    bool StmtLst();
-    bool NameSemiColon();
-    bool While();
-    bool If();
-    bool Assign();
+    bool Program() noexcept;
+    bool Procedure() noexcept;
+    bool StmtLst() noexcept;
+    bool NameSemiColon() noexcept;
+    bool While() noexcept;
+    bool If() noexcept;
+    bool Assign() noexcept;
     /**
      * Returns true if curr_token_ is a valid constant
      * Assumes that curr_token_ is not empty and if first char is a digit then
      * the rest of the char are also digits.
      */
-    bool IsConstant() const;
-    void FetchToken();
-    bool Accept(SourceTokenType type);
-    bool ArithmeticExpr(bool has_left = false);
-    bool Group();
-    bool CondExpr();
-    CondExprSubTypes CondPrefix();
-    CondExprSubTypes RelationalExpr();
-    bool CondInfix();
-    bool RelInfix();
-    bool ArithOpr();
-    bool RelOpr();
-    bool VarConst();
-    bool Condition();
-    CondExprSubTypes CondGroup();
+    bool IsConstant() const noexcept;
+    void FetchToken() noexcept;
+    bool Accept(SourceTokenType type) noexcept;
+    bool ArithmeticExpr(bool has_left = false) noexcept;
+    bool Group() noexcept;
+    bool CondExpr() noexcept;
+    CondExprSubTypes CondPrefix() noexcept;
+    CondExprSubTypes RelationalExpr() noexcept;
+    bool CondInfix() noexcept;
+    bool RelInfix() noexcept;
+    bool ArithOpr() noexcept;
+    bool RelOpr() noexcept;
+    bool VarConst() noexcept;
+    bool Condition() noexcept;
+    CondExprSubTypes CondGroup() noexcept;
 };
 }  // namespace spa
 

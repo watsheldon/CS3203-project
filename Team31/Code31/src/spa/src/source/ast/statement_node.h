@@ -16,40 +16,44 @@ class ProcedureNode;
 class StmtLstNode;
 class StatementNode : public IndexedNode<StatementNode>, public Visitable {
   public:
+    StatementNode() noexcept = default;
     ~StatementNode() override = 0;
 };
 class AssignNode : public StatementNode {
   public:
-    void SetModifiedVar(const VariableNode *variable);
-    void SetExpr(const PolishNotation *expr);
-    void SetRhsIndex(int rhs_index);
-    [[nodiscard]] const VariableNode *GetLhs() const;
-    [[nodiscard]] const PolishNotation *GetRhs() const;
-    [[nodiscard]] int GetRhsIndex() const;
-    void Accept(AstVisitor &visitor) const override;
+    AssignNode() noexcept = default;
+    void SetModifiedVar(const VariableNode *variable) noexcept;
+    void SetExpr(const PolishNotation *expr) noexcept;
+    void SetRhsIndex(int rhs_index) noexcept;
+    [[nodiscard]] const VariableNode *GetLhs() const noexcept;
+    [[nodiscard]] const PolishNotation *GetRhs() const noexcept;
+    [[nodiscard]] int GetRhsIndex() const noexcept;
+    void Accept(AstVisitor &visitor) const noexcept override;
 
   private:
-    const VariableNode *lhs_;
-    const PolishNotation *rhs_;
-    int rhs_index_;
+    const VariableNode *lhs_{};
+    const PolishNotation *rhs_{};
+    int rhs_index_{};
 };
 class CallNode : public StatementNode {
   public:
-    void SetProcedure(const ProcedureNode *proc);
-    [[nodiscard]] const ProcedureNode *GetProcedure() const;
-    void Accept(AstVisitor &visitor) const override;
+    CallNode() noexcept = default;
+    void SetProcedure(const ProcedureNode *proc) noexcept;
+    [[nodiscard]] const ProcedureNode *GetProcedure() const noexcept;
+    void Accept(AstVisitor &visitor) const noexcept override;
 
   private:
-    const ProcedureNode *procedure_;
+    const ProcedureNode *procedure_{};
 };
 class IfWhileNode : public StatementNode, public StmtLstParent {
   public:
-    void SetCondition(const ConditionNode *condition);
-    [[nodiscard]] const ConditionNode *GetCondition() const;
+    IfWhileNode() noexcept = default;
+    void SetCondition(const ConditionNode *condition) noexcept;
+    [[nodiscard]] const ConditionNode *GetCondition() const noexcept;
     ~IfWhileNode() override = 0;
 
   private:
-    const ConditionNode *condition_;
+    const ConditionNode *condition_{};
 };
 class IfNode : public IfWhileNode {
   public:
@@ -57,38 +61,43 @@ class IfNode : public IfWhileNode {
         const StmtLstNode *then_lst;
         const StmtLstNode *else_lst;
     };
-    void AddStmtLst(const StmtLstNode *node) override;
-    [[nodiscard]] const IfStmtLst &GetStmtLsts() const;
-    void Accept(AstVisitor &visitor) const override;
+    IfNode() noexcept = default;
+    void AddStmtLst(const StmtLstNode *node) noexcept override;
+    [[nodiscard]] const IfStmtLst &GetStmtLsts() const noexcept;
+    void Accept(AstVisitor &visitor) const noexcept override;
 
   private:
-    IfStmtLst if_stmt_lst_;
+    IfStmtLst if_stmt_lst_{};
 };
 class WhileNode : public IfWhileNode {
   public:
-    void AddStmtLst(const StmtLstNode *node) override;
-    [[nodiscard]] const StmtLstNode *GetStmtlst() const;
-    void Accept(AstVisitor &visitor) const override;
+    WhileNode() noexcept = default;
+    void AddStmtLst(const StmtLstNode *node) noexcept override;
+    [[nodiscard]] const StmtLstNode *GetStmtlst() const noexcept;
+    void Accept(AstVisitor &visitor) const noexcept override;
 
   private:
-    const StmtLstNode *stmt_lst_;
+    const StmtLstNode *stmt_lst_{};
 };
 class ReadPrintNode : public StatementNode {
   public:
-    void SetVariable(const VariableNode *variable);
-    [[nodiscard]] const VariableNode *GetVariable() const;
+    ReadPrintNode() noexcept = default;
+    void SetVariable(const VariableNode *variable) noexcept;
+    [[nodiscard]] const VariableNode *GetVariable() const noexcept;
     ~ReadPrintNode() override = 0;
 
   private:
-    const VariableNode *variable_;
+    const VariableNode *variable_{};
 };
 class ReadNode : public ReadPrintNode {
   public:
-    void Accept(AstVisitor &visitor) const override;
+    ReadNode() noexcept = default;
+    void Accept(AstVisitor &visitor) const noexcept override;
 };
 class PrintNode : public ReadPrintNode {
   public:
-    void Accept(AstVisitor &visitor) const override;
+    PrintNode() noexcept = default;
+    void Accept(AstVisitor &visitor) const noexcept override;
 };
 }  // namespace spa
 

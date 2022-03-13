@@ -14,8 +14,10 @@ namespace spa {
 class Synonym;
 class QueryEvaluator {
   public:
-    explicit QueryEvaluator(std::unique_ptr<KnowledgeBase> knowledge_base);
-    void Evaluate(const QueryObject &query, std::list<std::string> &list);
+    explicit QueryEvaluator(
+            std::unique_ptr<KnowledgeBase> knowledge_base) noexcept;
+    void Evaluate(const QueryObject &query,
+                  std::list<std::string> &list) noexcept;
 
   private:
     const std::unique_ptr<KnowledgeBase> knowledge_base_;
@@ -24,12 +26,13 @@ class QueryEvaluator {
     std::map<const Synonym *, std::vector<int>> vartable_map_;
     std::set<const Synonym *> update_queue_;
 
-    void Populate(std::list<std::string> &list, const Synonym *selected);
-    bool UpdateResult(ResultTable &result_table);
-    bool UpdateSingle(const VariableColumn &column);
-    bool Propagate();
-    bool UpdateDouble(ResultTable &i);
-    void Clear();
+    void Populate(std::list<std::string> &list,
+                  const Synonym *selected) noexcept;
+    bool UpdateResult(ResultTable &result_table) noexcept;
+    bool UpdateSingle(const VariableColumn &column) noexcept;
+    bool Propagate() noexcept;
+    bool UpdateDouble(ResultTable &i) noexcept;
+    void Clear() noexcept;
 };
 }  // namespace spa
 

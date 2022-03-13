@@ -5,7 +5,7 @@
 namespace spa {
 class Visitable {
   public:
-    virtual void Accept(AstVisitor &visitor) const = 0;
+    virtual void Accept(AstVisitor &visitor) const noexcept = 0;
 };
 }  // namespace spa
 

@@ -10,21 +10,21 @@
 #include <string_view>
 
 namespace spa {
-Tokenizer::Tokenizer(const std::filesystem::path &filepath) {
+Tokenizer::Tokenizer(const std::filesystem::path &filepath) noexcept {
     std::ifstream source(filepath);
     buffer_ << source.rdbuf();
 }
-Tokenizer::Tokenizer(std::string_view str) {
+Tokenizer::Tokenizer(std::string_view str) noexcept {
     buffer_.str(str.data());
     error = false;
 }
-Tokenizer &Tokenizer::operator()(std::string_view str) {
+Tokenizer &Tokenizer::operator()(std::string_view str) noexcept {
     buffer_.clear();
     buffer_.str(str.data());
     error = false;
     return *this;
 }
-std::string Tokenizer::Next() {
+std::string Tokenizer::Next() noexcept {
     std::string token;
     if (peek_.empty()) {
         ExtractInto(token);
@@ -34,19 +34,19 @@ std::string Tokenizer::Next() {
     }
     return token;
 }
-void Tokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
+void Tokenizer::KeepWhile(std::string &token, int (*pred)(int)) noexcept {
     auto last = std::find_if_not(token.begin() + 1, token.end(), pred);
     if (last == token.end()) return;
     KeepFirstOf(token, last - token.begin());
 }
-void Tokenizer::KeepFirstOf(std::string &token, long len) {
+void Tokenizer::KeepFirstOf(std::string &token, long len) noexcept {
     assert(len <= token.length());
     if (token.length() == len) return;
 
     buffer_.seekg(len - (long)token.length(), std::ios_base::cur);
     token.resize(len);
 }
-void Tokenizer::ExtractInto(std::string &token) {
+void Tokenizer::ExtractInto(std::string &token) noexcept {
     if (!(buffer_ >> token)) error = true;
     if (error) {
         token.resize(0);
@@ -87,7 +87,7 @@ void Tokenizer::ExtractInto(std::string &token) {
     // this should not be reached unless an illegal character is present
     error = true;
 }
-Tokenizer &Tokenizer::operator>>(std::string &token) {
+Tokenizer &Tokenizer::operator>>(std::string &token) noexcept {
     if (peek_.empty()) {
         ExtractInto(token);
     } else {
@@ -96,7 +96,7 @@ Tokenizer &Tokenizer::operator>>(std::string &token) {
     }
     return *this;
 }
-std::string Tokenizer::Peek() {
+std::string Tokenizer::Peek() noexcept {
     if (peek_.empty()) {
         ExtractInto(peek_);
     }

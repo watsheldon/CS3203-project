@@ -19,19 +19,19 @@ class ResultTable {
     using SynonymPair = Pair<const Synonym *>;
     enum ResultType { kBool, kSingle, kDouble };
 
-    static Domain Intersect(const Domain &first, const Domain &second);
-    explicit ResultTable(bool found_result = false);
-    ResultTable(Synonym *synonym, Domain &&domain);
+    static Domain Intersect(const Domain &first, const Domain &second) noexcept;
+    explicit ResultTable(bool found_result = false) noexcept;
+    ResultTable(Synonym *synonym, Domain &&domain) noexcept;
     ResultTable(Synonym *synonym_1, std::vector<int> &&column_1,
-                Synonym *synonym_2, std::vector<int> &&column_2);
+                Synonym *synonym_2, std::vector<int> &&column_2) noexcept;
 
-    DomainPair Update(const ResultTable &other);
-    const Domain &Update(const Synonym *syn_a, const Domain &domain_a);
+    DomainPair Update(const ResultTable &other) noexcept;
+    const Domain &Update(const Synonym *syn_a, const Domain &domain_a) noexcept;
     DomainPair Update(const Synonym *syn_a, const Domain &domain_a,
-                      const Synonym *syn_b, const Domain &domain_b);
-    [[nodiscard]] const VariableColumn *GetFirstColumn() const;
-    [[nodiscard]] const VariableColumn *GetSecondColumn() const;
-    [[nodiscard]] SynonymPair GetSynonyms() const;
+                      const Synonym *syn_b, const Domain &domain_b) noexcept;
+    [[nodiscard]] const VariableColumn *GetFirstColumn() const noexcept;
+    [[nodiscard]] const VariableColumn *GetSecondColumn() const noexcept;
+    [[nodiscard]] SynonymPair GetSynonyms() const noexcept;
 
     const bool has_result;
     const ResultType type;

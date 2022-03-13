@@ -19,9 +19,9 @@ enum class OperatorType : int {
 struct PolishNotationNode {
     const ExprNodeType type;
     const int id;
-    explicit PolishNotationNode(OperatorType opr);
-    explicit PolishNotationNode(ExprNodeType node_type, int id = 0);
-    bool operator==(const PolishNotationNode &other) const;
+    explicit PolishNotationNode(OperatorType opr) noexcept;
+    explicit PolishNotationNode(ExprNodeType node_type, int id = 0) noexcept;
+    bool operator==(const PolishNotationNode &other) const noexcept;
 };
 
 }  // namespace spa

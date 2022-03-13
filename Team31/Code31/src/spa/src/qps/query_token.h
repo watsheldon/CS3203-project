@@ -121,10 +121,10 @@ inline std::string_view Keyword(QueryTokenType token_type) {
 struct QueryToken {
     const QueryTokenType type;
     const std::string value;
-    explicit QueryToken(const QueryTokenType &type) : type(type){};
-    QueryToken(const QueryTokenType &type, std::string string)
+    explicit QueryToken(const QueryTokenType &type) noexcept : type(type){};
+    QueryToken(const QueryTokenType &type, std::string string) noexcept
             : type(type), value(std::move(string)){};
-    QueryToken(const QueryToken &other) = default;
+    QueryToken(const QueryToken &other) noexcept = default;
 };
 }  // namespace spa
 

@@ -11,7 +11,7 @@ struct QueryObject {
     const VecUniquePtr<Synonym> synonyms;
     const VecUniquePtr<ConditionClause> clauses;
     QueryObject(const Synonym *sel, VecUniquePtr<Synonym> &&syns,
-                VecUniquePtr<ConditionClause> &&cons)
+                VecUniquePtr<ConditionClause> &&cons) noexcept
             : select(sel),
               synonyms(std::move(syns)),
               clauses(std::move(cons)) {}

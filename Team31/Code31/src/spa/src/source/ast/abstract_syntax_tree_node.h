@@ -4,6 +4,7 @@
 namespace spa {
 class AbstractSyntaxTreeNode {
   public:
+    AbstractSyntaxTreeNode() noexcept = default;
     virtual ~AbstractSyntaxTreeNode() = 0;
 };
 }  // namespace spa

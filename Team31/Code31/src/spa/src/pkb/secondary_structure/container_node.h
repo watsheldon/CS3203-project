@@ -5,14 +5,14 @@ namespace spa {
 
 class ContainerNode {
   public:
-    ContainerNode() = default;
+    ContainerNode() noexcept = default;
 
-    void SetParent(int p);
-    void SetFirstChild(int c);
-    void SetNextSibling(int s);
-    [[nodiscard]] int GetParent() const;
-    [[nodiscard]] int GetFirstChild() const;
-    [[nodiscard]] int GetNextSibling() const;
+    void SetParent(int p) noexcept;
+    void SetFirstChild(int c) noexcept;
+    void SetNextSibling(int s) noexcept;
+    [[nodiscard]] int GetParent() const noexcept;
+    [[nodiscard]] int GetFirstChild() const noexcept;
+    [[nodiscard]] int GetNextSibling() const noexcept;
 
   private:
     int parent_ = 0;

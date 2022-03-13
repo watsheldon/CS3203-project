@@ -7,7 +7,7 @@
 #include "qps/synonym.h"
 
 namespace spa {
-constexpr StmtType SynToPkbType(const Synonym* synonym) {
+constexpr StmtType SynToPkbType(const Synonym* synonym) noexcept {
     switch (synonym->type) {
         case Synonym::kStmtAny:
             return StmtType::kAll;

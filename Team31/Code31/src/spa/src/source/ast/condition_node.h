@@ -9,10 +9,12 @@
 namespace spa {
 class ConditionNode : public AbstractSyntaxTreeNode {
   public:
-    void AddVariable(const VariableNode *variable);
-    void AddConstant(const ConstantNode *constant);
-    [[nodiscard]] const std::set<const VariableNode *> &GetVariables() const;
-    [[nodiscard]] const std::set<const ConstantNode *> &GetConstants() const;
+    void AddVariable(const VariableNode *variable) noexcept;
+    void AddConstant(const ConstantNode *constant) noexcept;
+    [[nodiscard]] const std::set<const VariableNode *> &GetVariables()
+            const noexcept;
+    [[nodiscard]] const std::set<const ConstantNode *> &GetConstants()
+            const noexcept;
 
   private:
     std::set<const VariableNode *> variables_;

@@ -19,12 +19,12 @@
 #include "variable_node.h"
 
 namespace spa {
-AbstractSyntaxTree::AbstractSyntaxTree(std::vector<Token> tokens)
+AbstractSyntaxTree::AbstractSyntaxTree(std::vector<Token> tokens) noexcept
         : tokens_(std::move(tokens)) {
     BuildTree();
     CheckTree();
 }
-BasicEntities AbstractSyntaxTree::GetInitEntities() const {
+BasicEntities AbstractSyntaxTree::GetInitEntities() const noexcept {
     if (!tree_valid_) return {};
     BasicEntities entities;
     ExtractStmtIndex(read_stmts_, entities.reads);
@@ -44,22 +44,22 @@ BasicEntities AbstractSyntaxTree::GetInitEntities() const {
     entities.proc_call_graph = call_edges_;
     return std::move(entities);
 }
-const ProgramNode *AbstractSyntaxTree::GetRoot() const {
+const ProgramNode *AbstractSyntaxTree::GetRoot() const noexcept {
     return tree_valid_ ? root_.get() : nullptr;
 }
-const VariableNode *AbstractSyntaxTree::AddVariable(std::string name) {
+const VariableNode *AbstractSyntaxTree::AddVariable(std::string name) noexcept {
     auto [pair, ins] = variables_.try_emplace(
             std::move(name),
             LazyFactory([] { return std::make_unique<VariableNode>(); }));
     return pair->second.get();
 }
-const ConstantNode *AbstractSyntaxTree::AddConstant(std::string name) {
+const ConstantNode *AbstractSyntaxTree::AddConstant(std::string name) noexcept {
     auto [pair, ins] = constants_.try_emplace(
             std::move(name),
             LazyFactory([] { return std::make_unique<ConstantNode>(); }));
     return pair->second.get();
 }
-void AbstractSyntaxTree::BracketL() {
+void AbstractSyntaxTree::BracketL() noexcept {
     if (mode_history_.top() == Mode::kAssign) {
         curr_expr_.emplace_back(ExprNodeType::kBracketL);
     } else if (mode_history_.top() == Mode::kWhile ||
@@ -73,7 +73,7 @@ void AbstractSyntaxTree::BracketL() {
         assert(false);
     }
 }
-void AbstractSyntaxTree::BracketR() {
+void AbstractSyntaxTree::BracketR() noexcept {
     if (mode_history_.top() == Mode::kAssign) {
         curr_expr_.emplace_back(ExprNodeType::kBracketR);
         return;
@@ -95,12 +95,12 @@ void AbstractSyntaxTree::BracketR() {
     if_stmts_.emplace_back(std::move(if_stmt));
     mode_history_.pop();
 }
-void AbstractSyntaxTree::BraceL() {
+void AbstractSyntaxTree::BraceL() noexcept {
     mode_history_.emplace(Mode::kStmtLst);
     auto &stmt_lst = stmt_lsts_.emplace_back(std::make_unique<StmtLstNode>());
     stmt_lst_path_.emplace(stmt_lst.get());
 }
-void AbstractSyntaxTree::BraceR() {
+void AbstractSyntaxTree::BraceR() noexcept {
     assert(mode_history_.top() == Mode::kStmtLst);
     mode_history_.pop();
     parent_path_.back()->AddStmtLst(stmt_lst_path_.top());
@@ -138,7 +138,7 @@ void AbstractSyntaxTree::BraceR() {
     }
     mode_history_.pop();
 }
-void AbstractSyntaxTree::Semicolon() {
+void AbstractSyntaxTree::Semicolon() noexcept {
     switch (mode_history_.top()) {
         case Mode::kRead:
             stmt_lst_path_.top()->AddStatement(read_stmts_.back().get());
@@ -163,7 +163,7 @@ void AbstractSyntaxTree::Semicolon() {
     }
     mode_history_.pop();
 }
-void AbstractSyntaxTree::Name(const std::string &name) {
+void AbstractSyntaxTree::Name(const std::string &name) noexcept {
     switch (mode_history_.top()) {
         case Mode::kStmtLst:
             AddAssign(name);
@@ -190,7 +190,7 @@ void AbstractSyntaxTree::Name(const std::string &name) {
             assert(false);
     }
 }
-void AbstractSyntaxTree::Constant(std::string name) {
+void AbstractSyntaxTree::Constant(std::string name) noexcept {
     auto constant = AddConstant(std::move(name));
     if (mode_history_.top() == Mode::kAssign) {
         curr_expr_.emplace_back(ExprNodeType::kConstant, constant->GetIndex());
@@ -200,7 +200,7 @@ void AbstractSyntaxTree::Constant(std::string name) {
     auto last_condition = conditions_.back().get();
     last_condition->AddConstant(constant);
 }
-void AbstractSyntaxTree::AddProcedure(std::string name) {
+void AbstractSyntaxTree::AddProcedure(std::string name) noexcept {
     auto [pair, inserted] = procedures_.try_emplace(
             std::move(name),
             LazyFactory([] { return std::make_unique<ProcedureNode>(); }));
@@ -210,19 +210,19 @@ void AbstractSyntaxTree::AddProcedure(std::string name) {
     call_edges_.resize(procedures_.size() + 1);
     parent_path_.emplace_back(proc);
 }
-void AbstractSyntaxTree::AddRead(std::string name) {
+void AbstractSyntaxTree::AddRead(std::string name) noexcept {
     auto variable = AddVariable(std::move(name));
     auto read = std::make_unique<ReadNode>();
     read->SetVariable(variable);
     read_stmts_.emplace_back(std::move(read));
 }
-void AbstractSyntaxTree::AddPrint(std::string name) {
+void AbstractSyntaxTree::AddPrint(std::string name) noexcept {
     auto variable = AddVariable(std::move(name));
     auto print = std::make_unique<PrintNode>();
     print->SetVariable(variable);
     print_stmts_.emplace_back(std::move(print));
 }
-void AbstractSyntaxTree::AddCall(std::string name) {
+void AbstractSyntaxTree::AddCall(std::string name) noexcept {
     auto [pair, inserted] = procedures_.try_emplace(
             std::move(name),
             LazyFactory([] { return std::make_unique<ProcedureNode>(); }));
@@ -237,23 +237,23 @@ void AbstractSyntaxTree::AddCall(std::string name) {
     call_edges_[caller->GetIndex()].emplace(callee->GetIndex());
     call_stmts_.emplace_back(std::move(call));
 }
-void AbstractSyntaxTree::AddAssign(std::string name) {
+void AbstractSyntaxTree::AddAssign(std::string name) noexcept {
     auto var = AddVariable(std::move(name));
     auto assign = std::make_unique<AssignNode>();
     assign->SetModifiedVar(var);
     assign_stmts_.emplace_back(std::move(assign));
     mode_history_.emplace(Mode::kAssign);
 }
-void AbstractSyntaxTree::LastCondAddVar(std::string name) {
+void AbstractSyntaxTree::LastCondAddVar(std::string name) noexcept {
     const auto variable = AddVariable(std::move(name));
     auto last_condition = conditions_.back().get();
     last_condition->AddVariable(variable);
 }
-void AbstractSyntaxTree::ExprAddVar(std::string name) {
+void AbstractSyntaxTree::ExprAddVar(std::string name) noexcept {
     const auto variable = AddVariable(std::move(name));
     curr_expr_.emplace_back(ExprNodeType::kVariable, variable->GetIndex());
 }
-void AbstractSyntaxTree::ParseToken(const Token &token) {
+void AbstractSyntaxTree::ParseToken(const Token &token) noexcept {
     auto &[type, name] = token;
     switch (type) {
         case SourceTokenType::kKeywordProcedure:
@@ -315,7 +315,7 @@ void AbstractSyntaxTree::ParseToken(const Token &token) {
         } break;
     }
 }
-void AbstractSyntaxTree::BuildTree() {
+void AbstractSyntaxTree::BuildTree() noexcept {
     root_ = std::make_unique<ProgramNode>();
     tree_valid_ = true;
     for (const auto &token : tokens_) {
@@ -323,7 +323,7 @@ void AbstractSyntaxTree::BuildTree() {
         ParseToken(token);
     }
 }
-void AbstractSyntaxTree::CheckTree() {
+void AbstractSyntaxTree::CheckTree() noexcept {
     if (!tree_valid_) return;
     // A procedure cannot call a non-existing procedure.
     if (procedures_.size() != root_->GetProcedures().size()) {
@@ -339,7 +339,8 @@ void AbstractSyntaxTree::CheckTree() {
         }
     }
 }
-bool AbstractSyntaxTree::HasCycle(int curr, std::vector<bool> visited) {
+bool AbstractSyntaxTree::HasCycle(int curr,
+                                  std::vector<bool> visited) noexcept {
     visited[curr] = true;
     for (auto i : call_edges_[curr]) {
         if (visited[i] || HasCycle(i, visited)) {
@@ -350,7 +351,7 @@ bool AbstractSyntaxTree::HasCycle(int curr, std::vector<bool> visited) {
     return false;
 }
 constexpr AbstractSyntaxTree::Mode AbstractSyntaxTree::KeywordToMode(
-        SourceTokenType keyword) {
+        SourceTokenType keyword) noexcept {
     switch (keyword) {
         case SourceTokenType::kKeywordProcedure:
             return Mode::kProc;
@@ -373,7 +374,7 @@ constexpr AbstractSyntaxTree::Mode AbstractSyntaxTree::KeywordToMode(
     }
 }
 constexpr OperatorType AbstractSyntaxTree::OperatorForRpn(
-        SourceTokenType keyword) {
+        SourceTokenType keyword) noexcept {
     switch (keyword) {
         case SourceTokenType::kOperatorPlus:
             return OperatorType::kPlus;

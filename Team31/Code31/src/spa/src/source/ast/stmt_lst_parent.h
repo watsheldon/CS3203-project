@@ -6,7 +6,8 @@
 namespace spa {
 class StmtLstParent {
   public:
-    virtual void AddStmtLst(const StmtLstNode *) = 0;
+    StmtLstParent() noexcept = default;
+    virtual void AddStmtLst(const StmtLstNode *) noexcept = 0;
     virtual ~StmtLstParent() = 0;
 };
 inline StmtLstParent::~StmtLstParent() = default;

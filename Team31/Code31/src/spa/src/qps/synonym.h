@@ -19,11 +19,11 @@ struct Synonym {
         kProc,
         kNone
     } type;
-    explicit Synonym(Type t) : type(t) { assert(t != kNone); }
-    void IncRef() { ++ref_count_; }
-    void IncResolved() { ++resolved_count_; }
-    [[nodiscard]] int GetRef() const { return ref_count_; }
-    [[nodiscard]] int GetResolved() const { return resolved_count_; }
+    explicit Synonym(Type t) noexcept : type(t) { assert(t != kNone); }
+    void IncRef() noexcept { ++ref_count_; }
+    void IncResolved() noexcept { ++resolved_count_; }
+    [[nodiscard]] int GetRef() const noexcept { return ref_count_; }
+    [[nodiscard]] int GetResolved() const noexcept { return resolved_count_; }
 
   private:
     int ref_count_ = 0;

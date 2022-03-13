@@ -6,19 +6,19 @@
 #include "token.h"
 
 namespace spa {
-Validator::Validator(const std::filesystem::path &filepath)
+Validator::Validator(const std::filesystem::path &filepath) noexcept
         : tokenizer_(filepath) {}
-std::vector<Token> Validator::Validate() {
+std::vector<Token> Validator::Validate() noexcept {
     tokens_.clear();
     FetchToken();
     bool valid_program = Program();
     return valid_program ? std::move(tokens_) : std::vector<Token>();
 }
-bool Validator::Procedure() {
+bool Validator::Procedure() noexcept {
     return Accept(SourceTokenType::kName) &&  // proc_name
            StmtLst();
 }
-bool Validator::Program() {
+bool Validator::Program() noexcept {
     bool valid = false;
     do {
         if (!Accept(SourceTokenType::kKeywordProcedure)) break;
@@ -26,8 +26,8 @@ bool Validator::Program() {
     } while (valid);
     return valid && curr_token_.empty();
 }
-inline void Validator::FetchToken() { tokenizer_ >> curr_token_; }
-bool Validator::Accept(SourceTokenType type) {
+inline void Validator::FetchToken() noexcept { tokenizer_ >> curr_token_; }
+bool Validator::Accept(SourceTokenType type) noexcept {
     if (curr_token_.empty()) return false;
     if (type < SourceTokenType::kName) {
         auto target = GetSourceKeyword(type);
@@ -49,11 +49,11 @@ bool Validator::Accept(SourceTokenType type) {
     }
     return false;
 }
-bool Validator::IsConstant() const {
+bool Validator::IsConstant() const noexcept {
     if (!std::isdigit(curr_token_[0])) return false;
     return curr_token_.length() == 1 || curr_token_[0] != kZero;
 }
-bool Validator::StmtLst() {
+bool Validator::StmtLst() noexcept {
     if (!Accept(SourceTokenType::kBraceL)) return false;
     bool valid = false;
     do {
@@ -74,26 +74,26 @@ bool Validator::StmtLst() {
     } while (valid);
     return valid && Accept(SourceTokenType::kBraceR);
 }
-bool Validator::NameSemiColon() {
+bool Validator::NameSemiColon() noexcept {
     return Accept(SourceTokenType::kName) &&
            Accept(SourceTokenType::kSemicolon);
 }
-bool Validator::While() { return Condition() && StmtLst(); }
-bool Validator::If() {
+bool Validator::While() noexcept { return Condition() && StmtLst(); }
+bool Validator::If() noexcept {
     return Condition() &&  //
            Accept(SourceTokenType::kKeywordThen) && StmtLst() &&
            Accept(SourceTokenType::kKeywordElse) && StmtLst();
 }
-bool Validator::Condition() {
+bool Validator::Condition() noexcept {
     return Accept(SourceTokenType::kBracketL) && CondExpr() &&
            Accept(SourceTokenType::kBracketR);
 }
-bool Validator::Assign() {
+bool Validator::Assign() noexcept {
     return Accept(SourceTokenType::kAssignEqual) &&  // =
            ArithmeticExpr() &&                       // expr
            Accept(SourceTokenType::kSemicolon);      // ;
 }
-bool Validator::ArithmeticExpr(bool has_left /*= false */) {
+bool Validator::ArithmeticExpr(bool has_left /*= false */) noexcept {
     if (Accept(SourceTokenType::kBracketL)) {
         if (!Group()) return false;
     } else if (!VarConst()) {
@@ -105,10 +105,10 @@ bool Validator::ArithmeticExpr(bool has_left /*= false */) {
     }
     return true;
 }
-bool Validator::Group() {
+bool Validator::Group() noexcept {
     return ArithmeticExpr() && Accept(SourceTokenType::kBracketR);
 }
-bool Validator::CondExpr() {
+bool Validator::CondExpr() noexcept {
     auto prefix_type = CondPrefix();
     switch (prefix_type) {
         case kInvalid:
@@ -123,7 +123,7 @@ bool Validator::CondExpr() {
             assert(false);
     }
 }
-Validator::CondExprSubTypes Validator::CondPrefix() {
+Validator::CondExprSubTypes Validator::CondPrefix() noexcept {
     if (VarConst()) {
         return RelationalExpr();
     }
@@ -135,7 +135,7 @@ Validator::CondExprSubTypes Validator::CondPrefix() {
     }
     return kInvalid;
 }
-Validator::CondExprSubTypes Validator::CondGroup() {
+Validator::CondExprSubTypes Validator::CondGroup() noexcept {
     auto prefix_type = CondPrefix();
     if (prefix_type == kInvalid || prefix_type == kBracketed && !CondInfix()) {
         return kInvalid;
@@ -144,7 +144,7 @@ Validator::CondExprSubTypes Validator::CondGroup() {
         return prefix_type == kSingular ? kBracketed : prefix_type;
     return kInvalid;
 }
-Validator::CondExprSubTypes Validator::RelationalExpr() {
+Validator::CondExprSubTypes Validator::RelationalExpr() noexcept {
     while (ArithOpr()) {
         if (!ArithmeticExpr(true)) {
             return kInvalid;
@@ -158,23 +158,23 @@ Validator::CondExprSubTypes Validator::RelationalExpr() {
     }
     return kArithmetic;
 }
-bool Validator::RelInfix() { return RelOpr() && ArithmeticExpr(); }
-bool Validator::CondInfix() {
+bool Validator::RelInfix() noexcept { return RelOpr() && ArithmeticExpr(); }
+bool Validator::CondInfix() noexcept {
     if (!Accept(SourceTokenType::kCondAnd) &&
         !Accept(SourceTokenType::kCondOr)) {
         return false;
     }
     return Condition();
 }
-bool Validator::ArithOpr() {
+bool Validator::ArithOpr() noexcept {
     return std::any_of(kArithmeticOpr.begin(), kArithmeticOpr.end(),
                        [this](SourceTokenType type) { return Accept(type); });
 }
-bool Validator::RelOpr() {
+bool Validator::RelOpr() noexcept {
     return std::any_of(kRelationalOpr.begin(), kRelationalOpr.end(),
                        [this](SourceTokenType type) { return Accept(type); });
 }
-bool Validator::VarConst() {
+bool Validator::VarConst() noexcept {
     return Accept(SourceTokenType::kName) || Accept(SourceTokenType::kInteger);
 }
 }  // namespace spa

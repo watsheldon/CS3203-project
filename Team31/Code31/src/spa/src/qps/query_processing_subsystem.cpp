@@ -10,12 +10,13 @@
 #include "qps/evaluator/query_evaluator.h"
 
 namespace spa {
-void QueryProcessingSubsystem::Use(std::unique_ptr<KnowledgeBase> pkb_ptr) {
+void QueryProcessingSubsystem::Use(
+        std::unique_ptr<KnowledgeBase> pkb_ptr) noexcept {
     evaluator_ = std::make_unique<QueryEvaluator>(std::move(pkb_ptr));
 }
 
 void QueryProcessingSubsystem::Evaluate(std::string_view query_string,
-                                        std::list<std::string> &list) {
+                                        std::list<std::string> &list) noexcept {
     if (!evaluator_) return;
     auto tokens = validator_.Validate(query_string);
 

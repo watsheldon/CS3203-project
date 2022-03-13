@@ -9,14 +9,16 @@ namespace spa {
 
 class PolishNotation {
   public:
-    explicit PolishNotation(const std::vector<PolishNotationNode> &expr);
-    bool operator==(const PolishNotation &other) const;
-    [[nodiscard]] bool Contains(const PolishNotation &other) const;
-    [[nodiscard]] std::vector<int> GetAllVarIndices() const;
+    explicit PolishNotation(
+            const std::vector<PolishNotationNode> &expr) noexcept;
+    bool operator==(const PolishNotation &other) const noexcept;
+    [[nodiscard]] bool Contains(const PolishNotation &other) const noexcept;
+    [[nodiscard]] std::vector<int> GetAllVarIndices() const noexcept;
 
   private:
     std::vector<PolishNotationNode> expr_;
-    std::vector<int> ComputeLps(const PolishNotation &pattern) const;
+    [[nodiscard]] static std::vector<int> ComputeLps(
+            const PolishNotation &pattern) noexcept;
 };
 
 }  // namespace spa

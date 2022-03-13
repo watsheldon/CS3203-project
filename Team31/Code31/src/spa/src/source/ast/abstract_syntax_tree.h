@@ -29,9 +29,9 @@ class AbstractSyntaxTree {
     using NamePtrMap = std::map<std::string, std::unique_ptr<T>>;
     template <typename T>
     using UniquePtrVec = std::vector<std::unique_ptr<T>>;
-    explicit AbstractSyntaxTree(std::vector<Token> tokens);
-    [[nodiscard]] BasicEntities GetInitEntities() const;
-    [[nodiscard]] const ProgramNode *GetRoot() const;
+    explicit AbstractSyntaxTree(std::vector<Token> tokens) noexcept;
+    [[nodiscard]] BasicEntities GetInitEntities() const noexcept;
+    [[nodiscard]] const ProgramNode *GetRoot() const noexcept;
 
   private:
     enum class Mode {
@@ -70,44 +70,45 @@ class AbstractSyntaxTree {
     std::vector<std::set<int>> call_edges_;
     bool tree_valid_ = false;
 
-    const VariableNode *AddVariable(std::string name);
-    const ConstantNode *AddConstant(std::string name);
-    void BracketL();
-    void BracketR();
-    void BraceL();
-    void BraceR();
-    void Semicolon();
-    void Name(const std::string &name);
-    void Constant(std::string name);
-    void AddProcedure(std::string name);
-    void AddRead(std::string name);
-    void AddPrint(std::string name);
-    void AddCall(std::string name);
-    void AddAssign(std::string name);
-    void LastCondAddVar(std::string name);
-    void ExprAddVar(std::string name);
-    void ParseToken(const Token &token);
-    void BuildTree();
-    void CheckTree();
-    bool HasCycle(int curr, std::vector<bool> visited);
+    const VariableNode *AddVariable(std::string name) noexcept;
+    const ConstantNode *AddConstant(std::string name) noexcept;
+    void BracketL() noexcept;
+    void BracketR() noexcept;
+    void BraceL() noexcept;
+    void BraceR() noexcept;
+    void Semicolon() noexcept;
+    void Name(const std::string &name) noexcept;
+    void Constant(std::string name) noexcept;
+    void AddProcedure(std::string name) noexcept;
+    void AddRead(std::string name) noexcept;
+    void AddPrint(std::string name) noexcept;
+    void AddCall(std::string name) noexcept;
+    void AddAssign(std::string name) noexcept;
+    void LastCondAddVar(std::string name) noexcept;
+    void ExprAddVar(std::string name) noexcept;
+    void ParseToken(const Token &token) noexcept;
+    void BuildTree() noexcept;
+    void CheckTree() noexcept;
+    bool HasCycle(int curr, std::vector<bool> visited) noexcept;
     template <typename T,
               typename = std::enable_if_t<std::is_base_of_v<StatementNode, T>>>
     static void ExtractStmtIndex(const UniquePtrVec<T> &src,
-                                 std::vector<int> &dst) {
+                                 std::vector<int> &dst) noexcept {
         dst.reserve(src.size());
         std::for_each(src.begin(), src.end(),
                       [&dst](auto &p) { dst.emplace_back(p->GetIndex()); });
     }
     template <typename T>
     static void ExtractNames(const NamePtrMap<T> &src,
-                             std::vector<std::string> &dst) {
+                             std::vector<std::string> &dst) noexcept {
         dst.resize(src.size() + 1);
         std::for_each(src.begin(), src.end(), [&dst](auto &pair) {
             dst[pair.second->GetIndex()] = pair.first;
         });
     }
-    static constexpr Mode KeywordToMode(SourceTokenType keyword);
-    static constexpr OperatorType OperatorForRpn(SourceTokenType keyword);
+    static constexpr Mode KeywordToMode(SourceTokenType keyword) noexcept;
+    static constexpr OperatorType OperatorForRpn(
+            SourceTokenType keyword) noexcept;
 };
 }  // namespace spa
 

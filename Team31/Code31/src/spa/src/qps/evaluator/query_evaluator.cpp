@@ -12,10 +12,11 @@
 #include "qps/synonym.h"
 
 namespace spa {
-QueryEvaluator::QueryEvaluator(std::unique_ptr<KnowledgeBase> knowledge_base)
+QueryEvaluator::QueryEvaluator(
+        std::unique_ptr<KnowledgeBase> knowledge_base) noexcept
         : knowledge_base_(std::move(knowledge_base)) {}
 void QueryEvaluator::Evaluate(const QueryObject& query,
-                              std::list<std::string>& list) {
+                              std::list<std::string>& list) noexcept {
     if (!knowledge_base_) return;
     Clear();
     std::queue<const ConditionClause*> queue;
@@ -34,7 +35,7 @@ void QueryEvaluator::Evaluate(const QueryObject& query,
     }
     Populate(list, query.select);
 }
-bool QueryEvaluator::UpdateResult(ResultTable& result_table) {
+bool QueryEvaluator::UpdateResult(ResultTable& result_table) noexcept {
     if (!result_table.has_result) {
         return false;
     }
@@ -56,7 +57,7 @@ bool QueryEvaluator::UpdateResult(ResultTable& result_table) {
     }
     return Propagate();
 }
-bool QueryEvaluator::UpdateSingle(const VariableColumn& column) {
+bool QueryEvaluator::UpdateSingle(const VariableColumn& column) noexcept {
     const auto& [itr, inserted] =
             domains_.try_emplace(column.synonym, column.domain);
     if (inserted) {
@@ -75,7 +76,7 @@ bool QueryEvaluator::UpdateSingle(const VariableColumn& column) {
     update_queue_.emplace(syn);
     return true;
 }
-bool QueryEvaluator::UpdateDouble(ResultTable& result_table) {
+bool QueryEvaluator::UpdateDouble(ResultTable& result_table) noexcept {
     const auto [syn_a, syn_b] = result_table.GetSynonyms();
     bool exist_a = domains_.find(syn_a) != domains_.end();
     bool exist_b = domains_.find(syn_b) != domains_.end();
@@ -141,7 +142,7 @@ bool QueryEvaluator::UpdateDouble(ResultTable& result_table) {
 
     return true;
 }
-bool QueryEvaluator::Propagate() {
+bool QueryEvaluator::Propagate() noexcept {
     while (!update_queue_.empty()) {
         auto curr = update_queue_.begin();
         auto synonym = *curr;
@@ -163,7 +164,7 @@ bool QueryEvaluator::Propagate() {
     return true;
 }
 void QueryEvaluator::Populate(std::list<std::string>& list,
-                              const Synonym* selected) {
+                              const Synonym* selected) noexcept {
     auto domain = domains_.find(selected);
     switch (selected->type) {
         case Synonym::kStmtAny: {
@@ -262,7 +263,7 @@ void QueryEvaluator::Populate(std::list<std::string>& list,
             assert(false);
     }
 }
-void QueryEvaluator::Clear() {
+void QueryEvaluator::Clear() noexcept {
     domains_.clear();
     vartables_.clear();
     vartable_map_.clear();

@@ -5,7 +5,10 @@
 
 namespace spa {
 
-class ConstantNode : public IndexedNode<ConstantNode> {};
+class ConstantNode : public IndexedNode<ConstantNode> {
+  public:
+    ConstantNode() noexcept = default;
+};
 
 }  // namespace spa
 

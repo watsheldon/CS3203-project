@@ -12,9 +12,9 @@ class ProcedureNode : public IndexedNode<ProcedureNode>,
                       public StmtLstParent,
                       public Visitable {
   public:
-    void AddStmtLst(const StmtLstNode *node) override;
-    [[nodiscard]] const StmtLstNode *GetStmtlst() const;
-    void Accept(AstVisitor &visitor) const override;
+    void AddStmtLst(const StmtLstNode *node) noexcept override;
+    [[nodiscard]] const StmtLstNode *GetStmtlst() const noexcept;
+    void Accept(AstVisitor &visitor) const noexcept override;
 
   private:
     const StmtLstNode *stmt_lst_;
