@@ -25,6 +25,10 @@ class PQLValidator {
         return result;
     }
     ();
+    static constexpr std::array<QueryTokenType, 5> kArithmeticOpr = {
+            QueryTokenType::kOperatorPlus, QueryTokenType::kOperatorMinus,
+            QueryTokenType::kOperatorTimes, QueryTokenType::kOperatorDivide,
+            QueryTokenType::kOperatorModulo};
 
     PQLTokenizer tokenizer_;
     std::vector<QueryToken> tokens_;
@@ -45,6 +49,9 @@ class PQLValidator {
     bool ExpressionSpec();
     bool Identifier();
     bool Factor();
+    bool ArithOpr();
+    bool ArithmeticExpr(bool has_left = false);
+    bool Group();
 
     bool FollowsParent();
     bool UsesModifies();

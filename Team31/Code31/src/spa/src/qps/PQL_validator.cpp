@@ -147,16 +147,38 @@ bool PQLValidator::Identifier() {
            Accept(QueryTokenType::kQuote);
 }
 bool PQLValidator::ExpressionSpec() {
+    bool not_wild = true;
     if (Accept(QueryTokenType::kUnderscore)) {
-        if (Accept(QueryTokenType::kQuote)) {
-            return Factor() && Accept(QueryTokenType::kQuote) &&
-                   Accept(QueryTokenType::kUnderscore);
-        }
-        return true;
+        if (!Accept(QueryTokenType::kQuote)) return true;
+        not_wild = false;
+    } else if (!Accept(QueryTokenType::kQuote)) {
+        return false;
     }
-    return Accept(QueryTokenType::kQuote) && Factor() &&
-           Accept(QueryTokenType::kQuote);
+    return ArithmeticExpr() && Accept(QueryTokenType::kQuote) &&
+           (not_wild || Accept(QueryTokenType::kUnderscore));
 }
+
+bool PQLValidator::ArithOpr() {
+    return std::any_of(kArithmeticOpr.begin(), kArithmeticOpr.end(),
+                       [this](QueryTokenType type) { return Accept(type); });
+}
+
+bool PQLValidator::ArithmeticExpr(bool has_left /*= false */) {
+    if (Accept(QueryTokenType::kBracketL)) {
+        if (!Group()) return false;
+    } else if (!Factor()) {
+        return false;
+    }
+    if (has_left) return true;
+    while (ArithOpr()) {
+        if (!ArithmeticExpr(true)) return false;
+    }
+    return true;
+}
+bool PQLValidator::Group() {
+    return ArithmeticExpr() && Accept(QueryTokenType::kBracketR);
+}
+
 bool PQLValidator::Factor() {
     return Accept(QueryTokenType::kInteger) || Accept(QueryTokenType::kWord);
 }
