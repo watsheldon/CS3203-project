@@ -7,6 +7,17 @@
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
+enum class Type {
+    kIntInt,
+    kIntSyn,
+    kIntWild,
+    kSynInt,
+    kSynSyn,
+    kSynWild,
+    kWildInt,
+    kWildSyn,
+    kWildWild
+};
 class ConditionClause {
   public:
     virtual ResultTable Execute(KnowledgeBase *knowledge_base) const = 0;

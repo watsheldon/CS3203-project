@@ -7,60 +7,176 @@
 #include "common/type_convert_helpers.h"
 
 namespace spa {
-FollowsIntInt::FollowsIntInt(int first, int second, bool transitive)
-        : first_(first), second_(second), transitive_(transitive) {}
-ResultTable FollowsIntInt::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->ExistFollows(transitive_,
-                                               Index<ArgPos::kFirst>(first_),
-                                               Index<ArgPos::kSecond>(second_));
-    return ResultTable(result);
+FollowsClause::FollowsClause() : type_(Type::kWildWild) {}
+FollowsClause::FollowsClause(int first, int second)
+        : type_(Type::kIntInt), first_int_(first), second_int_(second) {}
+FollowsClause::FollowsClause(int first, Synonym *second)
+        : type_(Type::kIntSyn),
+          first_int_(first),
+          second_syn_(std::move(second)) {}
+FollowsClause::FollowsClause(Synonym *first, int second)
+        : type_(Type::kSynInt),
+          first_syn_(std::move(first)),
+          second_int_(second) {}
+FollowsClause::FollowsClause(Synonym *first, Synonym *second)
+        : type_(Type::kSynSyn),
+          first_syn_(std::move(first)),
+          second_syn_(std::move(second)) {}
+FollowsClause::FollowsClause(ArgPos pos, int integer) {
+    if (pos == ArgPos::kFirst) {
+        type_ = Type::kIntWild;
+        first_int_ = integer;
+    } else {
+        assert(pos == ArgPos::kSecond);
+        type_ = Type::kWildInt;
+        second_int_ = integer;
+    }
 }
-FollowsIntSyn::FollowsIntSyn(int first, Synonym *second, bool transitive)
-        : first_(first), second_(second), transitive_(transitive) {}
-ResultTable FollowsIntSyn::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->GetFollows(
-            transitive_, Index<ArgPos::kFirst>(first_), SynToPkbType(second_));
-    return {second_, std::move(result)};
+FollowsClause::FollowsClause(ArgPos pos, Synonym *syn) {
+    if (pos == ArgPos::kFirst) {
+        type_ = Type::kIntWild;
+        first_syn_ = syn;
+    } else {
+        assert(pos == ArgPos::kSecond);
+        type_ = Type::kWildInt;
+        second_syn_ = syn;
+    }
 }
-FollowsIntWild::FollowsIntWild(int first) : first_(first) {}
-ResultTable FollowsIntWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->ExistFollows(Index<ArgPos::kFirst>(first_));
-    return ResultTable(result);
+ResultTable FollowsClause::Execute(KnowledgeBase *knowledge_base) const {
+    switch (type_) {
+        case Type::kIntInt: {
+            auto result = knowledge_base->ExistFollows(
+                    false, Index<ArgPos::kFirst>(first_int_),
+                    Index<ArgPos::kSecond>(second_int_));
+            return ResultTable(result);
+        }
+        case Type::kIntSyn: {
+            auto result = knowledge_base->GetFollows(
+                    false, Index<ArgPos::kFirst>(first_int_),
+                    SynToPkbType(second_syn_));
+            return {second_syn_, std::move(result)};
+        }
+        case Type::kIntWild: {
+            auto result = knowledge_base->ExistFollows(
+                    Index<ArgPos::kFirst>(first_int_));
+            return ResultTable(result);
+        }
+        case Type::kSynInt: {
+            auto result = knowledge_base->GetFollows(
+                    false, Index<ArgPos::kSecond>(second_int_),
+                    SynToPkbType(first_syn_));
+            return {first_syn_, std::move(result)};
+        }
+        case Type::kSynSyn: {
+            auto [col_1, col_2] = knowledge_base->GetFollowsPairs(
+                    false, SynToPkbType(first_syn_), SynToPkbType(second_syn_));
+            return {first_syn_, std::move(col_1), second_syn_,
+                    std::move(col_2)};
+        }
+        case Type::kSynWild: {
+            auto result = knowledge_base->GetFollows(ArgPos::kFirst,
+                                                     SynToPkbType(first_syn_));
+            return {first_syn_, std::move(result)};
+        }
+        case Type::kWildInt: {
+            auto result = knowledge_base->ExistFollows(
+                    Index<ArgPos::kSecond>(second_int_));
+            return ResultTable(result);
+        }
+        case Type::kWildSyn: {
+            auto result = knowledge_base->GetFollows(ArgPos::kSecond,
+                                                     SynToPkbType(second_syn_));
+            return {second_syn_, std::move(result)};
+        }
+        case Type::kWildWild:
+            auto result = knowledge_base->ExistFollows();
+            return ResultTable(result);
+    }
 }
-FollowsSynInt::FollowsSynInt(Synonym *first, int second, bool transitive)
-        : first_(first), second_(second), transitive_(transitive) {}
-ResultTable FollowsSynInt::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->GetFollows(
-            transitive_, Index<ArgPos::kSecond>(second_), SynToPkbType(first_));
-    return {first_, std::move(result)};
+FollowsTransClause::FollowsTransClause() : type_(Type::kWildWild) {}
+FollowsTransClause::FollowsTransClause(int first, int second)
+        : type_(Type::kIntInt), first_int_(first), second_int_(second) {}
+FollowsTransClause::FollowsTransClause(int first, Synonym *second)
+        : type_(Type::kIntSyn),
+          first_int_(first),
+          second_syn_(std::move(second)) {}
+FollowsTransClause::FollowsTransClause(Synonym *first, int second)
+        : type_(Type::kSynInt),
+          first_syn_(std::move(first)),
+          second_int_(second) {}
+FollowsTransClause::FollowsTransClause(Synonym *first, Synonym *second)
+        : type_(Type::kSynSyn),
+          first_syn_(std::move(first)),
+          second_syn_(std::move(second)) {}
+FollowsTransClause::FollowsTransClause(ArgPos pos, int integer) {
+    if (pos == ArgPos::kFirst) {
+        type_ = Type::kIntWild;
+        first_int_ = integer;
+    } else {
+        assert(pos == ArgPos::kSecond);
+        type_ = Type::kWildInt;
+        second_int_ = integer;
+    }
 }
-FollowsSynSyn::FollowsSynSyn(Synonym *first, Synonym *second, bool transitive)
-        : first_(first), second_(second), transitive_(transitive) {}
-ResultTable FollowsSynSyn::Execute(KnowledgeBase *knowledge_base) const {
-    auto [col_1, col_2] = knowledge_base->GetFollowsPairs(
-            transitive_, SynToPkbType(first_), SynToPkbType(second_));
-    return {first_, std::move(col_1), second_, std::move(col_2)};
+FollowsTransClause::FollowsTransClause(ArgPos pos, Synonym *syn) {
+    if (pos == ArgPos::kFirst) {
+        type_ = Type::kIntWild;
+        first_syn_ = std::move(syn);
+    } else {
+        assert(pos == ArgPos::kSecond);
+        type_ = Type::kWildInt;
+        second_syn_ = std::move(syn);
+    }
 }
-FollowsSynWild::FollowsSynWild(Synonym *first) : first_(first) {}
-ResultTable FollowsSynWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result =
-            knowledge_base->GetFollows(ArgPos::kFirst, SynToPkbType(first_));
-    return {first_, std::move(result)};
-}
-FollowsWildInt::FollowsWildInt(int second) : second_(second) {}
-ResultTable FollowsWildInt::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->ExistFollows(Index<ArgPos::kSecond>(second_));
-    return ResultTable(result);
-}
-FollowsWildSyn::FollowsWildSyn(Synonym *second) : second_(second) {}
-ResultTable FollowsWildSyn::Execute(KnowledgeBase *knowledge_base) const {
-    auto result =
-            knowledge_base->GetFollows(ArgPos::kSecond, SynToPkbType(second_));
-    return {second_, std::move(result)};
-}
-FollowsWildWild::FollowsWildWild() = default;
-ResultTable FollowsWildWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->ExistFollows();
-    return ResultTable(result);
+ResultTable FollowsTransClause::Execute(KnowledgeBase *knowledge_base) const {
+    switch (type_) {
+        case Type::kIntInt: {
+            auto result = knowledge_base->ExistFollows(
+                    true, Index<ArgPos::kFirst>(first_int_),
+                    Index<ArgPos::kSecond>(second_int_));
+            return ResultTable(result);
+        }
+        case Type::kIntSyn: {
+            auto result = knowledge_base->GetFollows(
+                    true, Index<ArgPos::kFirst>(first_int_),
+                    SynToPkbType(second_syn_));
+            return {second_syn_, std::move(result)};
+        }
+        case Type::kIntWild: {
+            auto result = knowledge_base->ExistFollows(
+                    Index<ArgPos::kFirst>(first_int_));
+            return ResultTable(result);
+        }
+        case Type::kSynInt: {
+            auto result = knowledge_base->GetFollows(
+                    true, Index<ArgPos::kSecond>(second_int_),
+                    SynToPkbType(first_syn_));
+            return {first_syn_, std::move(result)};
+        }
+        case Type::kSynSyn: {
+            auto [col_1, col_2] = knowledge_base->GetFollowsPairs(
+                    true, SynToPkbType(first_syn_), SynToPkbType(second_syn_));
+            return {first_syn_, std::move(col_1), second_syn_,
+                    std::move(col_2)};
+        }
+        case Type::kSynWild: {
+            auto result = knowledge_base->GetFollows(ArgPos::kFirst,
+                                                     SynToPkbType(first_syn_));
+            return {first_syn_, std::move(result)};
+        }
+        case Type::kWildInt: {
+            auto result = knowledge_base->ExistFollows(
+                    Index<ArgPos::kSecond>(second_int_));
+            return ResultTable(result);
+        }
+        case Type::kWildSyn: {
+            auto result = knowledge_base->GetFollows(ArgPos::kSecond,
+                                                     SynToPkbType(second_syn_));
+            return {second_syn_, std::move(result)};
+        }
+        case Type::kWildWild:
+            auto result = knowledge_base->ExistFollows();
+            return ResultTable(result);
+    }
 }
 }  // namespace spa

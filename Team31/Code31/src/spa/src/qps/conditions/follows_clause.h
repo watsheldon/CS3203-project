@@ -5,83 +5,43 @@
 
 #include "condition_clause.h"
 namespace spa {
-class FollowsClause : public ConditionClause {};
-class FollowsIntInt : public FollowsClause {
+
+class FollowsClause : public ConditionClause {
   public:
-    FollowsIntInt(int first, int second, bool transitive);
+    FollowsClause();
+    FollowsClause(int first, int second);
+    FollowsClause(int first, Synonym *second);
+    FollowsClause(Synonym *first, int second);
+    FollowsClause(Synonym *first, Synonym *second);
+    FollowsClause(ArgPos pos, int integer);
+    FollowsClause(ArgPos pos, Synonym *syn);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
-    const int first_;
-    const int second_;
-    const bool transitive_;
+    Type type_;
+    int first_int_;
+    int second_int_;
+    Synonym *first_syn_;
+    Synonym *second_syn_;
 };
-class FollowsIntSyn : public FollowsClause {
+
+class FollowsTransClause : public ConditionClause {
   public:
-    FollowsIntSyn(int first, Synonym *second, bool transitive);
+    FollowsTransClause();
+    FollowsTransClause(int first, int second);
+    FollowsTransClause(int first, Synonym *second);
+    FollowsTransClause(Synonym *first, int second);
+    FollowsTransClause(Synonym *first, Synonym *second);
+    FollowsTransClause(ArgPos pos, int integer);
+    FollowsTransClause(ArgPos pos, Synonym *syn);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
-    const int first_;
-    Synonym *const second_;
-    const bool transitive_;
-};
-class FollowsIntWild : public FollowsClause {
-  public:
-    explicit FollowsIntWild(int first);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    const int first_;
-};
-class FollowsSynInt : public FollowsClause {
-  public:
-    FollowsSynInt(Synonym *first, int second, bool transitive);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
-    const int second_;
-    const bool transitive_;
-};
-class FollowsSynSyn : public FollowsClause {
-  public:
-    FollowsSynSyn(Synonym *first, Synonym *second, bool transitive);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
-    Synonym *const second_;
-    const bool transitive_;
-};
-class FollowsSynWild : public FollowsClause {
-  public:
-    explicit FollowsSynWild(Synonym *first);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
-};
-class FollowsWildInt : public FollowsClause {
-  public:
-    explicit FollowsWildInt(int second);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    const int second_;
-};
-class FollowsWildSyn : public FollowsClause {
-  public:
-    explicit FollowsWildSyn(Synonym *second);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const second_;
-};
-class FollowsWildWild : public FollowsClause {
-  public:
-    FollowsWildWild();
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
+    Type type_;
+    int first_int_;
+    int second_int_;
+    Synonym *first_syn_;
+    Synonym *second_syn_;
 };
 }  // namespace spa
 
