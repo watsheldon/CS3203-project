@@ -227,15 +227,15 @@ void UsesRelationshipStore::AggregateStmts() {
 }
 void UsesRelationshipStore::UpdateStmtVar() {
     for (int i = 1; i < num_stmts + 1; ++i) {
-        complete_stmt_var_.Add(i, GetVarIndex(i));
+        complete_stmt_var_.Set(i, GetVarIndex(i));
     }
     auto& [if_stmts, if_vars] = if_var_pairs_;
     for (int i = 0; i < if_stmts.size(); ++i) {
-        complete_stmt_var_.Add(if_stmts[i], if_vars[i]);
+        complete_stmt_var_.Set(if_stmts[i], if_vars[i]);
     }
     auto& [while_stmts, while_vars] = while_var_pairs_;
     for (int i = 0; i < while_stmts.size(); ++i) {
-        complete_stmt_var_.Add(while_stmts[i], while_vars[i]);
+        complete_stmt_var_.Set(while_stmts[i], while_vars[i]);
     }
 }
 }  // namespace spa

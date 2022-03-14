@@ -23,7 +23,8 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
           stmtlst_stmt_(stmtlst_count_, stmt_count_),
           modifies_rel_(stmt_count_, init.variables.size() - 1),
           uses_rel_(stmt_count_, init.variables.size() - 1),
-          call_proc_(stmt_count_, std::move(init.proc_call_graph)),
+          call_proc_(stmt_count_, init.procedures.size() - 1,
+                     std::move(init.proc_call_graph)),
           polish_notation_(stmt_count_, std::move(init.notations)),
           name_value_(std::move(init.procedures), std::move(init.variables),
                       std::move(init.constants)),
@@ -966,20 +967,22 @@ PairVec<int> ProgramKnowledgeBase::GetPatternPair() {
 bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kFirst> first_proc,
                                       Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
-    return false;
+    const auto &callees = call_proc_.GetCalleeProcs(first_proc.value);
+    return callees.find(second_proc.value) != callees.end();
 }
 bool ProgramKnowledgeBase::ExistCallsT(Index<ArgPos::kFirst> first_proc,
                                        Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
-    return false;
+    const auto &callees = call_proc_.GetCalleeProcsT(first_proc.value);
+    return callees.find(second_proc.value) != callees.end();
 }
 bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kFirst> first_proc) {
     assert(compiled);
-    return false;
+    return !call_proc_.GetCalleeProcs(first_proc.value).empty();
 }
 bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
-    return !call_proc_.GetCalls(second_proc.value).empty();
+    return !call_proc_.GetStmts(second_proc.value).empty();
 }
 bool ProgramKnowledgeBase::ExistCalls() {
     assert(compiled);
@@ -987,34 +990,37 @@ bool ProgramKnowledgeBase::ExistCalls() {
 }
 std::set<int> ProgramKnowledgeBase::GetCalls(ArgPos return_pos) {
     assert(compiled);
-    return std::set<int>{};
+    if (return_pos == ArgPos::kFirst) {
+        return call_proc_.GetAllCallers();
+    }
+    return call_proc_.GetAllCallees();
 }
 std::set<int> ProgramKnowledgeBase::GetCalls(Index<ArgPos::kFirst> first_proc) {
     assert(compiled);
-    return std::set<int>{};
+    return call_proc_.GetCalleeProcs(first_proc.value);
 }
 std::set<int> ProgramKnowledgeBase::GetCallsT(
         Index<ArgPos::kFirst> first_proc) {
     assert(compiled);
-    return std::set<int>{};
+    return call_proc_.GetCalleeProcsT(first_proc.value);
 }
 std::set<int> ProgramKnowledgeBase::GetCalls(
         Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
-    return std::set<int>{};
+    return call_proc_.GetCallerProcs(second_proc.value);
 }
 std::set<int> ProgramKnowledgeBase::GetCallsT(
         Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
-    return std::set<int>{};
+    return call_proc_.GetCallerProcsT(second_proc.value);
 }
 PairVec<int> ProgramKnowledgeBase::GetCallsPairs() {
     assert(compiled);
-    return std::pair<std::vector<int>, std::vector<int>>{};
+    return call_proc_.GetCallsPairs();
 }
 PairVec<int> ProgramKnowledgeBase::GetCallsTPairs() {
     assert(compiled);
-    return std::pair<std::vector<int>, std::vector<int>>{};
+    return call_proc_.GetCallsTPairs();
 }
 
 void ProgramKnowledgeBase::Compile() {

@@ -17,6 +17,11 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     be.ifs = std::vector<int>{4};
     be.assigns = std::vector<int>{7, 8, 9};
 
+    std::vector<std::set<int>> procs;
+    procs.emplace_back(std::set<int>{});
+    procs.emplace_back(std::set<int>{});
+    be.proc_call_graph = procs;
+
     // dummy pn
     PolishNotation pn0(std::vector<PolishNotationNode>{});
     // v1+1*v3

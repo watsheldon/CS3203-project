@@ -12,7 +12,7 @@ namespace spa {
 template <typename V>
 class IndexBimap {
   public:
-    IndexBimap(std::vector<V> &&vals) : key_to_val_(std::move(vals)) {
+    explicit IndexBimap(std::vector<V> &&vals) : key_to_val_(std::move(vals)) {
         for (int i = 1; i < key_to_val_.size(); ++i) {
             val_to_key_.emplace(key_to_val_[i], i);
         }
@@ -92,14 +92,21 @@ class IndexBimap<std::set<int>> {
     IndexBimap(size_t key_count, size_t val_count)
             : key_to_val_(key_count + 1), val_to_key_(val_count + 1) {}
 
-    void Add(int key, const std::vector<int> &vals) {
+    IndexBimap(size_t val_count, std::vector<std::set<int>> &&vals)
+            : key_to_val_(std::move(vals)), val_to_key_(val_count + 1) {
+        for (int key = 1; key < key_to_val_.size(); ++key) {
+            for (auto &val : key_to_val_[key]) val_to_key_[val].emplace(key);
+        }
+    }
+
+    void Set(int key, const std::vector<int> &vals) {
         key_to_val_[key].insert(vals.begin(), vals.end());
         for (auto &val : vals) {
             val_to_key_[val].emplace(key);
         }
     }
 
-    void Add(int key, int val) {
+    void Set(int key, int val) {
         auto [it, succ] = key_to_val_[key].emplace(val);
         if (succ) {
             val_to_key_[val].emplace(key);

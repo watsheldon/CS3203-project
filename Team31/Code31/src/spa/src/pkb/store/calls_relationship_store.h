@@ -6,16 +6,28 @@
 namespace spa {
 class CallsRelationshipStore {
   public:
-    CallsRelationshipStore(size_t stmtSize, std::vector<std::set<int>> &&procs);
+    CallsRelationshipStore(size_t stmt_count, size_t proc_count,
+                           std::vector<std::set<int>> procs);
     void Set(int call_stmt, int proc_index);
-    [[nodiscard]] const std::vector<int> &GetCallerProcs(int callee) const;
-    [[nodiscard]] const std::vector<int> &GetCalleeProcs(int caller) const;
-    [[nodiscard]] const std::vector<int> &GetCalls(int proc_index) const;
+    [[nodiscard]] const std::set<int> &GetCallerProcs(int callee) const;
+    [[nodiscard]] const std::set<int> &GetCalleeProcs(int caller) const;
+    [[nodiscard]] const std::set<int> &GetCallerProcsT(int callee) const;
+    [[nodiscard]] const std::set<int> &GetCalleeProcsT(int caller) const;
+    [[nodiscard]] const std::set<int> &GetAllCallers() const;
+    [[nodiscard]] const std::set<int> &GetAllCallees() const;
+    [[nodiscard]] const PairVec<int> &GetCallsPairs() const;
+    [[nodiscard]] const PairVec<int> &GetCallsTPairs() const;
+    [[nodiscard]] const std::vector<int> &GetStmts(int proc_index) const;
     [[nodiscard]] int GetProc(int call_stmt) const;
 
   private:
-    IndexBimap<std::vector<int>> call_stmts_;
-    IndexBimap<std::vector<int>> call_procs_;
+    IndexBimap<std::vector<int>> stmt_proc_;
+    IndexBimap<std::set<int>> proc_proc_;
+    IndexBimap<std::set<int>> proc_proc_t_;
+    std::set<int> all_callees_;
+    std::set<int> all_callers_;
+    PairVec<int> pairs_;
+    PairVec<int> pairs_t_;
 };
 }  // namespace spa
 
