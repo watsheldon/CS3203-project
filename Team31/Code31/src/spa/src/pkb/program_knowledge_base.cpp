@@ -233,36 +233,9 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     if (stmt_no > stmt_count_) {
         return false;
     }
-
-    StmtType type = type_stmt_.GetType(stmt_no);
-
-    if (type == StmtType::kRead || type == StmtType::kCall) {
-        return false;
-    }
-
-    if (type == StmtType::kAssign || type == StmtType::kPrint) {
-        std::vector<int> var_indices;
-        var_indices = uses_rel_.GetVarIndex(stmt_no);
-        if (var_index == kWildCard) {
-            return !var_indices.empty();
-        }
-
-        return std::binary_search(var_indices.begin(), var_indices.end(),
-                                  var_index);
-    }
-
-    int first_stmt = stmt_no;
-    int last_stmt = GetContainerLastStmt(type, stmt_no);
-
-    if (var_index == kWildCard) {
-        return true;
-    }
-
-    auto using_stmt = uses_rel_.GetStmtNo(var_index);
-    return std::any_of(using_stmt.begin(), using_stmt.end(),
-                       [first_stmt, last_stmt](auto i) {
-                           return first_stmt <= i && i <= last_stmt;
-                       });
+    auto used_vars = uses_rel_.GetAllVar(stmt_no);
+    return var_index == 0 ? !used_vars.empty()
+                          : used_vars.find(var_index) != used_vars.end();
 }
 
 bool ProgramKnowledgeBase::ExistUses(int stmt_no, std::string_view var_name) {
@@ -530,60 +503,31 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
 std::set<int> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
-    assert(stmt_no.value != 0);
     if (stmt_no.value > stmt_count_) {
         return {};
     }
-    StmtType type = type_stmt_.GetType(stmt_no.value);
-
-    if (type == StmtType::kRead || type == StmtType::kCall) {
-        return {};
+    if (stmt_no.value == 0) {
+        auto used_vars = uses_rel_.GetStmtVar(StmtType::kAll).second;
+        return {used_vars.begin(), used_vars.end()};
     }
-
-    if (type == StmtType::kAssign || type == StmtType::kPrint) {
-        std::vector<int> var_indices;
-        var_indices = uses_rel_.GetVarIndex(stmt_no.value);
-
-        return {var_indices.begin(), var_indices.end()};
-    }
-
-    std::set<int> results;
-    auto conditional_var = uses_rel_.GetVarIndex(stmt_no.value);
-    results.insert(conditional_var.begin(), conditional_var.end());
-    std::vector<StmtType> stmtType = {StmtType::kAssign, StmtType::kPrint,
-                                      StmtType::kWhile, StmtType::kIf};
-    int first_stmt = stmt_no.value + 1;
-    int last_stmt = GetContainerLastStmt(type, stmt_no.value);
-
-    for (auto i : stmtType) {
-        auto bound = GetStmtBound(i, first_stmt, last_stmt);
-        AppendVarIndicesUses(bound, results);
-    }
-
-    return results;
+    return uses_rel_.GetAllVar(stmt_no.value);
 }
 std::set<int> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
     assert(var_index.value != 0);
-
-    if (type == StmtType::kRead || type == StmtType::kCall) {
-        return {};
-    }
-
-    auto direct_uses_stmt = uses_rel_.GetAllStmt(var_index.value);
+    auto stmts = uses_rel_.GetAllStmt(var_index.value);
     if (type == StmtType::kAll) {
-        return direct_uses_stmt;
+        return stmts;
     }
-
-    for (auto it = direct_uses_stmt.begin(); it != direct_uses_stmt.end();) {
+    for (auto it = stmts.begin(); it != stmts.end();) {
         if (type_stmt_.GetType(*it) != type) {
-            it = direct_uses_stmt.erase(it);
+            it = stmts.erase(it);
         } else {
             ++it;
         }
     }
-    return direct_uses_stmt;
+    return stmts;
 }
 std::set<int> ProgramKnowledgeBase::GetUses(std::string_view var_name,
                                             StmtType type) {

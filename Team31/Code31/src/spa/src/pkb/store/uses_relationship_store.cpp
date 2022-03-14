@@ -45,6 +45,7 @@ void UsesRelationshipStore::Compile(
     CompileContainers(forest, stmtlst_parent, stmtlst_stmt,
                       type_statement_store);
 }
+// Add direct Uses of variables by assign and print.
 void UsesRelationshipStore::CompileBasic(
         PairVec<int>& stmt_var_pair, const std::vector<int>& stmt_no) const {
     auto& [stmts, vars] = stmt_var_pair;
@@ -54,6 +55,7 @@ void UsesRelationshipStore::CompileBasic(
         stmts.resize(vars.size(), a);
     }
 }
+// Add indirect Uses for container statements.
 void UsesRelationshipStore::CompileContainers(
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt,
@@ -62,6 +64,7 @@ void UsesRelationshipStore::CompileContainers(
     BitVec2D while_added(num_stmts + 1, num_vars + 1);
     auto& [if_stmts, if_vars] = if_var_pairs_;
     for (auto i : type_statement_store.GetStatements(StmtType::kIf)) {
+        // Add indirect Uses of condition variables by ancestors of i.
         auto& var_indices = GetVarIndex(i);
         auto stmtlst = stmtlst_stmt.GetStmtlst(i);
         auto ancestors = forest.GetAncestryTrace(stmtlst);
@@ -81,6 +84,7 @@ void UsesRelationshipStore::CompileContainers(
             if (stmts.size() == vars.size()) break;
             stmts.resize(vars.size(), index);
         }
+        // Add direct Uses of condition variables by if statement i.
         for (auto v : var_indices) {
             if (if_added.At(i, v)) continue;
             if_vars.emplace_back(v);
@@ -90,6 +94,7 @@ void UsesRelationshipStore::CompileContainers(
     }
     auto& [while_stmts, while_vars] = while_var_pairs_;
     for (auto i : type_statement_store.GetStatements(StmtType::kWhile)) {
+        // Add indirect Uses of condition variables by ancestors of i.
         auto& var_indices = GetVarIndex(i);
         auto stmtlst = stmtlst_stmt.GetStmtlst(i);
         auto ancestors = forest.GetAncestryTrace(stmtlst);
@@ -109,6 +114,7 @@ void UsesRelationshipStore::CompileContainers(
             if (stmts.size() == vars.size()) break;
             stmts.resize(vars.size(), index);
         }
+        // Add direct Uses of condition variables by while statement i.
         for (auto v : var_indices) {
             if (while_added.At(i, v)) continue;
             while_vars.emplace_back(v);
@@ -167,6 +173,7 @@ PairVec<int> UsesRelationshipStore::Combine() const {
                 while_var_pairs_.second.end());
     return {stmts, vars};
 }
+// Add container statements indirect Uses of variables in assign and print.
 void UsesRelationshipStore::AddAncestorsOnly(
         const PairVec<int>& basic_pairs,
         const StmtlstStatementsStore& stmtlst_stmt,
