@@ -1,86 +1,45 @@
-#ifndef SRC_SPA_SRC_QPS_PARENT_FOLLOWS_CLAUSE_H_
-#define SRC_SPA_SRC_QPS_PARENT_FOLLOWS_CLAUSE_H_
+#ifndef SRC_SPA_SRC_QPS_PARENT_CLAUSE_H_
+#define SRC_SPA_SRC_QPS_PARENT_CLAUSE_H_
 
 #include "qps/conditions/condition_clause.h"
 
 namespace spa {
-class ParentClause : public ConditionClause {};
-class ParentIntInt : public ParentClause {
+class ParentClause : public ConditionClause {
   public:
-    ParentIntInt(int first, int second, bool transitive);
+    ParentClause();
+    ParentClause(int first, int second);
+    ParentClause(int first, Synonym *second);
+    ParentClause(Synonym *first, int second);
+    ParentClause(Synonym *first, Synonym *second);
+    ParentClause(ArgPos pos, int integer);
+    ParentClause(ArgPos pos, Synonym *syn);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
-    const int first_;
-    const int second_;
-    const bool transitive_;
+    Type type_;
+    int first_int_;
+    int second_int_;
+    Synonym *first_syn_;
+    Synonym *second_syn_;
 };
-class ParentIntSyn : public ParentClause {
+
+class ParentTransClause : public ConditionClause {
   public:
-    ParentIntSyn(int first, Synonym *second, bool transitive);
+    ParentTransClause();
+    ParentTransClause(int first, int second);
+    ParentTransClause(int first, Synonym *second);
+    ParentTransClause(Synonym *first, int second);
+    ParentTransClause(Synonym *first, Synonym *second);
+    ParentTransClause(ArgPos pos, int integer);
+    ParentTransClause(ArgPos pos, Synonym *syn);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
-    const int first_;
-    Synonym *const second_;
-    const bool transitive_;
-};
-class ParentIntWild : public ParentClause {
-  public:
-    explicit ParentIntWild(int first);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    const int first_;
-};
-class ParentSynInt : public ParentClause {
-  public:
-    ParentSynInt(Synonym *first, int second, bool transitive);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
-    const int second_;
-    const bool transitive_;
-};
-class ParentSynSyn : public ParentClause {
-  public:
-    ParentSynSyn(Synonym *first, Synonym *second, bool transitive);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
-    Synonym *const second_;
-    const bool transitive_;
-};
-class ParentSynWild : public ParentClause {
-  public:
-    explicit ParentSynWild(Synonym *first);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
-};
-class ParentWildInt : public ParentClause {
-  public:
-    explicit ParentWildInt(int second);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    const int second_;
-};
-class ParentWildSyn : public ParentClause {
-  public:
-    explicit ParentWildSyn(Synonym *second);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const second_;
-};
-class ParentWildWild : public ParentClause {
-  public:
-    ParentWildWild();
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
+    Type type_;
+    int first_int_;
+    int second_int_;
+    Synonym *first_syn_;
+    Synonym *second_syn_;
 };
 }  // namespace spa
-#endif  // SRC_SPA_SRC_QPS_PARENT_FOLLOWS_CLAUSE_H_
+#endif  // SRC_SPA_SRC_QPS_PARENT_CLAUSE_H_
