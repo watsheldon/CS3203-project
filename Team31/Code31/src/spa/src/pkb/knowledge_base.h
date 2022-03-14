@@ -233,6 +233,8 @@ class KnowledgeBase {
      */
     virtual std::set<int> GetModifies(std::string_view var_name,
                                       StmtType type) = 0;
+    virtual std::set<int> GetModifies(Index<QueryEntityType::kVar> var_index,
+                                      StmtType type) = 0;
 
     /**
      * Gets a list of stmt# that modifies any var_index (wildcard)
@@ -253,6 +255,8 @@ class KnowledgeBase {
      * Gets a list of stmt# that uses var_index
      */
     virtual std::set<int> GetUses(std::string_view var_name, StmtType type) = 0;
+    virtual std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
+                                  StmtType type) = 0;
 
     /**
      * Gets a list of stmt# that uses var_index
@@ -270,9 +274,13 @@ class KnowledgeBase {
 
     //(" ", _)
     virtual std::set<int> GetPattern(std::string_view var_name) = 0;
+    virtual std::set<int> GetPattern(int var_index) = 0;
 
     // (" ", " ") , (" ", _" "_)
     virtual std::set<int> GetPattern(std::string_view var_name,
+                                     std::vector<QueryToken> second_tokens,
+                                     bool partial_match) = 0;
+    virtual std::set<int> GetPattern(int var_index,
                                      std::vector<QueryToken> second_tokens,
                                      bool partial_match) = 0;
     // (v, " ") , (v, _" "_)
@@ -331,8 +339,7 @@ class KnowledgeBase {
      */
     virtual std::vector<int> GetAllEntityIndices(QueryEntityType et) = 0;
     virtual std::vector<int> GetAllEntityIndices(StmtType st) = 0;
-    virtual std::vector<int> GetAllEntityIndices(
-            const Synonym::Type synType) = 0;
+    virtual std::vector<int> GetAllEntityIndices(Synonym::Type synType) = 0;
 
     /**
      * Converts the entities to string according to their respective indices.
@@ -340,7 +347,7 @@ class KnowledgeBase {
      * internal data structure. The statement types are using stmt# directly as
      * their indices.
      */
-    virtual void ToName(const Synonym::Type syn_type,
+    virtual void ToName(Synonym::Type syn_type,
                         const std::vector<int> &index_list,
                         std::list<std::string> &names) = 0;
 

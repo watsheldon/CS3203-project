@@ -342,9 +342,9 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
     }
     std::vector<int> results;
     if (transitive) {
-        std::vector<int> stmtlsts =
+        std::vector<int> ancestors =
                 container_forest_->GetAncestryTrace(stmtlst_index);
-        for (auto &i : stmtlsts) {
+        for (int i : ancestors) {
             if (stmtlst_parent_.GetParent(i).type != PType::kWhile &&
                 stmtlst_parent_.GetParent(i).type != PType::kIf)
                 continue;
@@ -517,11 +517,8 @@ bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
 
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no,
                                          std::string_view var_name) {
-    assert(compiled);
-    assert(stmt_no != 0);
-
     int var_index = NameToIndex(QueryEntityType::kVar, var_name);
-
+    if (var_index == 0) return false;
     return ExistModifies(stmt_no, var_index);
 }
 
@@ -542,7 +539,7 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
         std::vector<int> var_indices;
         var_indices = uses_rel_.GetVarIndex(stmt_no);
         if (var_index == kWildCard) {
-            return var_indices.size() > 0;
+            return !var_indices.empty();
         }
 
         return std::binary_search(var_indices.begin(), var_indices.end(),
@@ -564,11 +561,8 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
 }
 
 bool ProgramKnowledgeBase::ExistUses(int stmt_no, std::string_view var_name) {
-    assert(compiled);
-    assert(stmt_no != 0);
-
     int var_index = NameToIndex(QueryEntityType::kVar, var_name);
-
+    if (var_index == 0) return false;
     return ExistUses(stmt_no, var_index);
 }
 
@@ -603,17 +597,19 @@ std::set<int> ProgramKnowledgeBase::GetModifies(
 
 std::set<int> ProgramKnowledgeBase::GetModifies(std::string_view var_name,
                                                 StmtType type) {
-    assert(compiled);
-
     int var_index = NameToIndex(QueryEntityType::kVar, var_name);
+    if (var_index == 0) return {};
+    return GetModifies(Index<QueryEntityType::kVar>(var_index), type);
+}
 
-    assert(var_index != 0);
-
+std::set<int> ProgramKnowledgeBase::GetModifies(
+        Index<QueryEntityType::kVar> var_index, StmtType type) {
+    assert(compiled);
     if (type == StmtType::kPrint || type == StmtType::kCall) {
         return {};
     }
 
-    auto direct_modifying_stmt = modifies_rel_.GetStmtNo(var_index);
+    auto direct_modifying_stmt = modifies_rel_.GetStmtNo(var_index.value);
 
     if (type == StmtType::kAssign) {
         std::set<int> assign_stmt;
@@ -637,7 +633,7 @@ std::set<int> ProgramKnowledgeBase::GetModifies(std::string_view var_name,
 
     std::set<int> container_stmt;
 
-    for (auto &i : direct_modifying_stmt) {
+    for (int i : direct_modifying_stmt) {
         auto parents =
                 GetParent(true, Index<ArgPos::kSecond>(i), StmtType::kAll);
         container_stmt.insert(parents.begin(), parents.end());
@@ -736,7 +732,8 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
                 type_stmt_.GetStatements(StmtType::kAssign);
         std::vector<int> assign_var;
 
-        for (auto &i : assign_stmt) {
+        assign_var.reserve(assign_stmt.size());
+        for (int i : assign_stmt) {
             assign_var.emplace_back(modifies_rel_.GetVarIndex(i));
         }
 
@@ -746,8 +743,8 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
     if (type == StmtType::kRead) {
         std::vector<int> read_stmt = type_stmt_.GetStatements(StmtType::kRead);
         std::vector<int> read_var;
-
-        for (auto &i : read_stmt) {
+        read_var.resize(read_stmt.size());
+        for (int i : read_stmt) {
             read_var.emplace_back(modifies_rel_.GetVarIndex(i));
         }
 
@@ -766,11 +763,11 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
         std::vector<int> if_stmt;
         std::vector<int> if_var;
 
-        for (auto i : direct_modifying_stmt) {
+        for (int i : direct_modifying_stmt) {
             int var_index = modifies_rel_.GetVarIndex(i);
             int stmtlst = stmtlst_stmt_.GetStmtlst(i);
             auto parents = container_forest_->GetAncestryTrace(stmtlst);
-            for (auto j : parents) {
+            for (int j : parents) {
                 auto stmt = stmtlst_parent_.GetParent(j);
                 if (stmt.type == StmtlstParentStore::kIf) {
                     if_stmt.emplace_back(stmt.index);
@@ -853,26 +850,23 @@ std::set<int> ProgramKnowledgeBase::GetUses(
     int first_stmt = stmt_no.value + 1;
     int last_stmt = GetContainerLastStmt(type, stmt_no.value);
 
-    for (auto &i : stmtType) {
+    for (auto i : stmtType) {
         auto bound = GetStmtBound(i, first_stmt, last_stmt);
         AppendVarIndicesUses(bound, results);
     }
 
     return results;
 }
-
-std::set<int> ProgramKnowledgeBase::GetUses(std::string_view var_name,
-                                            StmtType type) {
+std::set<int> ProgramKnowledgeBase::GetUses(
+        Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
-
-    int var_index = NameToIndex(QueryEntityType::kVar, var_name);
-    assert(var_index != 0);
+    assert(var_index.value != 0);
 
     if (type == StmtType::kRead || type == StmtType::kCall) {
         return {};
     }
 
-    auto direct_uses_stmt = uses_rel_.GetAllStmt(var_index);
+    auto direct_uses_stmt = uses_rel_.GetAllStmt(var_index.value);
     if (type == StmtType::kAll) {
         return direct_uses_stmt;
     }
@@ -886,13 +880,19 @@ std::set<int> ProgramKnowledgeBase::GetUses(std::string_view var_name,
     }
     return direct_uses_stmt;
 }
+std::set<int> ProgramKnowledgeBase::GetUses(std::string_view var_name,
+                                            StmtType type) {
+    int var_index = NameToIndex(QueryEntityType::kVar, var_name);
+    if (var_index == 0) return {};
+    return GetUses(Index<QueryEntityType::kVar>(var_index), type);
+}
 
 std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
-    assert(compiled);
     return uses_rel_.GetStmt(type);
 }
 
 PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
+    assert(compiled);
     return uses_rel_.GetStmtVar(type);
 }
 
@@ -912,7 +912,7 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
     if (partial_match) {
         std::set<int> partial_match_stmt;
 
-        for (auto &i : assign_stmt) {
+        for (int i : assign_stmt) {
             const PN &pn = polish_notation_.GetNotation(
                     polish_notation_.GetPolishIndex(i));
             if (pn.Contains(converted_pn)) {
@@ -937,14 +937,26 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
 }
 
 // (" ", _)
-std::set<int> ProgramKnowledgeBase::GetPattern(std::string_view var_name) {
+std::set<int> ProgramKnowledgeBase::GetPattern(int var_index) {
     assert(compiled);
-    return GetModifies(var_name, StmtType::kAssign);
+    return GetModifies(Index<QueryEntityType::kVar>(var_index),
+                       StmtType::kAssign);
 }
-
+std::set<int> ProgramKnowledgeBase::GetPattern(std::string_view var_name) {
+    int var_index = NameToIndex(QueryEntityType::kVar, var_name);
+    if (var_index == 0) return {};
+    return GetPattern(var_index);
+}
 // (" ", " ") , (" ", _" "_)
 std::set<int> ProgramKnowledgeBase::GetPattern(
         std::string_view var_name, std::vector<QueryToken> second_tokens,
+        bool partial_match) {
+    int var_index = NameToIndex(QueryEntityType::kVar, var_name);
+    if (var_index == 0) return {};
+    return GetPattern(var_index, second_tokens, partial_match);
+}
+std::set<int> ProgramKnowledgeBase::GetPattern(
+        int var_index, std::vector<QueryToken> second_tokens,
         bool partial_match) {
     assert(compiled);
 
@@ -953,7 +965,7 @@ std::set<int> ProgramKnowledgeBase::GetPattern(
     assign_stmt = GetPattern(second_tokens, partial_match);
 
     for (auto &i : assign_stmt) {
-        if (ExistModifies(i, var_name)) {
+        if (ExistModifies(i, var_index)) {
             filtered_assign_stmt.emplace(i);
         }
     }
@@ -981,9 +993,9 @@ PairVec<int> ProgramKnowledgeBase::GetPatternPair(
 
 // (v, _)
 PairVec<int> ProgramKnowledgeBase::GetPatternPair() {
+    assert(compiled);
     return GetModifiesStmtVar(StmtType::kAssign);
 }
-
 bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kFirst> first_proc,
                                       Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
@@ -1051,7 +1063,6 @@ void ProgramKnowledgeBase::Compile() {
                       stmtlst_stmt_);
     compiled = true;
 }
-
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {
     assert(compiled);
     std::vector<int> results;
@@ -1085,7 +1096,7 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(StmtType st) {
 }
 
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(
-        const Synonym::Type synType) {
+        Synonym::Type synType) {
     assert(compiled);
     std::vector<int> results;
     switch (synType) {
@@ -1114,7 +1125,7 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(
     }
 }
 
-void ProgramKnowledgeBase::ToName(const Synonym::Type syn_type,
+void ProgramKnowledgeBase::ToName(Synonym::Type syn_type,
                                   const std::vector<int> &index_list,
                                   std::list<std::string> &names) {
     assert(compiled);
@@ -1150,7 +1161,7 @@ void ProgramKnowledgeBase::ToName(const Synonym::Type syn_type,
 }
 
 int ProgramKnowledgeBase::NameToIndex(QueryEntityType et,
-                                      std::string_view &name) {
+                                      std::string_view name) {
     assert(compiled);
     assert(et == QueryEntityType::kVar || et == QueryEntityType::kProc);
     return (et == QueryEntityType::kVar)
@@ -1268,7 +1279,6 @@ void ProgramKnowledgeBase::AppendVarIndicesModifies(
         results.emplace(modifies_rel_.GetVarIndex(*i));
     }
 }
-
 void ProgramKnowledgeBase::AppendVarIndicesUses(
         std::pair<std::vector<int>::const_iterator,
                   std::vector<int>::const_iterator>

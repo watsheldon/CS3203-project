@@ -94,10 +94,14 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetModifies(Index<QueryEntityType::kStmt> stmt_no) override;
     std::set<int> GetModifies(std::string_view var_name,
                               StmtType type) override;
+    std::set<int> GetModifies(Index<QueryEntityType::kVar> var_index,
+                              StmtType type) override;
     std::set<int> GetModifies(StmtType type) override;
     PairVec<int> GetModifiesStmtVar(StmtType type) override;
     std::set<int> GetUses(Index<QueryEntityType::kStmt> stmt_no) override;
     std::set<int> GetUses(std::string_view var_name, StmtType type) override;
+    std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
+                          StmtType type) override;
     std::set<int> GetUses(StmtType type) override;
     PairVec<int> GetUsesStmtVar(StmtType type) override;
 
@@ -107,9 +111,13 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     //(" ", _)
     std::set<int> GetPattern(std::string_view var_name) override;
+    std::set<int> GetPattern(int var_index) override;
 
     // (" ", " ") , (" ", _" "_)
     std::set<int> GetPattern(std::string_view var_name,
+                             std::vector<QueryToken> second_tokens,
+                             bool partial_match) override;
+    std::set<int> GetPattern(int var_index,
                              std::vector<QueryToken> second_tokens,
                              bool partial_match) override;
     // (v, " ")  , (v, _" "_)
@@ -136,10 +144,9 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
-    std::vector<int> GetAllEntityIndices(const Synonym::Type synType) override;
+    std::vector<int> GetAllEntityIndices(Synonym::Type synType) override;
 
-    void ToName(const Synonym::Type syn_type,
-                const std::vector<int> &index_list,
+    void ToName(Synonym::Type syn_type, const std::vector<int> &index_list,
                 std::list<std::string> &names) override;
 
     // mark the end of source processor
@@ -182,7 +189,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                                   std::vector<int> &results);
     void GetTransitiveParentPairs(PairVec<int> &results);
     void GetNonTransitiveParentPairs(PairVec<int> &results);
-    int NameToIndex(QueryEntityType et, std::string_view &name);
+    int NameToIndex(QueryEntityType et, std::string_view name);
 };
 
 }  // namespace spa
