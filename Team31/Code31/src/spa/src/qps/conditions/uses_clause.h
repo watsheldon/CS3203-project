@@ -4,58 +4,27 @@
 #include "qps/conditions/condition_clause.h"
 
 namespace spa {
-class UsesClause : public ConditionClause {};
-class UsesIntIdent : public UsesClause {
+class UsesClause : public ConditionClause {
   public:
-    UsesIntIdent(int first, std::string second);
+    UsesClause(int first, std::string second);
+    UsesClause(int first, Synonym *second);
+    explicit UsesClause(int first);
+    UsesClause(Synonym *first, std::string second);
+    UsesClause(Synonym *first, Synonym *second);
+    explicit UsesClause(Synonym *first);
+    UsesClause(std::string first, Synonym *second);
+    UsesClause(std::string first, std::string second);
+    explicit UsesClause(std::string first);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override;
 
   private:
-    const int first_;
-    const std::string second_;
-};
-class UsesIntSyn : public UsesClause {
-  public:
-    UsesIntSyn(int first, Synonym *second);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    const int first_;
-    Synonym *const second_;
-};
-class UsesIntWild : public UsesClause {
-  public:
-    explicit UsesIntWild(int first);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    const int first_;
-};
-class UsesSynIdent : public UsesClause {
-  public:
-    UsesSynIdent(Synonym *first, std::string second);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
-    const std::string second_;
-};
-class UsesSynSyn : public UsesClause {
-  public:
-    UsesSynSyn(Synonym *first, Synonym *second);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
-    Synonym *const second_;
-};
-class UsesSynWild : public UsesClause {
-  public:
-    explicit UsesSynWild(Synonym *first);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-
-  private:
-    Synonym *const first_;
+    Type type_;
+    int first_int_;
+    Synonym *first_syn_;
+    std::string first_ident_;
+    int second_int_;
+    Synonym *second_syn_;
+    std::string second_ident_;
 };
 }  // namespace spa
 

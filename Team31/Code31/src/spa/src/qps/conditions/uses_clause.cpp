@@ -5,39 +5,74 @@
 #include "common/type_convert_helpers.h"
 
 namespace spa {
-UsesIntIdent::UsesIntIdent(int first, std::string second)
-        : first_(first), second_(std::move(second)) {}
-ResultTable UsesIntIdent::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->ExistUses(first_, second_);
-    return ResultTable(result);
-}
-UsesIntSyn::UsesIntSyn(int first, Synonym *second)
-        : first_(first), second_(second) {}
-ResultTable UsesIntSyn::Execute(KnowledgeBase *knowledge_base) const {
-    auto result =
-            knowledge_base->GetUses(Index<QueryEntityType::kStmt>(first_));
-    return {second_, std::move(result)};
-}
-UsesIntWild::UsesIntWild(int first) : first_(first) {}
-ResultTable UsesIntWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->ExistUses(first_, KnowledgeBase::kWildCard);
-    return ResultTable(result);
-}
-UsesSynIdent::UsesSynIdent(Synonym *first, std::string second)
-        : first_(first), second_(std::move(second)) {}
-ResultTable UsesSynIdent::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->GetUses(second_, SynToPkbType(first_));
-    return {first_, std::move(result)};
-}
-UsesSynSyn::UsesSynSyn(Synonym *first, Synonym *second)
-        : first_(first), second_(second) {}
-ResultTable UsesSynSyn::Execute(KnowledgeBase *knowledge_base) const {
-    auto [col_1, col_2] = knowledge_base->GetUsesStmtVar(SynToPkbType(first_));
-    return {first_, std::move(col_1), second_, std::move(col_2)};
-}
-UsesSynWild::UsesSynWild(Synonym *first) : first_(first) {}
-ResultTable UsesSynWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->GetUses(SynToPkbType(first_));
-    return {first_, std::move(result)};
+UsesClause::UsesClause(int first, std::string second)
+        : type_(Type::kIntIdent),
+          first_int_(first),
+          second_ident_(std::move(second)) {}
+UsesClause::UsesClause(int first, Synonym *second)
+        : type_(Type::kIntSyn), first_int_(first), second_syn_(second) {}
+UsesClause::UsesClause(int first) : type_(Type::kIntWild), first_int_(first) {}
+UsesClause::UsesClause(Synonym *first, std::string second)
+        : type_(Type::kSynIdent),
+          first_syn_(first),
+          second_ident_(std::move(second)) {}
+UsesClause::UsesClause(Synonym *first, Synonym *second)
+        : type_(Type::kSynSyn), first_syn_(first), second_syn_(second) {}
+UsesClause::UsesClause(Synonym *first)
+        : type_(Type::kSynWild), first_syn_(first) {}
+UsesClause::UsesClause(std::string first, Synonym *second)
+        : type_(Type::kIdentSyn),
+          first_ident_(std::move(first)),
+          second_syn_(second) {}
+UsesClause::UsesClause(std::string first, std::string second)
+        : type_(Type::kIdentIdent),
+          first_ident_(std::move(first)),
+          second_ident_(std::move(second)) {}
+UsesClause::UsesClause(std::string first)
+        : type_(Type::kIdentWild), first_ident_(std::move(first)) {}
+ResultTable UsesClause::Execute(KnowledgeBase *knowledge_base) const {
+    switch (type_) {
+        case Type::kIntSyn: {
+            auto result = knowledge_base->GetUses(
+                    Index<QueryEntityType::kStmt>(first_int_));
+            return {second_syn_, std::move(result)};
+        }
+        case Type::kIntWild: {
+            auto result = knowledge_base->ExistUses(first_int_, 0);
+            return ResultTable(result);
+        }
+        case Type::kIntIdent: {
+            auto index_2nd = knowledge_base->NameToIndex(QueryEntityType::kVar,
+                                                         second_ident_);
+            if (index_2nd == 0) return ResultTable(false);
+            auto result = knowledge_base->ExistUses(first_int_, index_2nd);
+            return ResultTable(result);
+        }
+        case Type::kSynSyn: {
+            auto [col_1, col_2] =
+                    knowledge_base->GetUsesStmtVar(SynToPkbType(first_syn_));
+            return {first_syn_, std::move(col_1), second_syn_,
+                    std::move(col_2)};
+        }
+        case Type::kSynWild: {
+            auto result = knowledge_base->GetUses(SynToPkbType(first_syn_));
+            return {first_syn_, std::move(result)};
+        }
+        case Type::kSynIdent: {
+            auto index_2nd = knowledge_base->NameToIndex(QueryEntityType::kVar,
+                                                         second_ident_);
+            if (index_2nd == 0) return ResultTable(false);
+            auto result = knowledge_base->GetUses(
+                    Index<QueryEntityType::kVar>(index_2nd),
+                    SynToPkbType(first_syn_));
+            return {first_syn_, std::move(result)};
+        }
+        case Type::kIdentIdent:
+            break;
+        case Type::kIdentSyn:
+            break;
+        case Type::kIdentWild:
+            break;
+    }
 }
 }  // namespace spa
