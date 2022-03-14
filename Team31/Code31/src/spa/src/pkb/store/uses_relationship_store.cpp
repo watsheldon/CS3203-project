@@ -26,7 +26,7 @@ const std::vector<int>& UsesRelationshipStore::GetVarIndex(int stmt_no) const {
 }
 
 const std::set<int>& UsesRelationshipStore::GetAllVar(int stmt_no) const {
-    return complete_stmt_var_.GetVals(stmt_no);
+    return stmt_no == 0 ? all_vars_ : complete_stmt_var_.GetVals(stmt_no);
 }
 const std::vector<int>& UsesRelationshipStore::GetStmtNo(int var_index) const {
     return stmt_var_.GetKeys(var_index);
@@ -38,6 +38,7 @@ void UsesRelationshipStore::Compile(
         const TypeStatementsStore& type_statement_store,
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt) {
+    AggregateVars();
     CompileBasic(assign_var_pairs_,
                  type_statement_store.GetStatements(StmtType::kAssign));
     CompileBasic(print_var_pairs_,
@@ -243,6 +244,12 @@ void UsesRelationshipStore::UpdateStmtVar() {
     auto& [while_stmts, while_vars] = while_var_pairs_;
     for (int i = 0; i < while_stmts.size(); ++i) {
         complete_stmt_var_.Set(while_stmts[i], while_vars[i]);
+    }
+}
+void UsesRelationshipStore::AggregateVars() {
+    for (int i = 1; i <= num_stmts; ++i) {
+        auto vars = stmt_var_.GetVals(i);
+        all_vars_.insert(vars.begin(), vars.end());
     }
 }
 }  // namespace spa

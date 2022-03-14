@@ -44,6 +44,7 @@ class UsesRelationshipStore {
     std::set<int> if_stmts_;
     std::set<int> while_stmts_;
     std::set<int> all_stmts_;
+    std::set<int> all_vars_;
 
     void CompileBasic(PairVec<int> &stmt_var_pair,
                       const std::vector<int> &stmt_no) const;
@@ -59,6 +60,7 @@ class UsesRelationshipStore {
                           BitVec2D &while_added);
     void AggregateStmts();
     void UpdateStmtVar();
+    void AggregateVars();
 };
 }  // namespace spa
 

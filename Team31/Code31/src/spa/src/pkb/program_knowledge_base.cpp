@@ -506,10 +506,6 @@ std::set<int> ProgramKnowledgeBase::GetUses(
     if (stmt_no.value > stmt_count_) {
         return {};
     }
-    if (stmt_no.value == 0) {
-        auto used_vars = uses_rel_.GetStmtVar(StmtType::kAll).second;
-        return {used_vars.begin(), used_vars.end()};
-    }
     return uses_rel_.GetAllVar(stmt_no.value);
 }
 std::set<int> ProgramKnowledgeBase::GetUses(
