@@ -38,14 +38,12 @@ ResultTable UsesClause::Execute(KnowledgeBase *knowledge_base) const {
             return {second_syn_, std::move(result)};
         }
         case Type::kIntWild: {
-            auto result = knowledge_base->ExistUses(first_int_, 0);
+            auto result = knowledge_base->ExistUses(first_int_,
+                                                    KnowledgeBase::kWildCard);
             return ResultTable(result);
         }
         case Type::kIntIdent: {
-            auto index_2nd = knowledge_base->NameToIndex(QueryEntityType::kVar,
-                                                         second_ident_);
-            if (index_2nd == 0) return ResultTable(false);
-            auto result = knowledge_base->ExistUses(first_int_, index_2nd);
+            auto result = knowledge_base->ExistUses(first_int_, second_ident_);
             return ResultTable(result);
         }
         case Type::kSynSyn: {
@@ -59,12 +57,8 @@ ResultTable UsesClause::Execute(KnowledgeBase *knowledge_base) const {
             return {first_syn_, std::move(result)};
         }
         case Type::kSynIdent: {
-            auto index_2nd = knowledge_base->NameToIndex(QueryEntityType::kVar,
-                                                         second_ident_);
-            if (index_2nd == 0) return ResultTable(false);
-            auto result = knowledge_base->GetUses(
-                    Index<QueryEntityType::kVar>(index_2nd),
-                    SynToPkbType(first_syn_));
+            auto result = knowledge_base->GetUses(second_ident_,
+                                                  SynToPkbType(first_syn_));
             return {first_syn_, std::move(result)};
         }
         case Type::kIdentIdent:

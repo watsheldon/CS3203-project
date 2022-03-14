@@ -40,18 +40,12 @@ PatternPartialClause::PatternPartialClause() : type_(Type::kWildWild) {}
 ResultTable PatternPartialClause::Execute(KnowledgeBase *knowledge_base) const {
     switch (type_) {
         case Type::kIdentExpr: {
-            auto index_1st = knowledge_base->NameToIndex(QueryEntityType::kVar,
-                                                         first_ident_);
-            if (index_1st == 0) return ResultTable(false);
-            auto result =
-                    knowledge_base->GetPattern(index_1st, second_expr_, true);
+            auto result = knowledge_base->GetPattern(first_ident_, second_expr_,
+                                                     true);
             return {assign_, std::move(result)};
         }
         case Type::kIdentWild: {
-            auto index_1st = knowledge_base->NameToIndex(QueryEntityType::kVar,
-                                                         first_ident_);
-            if (index_1st == 0) return ResultTable(false);
-            auto result = knowledge_base->GetPattern(index_1st);
+            auto result = knowledge_base->GetPattern(first_ident_);
             return {assign_, std::move(result)};
         }
         case Type::kSynExpr: {
@@ -95,11 +89,8 @@ PatternExactClause::PatternExactClause(Synonym *assign,
 ResultTable PatternExactClause::Execute(KnowledgeBase *knowledge_base) const {
     switch (type_) {
         case Type::kIdentExpr: {
-            auto index_1st = knowledge_base->NameToIndex(QueryEntityType::kVar,
-                                                         first_ident_);
-            if (index_1st == 0) return ResultTable(false);
-            auto result =
-                    knowledge_base->GetPattern(index_1st, second_expr_, false);
+            auto result = knowledge_base->GetPattern(first_ident_, second_expr_,
+                                                     false);
             return {assign_, std::move(result)};
         }
         case Type::kSynExpr: {
