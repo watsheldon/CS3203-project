@@ -16,12 +16,15 @@ enum class Type {
     kSynSyn,
     kSynWild,
     kSynIdent,
+    kSynExpr,
     kWildInt,
     kWildSyn,
     kWildWild,
+    kWildExpr,
     kIdentIdent,
     kIdentSyn,
-    kIdentWild
+    kIdentWild,
+    kIdentExpr
 };
 class ConditionClause {
   public:

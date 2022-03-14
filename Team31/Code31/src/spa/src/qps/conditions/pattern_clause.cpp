@@ -10,50 +10,107 @@
 #include "qps/query_token.h"
 
 namespace spa {
-PatternIdentExpr::PatternIdentExpr(Synonym *const assign, std::string first,
-                                   std::vector<QueryToken> &&second,
-                                   bool partial)
-        : assign_(assign),
-          first_(std::move(first)),
-          second_(std::move(second)),
-          partial_(partial) {}
-ResultTable PatternIdentExpr::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->GetPattern(first_, second_, partial_);
-    return {assign_, std::move(result)};
+PatternPartialClause::PatternPartialClause(Synonym *assign, std::string first,
+                                           std::vector<QueryToken> &&second)
+        : type_(Type::kIdentExpr),
+          assign_(assign),
+          first_ident_(std::move(first)),
+          second_expr_(std::move(second)) {}
+PatternPartialClause::PatternPartialClause(Synonym *const assign,
+                                           std::string first)
+        : type_(Type::kIdentWild),
+          assign_(assign),
+          first_ident_(std::move(first)) {}
+PatternPartialClause::PatternPartialClause(Synonym *const assign,
+                                           Synonym *first,
+                                           std::vector<QueryToken> &&second)
+        : type_(Type::kSynExpr),
+          assign_(assign),
+          first_syn_(first),
+          second_expr_(std::move(second)) {}
+PatternPartialClause::PatternPartialClause(Synonym *const assign,
+                                           Synonym *first)
+        : type_(Type::kSynWild), assign_(assign), first_syn_(first) {}
+PatternPartialClause::PatternPartialClause(Synonym *const assign,
+                                           std::vector<QueryToken> &&second)
+        : type_(Type::kWildExpr),
+          assign_(assign),
+          second_expr_(std::move(second)) {}
+PatternPartialClause::PatternPartialClause() : type_(Type::kWildWild) {}
+ResultTable PatternPartialClause::Execute(KnowledgeBase *knowledge_base) const {
+    switch (type_) {
+        case Type::kIdentExpr: {
+            auto index_1st = knowledge_base->NameToIndex(QueryEntityType::kVar,
+                                                         first_ident_);
+            if (index_1st == 0) return ResultTable(false);
+            auto result =
+                    knowledge_base->GetPattern(index_1st, second_expr_, true);
+            return {assign_, std::move(result)};
+        }
+        case Type::kIdentWild: {
+            auto index_1st = knowledge_base->NameToIndex(QueryEntityType::kVar,
+                                                         first_ident_);
+            if (index_1st == 0) return ResultTable(false);
+            auto result = knowledge_base->GetPattern(index_1st);
+            return {assign_, std::move(result)};
+        }
+        case Type::kSynExpr: {
+            auto [col_1, col_2] =
+                    knowledge_base->GetPatternPair(second_expr_, true);
+            return {assign_, std::move(col_1), first_syn_, std::move(col_2)};
+        }
+        case Type::kSynWild: {
+            auto [col_1, col_2] = knowledge_base->GetPatternPair();
+            return {assign_, std::move(col_1), first_syn_, std::move(col_2)};
+        }
+        case Type::kWildExpr: {
+            auto result = knowledge_base->GetPattern(second_expr_, true);
+            return {assign_, std::move(result)};
+        }
+        case Type::kWildWild: {
+            auto result =
+                    knowledge_base->GetAllEntityIndices(StmtType::kAssign);
+            return {assign_, {result.begin(), result.end()}};
+        }
+    }
 }
-PatternIdentWild::PatternIdentWild(Synonym *const assign, std::string first)
-        : assign_(assign), first_(std::move(first)) {}
-ResultTable PatternIdentWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->GetPattern(first_);
-    return {assign_, std::move(result)};
-}
+PatternExactClause::PatternExactClause(Synonym *assign, std::string first,
+                                       std::vector<QueryToken> &&second)
+        : type_(Type::kIdentExpr),
+          assign_(assign),
+          first_ident_(std::move(first)),
+          second_expr_(std::move(second)) {}
+PatternExactClause::PatternExactClause(Synonym *assign, Synonym *first,
+                                       std::vector<QueryToken> &&second)
+        : type_(Type::kSynExpr),
+          assign_(assign),
+          first_syn_(first),
+          second_expr_(std::move(second)) {}
+PatternExactClause::PatternExactClause(Synonym *assign,
+                                       std::vector<QueryToken> &&second)
+        : type_(Type::kWildExpr),
+          assign_(assign),
+          second_expr_(std::move(second)) {}
 
-PatternSynExpr::PatternSynExpr(Synonym *const assign, Synonym *first,
-                               std::vector<QueryToken> &&second, bool partial)
-        : assign_(assign),
-          first_(first),
-          second_(std::move(second)),
-          partial_(partial) {}
-ResultTable PatternSynExpr::Execute(KnowledgeBase *knowledge_base) const {
-    auto [col_1, col_2] = knowledge_base->GetPatternPair(second_, partial_);
-    return {assign_, std::move(col_1), first_, std::move(col_2)};
-}
-PatternSynWild::PatternSynWild(Synonym *const assign, Synonym *first)
-        : assign_(assign), first_(first) {}
-ResultTable PatternSynWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto [col_1, col_2] = knowledge_base->GetPatternPair();
-    return {assign_, std::move(col_1), first_, std::move(col_2)};
-}
-PatternWildExpr::PatternWildExpr(Synonym *const assign,
-                                 std::vector<QueryToken> &&second, bool partial)
-        : assign_(assign), second_(std::move(second)), partial_(partial) {}
-ResultTable PatternWildExpr::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->GetPattern(second_, partial_);
-    return {assign_, std::move(result)};
-}
-PatternWildWild::PatternWildWild(Synonym *const assign) : assign_(assign){};
-ResultTable PatternWildWild::Execute(KnowledgeBase *knowledge_base) const {
-    auto result = knowledge_base->GetAllEntityIndices(StmtType::kAssign);
-    return {assign_, {result.begin(), result.end()}};
+ResultTable PatternExactClause::Execute(KnowledgeBase *knowledge_base) const {
+    switch (type_) {
+        case Type::kIdentExpr: {
+            auto index_1st = knowledge_base->NameToIndex(QueryEntityType::kVar,
+                                                         first_ident_);
+            if (index_1st == 0) return ResultTable(false);
+            auto result =
+                    knowledge_base->GetPattern(index_1st, second_expr_, false);
+            return {assign_, std::move(result)};
+        }
+        case Type::kSynExpr: {
+            auto [col_1, col_2] =
+                    knowledge_base->GetPatternPair(second_expr_, false);
+            return {assign_, std::move(col_1), first_syn_, std::move(col_2)};
+        }
+        case Type::kWildExpr: {
+            auto result = knowledge_base->GetPattern(second_expr_, false);
+            return {assign_, std::move(result)};
+        }
+    }
 }
 }  // namespace spa
