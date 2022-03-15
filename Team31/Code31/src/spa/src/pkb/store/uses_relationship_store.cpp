@@ -181,8 +181,6 @@ void UsesRelationshipStore::AddAncestorsOnly(
         const StmtlstParentStore& stmtlst_parent, const ContainerForest& forest,
         BitVec2D& if_added, BitVec2D& while_added) {
     auto& [basic_stmts, basic_vars] = basic_pairs;
-    auto& [while_stmts, while_vars] = while_var_pairs_;
-    auto& [if_stmts, if_vars] = if_var_pairs_;
     for (int i = 0; i < basic_stmts.size(); ++i) {
         auto s = basic_stmts[i], v = basic_vars[i];
         int stmtlst = stmtlst_stmt.GetStmtlst(s);
