@@ -111,7 +111,6 @@ std::set<int> ProgramKnowledgeBase::GetFollows(bool transitive,
                                                Index<ArgPos::kFirst> first_stmt,
                                                StmtType return_type) {
     assert(compiled);
-    assert(first_stmt.value > 0);
     return follows_parent_rel_.GetFollows(transitive, first_stmt, return_type);
 }
 
@@ -119,7 +118,6 @@ std::set<int> ProgramKnowledgeBase::GetFollows(
         bool transitive, Index<ArgPos::kSecond> second_stmt,
         StmtType return_type) {
     assert(compiled);
-    assert(second_stmt.value > 0);
     return follows_parent_rel_.GetFollows(transitive, second_stmt, return_type);
 }
 
@@ -159,14 +157,12 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
                                               Index<ArgPos::kFirst> parent_stmt,
                                               StmtType return_type) {
     assert(compiled);
-    assert(parent_stmt.value > 0);
     return follows_parent_rel_.GetParent(transitive, parent_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
                                               Index<ArgPos::kSecond> child_stmt,
                                               StmtType return_type) {
     assert(compiled);
-    assert(child_stmt.value > 0);
     return follows_parent_rel_.GetParent(transitive, child_stmt, return_type);
 }
 
