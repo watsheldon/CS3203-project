@@ -12,7 +12,7 @@
 namespace spa {
 UsesRelationshipStore::UsesRelationshipStore(std::size_t stmt_size,
                                              std::size_t var_size)
-        : UsesModifies(stmt_size, var_size) {}
+        : UsesModifiesStoreBase(stmt_size, var_size) {}
 
 void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
     stmt_var_.Set(stmt_no, std::forward<std::vector<int>>(var_indices));
@@ -26,19 +26,18 @@ void UsesRelationshipStore::Compile(
         const TypeStatementsStore& type_statement_store,
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt) {
-    UsesModifies::AggregateVars();
-    UsesModifies::CompileBasic(
+    UsesModifiesStoreBase::FillVars();
+    UsesModifiesStoreBase::AddDirectRel(
             assign_var_pairs_,
             type_statement_store.GetStatements(StmtType::kAssign));
-    UsesModifies::CompileBasic(
+    UsesModifiesStoreBase::AddDirectRel(
             print_var_pairs_,
             type_statement_store.GetStatements(StmtType::kPrint));
-    CompileContainers(forest, stmtlst_parent, stmtlst_stmt,
-                      type_statement_store);
+    AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
 }
 
 // Add indirect Uses for container statements.
-void UsesRelationshipStore::CompileContainers(
+void UsesRelationshipStore::AddContainerRel(
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt,
         const TypeStatementsStore& type_statement_store) {
@@ -104,13 +103,13 @@ void UsesRelationshipStore::CompileContainers(
         }
         while_stmts.resize(while_vars.size(), i);
     }
-    UsesModifies::AddAncestorsOnly(assign_var_pairs_, stmtlst_stmt,
-                                   stmtlst_parent, forest, if_added,
-                                   while_added);
-    UsesModifies::AddAncestorsOnly(print_var_pairs_, stmtlst_stmt,
-                                   stmtlst_parent, forest, if_added,
-                                   while_added);
-    UsesModifies::AggregateStmts();
-    UsesModifies::UpdateStmtVar();
+    UsesModifiesStoreBase::AddIndirectRel(assign_var_pairs_, stmtlst_stmt,
+                                          stmtlst_parent, forest, if_added,
+                                          while_added);
+    UsesModifiesStoreBase::AddIndirectRel(print_var_pairs_, stmtlst_stmt,
+                                          stmtlst_parent, forest, if_added,
+                                          while_added);
+    UsesModifiesStoreBase::FillStmts();
+    UsesModifiesStoreBase::FillRels();
 }
 }  // namespace spa

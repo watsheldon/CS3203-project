@@ -11,10 +11,10 @@
 #include "stmtlst_parent_store.h"
 #include "stmtlst_statements_store.h"
 #include "type_statements_store.h"
-#include "uses_modifies.h"
+#include "uses_modifies_store_base.h"
 
 namespace spa {
-class UsesRelationshipStore : public UsesModifies {
+class UsesRelationshipStore : public UsesModifiesStoreBase {
   public:
     UsesRelationshipStore(std::size_t stmt_size, std::size_t var_size);
     void Set(int stmt_no, std::vector<int> &&var_indices);
@@ -25,7 +25,7 @@ class UsesRelationshipStore : public UsesModifies {
                  const StmtlstStatementsStore &stmtlst_stmt) override;
 
   private:
-    void CompileContainers(
+    void AddContainerRel(
             const ContainerForest &forest,
             const StmtlstParentStore &stmtlst_parent,
             const StmtlstStatementsStore &stmtlst_stmt,

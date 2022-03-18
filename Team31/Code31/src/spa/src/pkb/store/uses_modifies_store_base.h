@@ -1,5 +1,5 @@
-#ifndef SRC_SPA_SRC_PKB_STORE_USES_MODIFIES_H_
-#define SRC_SPA_SRC_PKB_STORE_USES_MODIFIES_H_
+#ifndef SRC_SPA_SRC_PKB_STORE_USES_MODIFIES_STORE_BASE_H_
+#define SRC_SPA_SRC_PKB_STORE_USES_MODIFIES_STORE_BASE_H_
 
 #include <cstddef>
 #include <set>
@@ -14,7 +14,7 @@
 #include "type_statements_store.h"
 
 namespace spa {
-class UsesModifies {
+class UsesModifiesStoreBase {
   public:
     [[nodiscard]] const std::vector<int> &GetStmtNo(int var_index) const;
     [[nodiscard]] const std::set<int> &GetAllVar(int stmt_no) const;
@@ -23,24 +23,24 @@ class UsesModifies {
     [[nodiscard]] std::set<int> GetStmt(StmtType stmt_type) const;
 
   protected:
-    UsesModifies(std::size_t stmt_size, std::size_t var_size);
-    void CompileBasic(PairVec<int> &stmt_var_pair,
+    UsesModifiesStoreBase(std::size_t stmt_size, std::size_t var_size);
+    void AddDirectRel(PairVec<int> &stmt_var_pair,
                       const std::vector<int> &stmt_no) const;
-    void AddAncestorsOnly(const PairVec<int> &basic_pairs,
-                          const StmtlstStatementsStore &stmtlst_stmt,
-                          const StmtlstParentStore &stmtlst_parent,
-                          const ContainerForest &forest, BitVec2D &if_added,
-                          BitVec2D &while_added);
-    [[nodiscard]] PairVec<int> Combine() const;
-    void AggregateStmts();
-    void AggregateVars();
-    void UpdateStmtVar();
+    void AddIndirectRel(const PairVec<int> &basic_pairs,
+                        const StmtlstStatementsStore &stmtlst_stmt,
+                        const StmtlstParentStore &stmtlst_parent,
+                        const ContainerForest &forest, BitVec2D &if_added,
+                        BitVec2D &while_added);
+    [[nodiscard]] PairVec<int> GetAllRel() const;
+    void FillStmts();
+    void FillVars();
+    void FillRels();
 
     virtual void Compile(const TypeStatementsStore &type_statement_store,
                          const ContainerForest &forest,
                          const StmtlstParentStore &stmtlst_parent,
                          const StmtlstStatementsStore &stmtlst_stmt) = 0;
-    virtual void CompileContainers(
+    virtual void AddContainerRel(
             const ContainerForest &forest,
             const StmtlstParentStore &stmtlst_parent,
             const StmtlstStatementsStore &stmtlst_stmt,
@@ -67,4 +67,4 @@ class UsesModifies {
 };
 }  // namespace spa
 
-#endif  // SRC_SPA_SRC_PKB_STORE_USES_MODIFIES_H_
+#endif  // SRC_SPA_SRC_PKB_STORE_USES_MODIFIES_STORE_BASE_H_

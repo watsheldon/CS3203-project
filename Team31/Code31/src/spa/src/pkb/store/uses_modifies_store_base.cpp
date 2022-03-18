@@ -1,30 +1,31 @@
-#include "uses_modifies.h"
+#include "uses_modifies_store_base.h"
 
 #include <cassert>
 
 namespace spa {
-UsesModifies::UsesModifies(std::size_t stmt_size, std::size_t var_size)
+UsesModifiesStoreBase::UsesModifiesStoreBase(std::size_t stmt_size,
+                                             std::size_t var_size)
         : num_stmts(stmt_size),
           num_vars(var_size),
           stmt_var_(num_stmts, num_vars),
           complete_stmt_var_(num_stmts, num_vars) {}
 
-const std::vector<int>& UsesModifies::GetStmtNo(int var_index) const {
+const std::vector<int>& UsesModifiesStoreBase::GetStmtNo(int var_index) const {
     return stmt_var_.GetKeys(var_index);
 }
 
-const std::set<int>& UsesModifies::GetAllVar(int stmt_no) const {
+const std::set<int>& UsesModifiesStoreBase::GetAllVar(int stmt_no) const {
     return stmt_no == 0 ? all_vars_ : complete_stmt_var_.GetVals(stmt_no);
 }
 
-const std::set<int>& UsesModifies::GetAllStmt(int var_index) const {
+const std::set<int>& UsesModifiesStoreBase::GetAllStmt(int var_index) const {
     return complete_stmt_var_.GetKeys(var_index);
 }
 
-PairVec<int> UsesModifies::GetStmtVar(StmtType stmt_type) const {
+PairVec<int> UsesModifiesStoreBase::GetStmtVar(StmtType stmt_type) const {
     switch (stmt_type) {
         case StmtType::kAll:
-            return Combine();
+            return GetAllRel();
         case StmtType::kRead:
             return read_var_pairs_;
         case StmtType::kPrint:
@@ -42,7 +43,7 @@ PairVec<int> UsesModifies::GetStmtVar(StmtType stmt_type) const {
     }
 }
 
-PairVec<int> UsesModifies::Combine() const {
+PairVec<int> UsesModifiesStoreBase::GetAllRel() const {
     auto [stmts, vars] = PairVec<int>();
     auto total_size =
             if_var_pairs_.first.size() + while_var_pairs_.first.size() +
@@ -79,7 +80,7 @@ PairVec<int> UsesModifies::Combine() const {
     return {stmts, vars};
 }
 
-std::set<int> UsesModifies::GetStmt(StmtType stmt_type) const {
+std::set<int> UsesModifiesStoreBase::GetStmt(StmtType stmt_type) const {
     switch (stmt_type) {
         case StmtType::kAll:
             return all_stmts_;
@@ -98,8 +99,8 @@ std::set<int> UsesModifies::GetStmt(StmtType stmt_type) const {
     }
 }
 
-void UsesModifies::CompileBasic(PairVec<int>& stmt_var_pair,
-                                const std::vector<int>& stmt_no) const {
+void UsesModifiesStoreBase::AddDirectRel(
+        PairVec<int>& stmt_var_pair, const std::vector<int>& stmt_no) const {
     auto& [stmts, vars] = stmt_var_pair;
     for (auto a : stmt_no) {
         auto& var_indices = stmt_var_.GetVals(a);
@@ -108,11 +109,11 @@ void UsesModifies::CompileBasic(PairVec<int>& stmt_var_pair,
     }
 }
 
-void UsesModifies::AddAncestorsOnly(const PairVec<int>& basic_pairs,
-                                    const StmtlstStatementsStore& stmtlst_stmt,
-                                    const StmtlstParentStore& stmtlst_parent,
-                                    const ContainerForest& forest,
-                                    BitVec2D& if_added, BitVec2D& while_added) {
+void UsesModifiesStoreBase::AddIndirectRel(
+        const PairVec<int>& basic_pairs,
+        const StmtlstStatementsStore& stmtlst_stmt,
+        const StmtlstParentStore& stmtlst_parent, const ContainerForest& forest,
+        BitVec2D& if_added, BitVec2D& while_added) {
     auto& [basic_stmts, basic_vars] = basic_pairs;
     for (int i = 0; i < basic_stmts.size(); ++i) {
         auto s = basic_stmts[i], v = basic_vars[i];
@@ -134,7 +135,7 @@ void UsesModifies::AddAncestorsOnly(const PairVec<int>& basic_pairs,
     }
 }
 
-void UsesModifies::AggregateStmts() {
+void UsesModifiesStoreBase::FillStmts() {
     read_stmts_.insert(read_var_pairs_.first.begin(),
                        read_var_pairs_.first.end());
     all_stmts_.insert(read_stmts_.begin(), read_stmts_.end());
@@ -154,14 +155,14 @@ void UsesModifies::AggregateStmts() {
     all_stmts_.insert(while_stmts_.begin(), while_stmts_.end());
 }
 
-void UsesModifies::AggregateVars() {
+void UsesModifiesStoreBase::FillVars() {
     for (int i = 1; i <= num_stmts; ++i) {
         auto vars = stmt_var_.GetVals(i);
         all_vars_.insert(vars.begin(), vars.end());
     }
 }
 
-void UsesModifies::UpdateStmtVar() {
+void UsesModifiesStoreBase::FillRels() {
     for (int i = 1; i < num_stmts + 1; ++i) {
         complete_stmt_var_.Set(i, stmt_var_.GetVals(i));
     }
