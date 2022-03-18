@@ -194,14 +194,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void AppendVarIndicesUses(Pair<std::vector<int>::const_iterator> bound,
                               std::set<int> &result);
 
-    std::set<int> GetAllParents(StmtType return_type);
-    std::set<int> GetAllChildren(StmtType return_type);
-    void GetNonTransitiveParentFirst(StmtType parent_type, int parent,
-                                     std::vector<int> &results) const;
-    void GetTransitiveParentFirst(StmtType parent_type, int parent,
-                                  std::vector<int> &results);
-    void GetTransitiveParentPairs(PairVec<int> &results);
-    void GetNonTransitiveParentPairs(PairVec<int> &results);
     int IdentToIndexValue(std::string_view name, QueryEntityType et);
     template <QueryEntityType et>
     Index<et> IdentToIndex(std::string_view name) {
