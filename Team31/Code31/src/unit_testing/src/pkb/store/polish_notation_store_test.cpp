@@ -39,7 +39,11 @@ TEST_CASE("pkb/store/PolishNotation") {
             PolishNotationNode(ExprNodeType::kVariable, 233)});
     notations.emplace_back(pn4);
 
-    PolishNotationStore pns(10, std::move(notations));
+    NameValueStore nvs({std::string(), "f", "g", "h"},
+                       {std::string(), "a", "b", "c"},
+                       {std::string(), "1", "2", "3"});
+
+    PolishNotationStore pns(10, std::move(notations), nvs);
     pns.Set(1, 1);
     pns.Set(2, 3);
     pns.Set(10, 2);

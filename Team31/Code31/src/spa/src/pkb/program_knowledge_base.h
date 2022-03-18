@@ -234,8 +234,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     StmtlstStatementsStore stmtlst_stmt_;
     ModifiesRelationshipStore modifies_rel_;
     UsesRelationshipStore uses_rel_;
-    PolishNotationStore polish_notation_;
     NameValueStore name_value_;
+    PolishNotationStore polish_notation_;
     TypeStatementsStore type_stmt_;
 
     std::unique_ptr<ContainerForest> container_forest_;

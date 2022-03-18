@@ -25,9 +25,9 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
           uses_rel_(stmt_count_, init.variables.size() - 1),
           call_proc_(stmt_count_, init.procedures.size() - 1,
                      std::move(init.proc_call_graph)),
-          polish_notation_(stmt_count_, std::move(init.notations)),
           name_value_(std::move(init.procedures), std::move(init.variables),
                       std::move(init.constants)),
+          polish_notation_(stmt_count_, std::move(init.notations), name_value_),
           type_stmt_(std::move(init.reads), std::move(init.prints),
                      std::move(init.calls), std::move(init.whiles),
                      std::move(init.ifs), std::move(init.assigns)),
@@ -413,47 +413,27 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
 }
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens) {
     assert(compiled);
-    auto converted_token = ConvertFromQueryTokens(tokens);
-    if (converted_token.second) {
+    auto converted_token = polish_notation_.ConvertFromQueryTokens(tokens);
+    if (!converted_token) {
         return {};
     }
 
-    std::vector<int> assign_stmt;
-    assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-    PN converted_pn = converted_token.first;
-
-    std::set<int> full_match_stmt;
-    for (auto &i : assign_stmt) {
-        const PN &pn = polish_notation_.GetNotation(
-                polish_notation_.GetPolishIndex(i));
-        if (pn == converted_pn) {
-            full_match_stmt.emplace(i);
-        }
-    }
-
-    return full_match_stmt;
+    PN *converted_pn = converted_token.get();
+    return polish_notation_.CheckPattern(
+            *converted_pn, false, type_stmt_.GetStatements(StmtType::kAssign));
 }
+
 std::set<int> ProgramKnowledgeBase::GetPatternP(
         std::vector<QueryToken> tokens) {
     assert(compiled);
-    auto converted_token = ConvertFromQueryTokens(tokens);
-    if (converted_token.second) {
+    auto converted_token = polish_notation_.ConvertFromQueryTokens(tokens);
+    if (!converted_token) {
         return {};
     }
 
-    std::vector<int> assign_stmt;
-    assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
-    PN converted_pn = converted_token.first;
-
-    std::set<int> partial_match_stmt;
-    for (int i : assign_stmt) {
-        const PN &pn = polish_notation_.GetNotation(
-                polish_notation_.GetPolishIndex(i));
-        if (pn.Contains(converted_pn)) {
-            partial_match_stmt.emplace(i);
-        }
-    }
-    return partial_match_stmt;
+    PN *converted_pn = converted_token.get();
+    return polish_notation_.CheckPattern(
+            *converted_pn, true, type_stmt_.GetStatements(StmtType::kAssign));
 }
 
 // (" ", _)
@@ -797,76 +777,4 @@ int ProgramKnowledgeBase::IdentToIndexValue(std::string_view name,
                    : name_value_.GetIndex(name.data(), QueryEntityType::kProc);
 }
 
-std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
-        const std::vector<QueryToken> &tokens) {
-    std::vector<PolishNotationNode> expr;
-    bool contains_unseen = false;
-    for (const auto &token : tokens) {
-        switch (token.type) {
-            case QueryTokenType::kWord: {
-                int var_index = name_value_.GetIndex(token.value,
-                                                     QueryEntityType::kVar);
-                if (var_index == 0) {
-                    contains_unseen = true;
-                    break;
-                }
-                PolishNotationNode node(ExprNodeType::kVariable, var_index);
-                expr.emplace_back(node);
-                break;
-            }
-            case QueryTokenType::kInteger: {
-                int const_index = name_value_.GetIndex(token.value,
-                                                       QueryEntityType::kConst);
-                if (const_index == 0) {
-                    contains_unseen = true;
-                    break;
-                }
-                PolishNotationNode node(ExprNodeType::kConstant, const_index);
-                expr.emplace_back(node);
-                break;
-            }
-            case QueryTokenType::kOperatorPlus: {
-                PolishNotationNode node(OperatorType::kPlus);
-                expr.emplace_back(node);
-                break;
-            }
-            case QueryTokenType::kOperatorMinus: {
-                PolishNotationNode node(OperatorType::kMinus);
-                expr.emplace_back(node);
-                break;
-            }
-            case QueryTokenType::kOperatorTimes: {
-                PolishNotationNode node(OperatorType::kTimes);
-                expr.emplace_back(node);
-                break;
-            }
-            case QueryTokenType::kOperatorDivide: {
-                PolishNotationNode node(OperatorType::kDivide);
-                expr.emplace_back(node);
-                break;
-            }
-            case QueryTokenType::kOperatorModulo: {
-                PolishNotationNode node(OperatorType::kModulo);
-                expr.emplace_back(node);
-                break;
-            }
-            case QueryTokenType::kBracketL: {
-                PolishNotationNode node(ExprNodeType::kBracketL);
-                expr.emplace_back(node);
-                break;
-            }
-            case QueryTokenType::kBracketR: {
-                PolishNotationNode node(ExprNodeType::kBracketR);
-                expr.emplace_back(node);
-                break;
-            }
-            default:
-                assert(false);
-        }
-        if (contains_unseen) {
-            break;
-        }
-    }
-    return {PolishNotation(expr), contains_unseen};
-}
 }  // namespace spa
