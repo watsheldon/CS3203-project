@@ -295,19 +295,25 @@ class KnowledgeBase {
      */
     virtual bool ExistCalls(Index<ArgPos::kFirst> first_proc,
                             Index<ArgPos::kSecond> second_proc) = 0;
+    virtual bool ExistCalls(std::string_view first_proc_name,
+                            std::string_view second_proc_name) = 0;
     /**
      * Check if Calls* (first_proc, second_proc) exist
      */
     virtual bool ExistCallsT(Index<ArgPos::kFirst> first_proc,
                              Index<ArgPos::kSecond> second_proc) = 0;
+    virtual bool ExistCallsT(std::string_view first_proc_name,
+                             std::string_view second_proc_name) = 0;
     /**
      * Check if Calls or Calls* (first_proc, _) exist
      */
     virtual bool ExistCalls(Index<ArgPos::kFirst> first_proc) = 0;
+    virtual bool ExistCallsFirst(std::string_view first_proc_name) = 0;
     /**
      * Check if Calls or Calls* (_, second_proc) exist
      */
     virtual bool ExistCalls(Index<ArgPos::kSecond> second_proc) = 0;
+    virtual bool ExistCallsSecond(std::string_view second_proc_name) = 0;
     /**
      * Check if Calls or Calls* (_, _) exist
      */
@@ -323,11 +329,16 @@ class KnowledgeBase {
      */
     virtual std::set<int> GetCalls(Index<ArgPos::kFirst> first_proc) = 0;
     virtual std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) = 0;
+    virtual std::set<int> GetCallsFirst(std::string_view first_proc_name) = 0;
+    virtual std::set<int> GetCallsFirstT(std::string_view first_proc_name) = 0;
     /**
      * Gets a list of procedures that call the given procedure
      */
     virtual std::set<int> GetCalls(Index<ArgPos::kSecond> second_proc) = 0;
     virtual std::set<int> GetCallsT(Index<ArgPos::kSecond> second_proc) = 0;
+    virtual std::set<int> GetCallsSecond(std::string_view second_proc_name) = 0;
+    virtual std::set<int> GetCallsSecondT(
+            std::string_view second_proc_name) = 0;
     /**
      * Gets a list of procedure pairs that exist in Calls/Calls*
      */

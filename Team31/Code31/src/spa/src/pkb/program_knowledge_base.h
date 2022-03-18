@@ -129,16 +129,26 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     bool ExistCalls(Index<ArgPos::kFirst> first_proc,
                     Index<ArgPos::kSecond> second_proc) override;
+    bool ExistCalls(std::string_view first_proc_name,
+                    std::string_view second_proc_name) override;
     bool ExistCallsT(Index<ArgPos::kFirst> first_proc,
                      Index<ArgPos::kSecond> second_proc) override;
+    bool ExistCallsT(std::string_view first_proc_name,
+                     std::string_view second_proc_name) override;
     bool ExistCalls(Index<ArgPos::kFirst> first_proc) override;
+    bool ExistCallsFirst(std::string_view first_proc_name) override;
     bool ExistCalls(Index<ArgPos::kSecond> second_proc) override;
+    bool ExistCallsSecond(std::string_view second_proc_name) override;
     bool ExistCalls() override;
     std::set<int> GetCalls(ArgPos return_pos) override;
     std::set<int> GetCalls(Index<ArgPos::kFirst> first_proc) override;
     std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) override;
+    std::set<int> GetCallsFirst(std::string_view first_proc_name) override;
+    std::set<int> GetCallsFirstT(std::string_view first_proc_name) override;
     std::set<int> GetCalls(Index<ArgPos::kSecond> second_proc) override;
     std::set<int> GetCallsT(Index<ArgPos::kSecond> second_proc) override;
+    std::set<int> GetCallsSecond(std::string_view second_proc_name) override;
+    std::set<int> GetCallsSecondT(std::string_view second_proc_name) override;
     PairVec<int> GetCallsPairs() override;
     PairVec<int> GetCallsTPairs() override;
 
