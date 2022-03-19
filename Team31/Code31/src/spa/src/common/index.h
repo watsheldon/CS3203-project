@@ -17,6 +17,7 @@ struct IndexBase {
 template <auto EnumVal>
 struct Index : IndexBase<decltype(EnumVal), EnumVal> {
     using IndexBase<decltype(EnumVal), EnumVal>::IndexBase;
+    operator int() { return IndexBase<decltype(EnumVal), EnumVal>::value; }
 };
 }  // namespace spa
 

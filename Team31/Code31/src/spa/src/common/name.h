@@ -16,6 +16,9 @@ struct NameBase {
 template <auto EnumVal>
 struct Name : NameBase<decltype(EnumVal), EnumVal> {
     using NameBase<decltype(EnumVal), EnumVal>::NameBase;
+    operator std::string_view() {
+        return NameBase<decltype(EnumVal), EnumVal>::value;
+    }
 };
 }  // namespace spa
 
