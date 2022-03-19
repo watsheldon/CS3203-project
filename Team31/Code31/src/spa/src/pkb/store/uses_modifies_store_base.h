@@ -17,6 +17,7 @@
 namespace spa {
 class UsesModifiesStoreBase {
   public:
+    UsesModifiesStoreBase(std::size_t stmt_size, std::size_t var_size);
     [[nodiscard]] const std::vector<int> &GetStmtNo(int var_index) const;
     [[nodiscard]] const std::set<int> &GetAllVar(int stmt_no) const;
     [[nodiscard]] const std::set<int> &GetAllStmt(int var_index) const;
@@ -24,7 +25,6 @@ class UsesModifiesStoreBase {
     [[nodiscard]] std::set<int> GetStmt(StmtType stmt_type) const;
 
   protected:
-    UsesModifiesStoreBase(std::size_t stmt_size, std::size_t var_size);
     void AddDirectRel(PairVec<int> &stmt_var_pair,
                       const std::vector<int> &stmt_no) const;
     void AddIndirectRel(const PairVec<int> &basic_pairs,

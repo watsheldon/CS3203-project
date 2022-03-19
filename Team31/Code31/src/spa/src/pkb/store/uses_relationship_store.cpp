@@ -10,10 +10,6 @@
 #include "type_statements_store.h"
 
 namespace spa {
-UsesRelationshipStore::UsesRelationshipStore(std::size_t stmt_size,
-                                             std::size_t var_size)
-        : UsesModifiesStoreBase::UsesModifiesStoreBase(stmt_size, var_size) {}
-
 void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
     stmt_var_.Set(stmt_no, std::forward<std::vector<int>>(var_indices));
 }

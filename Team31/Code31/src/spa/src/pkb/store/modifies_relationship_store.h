@@ -16,7 +16,7 @@
 namespace spa {
 class ModifiesRelationshipStore : public UsesModifiesStoreBase {
   public:
-    ModifiesRelationshipStore(std::size_t stmt_size, std::size_t var_size);
+    using UsesModifiesStoreBase::UsesModifiesStoreBase;
     void Set(int stmt_no, int var_index);
     [[nodiscard]] int GetVarIndex(int stmt_no) const;
     void Compile(const TypeStatementsStore &type_statement_store,
