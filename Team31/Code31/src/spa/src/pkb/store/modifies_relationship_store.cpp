@@ -12,7 +12,7 @@
 namespace spa {
 ModifiesRelationshipStore::ModifiesRelationshipStore(size_t stmt_size,
                                                      size_t var_size)
-        : UsesModifiesStoreBase(stmt_size, var_size) {}
+        : UsesModifiesStoreBase::UsesModifiesStoreBase(stmt_size, var_size) {}
 
 void ModifiesRelationshipStore::Set(int stmt_no, int var_index) {
     stmt_var_.Set(stmt_no, std::vector<int>{var_index});
@@ -27,17 +27,15 @@ void ModifiesRelationshipStore::Compile(
         const TypeStatementsStore& type_statement_store,
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt) {
-    UsesModifiesStoreBase::FillVars();
+    FillVars();
 
     auto& assign_var_pairs_ = stmt_var_pairs_.at(5);
-    UsesModifiesStoreBase::AddDirectRel(
-            assign_var_pairs_,
-            type_statement_store.GetStatements(StmtType::kAssign));
+    AddDirectRel(assign_var_pairs_,
+                 type_statement_store.GetStatements(StmtType::kAssign));
 
     auto& read_var_pairs_ = stmt_var_pairs_.at(0);
-    UsesModifiesStoreBase::AddDirectRel(
-            read_var_pairs_,
-            type_statement_store.GetStatements(StmtType::kRead));
+    AddDirectRel(read_var_pairs_,
+                 type_statement_store.GetStatements(StmtType::kRead));
 
     AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
 }
@@ -51,22 +49,18 @@ void ModifiesRelationshipStore::AddContainerRel(
     BitVec2D while_added(num_stmts + 1, num_vars + 1);
 
     auto& assign_var_pairs_ = stmt_var_pairs_.at(5);
-    UsesModifiesStoreBase::AddIndirectRel(assign_var_pairs_, stmtlst_stmt,
-                                          stmtlst_parent, forest, if_added,
-                                          while_added);
+    AddIndirectRel(assign_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
+                   if_added, while_added);
     auto& read_var_pairs_ = stmt_var_pairs_.at(0);
-    UsesModifiesStoreBase::AddIndirectRel(read_var_pairs_, stmtlst_stmt,
-                                          stmtlst_parent, forest, if_added,
-                                          while_added);
+    AddIndirectRel(read_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
+                   if_added, while_added);
     auto& if_var_pairs_ = stmt_var_pairs_.at(4);
-    UsesModifiesStoreBase::AddIndirectRel(if_var_pairs_, stmtlst_stmt,
-                                          stmtlst_parent, forest, if_added,
-                                          while_added);
+    AddIndirectRel(if_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
+                   if_added, while_added);
     auto& while_var_pairs_ = stmt_var_pairs_.at(3);
-    UsesModifiesStoreBase::AddIndirectRel(while_var_pairs_, stmtlst_stmt,
-                                          stmtlst_parent, forest, if_added,
-                                          while_added);
-    UsesModifiesStoreBase::FillStmts();
-    UsesModifiesStoreBase::FillRels();
+    AddIndirectRel(while_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
+                   if_added, while_added);
+    FillStmts();
+    FillRels();
 }
 }  // namespace spa

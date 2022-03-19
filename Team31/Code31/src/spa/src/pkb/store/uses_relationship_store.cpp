@@ -12,7 +12,7 @@
 namespace spa {
 UsesRelationshipStore::UsesRelationshipStore(std::size_t stmt_size,
                                              std::size_t var_size)
-        : UsesModifiesStoreBase(stmt_size, var_size) {}
+        : UsesModifiesStoreBase::UsesModifiesStoreBase(stmt_size, var_size) {}
 
 void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
     stmt_var_.Set(stmt_no, std::forward<std::vector<int>>(var_indices));
@@ -26,17 +26,15 @@ void UsesRelationshipStore::Compile(
         const TypeStatementsStore& type_statement_store,
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt) {
-    UsesModifiesStoreBase::FillVars();
+    FillVars();
 
     auto& assign_var_pairs_ = stmt_var_pairs_.at(5);
-    UsesModifiesStoreBase::AddDirectRel(
-            assign_var_pairs_,
-            type_statement_store.GetStatements(StmtType::kAssign));
+    AddDirectRel(assign_var_pairs_,
+                 type_statement_store.GetStatements(StmtType::kAssign));
 
     auto& print_var_pairs_ = stmt_var_pairs_.at(1);
-    UsesModifiesStoreBase::AddDirectRel(
-            print_var_pairs_,
-            type_statement_store.GetStatements(StmtType::kPrint));
+    AddDirectRel(print_var_pairs_,
+                 type_statement_store.GetStatements(StmtType::kPrint));
 
     AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
 }
@@ -111,14 +109,12 @@ void UsesRelationshipStore::AddContainerRel(
         while_stmts.resize(while_vars.size(), i);
     }
     auto& assign_var_pairs_ = stmt_var_pairs_.at(5);
-    UsesModifiesStoreBase::AddIndirectRel(assign_var_pairs_, stmtlst_stmt,
-                                          stmtlst_parent, forest, if_added,
-                                          while_added);
+    AddIndirectRel(assign_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
+                   if_added, while_added);
     auto& print_var_pairs_ = stmt_var_pairs_.at(1);
-    UsesModifiesStoreBase::AddIndirectRel(print_var_pairs_, stmtlst_stmt,
-                                          stmtlst_parent, forest, if_added,
-                                          while_added);
-    UsesModifiesStoreBase::FillStmts();
-    UsesModifiesStoreBase::FillRels();
+    AddIndirectRel(print_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
+                   if_added, while_added);
+    FillStmts();
+    FillRels();
 }
 }  // namespace spa
