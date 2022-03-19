@@ -1028,8 +1028,8 @@ bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kFirst> first_proc) {
     assert(compiled);
     return !call_proc_.GetCalleeProcs(first_proc.value).empty();
 }
-bool ProgramKnowledgeBase::ExistCallsFirst(std::string_view first_proc_name) {
-    int first_proc = NameToIndex(QueryEntityType::kProc, first_proc_name);
+bool ProgramKnowledgeBase::ExistCalls(Name<ArgPos::kFirst> first_proc_name) {
+    int first_proc = NameToIndex(QueryEntityType::kProc, first_proc_name.value);
     if (first_proc == 0) return {};
     return ExistCalls(Index<ArgPos::kFirst>(first_proc));
 }
@@ -1037,8 +1037,9 @@ bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kSecond> second_proc) {
     assert(compiled);
     return !call_proc_.GetStmts(second_proc.value).empty();
 }
-bool ProgramKnowledgeBase::ExistCallsSecond(std::string_view second_proc_name) {
-    int second_proc = NameToIndex(QueryEntityType::kProc, second_proc_name);
+bool ProgramKnowledgeBase::ExistCalls(Name<ArgPos::kSecond> second_proc_name) {
+    int second_proc =
+            NameToIndex(QueryEntityType::kProc, second_proc_name.value);
     if (second_proc == 0) return {};
     return ExistCalls(Index<ArgPos::kSecond>(second_proc));
 }
@@ -1057,9 +1058,9 @@ std::set<int> ProgramKnowledgeBase::GetCalls(Index<ArgPos::kFirst> first_proc) {
     assert(compiled);
     return call_proc_.GetCalleeProcs(first_proc.value);
 }
-std::set<int> ProgramKnowledgeBase::GetCallsFirst(
-        std::string_view first_proc_name) {
-    int first_proc = NameToIndex(QueryEntityType::kProc, first_proc_name);
+std::set<int> ProgramKnowledgeBase::GetCalls(
+        Name<ArgPos::kFirst> first_proc_name) {
+    int first_proc = NameToIndex(QueryEntityType::kProc, first_proc_name.value);
     if (first_proc == 0) return {};
     return GetCalls(Index<ArgPos::kFirst>(first_proc));
 }
@@ -1068,9 +1069,9 @@ std::set<int> ProgramKnowledgeBase::GetCallsT(
     assert(compiled);
     return call_proc_.GetCalleeProcsT(first_proc.value);
 }
-std::set<int> ProgramKnowledgeBase::GetCallsFirstT(
-        std::string_view first_proc_name) {
-    int first_proc = NameToIndex(QueryEntityType::kProc, first_proc_name);
+std::set<int> ProgramKnowledgeBase::GetCallsT(
+        Name<ArgPos::kFirst> first_proc_name) {
+    int first_proc = NameToIndex(QueryEntityType::kProc, first_proc_name.value);
     if (first_proc == 0) return {};
     return GetCallsT(Index<ArgPos::kFirst>(first_proc));
 }
@@ -1079,9 +1080,10 @@ std::set<int> ProgramKnowledgeBase::GetCalls(
     assert(compiled);
     return call_proc_.GetCallerProcs(second_proc.value);
 }
-std::set<int> ProgramKnowledgeBase::GetCallsSecond(
-        std::string_view second_proc_name) {
-    int second_proc = NameToIndex(QueryEntityType::kProc, second_proc_name);
+std::set<int> ProgramKnowledgeBase::GetCalls(
+        Name<ArgPos::kSecond> second_proc_name) {
+    int second_proc =
+            NameToIndex(QueryEntityType::kProc, second_proc_name.value);
     if (second_proc == 0) return {};
     return GetCalls(Index<ArgPos::kSecond>(second_proc));
 }
@@ -1090,9 +1092,10 @@ std::set<int> ProgramKnowledgeBase::GetCallsT(
     assert(compiled);
     return call_proc_.GetCallerProcsT(second_proc.value);
 }
-std::set<int> ProgramKnowledgeBase::GetCallsSecondT(
-        std::string_view second_proc_name) {
-    int second_proc = NameToIndex(QueryEntityType::kProc, second_proc_name);
+std::set<int> ProgramKnowledgeBase::GetCallsT(
+        Name<ArgPos::kSecond> second_proc_name) {
+    int second_proc =
+            NameToIndex(QueryEntityType::kProc, second_proc_name.value);
     if (second_proc == 0) return {};
     return GetCallsT(Index<ArgPos::kSecond>(second_proc));
 }

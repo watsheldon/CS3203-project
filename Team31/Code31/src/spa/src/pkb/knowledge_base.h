@@ -9,6 +9,7 @@
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "common/index.h"
+#include "common/name.h"
 #include "common/polish_notation.h"
 #include "pkb/store/stmtlst_parent_store.h"
 #include "qps/query_token.h"
@@ -308,12 +309,12 @@ class KnowledgeBase {
      * Check if Calls or Calls* (first_proc, _) exist
      */
     virtual bool ExistCalls(Index<ArgPos::kFirst> first_proc) = 0;
-    virtual bool ExistCallsFirst(std::string_view first_proc_name) = 0;
+    virtual bool ExistCalls(Name<ArgPos::kFirst> first_proc_name) = 0;
     /**
      * Check if Calls or Calls* (_, second_proc) exist
      */
     virtual bool ExistCalls(Index<ArgPos::kSecond> second_proc) = 0;
-    virtual bool ExistCallsSecond(std::string_view second_proc_name) = 0;
+    virtual bool ExistCalls(Name<ArgPos::kSecond> second_proc_name) = 0;
     /**
      * Check if Calls or Calls* (_, _) exist
      */
@@ -328,17 +329,16 @@ class KnowledgeBase {
      * Gets a list of procedures that is called by the given procedure
      */
     virtual std::set<int> GetCalls(Index<ArgPos::kFirst> first_proc) = 0;
+    virtual std::set<int> GetCalls(Name<ArgPos::kFirst> first_proc_name) = 0;
     virtual std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) = 0;
-    virtual std::set<int> GetCallsFirst(std::string_view first_proc_name) = 0;
-    virtual std::set<int> GetCallsFirstT(std::string_view first_proc_name) = 0;
+    virtual std::set<int> GetCallsT(Name<ArgPos::kFirst> first_proc_name) = 0;
     /**
      * Gets a list of procedures that call the given procedure
      */
     virtual std::set<int> GetCalls(Index<ArgPos::kSecond> second_proc) = 0;
+    virtual std::set<int> GetCalls(Name<ArgPos::kSecond> second_proc_name) = 0;
     virtual std::set<int> GetCallsT(Index<ArgPos::kSecond> second_proc) = 0;
-    virtual std::set<int> GetCallsSecond(std::string_view second_proc_name) = 0;
-    virtual std::set<int> GetCallsSecondT(
-            std::string_view second_proc_name) = 0;
+    virtual std::set<int> GetCallsT(Name<ArgPos::kSecond> second_proc_name) = 0;
     /**
      * Gets a list of procedure pairs that exist in Calls/Calls*
      */
