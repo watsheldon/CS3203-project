@@ -112,18 +112,14 @@ void UsesModifiesStoreBase::FillRels() {
         complete_stmt_var_.Set(i, stmt_var_.GetVals(i));
     }
 
-    auto& if_var_pairs_ =
-            stmt_var_pairs_.at(static_cast<int>(StmtType::kIf) - 1);
-    auto& [if_stmts, if_vars] = if_var_pairs_;
-    for (int i = 0; i < if_stmts.size(); ++i) {
-        complete_stmt_var_.Set(if_stmts[i], if_vars[i]);
-    }
-
-    auto& while_var_pairs_ =
-            stmt_var_pairs_.at(static_cast<int>(StmtType::kWhile) - 1);
-    auto& [while_stmts, while_vars] = while_var_pairs_;
-    for (int i = 0; i < while_stmts.size(); ++i) {
-        complete_stmt_var_.Set(while_stmts[i], while_vars[i]);
+    std::array<StmtType, 2> container_types{{StmtType::kIf, StmtType::kWhile}};
+    for (const auto& stmt_type : container_types) {
+        auto& stmt_var_pairs =
+                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
+        auto& [stmts, vars] = stmt_var_pairs;
+        for (int i = 0; i < stmts.size(); ++i) {
+            complete_stmt_var_.Set(stmts[i], vars[i]);
+        }
     }
 }
 }  // namespace spa
