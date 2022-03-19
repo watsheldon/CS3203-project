@@ -44,6 +44,7 @@ class UsesModifiesStoreBase {
     void FillStmts();
     void FillVars();
     void FillRels();
+    void CalculateNumRels();
 
     virtual void AddConditionRel(
             const ContainerForest &forest,
@@ -56,6 +57,7 @@ class UsesModifiesStoreBase {
 
     std::size_t num_stmts;
     std::size_t num_vars;
+    std::size_t num_rels;
     IndexBimap<std::vector<int>> stmt_var_;
     IndexBimap<std::set<int>> complete_stmt_var_;
     std::set<int> all_vars_;

@@ -31,13 +31,9 @@ PairVec<int> UsesModifiesStoreBase::GetStmtVar(StmtType stmt_type) const {
 
 PairVec<int> UsesModifiesStoreBase::GetAllRel() const {
     auto [stmts, vars] = PairVec<int>();
-    std::size_t total_size = 0;
-    for (auto& stmt_var_pair : stmt_var_pairs_) {
-        total_size += stmt_var_pair.first.size();
-    }
-    stmts.reserve(total_size), vars.reserve(total_size);
+    stmts.reserve(num_rels), vars.reserve(num_rels);
 
-    for (auto& stmt_var_pair : stmt_var_pairs_) {
+    for (const auto& stmt_var_pair : stmt_var_pairs_) {
         stmts.insert(stmts.end(), stmt_var_pair.first.begin(),
                      stmt_var_pair.first.end());
         vars.insert(vars.end(), stmt_var_pair.second.begin(),
@@ -55,7 +51,7 @@ void UsesModifiesStoreBase::Compile(
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt) {
     auto direct_stmt_types = InitDirectTypes();
-    for (const auto& stmt_type : direct_stmt_types) {
+    for (const auto stmt_type : direct_stmt_types) {
         auto& stmt_var_pairs =
                 stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
         AddDirectRel(stmt_var_pairs,
@@ -65,6 +61,7 @@ void UsesModifiesStoreBase::Compile(
     FillStmts();
     FillVars();
     FillRels();
+    CalculateNumRels();
 }
 
 void UsesModifiesStoreBase::AddDirectRel(
@@ -118,7 +115,7 @@ void UsesModifiesStoreBase::AddContainerRel(
                     if_added, while_added);
 
     auto indirect_stmt_types = InitIndirectTypes();
-    for (const auto& stmt_type : indirect_stmt_types) {
+    for (const auto stmt_type : indirect_stmt_types) {
         auto& stmt_var_pairs =
                 stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
         AddIndirectRel(stmt_var_pairs, stmtlst_stmt, stmtlst_parent, forest,
@@ -149,7 +146,7 @@ void UsesModifiesStoreBase::FillRels() {
     }
 
     std::array<StmtType, 2> container_types{{StmtType::kIf, StmtType::kWhile}};
-    for (const auto& stmt_type : container_types) {
+    for (const auto stmt_type : container_types) {
         auto& stmt_var_pairs =
                 stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
         auto& [stmts, vars] = stmt_var_pairs;
@@ -157,5 +154,13 @@ void UsesModifiesStoreBase::FillRels() {
             complete_stmt_var_.Set(stmts[i], vars[i]);
         }
     }
+}
+
+void UsesModifiesStoreBase::CalculateNumRels() {
+    std::size_t total_size = 0;
+    for (auto& stmt_var_pair : stmt_var_pairs_) {
+        total_size += stmt_var_pair.first.size();
+    }
+    num_rels = total_size;
 }
 }  // namespace spa
