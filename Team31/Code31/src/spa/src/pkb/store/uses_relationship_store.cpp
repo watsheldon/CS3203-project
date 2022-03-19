@@ -32,12 +32,12 @@ void UsesRelationshipStore::AddConditionRel(
     auto& all_if_stmts = type_statement_store.GetStatements(StmtType::kIf);
     auto& all_while_stmts =
             type_statement_store.GetStatements(StmtType::kWhile);
-    std::array<std::vector<int>, 2> container_stmts{
+    std::array<std::vector<int>, 2> all_container_stmts{
             {all_if_stmts, all_while_stmts}};
 
     for (int pos = 0; pos < 2; ++pos) {
-        auto& [stmts, vars] = container_var_pairs.at(pos);
-        for (auto i : container_stmts.at(pos)) {
+        auto& [container_stmts, container_vars] = container_var_pairs.at(pos);
+        for (auto i : all_container_stmts.at(pos)) {
             // Add indirect Uses of condition variables by ancestors of i.
             auto& var_indices = GetVarIndex(i);
             auto stmtlst = stmtlst_stmt.GetStmtlst(i);
@@ -62,10 +62,10 @@ void UsesRelationshipStore::AddConditionRel(
             auto& bitmap = container_bitmaps.at(pos);
             for (auto v : var_indices) {
                 if (bitmap.At(i, v)) continue;
-                vars.emplace_back(v);
+                container_vars.emplace_back(v);
                 bitmap.Set(i, v);
             }
-            stmts.resize(vars.size(), i);
+            container_stmts.resize(container_vars.size(), i);
         }
     }
 }
