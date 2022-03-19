@@ -28,15 +28,14 @@ void UsesRelationshipStore::Compile(
         const StmtlstStatementsStore& stmtlst_stmt) {
     FillVars();
 
-    auto& assign_var_pairs_ =
-            stmt_var_pairs_.at(static_cast<int>(StmtType::kAssign) - 1);
-    AddDirectRel(assign_var_pairs_,
-                 type_statement_store.GetStatements(StmtType::kAssign));
-
-    auto& print_var_pairs_ =
-            stmt_var_pairs_.at(static_cast<int>(StmtType::kPrint) - 1);
-    AddDirectRel(print_var_pairs_,
-                 type_statement_store.GetStatements(StmtType::kPrint));
+    std::array<StmtType, 2> direct_stmt_types{
+            {StmtType::kAssign, StmtType::kPrint}};
+    for (const auto& stmt_type : direct_stmt_types) {
+        auto& stmt_var_pairs =
+                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
+        AddDirectRel(stmt_var_pairs,
+                     type_statement_store.GetStatements(stmt_type));
+    }
 
     AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
 }
@@ -112,14 +111,18 @@ void UsesRelationshipStore::AddContainerRel(
         }
         while_stmts.resize(while_vars.size(), i);
     }
-    auto& assign_var_pairs_ =
-            stmt_var_pairs_.at(static_cast<int>(StmtType::kAssign) - 1);
-    AddIndirectRel(assign_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
-                   if_added, while_added);
-    auto& print_var_pairs_ =
-            stmt_var_pairs_.at(static_cast<int>(StmtType::kPrint) - 1);
-    AddIndirectRel(print_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
-                   if_added, while_added);
+
+    std::array<StmtType, 2> indirect_stmt_types{{
+            StmtType::kAssign,
+            StmtType::kPrint,
+    }};
+    for (const auto& stmt_type : indirect_stmt_types) {
+        auto& stmt_var_pairs =
+                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
+        AddIndirectRel(stmt_var_pairs, stmtlst_stmt, stmtlst_parent, forest,
+                       if_added, while_added);
+    }
+
     FillStmts();
     FillRels();
 }
