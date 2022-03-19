@@ -23,8 +23,13 @@ class UsesModifiesStoreBase {
     [[nodiscard]] const std::set<int> &GetAllStmt(int var_index) const;
     [[nodiscard]] PairVec<int> GetStmtVar(StmtType stmt_type) const;
     [[nodiscard]] std::set<int> GetStmt(StmtType stmt_type) const;
+    void Compile(const TypeStatementsStore &type_statement_store,
+                 const ContainerForest &forest,
+                 const StmtlstParentStore &stmtlst_parent,
+                 const StmtlstStatementsStore &stmtlst_stmt);
 
   protected:
+    [[nodiscard]] PairVec<int> GetAllRel() const;
     void AddDirectRel(PairVec<int> &stmt_var_pair,
                       const std::vector<int> &stmt_no) const;
     void AddIndirectRel(const PairVec<int> &basic_pairs,
@@ -32,20 +37,22 @@ class UsesModifiesStoreBase {
                         const StmtlstParentStore &stmtlst_parent,
                         const ContainerForest &forest, BitVec2D &if_added,
                         BitVec2D &while_added);
-    [[nodiscard]] PairVec<int> GetAllRel() const;
+    void AddContainerRel(const ContainerForest &forest,
+                         const StmtlstParentStore &stmtlst_parent,
+                         const StmtlstStatementsStore &stmtlst_stmt,
+                         const TypeStatementsStore &type_statement_store);
     void FillStmts();
     void FillVars();
     void FillRels();
 
-    virtual void Compile(const TypeStatementsStore &type_statement_store,
-                         const ContainerForest &forest,
-                         const StmtlstParentStore &stmtlst_parent,
-                         const StmtlstStatementsStore &stmtlst_stmt) = 0;
-    virtual void AddContainerRel(
+    virtual void AddConditionRel(
             const ContainerForest &forest,
             const StmtlstParentStore &stmtlst_parent,
             const StmtlstStatementsStore &stmtlst_stmt,
-            const TypeStatementsStore &type_statement_store) = 0;
+            const TypeStatementsStore &type_statement_store, BitVec2D &if_added,
+            BitVec2D &while_added) = 0;
+    virtual std::vector<StmtType> InitIndirectTypes() = 0;
+    virtual std::vector<StmtType> InitDirectTypes() = 0;
 
     std::size_t num_stmts;
     std::size_t num_vars;

@@ -50,6 +50,23 @@ std::set<int> UsesModifiesStoreBase::GetStmt(StmtType stmt_type) const {
     return stmts_arr_.at(static_cast<int>(stmt_type));
 }
 
+void UsesModifiesStoreBase::Compile(
+        const TypeStatementsStore& type_statement_store,
+        const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
+        const StmtlstStatementsStore& stmtlst_stmt) {
+    auto direct_stmt_types = InitDirectTypes();
+    for (const auto& stmt_type : direct_stmt_types) {
+        auto& stmt_var_pairs =
+                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
+        AddDirectRel(stmt_var_pairs,
+                     type_statement_store.GetStatements(stmt_type));
+    }
+    AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
+    FillStmts();
+    FillVars();
+    FillRels();
+}
+
 void UsesModifiesStoreBase::AddDirectRel(
         PairVec<int>& stmt_var_pair, const std::vector<int>& stmt_no) const {
     auto& [stmts, vars] = stmt_var_pair;
@@ -87,6 +104,25 @@ void UsesModifiesStoreBase::AddIndirectRel(
             stmts.emplace_back(index);
             added.Set(index, v);
         }
+    }
+}
+
+void UsesModifiesStoreBase::AddContainerRel(
+        const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
+        const StmtlstStatementsStore& stmtlst_stmt,
+        const TypeStatementsStore& type_statement_store) {
+    BitVec2D if_added(num_stmts + 1, num_vars + 1);
+    BitVec2D while_added(num_stmts + 1, num_vars + 1);
+
+    AddConditionRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store,
+                    if_added, while_added);
+
+    auto indirect_stmt_types = InitIndirectTypes();
+    for (const auto& stmt_type : indirect_stmt_types) {
+        auto& stmt_var_pairs =
+                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
+        AddIndirectRel(stmt_var_pairs, stmtlst_stmt, stmtlst_parent, forest,
+                       if_added, while_added);
     }
 }
 

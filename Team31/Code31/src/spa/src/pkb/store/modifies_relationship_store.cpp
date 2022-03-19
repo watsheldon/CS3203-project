@@ -1,6 +1,5 @@
 #include "modifies_relationship_store.h"
 
-#include <cassert>
 #include <vector>
 
 #include "common/bitvec2d.h"
@@ -19,43 +18,20 @@ int ModifiesRelationshipStore::GetVarIndex(int stmt_no) const {
     return var_indices.empty() ? 0 : var_indices[0];
 }
 
-void ModifiesRelationshipStore::Compile(
-        const TypeStatementsStore& type_statement_store,
-        const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
-        const StmtlstStatementsStore& stmtlst_stmt) {
-    FillVars();
-
-    std::array<StmtType, 2> direct_stmt_types{
-            {StmtType::kAssign, StmtType::kRead}};
-    for (const auto& stmt_type : direct_stmt_types) {
-        auto& stmt_var_pairs =
-                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
-        AddDirectRel(stmt_var_pairs,
-                     type_statement_store.GetStatements(stmt_type));
-    }
-
-    AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
-}
-
-// Add indirect Modifies for container statements.
-void ModifiesRelationshipStore::AddContainerRel(
+void ModifiesRelationshipStore::AddConditionRel(
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt,
-        const TypeStatementsStore& type_statement_store) {
-    BitVec2D if_added(num_stmts + 1, num_vars + 1);
-    BitVec2D while_added(num_stmts + 1, num_vars + 1);
+        const TypeStatementsStore& type_statement_store, BitVec2D& if_added,
+        BitVec2D& while_added) {
+    return;
+}
 
-    std::array<StmtType, 4> indirect_stmt_types{{StmtType::kAssign,
-                                                 StmtType::kRead, StmtType::kIf,
-                                                 StmtType::kWhile}};
-    for (const auto& stmt_type : indirect_stmt_types) {
-        auto& stmt_var_pairs =
-                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
-        AddIndirectRel(stmt_var_pairs, stmtlst_stmt, stmtlst_parent, forest,
-                       if_added, while_added);
-    }
+std::vector<StmtType> ModifiesRelationshipStore::InitIndirectTypes() {
+    return std::vector<StmtType>{StmtType::kAssign, StmtType::kRead,
+                                 StmtType::kIf, StmtType::kWhile};
+}
 
-    FillStmts();
-    FillRels();
+std::vector<StmtType> ModifiesRelationshipStore::InitDirectTypes() {
+    return std::vector<StmtType>{StmtType::kAssign, StmtType::kRead};
 }
 }  // namespace spa

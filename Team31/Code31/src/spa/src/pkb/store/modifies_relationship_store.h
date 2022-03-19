@@ -19,17 +19,15 @@ class ModifiesRelationshipStore : public UsesModifiesStoreBase {
     using UsesModifiesStoreBase::UsesModifiesStoreBase;
     void Set(int stmt_no, int var_index);
     [[nodiscard]] int GetVarIndex(int stmt_no) const;
-    void Compile(const TypeStatementsStore &type_statement_store,
-                 const ContainerForest &forest,
-                 const StmtlstParentStore &stmtlst_parent,
-                 const StmtlstStatementsStore &stmtlst_stmt) override;
 
   private:
-    void AddContainerRel(
-            const ContainerForest &forest,
-            const StmtlstParentStore &stmtlst_parent,
-            const StmtlstStatementsStore &stmtlst_stmt,
-            const TypeStatementsStore &type_statement_store) override;
+    void AddConditionRel(const ContainerForest& forest,
+                         const StmtlstParentStore& stmtlst_parent,
+                         const StmtlstStatementsStore& stmtlst_stmt,
+                         const TypeStatementsStore& type_statement_store,
+                         BitVec2D& if_added, BitVec2D& while_added) override;
+    std::vector<StmtType> InitIndirectTypes() override;
+    std::vector<StmtType> InitDirectTypes() override;
 };
 }  // namespace spa
 
