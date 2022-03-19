@@ -16,16 +16,16 @@ class PatternBase : public ConditionClause {
     };
     PatternBase(Synonym *assign, std::string first,
                 std::vector<QueryToken> &&second);  // IdentExpr
-    PatternBase(Synonym *const assign,
+    PatternBase(Synonym *assign,
                 std::string first);  // IdentWild
-    PatternBase(Synonym *const assign, Synonym *first,
-                std::vector<QueryToken> &&second);       // SynExpr
-    PatternBase(Synonym *const assign, Synonym *first);  // SynWild
-    PatternBase(Synonym *const assign,
+    PatternBase(Synonym *assign, Synonym *first,
+                std::vector<QueryToken> &&second);  // SynExpr
+    PatternBase(Synonym *assign, Synonym *first);   // SynWild
+    PatternBase(Synonym *assign,
                 std::vector<QueryToken> &&second);  // WildExpr
-    PatternBase();                                  // WildWild
+    explicit PatternBase(Synonym *assign);          // WildWild
     ResultTable Execute(KnowledgeBase *knowledge_base) const override = 0;
-    virtual ~PatternBase() = 0;
+    ~PatternBase() override = 0;
 
   protected:
     Type type_;

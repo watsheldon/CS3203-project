@@ -28,7 +28,7 @@ class UsesModifiesBase : public ConditionClause {
     UsesModifiesBase(std::string first, std::string second);
     explicit UsesModifiesBase(std::string first);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override = 0;
-    virtual ~UsesModifiesBase() = 0;
+    ~UsesModifiesBase() override = 0;
 
   protected:
     Type type_;

@@ -26,7 +26,7 @@ class StmtStmtBase : public ConditionClause {
     StmtStmtBase(ArgPos pos, int integer);
     StmtStmtBase(ArgPos pos, Synonym *syn);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override = 0;
-    virtual ~StmtStmtBase() = 0;
+    ~StmtStmtBase() override = 0;
 
   protected:
     Type type_;

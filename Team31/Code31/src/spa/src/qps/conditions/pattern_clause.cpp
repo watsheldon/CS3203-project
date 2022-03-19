@@ -33,7 +33,9 @@ PatternBase::PatternBase(Synonym *const assign,
         : type_(Type::kWildExpr),
           assign_(assign),
           second_expr_(std::move(second)) {}
-PatternBase::PatternBase() : type_(Type::kWildWild) {}
+PatternBase::PatternBase(Synonym *const assign)
+        : type_(Type::kWildWild), assign_(assign) {}
+PatternBase::~PatternBase() = default;
 ResultTable PatternPartial::Execute(KnowledgeBase *knowledge_base) const {
     switch (type_) {
         case Type::kIdentExpr: {
@@ -81,6 +83,8 @@ ResultTable PatternExact::Execute(KnowledgeBase *knowledge_base) const {
             auto result = knowledge_base->GetPattern(second_expr_, false);
             return {assign_, std::move(result)};
         }
+        default:
+            assert(false);
     }
 }
 }  // namespace spa

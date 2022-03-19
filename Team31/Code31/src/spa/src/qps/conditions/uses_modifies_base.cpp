@@ -28,7 +28,7 @@ UsesModifiesBase::UsesModifiesBase(std::string first, std::string second)
           second_ident_(std::move(second)) {}
 UsesModifiesBase::UsesModifiesBase(std::string first)
         : type_(Type::kIdentWild), first_ident_(std::move(first)) {}
-
+UsesModifiesBase::~UsesModifiesBase() = default;
 ResultTable UsesClause::Execute(KnowledgeBase *knowledge_base) const {
     switch (type_) {
         case Type::kIntSyn: {
@@ -60,12 +60,8 @@ ResultTable UsesClause::Execute(KnowledgeBase *knowledge_base) const {
                                                   SynToPkbType(first_syn_));
             return {first_syn_, std::move(result)};
         }
-        case Type::kIdentIdent:
-            break;
-        case Type::kIdentSyn:
-            break;
-        case Type::kIdentWild:
-            break;
+        default:
+            assert(false);
     }
 }
 ResultTable ModifiesClause::Execute(KnowledgeBase *knowledge_base) const {
@@ -100,12 +96,8 @@ ResultTable ModifiesClause::Execute(KnowledgeBase *knowledge_base) const {
                                                       SynToPkbType(first_syn_));
             return {first_syn_, std::move(result)};
         }
-        case Type::kIdentIdent:
-            break;
-        case Type::kIdentSyn:
-            break;
-        case Type::kIdentWild:
-            break;
+        default:
+            assert(false);
     }
 }
 }  // namespace spa

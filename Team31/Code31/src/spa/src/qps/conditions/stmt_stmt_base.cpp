@@ -30,14 +30,15 @@ StmtStmtBase::StmtStmtBase(ArgPos pos, int integer) {
 }
 StmtStmtBase::StmtStmtBase(ArgPos pos, Synonym *syn) {
     if (pos == ArgPos::kFirst) {
-        type_ = Type::kIntWild;
+        type_ = Type::kSynWild;
         first_syn_ = syn;
     } else {
         assert(pos == ArgPos::kSecond);
-        type_ = Type::kWildInt;
+        type_ = Type::kWildSyn;
         second_syn_ = syn;
     }
 }
+StmtStmtBase::~StmtStmtBase() = default;
 ResultTable FollowsClause::Execute(KnowledgeBase *knowledge_base) const {
     switch (type_) {
         case Type::kIntInt: {
