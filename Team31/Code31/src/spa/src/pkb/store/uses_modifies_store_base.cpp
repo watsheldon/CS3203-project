@@ -75,8 +75,10 @@ void UsesModifiesStoreBase::AddIndirectRel(
             if (type == StmtlstParentStore::kProc) break;
             auto added =
                     type == StmtlstParentStore::kIf ? if_added : while_added;
-            auto& if_var_pairs_ = stmt_var_pairs_.at(4);
-            auto& while_var_pairs_ = stmt_var_pairs_.at(3);
+            auto& if_var_pairs_ =
+                    stmt_var_pairs_.at(static_cast<int>(StmtType::kIf) - 1);
+            auto& while_var_pairs_ =
+                    stmt_var_pairs_.at(static_cast<int>(StmtType::kWhile) - 1);
             auto& [stmts, vars] = type == StmtlstParentStore::kIf
                                           ? if_var_pairs_
                                           : while_var_pairs_;
@@ -89,7 +91,7 @@ void UsesModifiesStoreBase::AddIndirectRel(
 }
 
 void UsesModifiesStoreBase::FillStmts() {
-    auto& all_stmts = stmts_arr_.at(0);
+    auto& all_stmts = stmts_arr_.at(static_cast<int>(StmtType::kAll));
     for (int i = 1; i < stmts_arr_.size(); ++i) {
         auto& stmt_var_pair = stmt_var_pairs_.at(i - 1);
         auto& stmts = stmts_arr_.at(i);
@@ -110,13 +112,15 @@ void UsesModifiesStoreBase::FillRels() {
         complete_stmt_var_.Set(i, stmt_var_.GetVals(i));
     }
 
-    auto& if_var_pairs_ = stmt_var_pairs_.at(4);
+    auto& if_var_pairs_ =
+            stmt_var_pairs_.at(static_cast<int>(StmtType::kIf) - 1);
     auto& [if_stmts, if_vars] = if_var_pairs_;
     for (int i = 0; i < if_stmts.size(); ++i) {
         complete_stmt_var_.Set(if_stmts[i], if_vars[i]);
     }
 
-    auto& while_var_pairs_ = stmt_var_pairs_.at(3);
+    auto& while_var_pairs_ =
+            stmt_var_pairs_.at(static_cast<int>(StmtType::kWhile) - 1);
     auto& [while_stmts, while_vars] = while_var_pairs_;
     for (int i = 0; i < while_stmts.size(); ++i) {
         complete_stmt_var_.Set(while_stmts[i], while_vars[i]);

@@ -29,11 +29,13 @@ void ModifiesRelationshipStore::Compile(
         const StmtlstStatementsStore& stmtlst_stmt) {
     FillVars();
 
-    auto& assign_var_pairs_ = stmt_var_pairs_.at(5);
+    auto& assign_var_pairs_ =
+            stmt_var_pairs_.at(static_cast<int>(StmtType::kAssign) - 1);
     AddDirectRel(assign_var_pairs_,
                  type_statement_store.GetStatements(StmtType::kAssign));
 
-    auto& read_var_pairs_ = stmt_var_pairs_.at(0);
+    auto& read_var_pairs_ =
+            stmt_var_pairs_.at(static_cast<int>(StmtType::kRead) - 1);
     AddDirectRel(read_var_pairs_,
                  type_statement_store.GetStatements(StmtType::kRead));
 
@@ -48,16 +50,20 @@ void ModifiesRelationshipStore::AddContainerRel(
     BitVec2D if_added(num_stmts + 1, num_vars + 1);
     BitVec2D while_added(num_stmts + 1, num_vars + 1);
 
-    auto& assign_var_pairs_ = stmt_var_pairs_.at(5);
+    auto& assign_var_pairs_ =
+            stmt_var_pairs_.at(static_cast<int>(StmtType::kAssign) - 1);
     AddIndirectRel(assign_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
                    if_added, while_added);
-    auto& read_var_pairs_ = stmt_var_pairs_.at(0);
+    auto& read_var_pairs_ =
+            stmt_var_pairs_.at(static_cast<int>(StmtType::kRead) - 1);
     AddIndirectRel(read_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
                    if_added, while_added);
-    auto& if_var_pairs_ = stmt_var_pairs_.at(4);
+    auto& if_var_pairs_ =
+            stmt_var_pairs_.at(static_cast<int>(StmtType::kIf) - 1);
     AddIndirectRel(if_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
                    if_added, while_added);
-    auto& while_var_pairs_ = stmt_var_pairs_.at(3);
+    auto& while_var_pairs_ =
+            stmt_var_pairs_.at(static_cast<int>(StmtType::kWhile) - 1);
     AddIndirectRel(while_var_pairs_, stmtlst_stmt, stmtlst_parent, forest,
                    if_added, while_added);
     FillStmts();
