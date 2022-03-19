@@ -1,6 +1,7 @@
 #ifndef SRC_SPA_SRC_PKB_STORE_USES_MODIFIES_STORE_BASE_H_
 #define SRC_SPA_SRC_PKB_STORE_USES_MODIFIES_STORE_BASE_H_
 
+#include <array>
 #include <cstddef>
 #include <set>
 #include <vector>
@@ -50,20 +51,11 @@ class UsesModifiesStoreBase {
     std::size_t num_vars;
     IndexBimap<std::vector<int>> stmt_var_;
     IndexBimap<std::set<int>> complete_stmt_var_;
-    PairVec<int> if_var_pairs_;
-    PairVec<int> while_var_pairs_;
-    PairVec<int> assign_var_pairs_;
-    PairVec<int> read_var_pairs_;
-    PairVec<int> print_var_pairs_;
-    PairVec<int> call_var_pairs_;
-    std::set<int> if_stmts_;
-    std::set<int> while_stmts_;
-    std::set<int> assign_stmts_;
-    std::set<int> read_stmts_;
-    std::set<int> print_stmts_;
-    std::set<int> call_stmts_;
-    std::set<int> all_stmts_;
     std::set<int> all_vars_;
+    // Read, Print, Call, While, If, Assign
+    std::array<PairVec<int>, 6> stmt_var_pairs_;
+    // All, Read, Print, Call, While, If, Assign
+    std::array<std::set<int>, 7> stmts_arr_;
 };
 }  // namespace spa
 

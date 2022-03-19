@@ -23,80 +23,31 @@ const std::set<int>& UsesModifiesStoreBase::GetAllStmt(int var_index) const {
 }
 
 PairVec<int> UsesModifiesStoreBase::GetStmtVar(StmtType stmt_type) const {
-    switch (stmt_type) {
-        case StmtType::kAll:
-            return GetAllRel();
-        case StmtType::kRead:
-            return read_var_pairs_;
-        case StmtType::kPrint:
-            return print_var_pairs_;
-        case StmtType::kCall:
-            return call_var_pairs_;
-        case StmtType::kWhile:
-            return while_var_pairs_;
-        case StmtType::kIf:
-            return if_var_pairs_;
-        case StmtType::kAssign:
-            return assign_var_pairs_;
-        default:
-            assert(false);
+    if (stmt_type == StmtType::kAll) {
+        return GetAllRel();
     }
+    return stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
 }
 
 PairVec<int> UsesModifiesStoreBase::GetAllRel() const {
     auto [stmts, vars] = PairVec<int>();
-    auto total_size =
-            if_var_pairs_.first.size() + while_var_pairs_.first.size() +
-            assign_var_pairs_.first.size() + read_var_pairs_.first.size() +
-            print_var_pairs_.first.size() + call_var_pairs_.first.size();
+    std::size_t total_size = 0;
+    for (auto& stmt_var_pair : stmt_var_pairs_) {
+        total_size += stmt_var_pair.first.size();
+    }
     stmts.reserve(total_size), vars.reserve(total_size);
 
-    stmts.insert(stmts.end(), if_var_pairs_.first.begin(),
-                 if_var_pairs_.first.end());
-    stmts.insert(stmts.end(), while_var_pairs_.first.begin(),
-                 while_var_pairs_.first.end());
-    stmts.insert(stmts.end(), assign_var_pairs_.first.begin(),
-                 assign_var_pairs_.first.end());
-    stmts.insert(stmts.end(), read_var_pairs_.first.begin(),
-                 read_var_pairs_.first.end());
-    stmts.insert(stmts.end(), print_var_pairs_.first.begin(),
-                 print_var_pairs_.first.end());
-    stmts.insert(stmts.end(), call_var_pairs_.first.begin(),
-                 call_var_pairs_.first.end());
-
-    vars.insert(vars.end(), if_var_pairs_.second.begin(),
-                if_var_pairs_.second.end());
-    vars.insert(vars.end(), while_var_pairs_.second.begin(),
-                while_var_pairs_.second.end());
-    vars.insert(vars.end(), assign_var_pairs_.second.begin(),
-                assign_var_pairs_.second.end());
-    vars.insert(vars.end(), read_var_pairs_.second.begin(),
-                read_var_pairs_.second.end());
-    vars.insert(vars.end(), print_var_pairs_.second.begin(),
-                print_var_pairs_.second.end());
-    vars.insert(vars.end(), call_var_pairs_.second.begin(),
-                call_var_pairs_.second.end());
-
+    for (auto& stmt_var_pair : stmt_var_pairs_) {
+        stmts.insert(stmts.end(), stmt_var_pair.first.begin(),
+                     stmt_var_pair.first.end());
+        vars.insert(vars.end(), stmt_var_pair.second.begin(),
+                    stmt_var_pair.second.end());
+    }
     return {stmts, vars};
 }
 
 std::set<int> UsesModifiesStoreBase::GetStmt(StmtType stmt_type) const {
-    switch (stmt_type) {
-        case StmtType::kAll:
-            return all_stmts_;
-        case StmtType::kRead:
-            return read_stmts_;
-        case StmtType::kPrint:
-            return print_stmts_;
-        case StmtType::kCall:
-            return call_stmts_;
-        case StmtType::kWhile:
-            return while_stmts_;
-        case StmtType::kIf:
-            return if_stmts_;
-        case StmtType::kAssign:
-            return assign_stmts_;
-    }
+    return stmts_arr_.at(static_cast<int>(stmt_type));
 }
 
 void UsesModifiesStoreBase::AddDirectRel(
@@ -124,6 +75,8 @@ void UsesModifiesStoreBase::AddIndirectRel(
             if (type == StmtlstParentStore::kProc) break;
             auto added =
                     type == StmtlstParentStore::kIf ? if_added : while_added;
+            auto& if_var_pairs_ = stmt_var_pairs_.at(4);
+            auto& while_var_pairs_ = stmt_var_pairs_.at(3);
             auto& [stmts, vars] = type == StmtlstParentStore::kIf
                                           ? if_var_pairs_
                                           : while_var_pairs_;
@@ -136,23 +89,13 @@ void UsesModifiesStoreBase::AddIndirectRel(
 }
 
 void UsesModifiesStoreBase::FillStmts() {
-    read_stmts_.insert(read_var_pairs_.first.begin(),
-                       read_var_pairs_.first.end());
-    all_stmts_.insert(read_stmts_.begin(), read_stmts_.end());
-    print_stmts_.insert(print_var_pairs_.first.begin(),
-                        print_var_pairs_.first.end());
-    all_stmts_.insert(print_stmts_.begin(), print_stmts_.end());
-    call_stmts_.insert(call_var_pairs_.first.begin(),
-                       call_var_pairs_.first.end());
-    all_stmts_.insert(call_stmts_.begin(), call_stmts_.end());
-    assign_stmts_.insert(assign_var_pairs_.first.begin(),
-                         assign_var_pairs_.first.end());
-    all_stmts_.insert(assign_stmts_.begin(), assign_stmts_.end());
-    if_stmts_.insert(if_var_pairs_.first.begin(), if_var_pairs_.first.end());
-    all_stmts_.insert(if_stmts_.begin(), if_stmts_.end());
-    while_stmts_.insert(while_var_pairs_.first.begin(),
-                        while_var_pairs_.first.end());
-    all_stmts_.insert(while_stmts_.begin(), while_stmts_.end());
+    auto& all_stmts = stmts_arr_.at(0);
+    for (int i = 1; i < stmts_arr_.size(); ++i) {
+        auto& stmt_var_pair = stmt_var_pairs_.at(i - 1);
+        auto& stmts = stmts_arr_.at(i);
+        stmts.insert(stmt_var_pair.first.begin(), stmt_var_pair.first.end());
+        all_stmts.insert(stmts.begin(), stmts.end());
+    }
 }
 
 void UsesModifiesStoreBase::FillVars() {
@@ -166,10 +109,14 @@ void UsesModifiesStoreBase::FillRels() {
     for (int i = 1; i < num_stmts + 1; ++i) {
         complete_stmt_var_.Set(i, stmt_var_.GetVals(i));
     }
+
+    auto& if_var_pairs_ = stmt_var_pairs_.at(4);
     auto& [if_stmts, if_vars] = if_var_pairs_;
     for (int i = 0; i < if_stmts.size(); ++i) {
         complete_stmt_var_.Set(if_stmts[i], if_vars[i]);
     }
+
+    auto& while_var_pairs_ = stmt_var_pairs_.at(3);
     auto& [while_stmts, while_vars] = while_var_pairs_;
     for (int i = 0; i < while_stmts.size(); ++i) {
         complete_stmt_var_.Set(while_stmts[i], while_vars[i]);

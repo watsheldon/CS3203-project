@@ -27,12 +27,17 @@ void UsesRelationshipStore::Compile(
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt) {
     UsesModifiesStoreBase::FillVars();
+
+    auto& assign_var_pairs_ = stmt_var_pairs_.at(5);
     UsesModifiesStoreBase::AddDirectRel(
             assign_var_pairs_,
             type_statement_store.GetStatements(StmtType::kAssign));
+
+    auto& print_var_pairs_ = stmt_var_pairs_.at(1);
     UsesModifiesStoreBase::AddDirectRel(
             print_var_pairs_,
             type_statement_store.GetStatements(StmtType::kPrint));
+
     AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
 }
 
@@ -43,6 +48,8 @@ void UsesRelationshipStore::AddContainerRel(
         const TypeStatementsStore& type_statement_store) {
     BitVec2D if_added(num_stmts + 1, num_vars + 1);
     BitVec2D while_added(num_stmts + 1, num_vars + 1);
+    auto& if_var_pairs_ = stmt_var_pairs_.at(4);
+    auto& while_var_pairs_ = stmt_var_pairs_.at(3);
     auto& [if_stmts, if_vars] = if_var_pairs_;
     for (auto i : type_statement_store.GetStatements(StmtType::kIf)) {
         // Add indirect Uses of condition variables by ancestors of i.
@@ -103,9 +110,11 @@ void UsesRelationshipStore::AddContainerRel(
         }
         while_stmts.resize(while_vars.size(), i);
     }
+    auto& assign_var_pairs_ = stmt_var_pairs_.at(5);
     UsesModifiesStoreBase::AddIndirectRel(assign_var_pairs_, stmtlst_stmt,
                                           stmtlst_parent, forest, if_added,
                                           while_added);
+    auto& print_var_pairs_ = stmt_var_pairs_.at(1);
     UsesModifiesStoreBase::AddIndirectRel(print_var_pairs_, stmtlst_stmt,
                                           stmtlst_parent, forest, if_added,
                                           while_added);
