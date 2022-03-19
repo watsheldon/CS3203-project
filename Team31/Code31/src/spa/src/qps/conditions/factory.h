@@ -4,12 +4,24 @@
 #include <array>
 #include <string>
 
+#include "affects_clause.h"
+#include "affects_trans_clause.h"
 #include "call_base.h"
 #include "condition_clause.h"
-#include "pattern_clause.h"
+#include "follows_clause.h"
+#include "follows_trans_clause.h"
+#include "modifies_clause.h"
+#include "next_clause.h"
+#include "next_trans_clause.h"
+#include "parent_clause.h"
+#include "parent_trans_clause.h"
+#include "pattern_base.h"
+#include "pattern_exact_clause.h"
+#include "pattern_partial_clause.h"
 #include "qps/query_token.h"
 #include "qps/synonym.h"
 #include "stmt_stmt_base.h"
+#include "uses_clause.h"
 #include "uses_modifies_base.h"
 
 namespace spa {
@@ -132,10 +144,10 @@ class Factory {
             case kSynInt:
                 return std::make_unique<T>(first_syn_, second_int_);
             case kSynSyn:
-                if (std::is_same_v<T, FollowsClause> ||
-                    std::is_same_v<T, FollowsTransClause> ||
-                    std::is_same_v<T, ParentClause> ||
-                    std::is_same_v<T, ParentTransClause>) {
+                if constexpr (std::is_same_v<T, FollowsClause> ||
+                              std::is_same_v<T, FollowsTransClause> ||
+                              std::is_same_v<T, ParentClause> ||
+                              std::is_same_v<T, ParentTransClause>) {
                     if (first_syn_ == second_syn_) {
                         return nullptr;
                     }

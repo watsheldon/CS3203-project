@@ -34,18 +34,5 @@ class PatternBase : public ConditionClause {
     Synonym *first_syn_;
     std::vector<QueryToken> second_expr_;
 };
-class PatternPartial : public PatternBase {
-    using PatternBase::PatternBase;
-
-  public:
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-
-class PatternExact : public PatternBase {
-    using PatternBase::PatternBase;
-
-  public:
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_

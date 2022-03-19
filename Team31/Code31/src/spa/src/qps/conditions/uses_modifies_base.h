@@ -39,13 +39,5 @@ class UsesModifiesBase : public ConditionClause {
     Synonym *second_syn_;
     std::string second_ident_;
 };
-class UsesClause : public UsesModifiesBase {
-    using UsesModifiesBase::UsesModifiesBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-class ModifiesClause : public UsesModifiesBase {
-    using UsesModifiesBase::UsesModifiesBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_

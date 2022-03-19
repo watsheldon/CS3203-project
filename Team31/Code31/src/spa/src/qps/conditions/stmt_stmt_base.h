@@ -35,40 +35,5 @@ class StmtStmtBase : public ConditionClause {
     Synonym *first_syn_;
     Synonym *second_syn_;
 };
-
-class FollowsClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-class FollowsTransClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-class ParentClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-class ParentTransClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
-
-  public:
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-class NextClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-class NextTransClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-class AffectsClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
-class AffectsTransClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
-};
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_

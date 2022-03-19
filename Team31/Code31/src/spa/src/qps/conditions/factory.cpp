@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "pattern_clause.h"
+#include "pattern_base.h"
 #include "qps/query_token.h"
 #include "stmt_stmt_base.h"
 
@@ -88,31 +88,29 @@ void Factory::SetAssign(Synonym* syn) { assign_ = syn; }
 std::unique_ptr<ConditionClause> Factory::Build() {
     switch (rel_) {
         case Relationship::kParent:
-            param_type_ = stmt_stmt_type_.at(first_index_).at(second_index_);
+            param_type_ = stmt_stmt_type_[first_index_][second_index_];
             return BuildStmtStmtClause<ParentClause>();
         case Relationship::kParentTrans:
-            param_type_ = stmt_stmt_type_.at(first_index_).at(second_index_);
+            param_type_ = stmt_stmt_type_[first_index_][second_index_];
             return BuildStmtStmtClause<ParentTransClause>();
         case Relationship::kFollows:
-            param_type_ = stmt_stmt_type_.at(first_index_).at(second_index_);
+            param_type_ = stmt_stmt_type_[first_index_][second_index_];
             return BuildStmtStmtClause<FollowsClause>();
         case Relationship::kFollowsTrans:
-            param_type_ = stmt_stmt_type_.at(first_index_).at(second_index_);
+            param_type_ = stmt_stmt_type_[first_index_][second_index_];
             return BuildStmtStmtClause<FollowsTransClause>();
         case Relationship::kUses:
-            param_type_ =
-                    uses_modifies_type_.at(first_index_).at(second_index_);
+            param_type_ = uses_modifies_type_[first_index_][second_index_];
             return BuildUsesModifiesClause<UsesClause>();
         case Relationship::kModifies:
-            param_type_ =
-                    uses_modifies_type_.at(first_index_).at(second_index_);
+            param_type_ = uses_modifies_type_[first_index_][second_index_];
             return BuildUsesModifiesClause<ModifiesClause>();
         case Relationship::kPatternExact:
-            param_type_ = pattern_type_.at(first_index_).at(second_index_);
-            return BuildPatternClause<PatternExact>();
+            param_type_ = pattern_type_[first_index_][second_index_];
+            return BuildPatternClause<PatternExactClause>();
         case Relationship::kPatternPartial:
-            param_type_ = pattern_type_.at(first_index_).at(second_index_);
-            return BuildPatternClause<PatternPartial>();
+            param_type_ = pattern_type_[first_index_][second_index_];
+            return BuildPatternClause<PatternPartialClause>();
         default:
             assert(false);
     }
