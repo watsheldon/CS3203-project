@@ -136,19 +136,19 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistCallsT(std::string_view first_proc_name,
                      std::string_view second_proc_name) override;
     bool ExistCalls(Index<ArgPos::kFirst> first_proc) override;
-    bool ExistCalls(Name<ArgPos::kFirst> first_proc_name) override;
-    bool ExistCalls(Index<ArgPos::kSecond> second_proc) override;
-    bool ExistCalls(Name<ArgPos::kSecond> second_proc_name) override;
+    bool ExistCalls(Name<ArgPos::kFirst> proc_name) override;
+    bool ExistCalls(Index<ArgPos::kSecond> proc) override;
+    bool ExistCalls(Name<ArgPos::kSecond> proc_name) override;
     bool ExistCalls() override;
     std::set<int> GetCalls(ArgPos return_pos) override;
-    std::set<int> GetCalls(Index<ArgPos::kFirst> first_proc) override;
-    std::set<int> GetCalls(Name<ArgPos::kFirst> first_proc_name) override;
+    std::set<int> GetCalls(Index<ArgPos::kFirst> proc) override;
+    std::set<int> GetCalls(Name<ArgPos::kFirst> proc_name) override;
     std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) override;
-    std::set<int> GetCallsT(Name<ArgPos::kFirst> first_proc_name) override;
-    std::set<int> GetCalls(Index<ArgPos::kSecond> second_proc) override;
-    std::set<int> GetCalls(Name<ArgPos::kSecond> second_proc_name) override;
-    std::set<int> GetCallsT(Index<ArgPos::kSecond> second_proc) override;
-    std::set<int> GetCallsT(Name<ArgPos::kSecond> second_proc_name) override;
+    std::set<int> GetCallsT(Name<ArgPos::kFirst> proc_name) override;
+    std::set<int> GetCalls(Index<ArgPos::kSecond> proc) override;
+    std::set<int> GetCalls(Name<ArgPos::kSecond> proc_name) override;
+    std::set<int> GetCallsT(Index<ArgPos::kSecond> proc) override;
+    std::set<int> GetCallsT(Name<ArgPos::kSecond> proc_name) override;
     PairVec<int> GetCallsPairs() override;
     PairVec<int> GetCallsTPairs() override;
 
@@ -199,7 +199,20 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                                   std::vector<int> &results);
     void GetTransitiveParentPairs(PairVec<int> &results);
     void GetNonTransitiveParentPairs(PairVec<int> &results);
-    int NameToIndex(QueryEntityType et, std::string_view name);
+    int IdentToIndexValue(std::string_view name, QueryEntityType et);
+    template <QueryEntityType et>
+    Index<et> IdentToIndex(std::string_view name) {
+        return Index<et>(IdentToIndexValue(name, et));
+    }
+    template <ArgPos pos>
+    Index<pos> IdentToIndex(std::string_view name,
+                            QueryEntityType et) noexcept {
+        return Index<pos>(IdentToIndexValue(name, et));
+    }
+    template <ArgPos pos>
+    Index<pos> IdentToIndex(Name<pos> identifier, QueryEntityType et) noexcept {
+        return IdentToIndex<pos>(identifier.value, et);
+    }
 };
 
 }  // namespace spa
