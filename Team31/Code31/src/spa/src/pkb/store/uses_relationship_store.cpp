@@ -22,69 +22,51 @@ void UsesRelationshipStore::AddConditionRel(
         const StmtlstStatementsStore& stmtlst_stmt,
         const TypeStatementsStore& type_statement_store, BitVec2D& if_added,
         BitVec2D& while_added) {
-    auto& if_var_pairs_ =
+    std::array<BitVec2D, 2> container_bitmaps{{if_added, while_added}};
+    auto& if_var_pairs =
             stmt_var_pairs_.at(static_cast<int>(StmtType::kIf) - 1);
-    auto& while_var_pairs_ =
+    auto& while_var_pairs =
             stmt_var_pairs_.at(static_cast<int>(StmtType::kWhile) - 1);
-    auto& [if_stmts, if_vars] = if_var_pairs_;
-    for (auto i : type_statement_store.GetStatements(StmtType::kIf)) {
-        // Add indirect Uses of condition variables by ancestors of i.
-        auto& var_indices = GetVarIndex(i);
-        auto stmtlst = stmtlst_stmt.GetStmtlst(i);
-        auto ancestors = forest.GetAncestryTrace(stmtlst);
-        for (auto a : ancestors) {
-            auto& [type, index] = stmtlst_parent.GetParent(a);
-            if (type == StmtlstParentStore::kProc) break;
-            auto& [stmts, vars] = type == StmtlstParentStore::kIf
-                                          ? if_var_pairs_
-                                          : while_var_pairs_;
-            auto& added =
-                    type == StmtlstParentStore::kIf ? if_added : while_added;
-            for (auto v : var_indices) {
-                if (added.At(a, v)) continue;
-                vars.emplace_back(v);
-                added.Set(a, v);
+    std::array<PairVec<int>, 2> container_var_pairs{
+            {if_var_pairs, while_var_pairs}};
+    auto& all_if_stmts = type_statement_store.GetStatements(StmtType::kIf);
+    auto& all_while_stmts =
+            type_statement_store.GetStatements(StmtType::kWhile);
+    std::array<std::vector<int>, 2> container_stmts{
+            {all_if_stmts, all_while_stmts}};
+
+    for (int pos = 0; pos < 2; ++pos) {
+        auto& [stmts, vars] = container_var_pairs.at(pos);
+        for (auto i : container_stmts.at(pos)) {
+            // Add indirect Uses of condition variables by ancestors of i.
+            auto& var_indices = GetVarIndex(i);
+            auto stmtlst = stmtlst_stmt.GetStmtlst(i);
+            auto ancestors = forest.GetAncestryTrace(stmtlst);
+            for (auto a : ancestors) {
+                auto& [type, index] = stmtlst_parent.GetParent(a);
+                if (type == StmtlstParentStore::kProc) break;
+                auto& [stmts, vars] = type == StmtlstParentStore::kIf
+                                              ? if_var_pairs
+                                              : while_var_pairs;
+                auto& added = type == StmtlstParentStore::kIf ? if_added
+                                                              : while_added;
+                for (auto v : var_indices) {
+                    if (added.At(a, v)) continue;
+                    vars.emplace_back(v);
+                    added.Set(a, v);
+                }
+                if (stmts.size() == vars.size()) break;
+                stmts.resize(vars.size(), index);
             }
-            if (stmts.size() == vars.size()) break;
-            stmts.resize(vars.size(), index);
-        }
-        // Add direct Uses of condition variables by if statement i.
-        for (auto v : var_indices) {
-            if (if_added.At(i, v)) continue;
-            if_vars.emplace_back(v);
-            if_added.Set(i, v);
-        }
-        if_stmts.resize(if_vars.size(), i);
-    }
-    auto& [while_stmts, while_vars] = while_var_pairs_;
-    for (auto i : type_statement_store.GetStatements(StmtType::kWhile)) {
-        // Add indirect Uses of condition variables by ancestors of i.
-        auto& var_indices = GetVarIndex(i);
-        auto stmtlst = stmtlst_stmt.GetStmtlst(i);
-        auto ancestors = forest.GetAncestryTrace(stmtlst);
-        for (auto a : ancestors) {
-            auto& [type, index] = stmtlst_parent.GetParent(a);
-            if (type == StmtlstParentStore::kProc) break;
-            auto& [stmts, vars] = type == StmtlstParentStore::kIf
-                                          ? if_var_pairs_
-                                          : while_var_pairs_;
-            auto& added =
-                    type == StmtlstParentStore::kIf ? if_added : while_added;
+            // Add direct Uses of condition variables by container statement i.
+            auto& bitmap = container_bitmaps.at(pos);
             for (auto v : var_indices) {
-                if (added.At(a, v)) continue;
+                if (bitmap.At(i, v)) continue;
                 vars.emplace_back(v);
-                added.Set(a, v);
+                bitmap.Set(i, v);
             }
-            if (stmts.size() == vars.size()) break;
-            stmts.resize(vars.size(), index);
+            stmts.resize(vars.size(), i);
         }
-        // Add direct Uses of condition variables by while statement i.
-        for (auto v : var_indices) {
-            if (while_added.At(i, v)) continue;
-            while_vars.emplace_back(v);
-            while_added.Set(i, v);
-        }
-        while_stmts.resize(while_vars.size(), i);
     }
 }
 
