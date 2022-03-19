@@ -26,7 +26,7 @@ PairVec<int> UsesModifiesStoreBase::GetStmtVar(StmtType stmt_type) const {
     if (stmt_type == StmtType::kAll) {
         return GetAllRel();
     }
-    return stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
+    return stmt_var_pairs_[static_cast<int>(stmt_type) - 1];
 }
 
 PairVec<int> UsesModifiesStoreBase::GetAllRel() const {
@@ -43,7 +43,7 @@ PairVec<int> UsesModifiesStoreBase::GetAllRel() const {
 }
 
 std::set<int> UsesModifiesStoreBase::GetStmt(StmtType stmt_type) const {
-    return stmts_arr_.at(static_cast<int>(stmt_type));
+    return stmts_arr_[static_cast<int>(stmt_type)];
 }
 
 void UsesModifiesStoreBase::Compile(
@@ -52,9 +52,8 @@ void UsesModifiesStoreBase::Compile(
         const StmtlstStatementsStore& stmtlst_stmt) {
     auto direct_stmt_types = InitDirectTypes();
     for (const auto stmt_type : direct_stmt_types) {
-        auto& stmt_var_pairs =
-                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
-        AddDirectRel(stmt_var_pairs,
+        auto& relationships = stmt_var_pairs_[static_cast<int>(stmt_type) - 1];
+        AddDirectRel(relationships,
                      type_statement_store.GetStatements(stmt_type));
     }
     AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
@@ -90,9 +89,9 @@ void UsesModifiesStoreBase::AddIndirectRel(
             auto added =
                     type == StmtlstParentStore::kIf ? if_added : while_added;
             auto& if_var_pairs_ =
-                    stmt_var_pairs_.at(static_cast<int>(StmtType::kIf) - 1);
+                    stmt_var_pairs_[static_cast<int>(StmtType::kIf) - 1];
             auto& while_var_pairs_ =
-                    stmt_var_pairs_.at(static_cast<int>(StmtType::kWhile) - 1);
+                    stmt_var_pairs_[static_cast<int>(StmtType::kWhile) - 1];
             auto& [stmts, vars] = type == StmtlstParentStore::kIf
                                           ? if_var_pairs_
                                           : while_var_pairs_;
@@ -116,18 +115,17 @@ void UsesModifiesStoreBase::AddContainerRel(
 
     auto indirect_stmt_types = InitIndirectTypes();
     for (const auto stmt_type : indirect_stmt_types) {
-        auto& stmt_var_pairs =
-                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
-        AddIndirectRel(stmt_var_pairs, stmtlst_stmt, stmtlst_parent, forest,
+        auto& relationships = stmt_var_pairs_[static_cast<int>(stmt_type) - 1];
+        AddIndirectRel(relationships, stmtlst_stmt, stmtlst_parent, forest,
                        if_added, while_added);
     }
 }
 
 void UsesModifiesStoreBase::FillStmts() {
-    auto& all_stmts = stmts_arr_.at(static_cast<int>(StmtType::kAll));
+    auto& all_stmts = stmts_arr_[static_cast<int>(StmtType::kAll)];
     for (int i = 1; i < stmts_arr_.size(); ++i) {
-        auto& stmt_var_pair = stmt_var_pairs_.at(i - 1);
-        auto& stmts = stmts_arr_.at(i);
+        auto& stmt_var_pair = stmt_var_pairs_[i - 1];
+        auto& stmts = stmts_arr_[i];
         stmts.insert(stmt_var_pair.first.begin(), stmt_var_pair.first.end());
         all_stmts.insert(stmts.begin(), stmts.end());
     }
@@ -147,9 +145,8 @@ void UsesModifiesStoreBase::FillRels() {
 
     std::array<StmtType, 2> container_types{{StmtType::kIf, StmtType::kWhile}};
     for (const auto stmt_type : container_types) {
-        auto& stmt_var_pairs =
-                stmt_var_pairs_.at(static_cast<int>(stmt_type) - 1);
-        auto& [stmts, vars] = stmt_var_pairs;
+        auto& relationships = stmt_var_pairs_[static_cast<int>(stmt_type) - 1];
+        auto& [stmts, vars] = relationships;
         for (int i = 0; i < stmts.size(); ++i) {
             complete_stmt_var_.Set(stmts[i], vars[i]);
         }
@@ -158,7 +155,7 @@ void UsesModifiesStoreBase::FillRels() {
 
 void UsesModifiesStoreBase::CalculateNumRels() {
     std::size_t total_size = 0;
-    for (auto& stmt_var_pair : stmt_var_pairs_) {
+    for (const auto& stmt_var_pair : stmt_var_pairs_) {
         total_size += stmt_var_pair.first.size();
     }
     num_rels = total_size;
