@@ -7,12 +7,12 @@
 namespace spa {
 TEST_CASE("pkb/ProgramKnowledgeBase") {
     BasicEntities be;
-    be.procedures = std::vector<std::string>{"", "p1"};
+    be.procedures = std::vector<std::string>{"", "p1", "p2", "p3"};
     be.variables = std::vector<std::string>{"", "v1", "v2", "v3", "v4"};
     be.constants = std::vector<std::string>{"", "1", "2", "3"};
-    be.reads = std::vector<int>{2, 10};
-    be.prints = std::vector<int>{3, 6};
-    be.calls = std::vector<int>{};
+    be.reads = std::vector<int>{2, 10, 13};
+    be.prints = std::vector<int>{3, 6, 14};
+    be.calls = std::vector<int>{11, 12};
     be.whiles = std::vector<int>{1, 5};
     be.ifs = std::vector<int>{4};
     be.assigns = std::vector<int>{7, 8, 9};
@@ -20,6 +20,8 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     std::vector<std::set<int>> procs;
     procs.emplace_back(std::set<int>{});
     procs.emplace_back(std::set<int>{});
+    procs.emplace_back(std::set<int>{3});
+    procs.emplace_back(std::set<int>{1});
     be.proc_call_graph = procs;
 
     // dummy pn
@@ -99,7 +101,6 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     pkb.SetLst(Index<SetEntityType::kStmtLst>(3), std::vector<int>{5, 8});
     pkb.SetLst(Index<SetEntityType::kStmtLst>(4), std::vector<int>{6, 7});
     pkb.SetLst(Index<SetEntityType::kStmtLst>(5), std::vector<int>{9});
-
     pkb.SetIndex(Index<SetEntityType::kStmt>(7),
                  Index<SetEntityType::kNotation>(1));
     pkb.SetIndex(Index<SetEntityType::kStmt>(8),
@@ -118,6 +119,20 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     pkb.SetRel(Index<SetEntityType::kStmt>(6), std::vector<int>{2});
     pkb.SetRel(Index<SetEntityType::kStmt>(5), std::vector<int>{4});
     pkb.SetRel(Index<SetEntityType::kStmt>(4), std::vector<int>{4});
+
+    // support Calls and multiple procedures
+    pkb.SetIndex(Index<SetEntityType::kStmt>(11),
+                 Index<SetEntityType::kProc>(3));
+    pkb.SetIndex(Index<SetEntityType::kStmt>(12),
+                 Index<SetEntityType::kProc>(1));
+    pkb.SetIndex(Index<SetEntityType::kProc>(2),
+                 Index<SetEntityType::kStmtLst>(6));
+    pkb.SetIndex(Index<SetEntityType::kProc>(3),
+                 Index<SetEntityType::kStmtLst>(7));
+    pkb.SetLst(Index<SetEntityType::kStmtLst>(6), std::vector<int>{11});
+    pkb.SetLst(Index<SetEntityType::kStmtLst>(7), std::vector<int>{12, 13, 14});
+    pkb.SetRel(Index<SetEntityType::kStmt>(13), Index<SetEntityType::kVar>(1));
+    pkb.SetRel(Index<SetEntityType::kStmt>(14), std::vector<int>{2});
 
     pkb.Compile();
     SECTION("ExistFollows") {
@@ -159,17 +174,13 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                                StmtType::kAll) == std::set<int>{2, 3});
         REQUIRE(pkb.GetFollows(true, Index<ArgPos::kSecond>(8),
                                StmtType::kWhile) == std::set<int>{5});
-    }
-    SECTION("GetFollowsWildcard") {
         REQUIRE(pkb.GetFollows(ArgPos::kFirst, StmtType::kAssign).empty());
         REQUIRE(pkb.GetFollows(ArgPos::kSecond, StmtType::kAssign) ==
                 std::set<int>{7, 8});
-    }
-    SECTION("GetFollowsPairs") {
         REQUIRE(pkb.GetFollowsPairs(true, StmtType::kAll, StmtType::kAll)
-                        .first.size() == 6);
+                        .first.size() == 9);
         REQUIRE(pkb.GetFollowsPairs(false, StmtType::kAll, StmtType::kAll)
-                        .first.size() == 5);
+                        .first.size() == 7);
     }
     SECTION("GetParent") {
         REQUIRE(pkb.GetParent(true, Index<ArgPos::kFirst>(1),
@@ -182,15 +193,11 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                               StmtType::kWhile) == std::set<int>{5});
         REQUIRE(pkb.GetParent(true, Index<ArgPos::kSecond>(3), StmtType::kIf)
                         .empty());
-    }
-    SECTION("GetParentWildcard") {
         REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kAssign).empty());
         REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kWhile) ==
                 std::set<int>{1, 5});
         REQUIRE(pkb.GetParent(ArgPos::kSecond, StmtType::kAll) ==
                 std::set<int>{2, 3, 4, 5, 6, 7, 8, 9});
-    }
-    SECTION("GetParentPairs") {
         REQUIRE(pkb.GetParentPairs(true, StmtType::kAll, StmtType::kAll)
                         .first.size() == 15);
         REQUIRE(pkb.GetParentPairs(false, StmtType::kAll, StmtType::kAll)
@@ -243,7 +250,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetUses("v4", StmtType::kAll) == std::set<int>{1, 4, 5});
         REQUIRE(pkb.GetUses("v4", StmtType::kIf) == std::set<int>{4});
         REQUIRE(pkb.GetUses(StmtType::kAll) ==
-                std::set<int>{1, 5, 4, 3, 6, 7, 8, 9});
+                std::set<int>{1, 5, 4, 3, 6, 7, 8, 9, 14});
         REQUIRE(pkb.GetUses(StmtType::kIf) == std::set<int>{4});
         // pair can contain duplicates
         std::vector<int> first = pkb.GetUsesStmtVar(StmtType::kIf).first;
@@ -272,13 +279,13 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                 std::set<int>{1, 2, 3});
         REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(10)) ==
                 std::set<int>{2});
-        REQUIRE(pkb.GetModifies("v1", StmtType::kRead) == std::set<int>{2});
+        REQUIRE(pkb.GetModifies("v1", StmtType::kRead) == std::set<int>{2, 13});
         REQUIRE(pkb.GetModifies("v1", StmtType::kPrint).empty());
         REQUIRE(pkb.GetModifies("v1", StmtType::kAll) ==
-                std::set<int>{1, 2, 4, 5, 7});
+                std::set<int>{1, 2, 4, 5, 7, 13});
         REQUIRE(pkb.GetModifies("v3", StmtType::kWhile) == std::set<int>{1});
         REQUIRE(pkb.GetModifies(StmtType::kAll) ==
-                std::set<int>{1, 2, 4, 5, 7, 8, 9, 10});
+                std::set<int>{1, 2, 4, 5, 7, 8, 9, 10, 13});
         // pairs can have duplication
         std::vector<int> first = pkb.GetModifiesStmtVar(StmtType::kWhile).first;
         std::vector<int> second =
@@ -292,6 +299,29 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                 std::vector<int>{1, 2}, std::vector<int>{1, 3}};
         REQUIRE(results == expected);
     }
+    SECTION("ExistCalls") {
+        REQUIRE(pkb.ExistCalls());
+        REQUIRE_FALSE(pkb.ExistCalls(Name<ArgPos::kFirst>("p1")));
+        REQUIRE_FALSE(pkb.ExistCalls(Name<ArgPos::kSecond>("p2")));
+        REQUIRE(pkb.ExistCalls(Name<ArgPos::kSecond>("p3")));
+        REQUIRE_FALSE(pkb.ExistCalls(Name<ArgPos::kFirst>("p2"),
+                                     Name<ArgPos::kSecond>("p1")));
+        REQUIRE(pkb.ExistCallsT(Name<ArgPos::kFirst>("p2"),
+                                Name<ArgPos::kSecond>("p1")));
+    }
+    SECTION("GetCalls") {
+        REQUIRE(pkb.GetCalls(Name<ArgPos::kFirst>("p4")).empty());
+        REQUIRE(pkb.GetCalls(Name<ArgPos::kFirst>("p2")) == std::set<int>{3});
+        REQUIRE(pkb.GetCallsT(Name<ArgPos::kFirst>("p2")) ==
+                std::set<int>{1, 3});
+        REQUIRE(pkb.GetCalls(Name<ArgPos::kSecond>("p1")) == std::set<int>{3});
+        REQUIRE(pkb.GetCallsT(Name<ArgPos::kSecond>("p1")) ==
+                std::set<int>{2, 3});
+        REQUIRE(pkb.GetCallsPairs() ==
+                std::pair{std::vector<int>{2, 3}, std::vector<int>{3, 1}});
+        REQUIRE(pkb.GetCallsTPairs() == std::pair{std::vector<int>{2, 2, 3},
+                                                  std::vector<int>{1, 3, 1}});
+    }
     SECTION("ToName") {
         std::vector<int> list1 = {1, 2};
         std::list<std::string> names;
@@ -304,20 +334,22 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     SECTION("GetEntity") {
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kAssign) ==
                 std::vector<int>{7, 8, 9});
-        REQUIRE(pkb.GetAllEntityIndices(StmtType::kCall).empty());
+        REQUIRE(pkb.GetAllEntityIndices(StmtType::kCall) ==
+                std::vector<int>{11, 12});
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kIf) == std::vector<int>{4});
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kPrint) ==
-                std::vector<int>{3, 6});
+                std::vector<int>{3, 6, 14});
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kRead) ==
-                std::vector<int>{2, 10});
+                std::vector<int>{2, 10, 13});
         REQUIRE(pkb.GetAllEntityIndices(StmtType::kWhile) ==
                 std::vector<int>{1, 5});
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kConst) ==
                 std::vector<int>{1, 2, 3});
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kProc) ==
-                std::vector<int>{1});
+                std::vector<int>{1, 2, 3});
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kStmt) ==
-                std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+                std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+                                 14});
         REQUIRE(pkb.GetAllEntityIndices(QueryEntityType::kVar) ==
                 std::vector<int>{1, 2, 3, 4});
     }
