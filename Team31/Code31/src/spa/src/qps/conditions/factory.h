@@ -43,18 +43,19 @@ class Factory {
   private:
     enum Relationship {
         kFollows,
-        kFollowsTrans,
+        kFollowsT,
         kParent,
-        kParentTrans,
+        kParentT,
         kUses,
         kModifies,
         kPatternPartial,
         kPatternExact,
         kNext,
-        kNextTrans,
+        kNextT,
         kAffects,
-        kAffectsTrans,
-        kCalls
+        kAffectsT,
+        kCalls,
+        kCallsT
     };
     Relationship rel_;
     ConditionClause::FirstParamType first_param_type_ =

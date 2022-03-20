@@ -60,10 +60,10 @@ void Factory::SetSecond(std::vector<QueryToken>&& expr) {
 void Factory::SetTransPartial() {
     switch (rel_) {
         case Relationship::kFollows:
-            rel_ = Relationship::kFollowsTrans;
+            rel_ = Relationship::kFollowsT;
             return;
         case Relationship::kParent:
-            rel_ = Relationship::kParentTrans;
+            rel_ = Relationship::kParentT;
             return;
         case Relationship::kPatternExact:
         case Relationship::kPatternPartial:
@@ -78,11 +78,11 @@ std::unique_ptr<ConditionClause> Factory::Build() {
     switch (rel_) {
         case Relationship::kParent:
             return BuildStmtStmtClause<ParentClause>();
-        case Relationship::kParentTrans:
+        case Relationship::kParentT:
             return BuildStmtStmtClause<ParentTransClause>();
         case Relationship::kFollows:
             return BuildStmtStmtClause<FollowsClause>();
-        case Relationship::kFollowsTrans:
+        case Relationship::kFollowsT:
             return BuildStmtStmtClause<FollowsTransClause>();
         case Relationship::kUses:
             return BuildUsesModifiesClause<UsesClause>();
