@@ -26,8 +26,12 @@ class ModifiesRelationshipStore : public UsesModifiesStoreBase {
                          const StmtlstStatementsStore& stmtlst_stmt,
                          const TypeStatementsStore& type_statement_store,
                          BitVec2D& if_added, BitVec2D& while_added) override;
-    std::vector<StmtType> InitIndirectTypes() override;
-    std::vector<StmtType> InitDirectTypes() override;
+    void InitDirectTypes(const TypeStatementsStore& store) override;
+    void InitIndirectTypes(const TypeStatementsStore& type_statement_store,
+                           const StmtlstStatementsStore& stmtlst_stmt,
+                           const StmtlstParentStore& stmtlst_parent,
+                           const ContainerForest& forest, BitVec2D& if_added,
+                           BitVec2D& while_added) override;
 };
 }  // namespace spa
 

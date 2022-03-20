@@ -26,12 +26,20 @@ void ModifiesRelationshipStore::AddConditionRel(
     return;
 }
 
-std::vector<StmtType> ModifiesRelationshipStore::InitIndirectTypes() {
-    return std::vector<StmtType>{StmtType::kAssign, StmtType::kRead,
-                                 StmtType::kIf, StmtType::kWhile};
+void ModifiesRelationshipStore::InitIndirectTypes(
+        const TypeStatementsStore& type_statement_store,
+        const StmtlstStatementsStore& stmtlst_stmt,
+        const StmtlstParentStore& stmtlst_parent, const ContainerForest& forest,
+        BitVec2D& if_added, BitVec2D& while_added) {
+    InitIndirectRel(std::array<StmtType, 4>{StmtType::kAssign, StmtType::kRead,
+                                            StmtType::kIf, StmtType::kWhile},
+                    type_statement_store, stmtlst_stmt, stmtlst_parent, forest,
+                    if_added, while_added);
 }
 
-std::vector<StmtType> ModifiesRelationshipStore::InitDirectTypes() {
-    return std::vector<StmtType>{StmtType::kAssign, StmtType::kRead};
+void ModifiesRelationshipStore::InitDirectTypes(
+        const TypeStatementsStore& store) {
+    InitDirectRel(std::array<StmtType, 2>{StmtType::kAssign, StmtType::kRead},
+                  store);
 }
 }  // namespace spa

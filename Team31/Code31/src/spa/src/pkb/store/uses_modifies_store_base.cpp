@@ -50,12 +50,7 @@ void UsesModifiesStoreBase::Compile(
         const TypeStatementsStore& type_statement_store,
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt) {
-    auto direct_stmt_types = InitDirectTypes();
-    for (const auto stmt_type : direct_stmt_types) {
-        auto& relationships = stmt_var_pairs_[static_cast<int>(stmt_type) - 1];
-        AddDirectRel(relationships,
-                     type_statement_store.GetStatements(stmt_type));
-    }
+    InitDirectTypes(type_statement_store);
     AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
     FillStmts();
     FillVars();
@@ -113,12 +108,8 @@ void UsesModifiesStoreBase::AddContainerRel(
     AddConditionRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store,
                     if_added, while_added);
 
-    auto indirect_stmt_types = InitIndirectTypes();
-    for (const auto stmt_type : indirect_stmt_types) {
-        auto& relationships = stmt_var_pairs_[static_cast<int>(stmt_type) - 1];
-        AddIndirectRel(relationships, stmtlst_stmt, stmtlst_parent, forest,
-                       if_added, while_added);
-    }
+    InitIndirectTypes(type_statement_store, stmtlst_stmt, stmtlst_parent,
+                      forest, if_added, while_added);
 }
 
 void UsesModifiesStoreBase::FillStmts() {
