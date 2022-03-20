@@ -50,8 +50,9 @@ void UsesModifiesStoreBase::Compile(
         const TypeStatementsStore& type_statement_store,
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt) {
-    InitDirectTypes(type_statement_store);
-    AddContainerRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store);
+    AddAllDirectRel(type_statement_store);
+    AddAllContainerRel(forest, stmtlst_parent, stmtlst_stmt,
+                       type_statement_store);
     FillStmts();
     FillVars();
     FillRels();
@@ -98,7 +99,7 @@ void UsesModifiesStoreBase::AddIndirectRel(
     }
 }
 
-void UsesModifiesStoreBase::AddContainerRel(
+void UsesModifiesStoreBase::AddAllContainerRel(
         const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
         const StmtlstStatementsStore& stmtlst_stmt,
         const TypeStatementsStore& type_statement_store) {
@@ -108,7 +109,7 @@ void UsesModifiesStoreBase::AddContainerRel(
     AddConditionRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store,
                     if_added, while_added);
 
-    InitIndirectTypes(type_statement_store, stmtlst_stmt, stmtlst_parent,
+    AddAllIndirectRel(type_statement_store, stmtlst_stmt, stmtlst_parent,
                       forest, if_added, while_added);
 }
 

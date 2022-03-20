@@ -26,12 +26,15 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
                          const StmtlstStatementsStore& stmtlst_stmt,
                          const TypeStatementsStore& type_statement_store,
                          BitVec2D& if_added, BitVec2D& while_added) override;
-    void InitDirectTypes(const TypeStatementsStore& store) override;
-    void InitIndirectTypes(const TypeStatementsStore& type_statement_store,
+    void AddAllDirectRel(const TypeStatementsStore& store) override;
+    void AddAllIndirectRel(const TypeStatementsStore& type_statement_store,
                            const StmtlstStatementsStore& stmtlst_stmt,
                            const StmtlstParentStore& stmtlst_parent,
                            const ContainerForest& forest, BitVec2D& if_added,
                            BitVec2D& while_added) override;
+
+    static constexpr std::array<StmtType, 2> relevant_stmt_types_{
+            {StmtType::kAssign, StmtType::kPrint}};
 };
 }  // namespace spa
 

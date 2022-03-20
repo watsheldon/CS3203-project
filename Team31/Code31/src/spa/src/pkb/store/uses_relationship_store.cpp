@@ -74,19 +74,16 @@ void UsesRelationshipStore::AddConditionRel(
     }
 }
 
-void UsesRelationshipStore::InitIndirectTypes(
+void UsesRelationshipStore::AddAllIndirectRel(
         const TypeStatementsStore& type_statement_store,
         const StmtlstStatementsStore& stmtlst_stmt,
         const StmtlstParentStore& stmtlst_parent, const ContainerForest& forest,
         BitVec2D& if_added, BitVec2D& while_added) {
-    InitIndirectRel(
-            std::array<StmtType, 2>{StmtType::kAssign, StmtType::kPrint},
-            type_statement_store, stmtlst_stmt, stmtlst_parent, forest,
-            if_added, while_added);
+    FillIndirectRels(relevant_stmt_types_, type_statement_store, stmtlst_stmt,
+                     stmtlst_parent, forest, if_added, while_added);
 }
 
-void UsesRelationshipStore::InitDirectTypes(const TypeStatementsStore& store) {
-    InitDirectRel(std::array<StmtType, 2>{StmtType::kAssign, StmtType::kPrint},
-                  store);
+void UsesRelationshipStore::AddAllDirectRel(const TypeStatementsStore& store) {
+    FillDirectRels(relevant_stmt_types_, store);
 }
 }  // namespace spa
