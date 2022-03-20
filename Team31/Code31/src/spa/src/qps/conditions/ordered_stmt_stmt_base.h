@@ -5,7 +5,11 @@
 
 namespace spa {
 class OrderedStmtStmtBase : public StmtStmtBase {
+  protected:
     using StmtStmtBase::StmtStmtBase;
+
+  public:
+    ~OrderedStmtStmtBase() override = default;
 };
 }  // namespace spa
 
