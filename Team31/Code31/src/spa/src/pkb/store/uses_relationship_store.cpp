@@ -10,9 +10,6 @@
 #include "type_statements_store.h"
 
 namespace spa {
-template <typename T>
-using Ref = std::reference_wrapper<T>;
-
 void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
     stmt_var_.Set(stmt_no, std::forward<std::vector<int>>(var_indices));
 }
@@ -22,10 +19,8 @@ const std::vector<int>& UsesRelationshipStore::GetVarIndex(int stmt_no) const {
 }
 
 void UsesRelationshipStore::AddConditionRel(
-
         const TypeStatementsStore& type_statement_store,
         const ContainerInfo& info, PairBitmap& bitmaps) {
-    const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
     auto& [if_added, while_added] = bitmaps;
     std::array<Ref<BitVec2D>, 2> container_bitmaps{{if_added, while_added}};
     auto& if_var_pairs = stmt_var_pairs_[static_cast<int>(StmtType::kIf) - 1];
@@ -40,37 +35,14 @@ void UsesRelationshipStore::AddConditionRel(
             {all_if_stmts, all_while_stmts}};
 
     for (int pos = 0; pos < 2; ++pos) {
-        auto& [container_stmts, container_vars] =
-                container_var_pairs[pos].get();
-        for (auto i : all_container_stmts[pos]) {
-            // Add indirect Uses of condition variables by ancestors of i.
-            auto& var_indices = GetVarIndex(i);
-            auto stmtlst = stmtlst_stmt.GetStmtlst(i);
-            auto ancestors = forest.GetAncestryTrace(stmtlst);
-            for (auto a : ancestors) {
-                auto& [type, index] = stmtlst_parent.GetParent(a);
-                if (type == StmtlstParentStore::kProc) break;
-                auto& [stmts, vars] = type == StmtlstParentStore::kIf
-                                              ? if_var_pairs
-                                              : while_var_pairs;
-                auto& added = type == StmtlstParentStore::kIf ? if_added
-                                                              : while_added;
-                for (auto v : var_indices) {
-                    if (added.At(a, v)) continue;
-                    vars.emplace_back(v);
-                    added.Set(a, v);
-                }
-                if (stmts.size() == vars.size()) break;
-                stmts.resize(vars.size(), index);
-            }
-            // Add direct Uses of condition variables by container statement i.
+        auto& stmt_var_pairs = container_var_pairs[pos].get();
+        for (auto stmt_no : all_container_stmts[pos]) {
+            auto& var_indices = GetVarIndex(stmt_no);
+            AddConditionIndirectUses(stmt_no, var_indices, container_var_pairs,
+                                     info, bitmaps);
             auto& bitmap = container_bitmaps[pos].get();
-            for (auto v : var_indices) {
-                if (bitmap.At(i, v)) continue;
-                container_vars.emplace_back(v);
-                bitmap.Set(i, v);
-            }
-            container_stmts.resize(container_vars.size(), i);
+            AddConditionDirectUses(stmt_no, var_indices, stmt_var_pairs,
+                                   bitmap);
         }
     }
 }
@@ -83,5 +55,46 @@ void UsesRelationshipStore::AddAllIndirectRel(
 
 void UsesRelationshipStore::AddAllDirectRel(const TypeStatementsStore& store) {
     FillDirectRels(relevant_stmt_types_, store);
+}
+
+// Add direct Uses of condition variables by container stmt with the given
+// index.
+void UsesRelationshipStore::AddConditionDirectUses(
+        int stmt_no, const std::vector<int>& var_indices,
+        PairVec<int>& stmt_var_pairs, BitVec2D& bitmap) {
+    auto& [container_stmts, container_vars] = stmt_var_pairs;
+    for (auto v : var_indices) {
+        if (bitmap.At(stmt_no, v)) continue;
+        container_vars.emplace_back(v);
+        bitmap.Set(stmt_no, v);
+    }
+    container_stmts.resize(container_vars.size(), stmt_no);
+}
+
+// Add indirect Uses of condition variables by ancestors of stmt_no.
+void UsesRelationshipStore::AddConditionIndirectUses(
+        int stmt_no, const std::vector<int>& var_indices,
+        std::array<Ref<PairVec<int>>, 2>& container_var_pairs,
+        const ContainerInfo& info, PairBitmap& bitmaps) {
+    const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
+    auto& [if_added, while_added] = bitmaps;
+    auto& [if_var_pairs, while_var_pairs] = container_var_pairs;
+    auto stmtlst = stmtlst_stmt.GetStmtlst(stmt_no);
+    auto ancestors = forest.GetAncestryTrace(stmtlst);
+    for (auto a : ancestors) {
+        auto& [type, index] = stmtlst_parent.GetParent(a);
+        if (type == StmtlstParentStore::kProc) break;
+        auto& [stmts, vars] = type == StmtlstParentStore::kIf
+                                      ? if_var_pairs.get()
+                                      : while_var_pairs.get();
+        auto& added = type == StmtlstParentStore::kIf ? if_added : while_added;
+        for (auto v : var_indices) {
+            if (added.At(a, v)) continue;
+            vars.emplace_back(v);
+            added.Set(a, v);
+        }
+        if (stmts.size() == vars.size()) break;
+        stmts.resize(vars.size(), index);
+    }
 }
 }  // namespace spa
