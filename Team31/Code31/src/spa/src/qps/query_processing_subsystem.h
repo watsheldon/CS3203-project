@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include "PQL_validator.h"
+#include "generator.h"
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/query_evaluator.h"
 
@@ -14,11 +15,12 @@ class QueryProcessingSubsystem {
   public:
     void Use(std::unique_ptr<spa::KnowledgeBase> pkb_ptr) noexcept;
     void Evaluate(std::string_view query_string,
-                  std::list<std::string> &list) noexcept;
+                  std::list<std::string> &result) noexcept;
 
   private:
     std::unique_ptr<QueryEvaluator> evaluator_;
     PQLValidator validator_;
+    Generator generator_;
 };
 }  // namespace spa
 

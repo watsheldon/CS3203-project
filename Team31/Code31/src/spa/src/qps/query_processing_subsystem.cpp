@@ -5,7 +5,6 @@
 #include <string_view>
 #include <utility>
 
-#include "generator.h"
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/query_evaluator.h"
 
@@ -15,17 +14,18 @@ void QueryProcessingSubsystem::Use(
     evaluator_ = std::make_unique<QueryEvaluator>(std::move(pkb_ptr));
 }
 
-void QueryProcessingSubsystem::Evaluate(std::string_view query_string,
-                                        std::list<std::string> &list) noexcept {
+void QueryProcessingSubsystem::Evaluate(
+        std::string_view query_string,
+        std::list<std::string> &result) noexcept {
     if (!evaluator_) return;
     auto tokens = validator_.Validate(query_string);
 
     // there are only tokens if the query is syntactically correct
     if (tokens.empty()) return;
 
-    auto query = Generator::Generate(tokens);
+    auto query = generator_.Generate(tokens);
     if (query) {
-        evaluator_->Evaluate(*query, list);
+        evaluator_->Evaluate(*query, result);
     }
 }
 }  // namespace spa

@@ -12,9 +12,11 @@
 namespace spa {
 
 class Generator {
+    using SynonymMap = std::map<std::string_view, Synonym* const>;
+    using VecTokens = std::vector<QueryToken>;
+
   public:
-    static std::unique_ptr<QueryObject> Generate(
-            const std::vector<QueryToken>& tokens);
+    std::unique_ptr<QueryObject> Generate(const VecTokens& tokens);
 
   private:
     enum class Mode {
