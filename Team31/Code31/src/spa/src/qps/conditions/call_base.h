@@ -4,6 +4,6 @@
 #include "qps/conditions/condition_clause.h"
 
 namespace spa {
-class call_base : public ConditionClause {};
+class CallBase : public ConditionClause {};
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_CALLBASE_H_
