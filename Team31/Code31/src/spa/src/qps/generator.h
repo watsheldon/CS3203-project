@@ -1,10 +1,12 @@
 #ifndef SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 #define SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
 
+#include <map>
 #include <memory>
+#include <string_view>
 #include <vector>
 
-#include "PQL_validator.h"
+#include "conditions/factory.h"
 #include "query_object.h"
 #include "query_token.h"
 #include "synonym.h"
@@ -16,7 +18,7 @@ class Generator {
     using VecTokens = std::vector<QueryToken>;
 
   public:
-    std::unique_ptr<QueryObject> Generate(const VecTokens& tokens);
+    std::unique_ptr<QueryObject> Generate(const VecTokens& tokens) noexcept;
 
   private:
     enum class Mode {
@@ -29,15 +31,45 @@ class Generator {
         kPattern,
         kExpression,
         kIdentifier,
-        kZero,
+        kZeroth,
         kFirst,
         kSecond,
     };
-    static constexpr Synonym::Type TokenToSynType(QueryTokenType type);
-    static constexpr Mode TokenToClauseMode(QueryTokenType type);
-    static constexpr bool UnsuitableFirstSynType(Mode mode, Synonym::Type type);
+    bool error_;
+    SynonymMap synonym_map_;
+    VecUniquePtr<Synonym> synonyms_;
+    Synonym* selected_;
+    std::vector<Mode> mode_;
+    Synonym::Type curr_syn_type_;
+    VecUniquePtr<ConditionClause> conditions_;
+    std::vector<QueryToken> expression_;
+    Factory factory_;
+
+    void BeginDecl(QueryTokenType token_type) noexcept;
+    void BeginClause(QueryTokenType token_type) noexcept;
+    void Asterisk() noexcept;
+    void BracketL() noexcept;
+    void BracketR() noexcept;
+    void Name(const QueryToken& token) noexcept;
+    void Constant(const QueryToken& token) noexcept;
+    void AddDecl(std::string_view name) noexcept;
+    void Select(std::string_view name) noexcept;
+    void SetZeroth(std::string_view name) noexcept;
+    void SetFirst(std::string_view name) noexcept;
+    void SetSecond(std::string_view name) noexcept;
+    void ParseToken(const QueryToken& token) noexcept;
+    void Underscore() noexcept;
+    void Quote() noexcept;
+    void Comma() noexcept;
+    void Semicolon() noexcept;
+
+    static constexpr Synonym::Type TokenToSynType(QueryTokenType type) noexcept;
+    static constexpr Mode TokenToClauseMode(QueryTokenType type) noexcept;
+    static constexpr bool UnsuitableFirstSynType(Mode mode,
+                                                 Synonym::Type type) noexcept;
     static constexpr bool UnsuitableSecondSynType(Mode mode,
-                                                  Synonym::Type type);
+                                                  Synonym::Type type) noexcept;
+    void Reset() noexcept;
 };
 }  // namespace spa
 #endif  // SPA_SRC_SPA_SRC_QPS_GENERATOR_H_
