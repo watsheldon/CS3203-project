@@ -7,6 +7,7 @@
 
 namespace spa {
 class AffectsTransClause : public StmtStmtBase {
+  public:
     using StmtStmtBase::StmtStmtBase;
     ResultTable Execute(KnowledgeBase *knowledge_base) const final;
 };

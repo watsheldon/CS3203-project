@@ -3,7 +3,8 @@
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/result_table.h"
 
-spa::ResultTable spa::NextTransClause::Execute(
-        spa::KnowledgeBase *knowledge_base) const {
+namespace spa {
+ResultTable NextTransClause::Execute(KnowledgeBase* knowledge_base) const {
     return StmtStmtBase::Execute(knowledge_base);
 }
+}  // namespace spa

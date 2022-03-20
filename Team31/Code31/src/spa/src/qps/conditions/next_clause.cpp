@@ -5,6 +5,6 @@
 
 namespace spa {
 ResultTable NextClause::Execute(KnowledgeBase *knowledge_base) const {
-    return StmtStmtBase::Execute(knowledge_base);
+    return ResultTable{false};
 }
 }  // namespace spa
