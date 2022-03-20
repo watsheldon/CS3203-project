@@ -98,15 +98,8 @@ std::unique_ptr<ConditionClause> Factory::Build() {
 }
 
 void Factory::Reset() {
-    first_int_ = 0;
-    second_int_ = 0;
     first_param_type_ = ConditionClause::FirstParamType::kWild;
     second_param_type_ = ConditionClause::SecondParamType::kWild;
-    first_ident_.clear();
-    second_ident_.clear();
-    assign_ = nullptr;
-    first_syn_ = nullptr;
-    second_syn_ = nullptr;
     second_exprs_.clear();
 }
 }  // namespace spa

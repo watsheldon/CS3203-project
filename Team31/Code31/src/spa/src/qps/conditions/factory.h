@@ -58,10 +58,8 @@ class Factory {
         kCallsT
     };
     Relationship rel_;
-    ConditionClause::FirstParamType first_param_type_ =
-            ConditionClause::FirstParamType::kWild;
-    ConditionClause::SecondParamType second_param_type_ =
-            ConditionClause::SecondParamType::kWild;
+    ConditionClause::FirstParamType first_param_type_;
+    ConditionClause::SecondParamType second_param_type_;
     int first_int_;
     int second_int_;
     std::string first_ident_;
