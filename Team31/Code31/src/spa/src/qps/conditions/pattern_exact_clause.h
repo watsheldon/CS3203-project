@@ -2,6 +2,8 @@
 #define SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_EXACT_CLAUSE_H_
 
 #include "pattern_base.h"
+#include "pkb/knowledge_base.h"
+#include "qps/evaluator/result_table.h"
 
 namespace spa {
 class PatternExactClause : public PatternBase {

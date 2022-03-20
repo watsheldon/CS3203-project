@@ -1,6 +1,14 @@
 #include "parent_clause.h"
 
+#include <cassert>
+#include <utility>
+
+#include "common/entity_type_enum.h"
+#include "common/index.h"
 #include "common/type_convert_helpers.h"
+#include "pkb/knowledge_base.h"
+#include "qps/evaluator/result_table.h"
+
 namespace spa {
 ResultTable ParentClause::Execute(KnowledgeBase *knowledge_base) const {
     switch (type_) {

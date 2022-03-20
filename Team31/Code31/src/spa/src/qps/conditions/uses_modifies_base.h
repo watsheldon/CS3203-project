@@ -1,10 +1,13 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_
 
-#include <array>
+#include <string>
 
 #include "common/aliases.h"
-#include "qps/conditions/condition_clause.h"
+#include "condition_clause.h"
+#include "pkb/knowledge_base.h"
+#include "qps/evaluator/result_table.h"
+#include "qps/synonym.h"
 
 namespace spa {
 class UsesModifiesBase : public ConditionClause {

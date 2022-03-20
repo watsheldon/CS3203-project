@@ -4,10 +4,8 @@
 #include <utility>
 #include <vector>
 
-#include "common/entity_type_enum.h"
-#include "common/index.h"
-#include "common/type_convert_helpers.h"
 #include "qps/query_token.h"
+#include "qps/synonym.h"
 
 namespace spa {
 PatternBase::PatternBase(Synonym *assign, std::string first,

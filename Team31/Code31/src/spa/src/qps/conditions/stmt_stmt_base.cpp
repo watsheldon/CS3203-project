@@ -1,6 +1,8 @@
 #include "stmt_stmt_base.h"
 
-#include "common/type_convert_helpers.h"
+#include "common/entity_type_enum.h"
+#include "condition_clause.h"
+#include "qps/synonym.h"
 
 namespace spa {
 StmtStmtBase::StmtStmtBase() : type_(Type::kWildWild) {}

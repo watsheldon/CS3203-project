@@ -1,5 +1,11 @@
 #include "pattern_exact_clause.h"
 
+#include <cassert>
+#include <utility>
+
+#include "pkb/knowledge_base.h"
+#include "qps/evaluator/result_table.h"
+
 namespace spa {
 ResultTable PatternExactClause::Execute(KnowledgeBase *knowledge_base) const {
     switch (type_) {

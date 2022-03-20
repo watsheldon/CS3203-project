@@ -1,8 +1,6 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_
 #define SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_
 
-#include <utility>
-
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/result_table.h"
 

@@ -1,10 +1,10 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_
 
-#include <array>
-
 #include "common/aliases.h"
+#include "common/entity_type_enum.h"
 #include "condition_clause.h"
+#include "qps/synonym.h"
 
 namespace spa {
 class StmtStmtBase : public ConditionClause {

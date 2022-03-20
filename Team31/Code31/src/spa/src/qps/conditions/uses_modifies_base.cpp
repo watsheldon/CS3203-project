@@ -1,6 +1,11 @@
 #include "uses_modifies_base.h"
 
-#include "common/type_convert_helpers.h"
+#include <string>
+#include <utility>
+
+#include "condition_clause.h"
+#include "qps/synonym.h"
+
 namespace spa {
 UsesModifiesBase::UsesModifiesBase(int first, std::string second)
         : type_(Type::kIntIdent),

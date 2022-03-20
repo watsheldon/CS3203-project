@@ -1,6 +1,8 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_USES_CLAUSE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_USES_CLAUSE_H_
 
+#include "pkb/knowledge_base.h"
+#include "qps/evaluator/result_table.h"
 #include "uses_modifies_base.h"
 
 namespace spa {

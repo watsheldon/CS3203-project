@@ -2,6 +2,8 @@
 #define SRC_SPA_SRC_QPS_CONDITIONS_FOLLOWS_TRANS_CLAUSE_H_
 
 #include "ordered_stmt_stmt_base.h"
+#include "pkb/knowledge_base.h"
+#include "qps/evaluator/result_table.h"
 
 namespace spa {
 class FollowsTransClause : public OrderedStmtStmtBase {
@@ -10,4 +12,4 @@ class FollowsTransClause : public OrderedStmtStmtBase {
 };
 
 }  // namespace spa
-#endif  // RC_SPA_SRC_QPS_CONDITIONS_FOLLOWS_TRANS_CLAUSE_H_
+#endif  // SRC_SPA_SRC_QPS_CONDITIONS_FOLLOWS_TRANS_CLAUSE_H_

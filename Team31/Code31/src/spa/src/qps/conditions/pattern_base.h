@@ -1,11 +1,13 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
 
-#include <array>
+#include <vector>
 
 #include "common/aliases.h"
 #include "condition_clause.h"
+#include "qps/evaluator/result_table.h"
 #include "qps/query_token.h"
+
 namespace spa {
 class PatternBase : public ConditionClause {
   public:

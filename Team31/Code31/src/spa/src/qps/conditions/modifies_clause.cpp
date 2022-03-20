@@ -1,6 +1,12 @@
 #include "modifies_clause.h"
 
+#include <cassert>
+#include <utility>
+
+#include "common/index.h"
 #include "common/type_convert_helpers.h"
+#include "pkb/knowledge_base.h"
+#include "qps/evaluator/result_table.h"
 
 namespace spa {
 ResultTable ModifiesClause::Execute(KnowledgeBase *knowledge_base) const {
