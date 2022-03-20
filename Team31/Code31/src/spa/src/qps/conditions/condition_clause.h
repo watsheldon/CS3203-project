@@ -23,7 +23,6 @@ class ConditionClause {
         kWild,
         kExpr,
         kIdent,
-
     };
 };
 }  // namespace spa
