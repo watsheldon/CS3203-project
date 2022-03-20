@@ -49,9 +49,12 @@ ResultTable FollowsClause::Execute(KnowledgeBase *knowledge_base) const {
                                                      SynToPkbType(second_syn_));
             return {second_syn_, std::move(result)};
         }
-        case Type::kWildWild:
+        case Type::kWildWild: {
             auto result = knowledge_base->ExistFollows();
             return ResultTable(result);
+        }
+        default:
+            assert(false);
     }
 }
 }  // namespace spa

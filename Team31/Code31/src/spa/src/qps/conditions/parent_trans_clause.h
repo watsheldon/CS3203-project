@@ -1,14 +1,14 @@
-#ifndef SPA_SRC_SPA_SRC_QPS_CONDITIONS_PARENT_TRANS_CLAUSE_H_
-#define SPA_SRC_SPA_SRC_QPS_CONDITIONS_PARENT_TRANS_CLAUSE_H_
+#ifndef SRC_SPA_SRC_QPS_CONDITIONS_PARENT_TRANS_CLAUSE_H_
+#define SRC_SPA_SRC_QPS_CONDITIONS_PARENT_TRANS_CLAUSE_H_
 
-#include "stmt_stmt_base.h"
+#include "ordered_stmt_stmt_base.h"
 
 namespace spa {
-class ParentTransClause : public StmtStmtBase {
-    using StmtStmtBase::StmtStmtBase;
+class ParentTransClause : public OrderedStmtStmtBase {
+    using OrderedStmtStmtBase::OrderedStmtStmtBase;
 
   public:
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const final;
 };
 }  // namespace spa
-#endif  // SPA_SRC_SPA_SRC_QPS_CONDITIONS_PARENT_TRANS_CLAUSE_H_
+#endif  // SRC_SPA_SRC_QPS_CONDITIONS_PARENT_TRANS_CLAUSE_H_

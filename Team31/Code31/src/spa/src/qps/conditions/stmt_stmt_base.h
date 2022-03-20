@@ -1,6 +1,9 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_
 
+#include <array>
+
+#include "common/aliases.h"
 #include "condition_clause.h"
 
 namespace spa {
@@ -26,7 +29,8 @@ class StmtStmtBase : public ConditionClause {
     StmtStmtBase(ArgPos pos, int integer);
     StmtStmtBase(ArgPos pos, Synonym *syn);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override = 0;
-    ~StmtStmtBase() override = 0;
+    static Type StmtStmtType(FirstParamType first, SecondParamType second);
+    ~StmtStmtBase() override = default;
 
   protected:
     Type type_;
@@ -34,6 +38,10 @@ class StmtStmtBase : public ConditionClause {
     int second_int_;
     Synonym *first_syn_;
     Synonym *second_syn_;
+    static constexpr Array2D<Type, 3, 3> stmt_stmt_type_{
+            {{Type::kIntInt, Type::kIntSyn, Type::kIntWild},
+             {Type::kSynInt, Type::kSynSyn, Type::kSynWild},
+             {Type::kWildInt, Type::kWildSyn, Type::kWildWild}}};
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_

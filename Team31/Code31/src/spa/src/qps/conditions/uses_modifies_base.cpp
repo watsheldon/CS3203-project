@@ -28,5 +28,15 @@ UsesModifiesBase::UsesModifiesBase(std::string first, std::string second)
           second_ident_(std::move(second)) {}
 UsesModifiesBase::UsesModifiesBase(std::string first)
         : type_(Type::kIdentWild), first_ident_(std::move(first)) {}
-UsesModifiesBase::~UsesModifiesBase() = default;
+UsesModifiesBase::Type UsesModifiesBase::UsesModifiesType(
+        ConditionClause::FirstParamType first,
+        ConditionClause::SecondParamType second) {
+    int first_index = first == FirstParamType::kIdent
+                              ? static_cast<int>(first) - 1
+                              : static_cast<int>(first);
+    int second_index = second == SecondParamType::kIdent
+                               ? static_cast<int>(second) - 2
+                               : static_cast<int>(second) - 1;
+    return uses_modifies_type_[first_index][second_index];
+}
 }  // namespace spa

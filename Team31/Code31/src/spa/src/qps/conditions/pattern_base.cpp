@@ -35,5 +35,12 @@ PatternBase::PatternBase(Synonym *const assign,
           second_expr_(std::move(second)) {}
 PatternBase::PatternBase(Synonym *const assign)
         : type_(Type::kWildWild), assign_(assign) {}
+PatternBase::Type PatternBase::PatternType(
+        ConditionClause::FirstParamType first,
+        ConditionClause::SecondParamType second) {
+    int first_index = static_cast<int>(first) - 1;
+    int second_index = static_cast<int>(second) - 2;
+    return pattern_type_[first_index][second_index];
+}
 PatternBase::~PatternBase() = default;
 }  // namespace spa

@@ -1,6 +1,9 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_
 
+#include <array>
+
+#include "common/aliases.h"
 #include "qps/conditions/condition_clause.h"
 
 namespace spa {
@@ -28,7 +31,8 @@ class UsesModifiesBase : public ConditionClause {
     UsesModifiesBase(std::string first, std::string second);
     explicit UsesModifiesBase(std::string first);
     ResultTable Execute(KnowledgeBase *knowledge_base) const override = 0;
-    ~UsesModifiesBase() override = 0;
+    static Type UsesModifiesType(FirstParamType first, SecondParamType second);
+    ~UsesModifiesBase() override = default;
 
   protected:
     Type type_;
@@ -38,6 +42,10 @@ class UsesModifiesBase : public ConditionClause {
     int second_int_;
     Synonym *second_syn_;
     std::string second_ident_;
+    static constexpr Array2D<Type, 3, 3> uses_modifies_type_{
+            {{Type::kIntSyn, Type::kIntWild, Type::kIntIdent},
+             {Type::kSynSyn, Type::kSynWild, Type::kSynIdent},
+             {Type::kIdentSyn, Type::kIdentWild, Type::kIdentIdent}}};
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_

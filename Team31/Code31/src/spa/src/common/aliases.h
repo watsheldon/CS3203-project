@@ -13,6 +13,8 @@ template <typename T>
 using PairVec = Pair<std::vector<T>>;
 template <typename T>
 using Vec2D = std::vector<std::vector<T>>;
+template <typename T, size_t row, size_t col>
+using Array2D = std::array<std::array<T, col>, row>;
 }  // namespace spa
 
 #endif  // SRC_SPA_SRC_COMMON_ALIASES_H_

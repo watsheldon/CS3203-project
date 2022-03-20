@@ -23,7 +23,6 @@ StmtStmtBase::StmtStmtBase(ArgPos pos, int integer) {
         type_ = Type::kIntWild;
         first_int_ = integer;
     } else {
-        assert(pos == ArgPos::kSecond);
         type_ = Type::kWildInt;
         second_int_ = integer;
     }
@@ -33,10 +32,15 @@ StmtStmtBase::StmtStmtBase(ArgPos pos, Synonym *syn) {
         type_ = Type::kSynWild;
         first_syn_ = syn;
     } else {
-        assert(pos == ArgPos::kSecond);
         type_ = Type::kWildSyn;
         second_syn_ = syn;
     }
 }
-StmtStmtBase::~StmtStmtBase() = default;
+StmtStmtBase::Type StmtStmtBase::StmtStmtType(
+        ConditionClause::FirstParamType first,
+        ConditionClause::SecondParamType second) {
+    int first_index = static_cast<int>(first);
+    int second_index = static_cast<int>(second);
+    return stmt_stmt_type_[first_index][second_index];
+}
 }  // namespace spa

@@ -42,7 +42,6 @@ class Factory {
 
   private:
     enum Relationship {
-        kNone,
         kFollows,
         kFollowsTrans,
         kParent,
@@ -57,28 +56,11 @@ class Factory {
         kAffectsTrans,
         kCalls
     };
-    enum ParamType {
-        kNoneNone,
-        kIntInt,
-        kIntSyn,
-        kIntWild,
-        kIntIdent,
-        kSynInt,
-        kSynSyn,
-        kSynWild,
-        kSynIdent,
-        kSynExpr,
-        kWildInt,
-        kWildSyn,
-        kWildWild,
-        kWildExpr,
-        kIdentSyn,
-        kIdentIdent,
-        kIdentWild,
-        kIdentExpr,
-    };
     Relationship rel_;
-    ParamType param_type_;
+    ConditionClause::FirstParamType first_param_type_ =
+            ConditionClause::FirstParamType::kWild;
+    ConditionClause::SecondParamType second_param_type_ =
+            ConditionClause::SecondParamType::kWild;
     int first_int_;
     int second_int_;
     std::string first_ident_;
@@ -87,130 +69,82 @@ class Factory {
     Synonym* first_syn_;
     Synonym* second_syn_;
     std::vector<QueryToken> second_exprs_;
-    int first_index_ = 0;
-    int second_index_ = 0;
-    static constexpr std::array<std::array<ParamType, 3>, 3> stmt_stmt_type_ = {
-            {{
-                     ParamType::kWildWild,
-                     ParamType::kWildInt,
-                     ParamType::kWildSyn,
-             },
-             {
-                     ParamType::kIntWild,
-                     ParamType::kIntInt,
-                     ParamType::kIntSyn,
-             },
-             {
-                     ParamType::kSynWild,
-                     ParamType::kSynInt,
-                     ParamType::kSynSyn,
-             }}};
-    static constexpr std::array<std::array<ParamType, 3>, 3>
-            uses_modifies_type_ = {{
-                    {
-                            ParamType::kIdentWild,
-                            ParamType::kIdentIdent,
-                            ParamType::kIdentSyn,
-                    },
-                    {ParamType::kIntWild, ParamType::kIntIdent,
-                     ParamType::kIntSyn
-
-                    },
-                    {ParamType::kSynWild, ParamType::kSynIdent,
-                     ParamType::kSynSyn},
-            }};
-    static constexpr std::array<std::array<ParamType, 2>, 3> pattern_type_ = {{
-            {ParamType::kWildWild, ParamType::kWildExpr},
-
-            {ParamType::kIdentWild, ParamType::kIdentExpr
-
-            },
-            {ParamType::kSynWild, ParamType::kSynExpr
-
-            },
-    }};
     template <typename T>
     std::unique_ptr<ConditionClause> BuildStmtStmtClause() {
         static_assert(std::is_base_of_v<StmtStmtBase, T>);
-        switch (param_type_) {
-            case kIntInt:
+        StmtStmtBase::Type type = StmtStmtBase::StmtStmtType(
+                first_param_type_, second_param_type_);
+        switch (type) {
+            case StmtStmtBase::Type::kIntInt:
                 return std::make_unique<T>(first_int_, second_int_);
-            case kIntSyn:
+            case StmtStmtBase::Type::kIntSyn:
                 return std::make_unique<T>(first_int_, second_syn_);
-            case kIntWild:
+            case StmtStmtBase::Type::kIntWild:
                 return std::make_unique<T>(ArgPos::kFirst, first_int_);
-            case kIntIdent:
-                return std::make_unique<T>(first_int_, second_syn_);
-            case kSynInt:
+            case StmtStmtBase::Type::kSynInt:
                 return std::make_unique<T>(first_syn_, second_int_);
-            case kSynSyn:
-                if constexpr (std::is_same_v<T, FollowsClause> ||
-                              std::is_same_v<T, FollowsTransClause> ||
-                              std::is_same_v<T, ParentClause> ||
-                              std::is_same_v<T, ParentTransClause>) {
-                    if (first_syn_ == second_syn_) {
-                        return nullptr;
-                    }
+            case StmtStmtBase::Type::kSynSyn:
+                if (std::is_base_of_v<OrderedStmtStmtBase, T> &&
+                    first_syn_ == second_syn_) {
+                    return nullptr;
                 }
                 return std::make_unique<T>(first_syn_, second_syn_);
-            case kSynWild:
+            case StmtStmtBase::Type::kSynWild:
                 return std::make_unique<T>(ArgPos::kFirst, first_syn_);
-            case kWildInt:
+            case StmtStmtBase::Type::kWildInt:
                 return std::make_unique<T>(ArgPos::kSecond, second_int_);
-            case kWildSyn:
+            case StmtStmtBase::Type::kWildSyn:
                 return std::make_unique<T>(ArgPos::kSecond, second_syn_);
-            case kWildWild:
+            case StmtStmtBase::Type::kWildWild:
                 return std::make_unique<T>();
-            default:
-                assert(false);
         }
     }
     template <typename T>
     std::unique_ptr<ConditionClause> BuildUsesModifiesClause() {
         static_assert(std::is_base_of_v<UsesModifiesBase, T>);
-        switch (param_type_) {
-            case kIntSyn:
+        UsesModifiesBase::Type type = UsesModifiesBase::UsesModifiesType(
+                first_param_type_, second_param_type_);
+        switch (type) {
+            case UsesModifiesBase::Type::kIntSyn:
                 return std::make_unique<T>(first_int_, second_syn_);
-            case kIntWild:
+            case UsesModifiesBase::Type::kIntWild:
                 return std::make_unique<T>(first_int_);
-            case kIntIdent:
+            case UsesModifiesBase::Type::kIntIdent:
                 return std::make_unique<T>(first_int_, second_ident_);
-            case kSynSyn:
+            case UsesModifiesBase::Type::kSynSyn:
                 return std::make_unique<T>(first_syn_, second_syn_);
-            case kSynWild:
+            case UsesModifiesBase::Type::kSynWild:
                 return std::make_unique<T>(first_syn_);
-            case kSynIdent:
+            case UsesModifiesBase::Type::kSynIdent:
                 return std::make_unique<T>(first_syn_, second_ident_);
-            case kIdentSyn:
+            case UsesModifiesBase::Type::kIdentSyn:
                 return std::make_unique<T>(first_ident_, second_syn_);
-            case kIdentIdent:
+            case UsesModifiesBase::Type::kIdentIdent:
                 return std::make_unique<T>(first_ident_, second_ident_);
-            case kIdentWild:
+            case UsesModifiesBase::Type::kIdentWild:
                 return std::make_unique<T>(second_ident_);
-            default:
-                assert(false);
         }
     }
     template <typename T>
     std::unique_ptr<ConditionClause> BuildPatternClause() {
         static_assert(std::is_base_of_v<PatternBase, T>);
-        switch (param_type_) {
-            case kWildWild:
+        PatternBase::Type type =
+                PatternBase::PatternType(first_param_type_, second_param_type_);
+        switch (type) {
+            case PatternBase::Type::kWildWild:
                 return std::make_unique<T>(assign_);
-            case kWildExpr:
+            case PatternBase::Type::kWildExpr:
                 return std::make_unique<T>(assign_, std::move(second_exprs_));
-            case kIdentWild:
+            case PatternBase::Type::kIdentWild:
                 return std::make_unique<T>(assign_, first_ident_);
-            case kIdentExpr:
+            case PatternBase::Type::kIdentExpr:
                 return std::make_unique<T>(assign_, first_ident_,
                                            std::move(second_exprs_));
-            case kSynWild:
+            case PatternBase::Type::kSynWild:
                 return std::make_unique<T>(assign_, first_syn_);
-            case kSynExpr:
+            case PatternBase::Type::kSynExpr:
                 return std::make_unique<T>(assign_, first_syn_,
                                            std::move(second_exprs_));
-            default:
-                assert(false);
         }
     }
     void Reset();

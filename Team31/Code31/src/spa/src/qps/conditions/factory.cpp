@@ -31,42 +31,31 @@ void Factory::SetRelationship(QueryTokenType type) {
 }
 void Factory::SetFirst(int first) {
     first_int_ = first;
-    first_index_ = 1;
+    first_param_type_ = ConditionClause::FirstParamType::kInt;
 }
 void Factory::SetFirst(Synonym* syn) {
     first_syn_ = syn;
-    first_index_ = 2;
+    first_param_type_ = ConditionClause::FirstParamType::kSyn;
 }
 void Factory::SetFirst(const std::string& value) {
     first_ident_ = value;
-    switch (rel_) {
-        case kPatternExact:
-        case kPatternPartial:
-            first_index_ = 1;
-            return;
-        case kUses:
-        case kModifies:
-            first_index_ = 0;
-            return;
-        default:
-            assert(false);
-    }
+    first_param_type_ = ConditionClause::FirstParamType::kIdent;
 }
 void Factory::SetSecond(int second) {
     second_int_ = second;
-    second_index_ = 1;
+    second_param_type_ = ConditionClause::SecondParamType::kInt;
 }
 void Factory::SetSecond(Synonym* syn) {
     second_syn_ = syn;
-    second_index_ = 2;
+    second_param_type_ = ConditionClause::SecondParamType::kSyn;
 }
 void Factory::SetSecond(const std::string& value) {
     second_ident_ = value;
-    second_index_ = 1;
+    second_param_type_ = ConditionClause::SecondParamType::kIdent;
 }
 void Factory::SetSecond(std::vector<QueryToken>&& expr) {
     second_exprs_ = std::move(expr);
-    second_index_ = 1;
+    second_param_type_ = ConditionClause::SecondParamType::kExpr;
 }
 void Factory::SetTransPartial() {
     switch (rel_) {
@@ -88,28 +77,20 @@ void Factory::SetAssign(Synonym* syn) { assign_ = syn; }
 std::unique_ptr<ConditionClause> Factory::Build() {
     switch (rel_) {
         case Relationship::kParent:
-            param_type_ = stmt_stmt_type_[first_index_][second_index_];
             return BuildStmtStmtClause<ParentClause>();
         case Relationship::kParentTrans:
-            param_type_ = stmt_stmt_type_[first_index_][second_index_];
             return BuildStmtStmtClause<ParentTransClause>();
         case Relationship::kFollows:
-            param_type_ = stmt_stmt_type_[first_index_][second_index_];
             return BuildStmtStmtClause<FollowsClause>();
         case Relationship::kFollowsTrans:
-            param_type_ = stmt_stmt_type_[first_index_][second_index_];
             return BuildStmtStmtClause<FollowsTransClause>();
         case Relationship::kUses:
-            param_type_ = uses_modifies_type_[first_index_][second_index_];
             return BuildUsesModifiesClause<UsesClause>();
         case Relationship::kModifies:
-            param_type_ = uses_modifies_type_[first_index_][second_index_];
             return BuildUsesModifiesClause<ModifiesClause>();
         case Relationship::kPatternExact:
-            param_type_ = pattern_type_[first_index_][second_index_];
             return BuildPatternClause<PatternExactClause>();
         case Relationship::kPatternPartial:
-            param_type_ = pattern_type_[first_index_][second_index_];
             return BuildPatternClause<PatternPartialClause>();
         default:
             assert(false);
@@ -117,12 +98,10 @@ std::unique_ptr<ConditionClause> Factory::Build() {
 }
 
 void Factory::Reset() {
-    rel_ = Relationship::kNone;
-    param_type_ = ParamType::kNoneNone;
     first_int_ = 0;
     second_int_ = 0;
-    first_index_ = 0;
-    second_index_ = 0;
+    first_param_type_ = ConditionClause::FirstParamType::kWild;
+    second_param_type_ = ConditionClause::SecondParamType::kWild;
     first_ident_.clear();
     second_ident_.clear();
     assign_ = nullptr;

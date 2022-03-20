@@ -1,6 +1,8 @@
 #include "affects_clause.h"
 
-spa::ResultTable spa::AffectsClause::Execute(
-        spa::KnowledgeBase *knowledge_base) const {
+namespace spa {
+ResultTable AffectsClause::Execute(KnowledgeBase *knowledge_base) const {
     return StmtStmtBase::Execute(knowledge_base);
 }
+
+}  // namespace spa
