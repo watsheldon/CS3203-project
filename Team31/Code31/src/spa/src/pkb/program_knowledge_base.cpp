@@ -21,7 +21,6 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
           stmtlst_parent_(init.procedures.size() - 1, stmt_count_,
                           stmtlst_count_),
           stmtlst_stmt_(stmtlst_count_, stmt_count_),
-          follows_parent_rel_(stmt_count_),
           modifies_rel_(stmt_count_, init.variables.size() - 1),
           uses_rel_(stmt_count_, init.variables.size() - 1),
           call_proc_(stmt_count_, init.procedures.size() - 1,
@@ -31,7 +30,9 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
                       std::move(init.constants)),
           type_stmt_(std::move(init.reads), std::move(init.prints),
                      std::move(init.calls), std::move(init.whiles),
-                     std::move(init.ifs), std::move(init.assigns)) {}
+                     std::move(init.ifs), std::move(init.assigns)),
+          follows_parent_rel_(stmt_count_,
+                              type_stmt_, stmtlst_parent_,stmtlst_stmt_) {}
 
 void ProgramKnowledgeBase::SetIndex(
         Index<SetEntityType::kProc> proc_index,
@@ -817,11 +818,7 @@ void ProgramKnowledgeBase::Compile() {
             stmtlst_parent_, stmtlst_stmt_, stmtlst_count_);
     uses_rel_.Compile(type_stmt_, *container_forest_, stmtlst_parent_,
                       stmtlst_stmt_);
-    follows_parent_rel_.Compile(
-            std::make_unique<TypeStatementsStore>(type_stmt_),
-            std::make_unique<ContainerForest>(*container_forest_),
-            std::make_unique<StmtlstParentStore>(stmtlst_parent_),
-            std::make_unique<StmtlstStatementsStore>(stmtlst_stmt_));
+    follows_parent_rel_.container_forest_ = container_forest_.get();
     compiled = true;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {

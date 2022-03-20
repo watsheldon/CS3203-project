@@ -17,15 +17,12 @@
 #include "type_statements_store.h"
 
 namespace spa {
-struct StorePointers {
-    const TypeStatementsStore *type_stmt;
-    const ContainerForest *container_forest;
-    const StmtlstParentStore *stmtlst_parent;
-    const StmtlstStatementsStore *stmtlst_stmt;
-};
 class FollowsParentRelStore {
   public:
-    explicit FollowsParentRelStore(size_t stmt_count, StorePointers ptr);
+    explicit FollowsParentRelStore(size_t stmt_count,
+                                   const TypeStatementsStore &type_stmt,
+                                   const StmtlstParentStore &stmtlst_parent,
+                                   const StmtlstStatementsStore &stmtlst_stmt);
     [[nodiscard]] bool ExistFollows(bool transitive,
                                     Index<ArgPos::kFirst> first_stmt,
                                     Index<ArgPos::kSecond> second_stmt) const;
@@ -69,7 +66,10 @@ class FollowsParentRelStore {
   private:
     friend class ProgramKnowledgeBase;
     size_t stmt_count_;
-    StorePointers ptr_;
+    const TypeStatementsStore &type_stmt_;
+    const StmtlstParentStore &stmtlst_parent_;
+    const StmtlstStatementsStore &stmtlst_stmt_;
+    const ContainerForest *container_forest_{};
     [[nodiscard]] std::set<int> Extract(std::vector<int> results,
                                         StmtType return_type) const;
     [[nodiscard]] PairVec<int> ExtractPairs(PairVec<int> results,

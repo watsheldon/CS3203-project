@@ -4,24 +4,29 @@
 
 #include "pkb/knowledge_base.h"
 namespace spa {
-FollowsParentRelStore::FollowsParentRelStore(size_t stmt_count,
-                                             StorePointers ptr)
-        : stmt_count_(stmt_count), ptr_(ptr) {}
+FollowsParentRelStore::FollowsParentRelStore(
+        size_t stmt_count, const TypeStatementsStore &type_stmt,
+        const StmtlstParentStore &stmtlst_parent,
+        const StmtlstStatementsStore &stmtlst_stmt)
+        : stmt_count_(stmt_count),
+          type_stmt_(type_stmt),
+          stmtlst_parent_(stmtlst_parent),
+          stmtlst_stmt_(stmtlst_stmt) {}
 bool FollowsParentRelStore::ExistFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt,
         Index<ArgPos::kSecond> second_stmt) const {
-    return ptr_.stmtlst_stmt->ExistFollows(transitive, first_stmt, second_stmt);
+    return stmtlst_stmt_.ExistFollows(transitive, first_stmt, second_stmt);
 }
 bool FollowsParentRelStore::ExistFollows(
         Index<ArgPos::kFirst> first_stmt) const {
-    return ptr_.stmtlst_stmt->ExistFollows(first_stmt);
+    return stmtlst_stmt_.ExistFollows(first_stmt);
 }
 bool FollowsParentRelStore::ExistFollows(
         Index<ArgPos::kSecond> second_stmt) const {
-    return ptr_.stmtlst_stmt->ExistFollows(second_stmt);
+    return stmtlst_stmt_.ExistFollows(second_stmt);
 }
 bool FollowsParentRelStore::ExistFollows() const {
-    return ptr_.stmtlst_stmt->ExistFollows();
+    return stmtlst_stmt_.ExistFollows();
 }
 std::set<int> FollowsParentRelStore::Extract(std::vector<int> results,
                                              StmtType return_type) const {
@@ -32,7 +37,7 @@ std::set<int> FollowsParentRelStore::Extract(std::vector<int> results,
     std::copy_if(results.begin(), results.end(),
                  std::inserter(extracted_results, extracted_results.end()),
                  [this, return_type](int i) {
-                     return ptr_.type_stmt->GetType(i) == return_type;
+                     return type_stmt_.GetType(i) == return_type;
                  });
     return extracted_results;
 }
@@ -43,9 +48,9 @@ PairVec<int> FollowsParentRelStore::ExtractPairs(PairVec<int> results,
     PairVec<int> extracted_results;
     for (int i = 0; i < results.first.size(); ++i) {
         bool has_first = first == StmtType::kAll ||
-                         first == ptr_.type_stmt->GetType(results.first[i]);
+                         first == type_stmt_.GetType(results.first[i]);
         bool has_second = second == StmtType::kAll ||
-                          second == ptr_.type_stmt->GetType(results.second[i]);
+                          second == type_stmt_.GetType(results.second[i]);
         if (has_first && has_second) {
             extracted_results.first.emplace_back(results.first[i]);
             extracted_results.second.emplace_back(results.second[i]);
@@ -56,31 +61,31 @@ PairVec<int> FollowsParentRelStore::ExtractPairs(PairVec<int> results,
 std::set<int> FollowsParentRelStore::GetFollows(ArgPos return_pos,
                                                 StmtType return_type) const {
     auto results = return_pos == ArgPos::kFirst
-                           ? ptr_.stmtlst_stmt->GetFollowedByWildcard()
-                           : ptr_.stmtlst_stmt->GetFollowsWildcard();
+                           ? stmtlst_stmt_.GetFollowedByWildcard()
+                           : stmtlst_stmt_.GetFollowsWildcard();
     return Extract(std::move(results), return_type);
 }
 std::set<int> FollowsParentRelStore::GetFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt,
         StmtType return_type) const {
-    auto results = ptr_.stmtlst_stmt->GetFollows(transitive, first_stmt);
+    auto results = stmtlst_stmt_.GetFollows(transitive, first_stmt);
     return Extract(std::move(results), return_type);
 }
 
 std::set<int> FollowsParentRelStore::GetFollows(
         bool transitive, Index<ArgPos::kSecond> second_stmt,
         StmtType return_type) const {
-    auto results = ptr_.stmtlst_stmt->GetFollows(transitive, second_stmt);
+    auto results = stmtlst_stmt_.GetFollows(transitive, second_stmt);
     return Extract(std::move(results), return_type);
 }
 
 PairVec<int> FollowsParentRelStore::GetFollowsPairs(
         bool transitive, StmtType first_type, StmtType second_type) const {
-    PairVec<int> results = ptr_.stmtlst_stmt->GetFollowsPairs(transitive);
+    PairVec<int> results = stmtlst_stmt_.GetFollowsPairs(transitive);
     return ExtractPairs(std::move(results), first_type, second_type);
 }
 inline bool FollowsParentRelStore::IsParent(int stmt) const {
-    StmtType type = ptr_.type_stmt->GetType(stmt);
+    StmtType type = type_stmt_.GetType(stmt);
     return IsParent(type);
 }
 inline bool FollowsParentRelStore::IsParent(StmtType type) {
@@ -88,8 +93,8 @@ inline bool FollowsParentRelStore::IsParent(StmtType type) {
            parent_types_.end();
 }
 inline bool FollowsParentRelStore::HasParent(int stmt) const {
-    int stmtlst = ptr_.stmtlst_stmt->GetStmtlst(stmt);
-    PType type = ptr_.stmtlst_parent->GetParent(stmtlst).type;
+    int stmtlst = stmtlst_stmt_.GetStmtlst(stmt);
+    PType type = stmtlst_parent_.GetParent(stmtlst).type;
     return type == PType::kWhile || type == PType::kIf;
 }
 bool FollowsParentRelStore::ExistParent(
@@ -102,16 +107,14 @@ bool FollowsParentRelStore::ExistParent(
         return false;
     }
     if (transitive) {
-        StmtType type = ptr_.type_stmt->GetType(parent);
+        StmtType type = type_stmt_.GetType(parent);
         int last_stmt = GetContainerLastStmt(type, parent);
         return child <= last_stmt;
     }
-    int stmtlst = ptr_.stmtlst_stmt->GetStmtlst(child);
-    bool is_while = ptr_.stmtlst_parent->GetWhileStmtLst(parent) == stmtlst;
-    bool is_then =
-            ptr_.stmtlst_parent->GetIfStmtLst(parent).then_index == stmtlst;
-    bool is_else =
-            ptr_.stmtlst_parent->GetIfStmtLst(parent).else_index == stmtlst;
+    int stmtlst = stmtlst_stmt_.GetStmtlst(child);
+    bool is_while = stmtlst_parent_.GetWhileStmtLst(parent) == stmtlst;
+    bool is_then = stmtlst_parent_.GetIfStmtLst(parent).then_index == stmtlst;
+    bool is_else = stmtlst_parent_.GetIfStmtLst(parent).else_index == stmtlst;
     return is_while || is_then || is_else;
 }
 bool FollowsParentRelStore::ExistParent(
@@ -125,19 +128,19 @@ bool FollowsParentRelStore::ExistParent(
     return child <= stmt_count_ && HasParent(child);
 }
 bool FollowsParentRelStore::ExistParent() const {
-    return !ptr_.type_stmt->GetStatements(StmtType::kWhile).empty() ||
-           !ptr_.type_stmt->GetStatements(StmtType::kIf).empty();
+    return !type_stmt_.GetStatements(StmtType::kWhile).empty() ||
+           !type_stmt_.GetStatements(StmtType::kIf).empty();
 }
 
 std::set<int> FollowsParentRelStore::GetAllParents(StmtType return_type) const {
     if (!IsParent(return_type)) return {};
     std::vector<int> parents;
     if (return_type == StmtType::kAll) {
-        parents = ptr_.type_stmt->GetStatements(StmtType::kWhile);
-        auto if_stmts = ptr_.type_stmt->GetStatements(StmtType::kIf);
+        parents = type_stmt_.GetStatements(StmtType::kWhile);
+        auto if_stmts = type_stmt_.GetStatements(StmtType::kIf);
         parents.insert(parents.end(), if_stmts.begin(), if_stmts.end());
     } else {
-        parents = ptr_.type_stmt->GetStatements(return_type);
+        parents = type_stmt_.GetStatements(return_type);
     }
     return {parents.begin(), parents.end()};
 }
@@ -148,7 +151,7 @@ std::set<int> FollowsParentRelStore::GetAllChildren(
         stmts.resize(stmt_count_);
         std::iota(stmts.begin(), stmts.end(), 1);
     } else {
-        stmts = ptr_.type_stmt->GetStatements(return_type);
+        stmts = type_stmt_.GetStatements(return_type);
     }
     std::set<int> children;
     std::copy_if(stmts.begin(), stmts.end(),
@@ -163,20 +166,20 @@ std::set<int> FollowsParentRelStore::GetParent(ArgPos return_pos,
 }
 void FollowsParentRelStore::FillChildren(int parent,
                                          std::vector<int> &results) const {
-    StmtType type = ptr_.type_stmt->GetType(parent);
+    StmtType type = type_stmt_.GetType(parent);
     if (type == StmtType::kWhile) {
-        int stmtlst_index = ptr_.stmtlst_parent->GetWhileStmtLst(parent);
-        results = ptr_.stmtlst_stmt->GetStatements(stmtlst_index);
+        int stmtlst_index = stmtlst_parent_.GetWhileStmtLst(parent);
+        results = stmtlst_stmt_.GetStatements(stmtlst_index);
     }
-    int then_index = ptr_.stmtlst_parent->GetIfStmtLst(parent).then_index;
-    int else_index = ptr_.stmtlst_parent->GetIfStmtLst(parent).else_index;
-    results = ptr_.stmtlst_stmt->GetStatements(then_index);
-    auto else_vector = ptr_.stmtlst_stmt->GetStatements(else_index);
+    int then_index = stmtlst_parent_.GetIfStmtLst(parent).then_index;
+    int else_index = stmtlst_parent_.GetIfStmtLst(parent).else_index;
+    results = stmtlst_stmt_.GetStatements(then_index);
+    auto else_vector = stmtlst_stmt_.GetStatements(else_index);
     results.insert(results.end(), else_vector.begin(), else_vector.end());
 }
 void FollowsParentRelStore::FillChildrenT(int parent,
                                           std::vector<int> &results) const {
-    StmtType type = ptr_.type_stmt->GetType(parent);
+    StmtType type = type_stmt_.GetType(parent);
     int last_stmt = GetContainerLastStmt(type, parent);
     int size = last_stmt - parent;
     results.resize(size);
@@ -193,18 +196,18 @@ std::set<int> FollowsParentRelStore::GetParent(
 }
 void FollowsParentRelStore::FillParents(int child,
                                         std::vector<int> &results) const {
-    int stmtlst_index = ptr_.stmtlst_stmt->GetStmtlst(child);
-    results = {ptr_.stmtlst_parent->GetParent(stmtlst_index).index};
+    int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
+    results = {stmtlst_parent_.GetParent(stmtlst_index).index};
 }
 void FollowsParentRelStore::FillParentsT(int child,
                                          std::vector<int> &results) const {
-    int stmtlst_index = ptr_.stmtlst_stmt->GetStmtlst(child);
+    int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
     std::vector<int> ancestors =
-            ptr_.container_forest->GetAncestryTrace(stmtlst_index);
+            container_forest_->GetAncestryTrace(stmtlst_index);
     for (int i : ancestors) {
-        PType type = ptr_.stmtlst_parent->GetParent(i).type;
+        PType type = stmtlst_parent_.GetParent(i).type;
         if (type != PType::kWhile && type != PType::kIf) continue;
-        int parent = ptr_.stmtlst_parent->GetParent(i).index;
+        int parent = stmtlst_parent_.GetParent(i).index;
         results.emplace_back(parent);
     }
 }
@@ -222,14 +225,14 @@ std::set<int> FollowsParentRelStore::GetParent(
 
 void FollowsParentRelStore::FillParentTPairs(PairVec<int> &results) const {
     auto &[parents, children] = results;
-    for (int while_stmt : ptr_.type_stmt->GetStatements(StmtType::kWhile)) {
+    for (int while_stmt : type_stmt_.GetStatements(StmtType::kWhile)) {
         int end = GetContainerLastStmt(StmtType::kWhile, while_stmt);
         for (int i = while_stmt + 1; i <= end; ++i) {
             parents.emplace_back(while_stmt);
             children.emplace_back(i);
         }
     }
-    for (int if_stmt : ptr_.type_stmt->GetStatements(StmtType::kIf)) {
+    for (int if_stmt : type_stmt_.GetStatements(StmtType::kIf)) {
         int end = GetContainerLastStmt(StmtType::kIf, if_stmt);
         for (int i = if_stmt + 1; i <= end; ++i) {
             parents.emplace_back(if_stmt);
@@ -239,19 +242,19 @@ void FollowsParentRelStore::FillParentTPairs(PairVec<int> &results) const {
 }
 void FollowsParentRelStore::FillParentPairs(PairVec<int> &results) const {
     auto &[parents, children] = results;
-    for (int while_stmt : ptr_.type_stmt->GetStatements(StmtType::kWhile)) {
-        int stmtlst_index = ptr_.stmtlst_parent->GetWhileStmtLst(while_stmt);
-        auto stmtlst = ptr_.stmtlst_stmt->GetStatements(stmtlst_index);
+    for (int while_stmt : type_stmt_.GetStatements(StmtType::kWhile)) {
+        int stmtlst_index = stmtlst_parent_.GetWhileStmtLst(while_stmt);
+        auto stmtlst = stmtlst_stmt_.GetStatements(stmtlst_index);
         for (int child_stmt : stmtlst) {
             parents.emplace_back(while_stmt);
             children.emplace_back(child_stmt);
         }
     }
-    for (int if_stmt : ptr_.type_stmt->GetStatements(StmtType::kIf)) {
-        int then_index = ptr_.stmtlst_parent->GetIfStmtLst(if_stmt).then_index;
-        int else_index = ptr_.stmtlst_parent->GetIfStmtLst(if_stmt).else_index;
-        auto then_stmtlst = ptr_.stmtlst_stmt->GetStatements(then_index);
-        auto else_stmtlst = ptr_.stmtlst_stmt->GetStatements(else_index);
+    for (int if_stmt : type_stmt_.GetStatements(StmtType::kIf)) {
+        int then_index = stmtlst_parent_.GetIfStmtLst(if_stmt).then_index;
+        int else_index = stmtlst_parent_.GetIfStmtLst(if_stmt).else_index;
+        auto then_stmtlst = stmtlst_stmt_.GetStatements(then_index);
+        auto else_stmtlst = stmtlst_stmt_.GetStatements(else_index);
         for (int child_stmt : then_stmtlst) {
             parents.emplace_back(if_stmt);
             children.emplace_back(child_stmt);
@@ -274,20 +277,19 @@ PairVec<int> FollowsParentRelStore::GetParentPairs(bool transitive,
 int FollowsParentRelStore::GetContainerLastStmt(StmtType type,
                                                 int stmt_no) const {
     int last_stmt;
-    auto followers = ptr_.stmtlst_stmt->GetFollows(
-            false, Index<ArgPos::kFirst>(stmt_no));
+    auto followers =
+            stmtlst_stmt_.GetFollows(false, Index<ArgPos::kFirst>(stmt_no));
 
     if (followers.size() == 1) {
         last_stmt = *followers.begin() - 1;
         return last_stmt;
     }
 
-    int stmtlst =
-            type == StmtType::kWhile
-                    ? ptr_.stmtlst_parent->GetWhileStmtLst(stmt_no)
-                    : ptr_.stmtlst_parent->GetIfStmtLst(stmt_no).else_index;
-    int grandchild = ptr_.container_forest->GetRightmostGrandchild(stmtlst);
-    auto grandchild_stmts = ptr_.stmtlst_stmt->GetStatements(grandchild);
+    int stmtlst = type == StmtType::kWhile
+                          ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
+                          : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
+    int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
+    auto grandchild_stmts = stmtlst_stmt_.GetStatements(grandchild);
     last_stmt = grandchild_stmts.back();
     return last_stmt;
 }
