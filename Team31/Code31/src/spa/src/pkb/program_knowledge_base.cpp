@@ -31,8 +31,8 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
           type_stmt_(std::move(init.reads), std::move(init.prints),
                      std::move(init.calls), std::move(init.whiles),
                      std::move(init.ifs), std::move(init.assigns)),
-          follows_parent_rel_(stmt_count_, type_stmt_, stmtlst_parent_,
-                              stmtlst_stmt_) {}
+          follows_parent_rel_(stmt_count_,
+                              {type_stmt_, stmtlst_parent_, stmtlst_stmt_}) {}
 
 void ProgramKnowledgeBase::SetIndex(
         Index<SetEntityType::kProc> proc_index,

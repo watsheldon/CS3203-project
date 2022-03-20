@@ -17,12 +17,14 @@
 #include "type_statements_store.h"
 
 namespace spa {
+struct StoreRefs {
+    const TypeStatementsStore &type_stmt;
+    const StmtlstParentStore &stmtlst_parent;
+    const StmtlstStatementsStore &stmtlst_stmt;
+};
 class FollowsParentRelStore {
   public:
-    explicit FollowsParentRelStore(size_t stmt_count,
-                                   const TypeStatementsStore &type_stmt,
-                                   const StmtlstParentStore &stmtlst_parent,
-                                   const StmtlstStatementsStore &stmtlst_stmt);
+    explicit FollowsParentRelStore(size_t stmt_count, StoreRefs refs);
     [[nodiscard]] bool ExistFollows(bool transitive,
                                     Index<ArgPos::kFirst> first_stmt,
                                     Index<ArgPos::kSecond> second_stmt) const;

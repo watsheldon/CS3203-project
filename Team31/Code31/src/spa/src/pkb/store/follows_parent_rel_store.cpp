@@ -4,14 +4,11 @@
 
 #include "pkb/knowledge_base.h"
 namespace spa {
-FollowsParentRelStore::FollowsParentRelStore(
-        size_t stmt_count, const TypeStatementsStore &type_stmt,
-        const StmtlstParentStore &stmtlst_parent,
-        const StmtlstStatementsStore &stmtlst_stmt)
+FollowsParentRelStore::FollowsParentRelStore(size_t stmt_count, StoreRefs refs)
         : stmt_count_(stmt_count),
-          type_stmt_(type_stmt),
-          stmtlst_parent_(stmtlst_parent),
-          stmtlst_stmt_(stmtlst_stmt) {}
+          type_stmt_(refs.type_stmt),
+          stmtlst_parent_(refs.stmtlst_parent),
+          stmtlst_stmt_(refs.stmtlst_stmt) {}
 bool FollowsParentRelStore::ExistFollows(
         bool transitive, Index<ArgPos::kFirst> first_stmt,
         Index<ArgPos::kSecond> second_stmt) const {
@@ -290,9 +287,7 @@ int FollowsParentRelStore::GetContainerLastStmt(StmtType type,
                           : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
     auto child_stmts = stmtlst_stmt_.GetStatements(stmtlst);
     const int last_child = child_stmts.back();
-    auto last_child_type = type_stmt_.GetType(last_child);
-    if (last_child_type != StmtType::kWhile and
-        last_child_type != StmtType::kIf) {
+    if (!IsParent(last_child)) {
         return last_child;
     }
     int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
