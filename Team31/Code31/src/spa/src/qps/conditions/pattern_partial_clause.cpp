@@ -36,6 +36,8 @@ ResultTable PatternPartialClause::Execute(KnowledgeBase *knowledge_base) const {
                     knowledge_base->GetAllEntityIndices(StmtType::kAssign);
             return {assign_, {result.begin(), result.end()}};
         }
+        default:
+            assert(false);
     }
 }
 }  // namespace spa

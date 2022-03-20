@@ -60,6 +60,8 @@ ResultTable ParentClause::Execute(KnowledgeBase *knowledge_base) const {
             auto result = knowledge_base->ExistParent();
             return ResultTable(result);
         }
+        default:
+            assert(false);
     }
 }
 }  // namespace spa
