@@ -13,8 +13,19 @@ env:
     CMAKE_BUILD_PARALLEL_LEVEL: 6
 
 jobs:
+  dup_check:
+    name: Check for repeat
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v3.4.1
+
   build:
     name: CMake
+    needs: dup_check
+    if: ${{ needs.dup_check.outputs.should_skip != 'true' }}
     strategy:
       fail-fast: true
       matrix:
