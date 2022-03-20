@@ -48,11 +48,10 @@ std::set<int> UsesModifiesStoreBase::GetStmt(StmtType stmt_type) const {
 
 void UsesModifiesStoreBase::Compile(
         const TypeStatementsStore& type_statement_store,
-        const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
-        const StmtlstStatementsStore& stmtlst_stmt) {
+        const ContainerInfo& info) {
+    const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
     AddAllDirectRel(type_statement_store);
-    AddAllContainerRel(forest, stmtlst_parent, stmtlst_stmt,
-                       type_statement_store);
+    AddAllContainerRel(type_statement_store, info);
     FillStmts();
     FillVars();
     FillRels();
@@ -69,11 +68,10 @@ void UsesModifiesStoreBase::AddDirectRel(
     }
 }
 
-void UsesModifiesStoreBase::AddIndirectRel(
-        const PairVec<int>& basic_pairs,
-        const StmtlstStatementsStore& stmtlst_stmt,
-        const StmtlstParentStore& stmtlst_parent, const ContainerForest& forest,
-        PairBitmap& bitmaps) {
+void UsesModifiesStoreBase::AddIndirectRel(const PairVec<int>& basic_pairs,
+                                           const ContainerInfo& info,
+                                           PairBitmap& bitmaps) {
+    const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
     auto& [basic_stmts, basic_vars] = basic_pairs;
     for (int i = 0; i < basic_stmts.size(); ++i) {
         auto s = basic_stmts[i], v = basic_vars[i];
@@ -101,18 +99,16 @@ void UsesModifiesStoreBase::AddIndirectRel(
 }
 
 void UsesModifiesStoreBase::AddAllContainerRel(
-        const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
-        const StmtlstStatementsStore& stmtlst_stmt,
-        const TypeStatementsStore& type_statement_store) {
+        const TypeStatementsStore& type_statement_store,
+        const ContainerInfo& info) {
     BitVec2D if_added(num_stmts + 1, num_vars + 1);
     BitVec2D while_added(num_stmts + 1, num_vars + 1);
     PairBitmap bitmaps = {if_added, while_added};
+    const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
 
-    AddConditionRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store,
-                    bitmaps);
+    AddConditionRel(type_statement_store, info, bitmaps);
 
-    AddAllIndirectRel(type_statement_store, stmtlst_stmt, stmtlst_parent,
-                      forest, bitmaps);
+    AddAllIndirectRel(type_statement_store, info, bitmaps);
 }
 
 void UsesModifiesStoreBase::FillStmts() {

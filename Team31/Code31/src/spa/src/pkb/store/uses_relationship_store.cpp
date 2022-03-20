@@ -22,9 +22,10 @@ const std::vector<int>& UsesRelationshipStore::GetVarIndex(int stmt_no) const {
 }
 
 void UsesRelationshipStore::AddConditionRel(
-        const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
-        const StmtlstStatementsStore& stmtlst_stmt,
-        const TypeStatementsStore& type_statement_store, PairBitmap& bitmaps) {
+
+        const TypeStatementsStore& type_statement_store,
+        const ContainerInfo& info, PairBitmap& bitmaps) {
+    const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
     auto& [if_added, while_added] = bitmaps;
     std::array<Ref<BitVec2D>, 2> container_bitmaps{{if_added, while_added}};
     auto& if_var_pairs = stmt_var_pairs_[static_cast<int>(StmtType::kIf) - 1];
@@ -76,11 +77,8 @@ void UsesRelationshipStore::AddConditionRel(
 
 void UsesRelationshipStore::AddAllIndirectRel(
         const TypeStatementsStore& type_statement_store,
-        const StmtlstStatementsStore& stmtlst_stmt,
-        const StmtlstParentStore& stmtlst_parent, const ContainerForest& forest,
-        PairBitmap& bitmaps) {
-    FillIndirectRels(relevant_stmt_types_, type_statement_store, stmtlst_stmt,
-                     stmtlst_parent, forest, bitmaps);
+        const ContainerInfo& info, PairBitmap& bitmaps) {
+    FillIndirectRels(relevant_stmt_types_, type_statement_store, info, bitmaps);
 }
 
 void UsesRelationshipStore::AddAllDirectRel(const TypeStatementsStore& store) {

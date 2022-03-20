@@ -19,19 +19,16 @@ int ModifiesRelationshipStore::GetVarIndex(int stmt_no) const {
 }
 
 void ModifiesRelationshipStore::AddConditionRel(
-        const ContainerForest& forest, const StmtlstParentStore& stmtlst_parent,
-        const StmtlstStatementsStore& stmtlst_stmt,
-        const TypeStatementsStore& type_statement_store, PairBitmap& bitmaps) {
+
+        const TypeStatementsStore& type_statement_store,
+        const ContainerInfo& info, PairBitmap& bitmaps) {
     return;
 }
 
 void ModifiesRelationshipStore::AddAllIndirectRel(
         const TypeStatementsStore& type_statement_store,
-        const StmtlstStatementsStore& stmtlst_stmt,
-        const StmtlstParentStore& stmtlst_parent, const ContainerForest& forest,
-        PairBitmap& bitmaps) {
-    FillIndirectRels(indirect_stmt_types_, type_statement_store, stmtlst_stmt,
-                     stmtlst_parent, forest, bitmaps);
+        const ContainerInfo& info, PairBitmap& bitmaps) {
+    FillIndirectRels(indirect_stmt_types_, type_statement_store, info, bitmaps);
 }
 
 void ModifiesRelationshipStore::AddAllDirectRel(

@@ -512,10 +512,10 @@ void ProgramKnowledgeBase::Compile() {
     container_forest_ = std::make_unique<ContainerForest>(
             stmtlst_parent_, stmtlst_stmt_, stmtlst_count_);
     follows_parent_rel_.container_forest_ = container_forest_.get();
-    uses_rel_.Compile(type_stmt_, {*container_forest_, stmtlst_parent_,
-                      stmtlst_stmt_});
-    modifies_rel_.Compile(type_stmt_, {*container_forest_, stmtlst_parent_,
-                          stmtlst_stmt_});
+    uses_rel_.Compile(type_stmt_,
+                      {*container_forest_, stmtlst_parent_, stmtlst_stmt_});
+    modifies_rel_.Compile(type_stmt_,
+                          {*container_forest_, stmtlst_parent_, stmtlst_stmt_});
     compiled = true;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {

@@ -31,22 +31,16 @@ class UsesModifiesStoreBase {
     [[nodiscard]] PairVec<int> GetStmtVar(StmtType stmt_type) const;
     [[nodiscard]] std::set<int> GetStmt(StmtType stmt_type) const;
     void Compile(const TypeStatementsStore &type_statement_store,
-                 const ContainerForest &forest,
-                 const StmtlstParentStore &stmtlst_parent,
-                 const StmtlstStatementsStore &stmtlst_stmt);
+                 const ContainerInfo &info);
 
   protected:
     [[nodiscard]] PairVec<int> GetAllRel() const;
     void AddDirectRel(PairVec<int> &stmt_var_pair,
                       const std::vector<int> &stmt_no) const;
     void AddIndirectRel(const PairVec<int> &basic_pairs,
-                        const StmtlstStatementsStore &stmtlst_stmt,
-                        const StmtlstParentStore &stmtlst_parent,
-                        const ContainerForest &forest, PairBitmap &bitmaps);
-    void AddAllContainerRel(const ContainerForest &forest,
-                            const StmtlstParentStore &stmtlst_parent,
-                            const StmtlstStatementsStore &stmtlst_stmt,
-                            const TypeStatementsStore &type_statement_store);
+                        const ContainerInfo &info, PairBitmap &bitmaps);
+    void AddAllContainerRel(const TypeStatementsStore &type_statement_store,
+                            const ContainerInfo &info);
     void FillStmts();
     void FillVars();
     void FillRels();
@@ -55,15 +49,10 @@ class UsesModifiesStoreBase {
     virtual void AddAllDirectRel(const TypeStatementsStore &store) = 0;
     virtual void AddAllIndirectRel(
             const TypeStatementsStore &type_statement_store,
-            const StmtlstStatementsStore &stmtlst_stmt,
-            const StmtlstParentStore &stmtlst_parent,
-            const ContainerForest &forest, PairBitmap &bitmaps) = 0;
+            const ContainerInfo &info, PairBitmap &bitmaps) = 0;
     virtual void AddConditionRel(
-            const ContainerForest &forest,
-            const StmtlstParentStore &stmtlst_parent,
-            const StmtlstStatementsStore &stmtlst_stmt,
             const TypeStatementsStore &type_statement_store,
-            PairBitmap &bitmaps) = 0;
+            const ContainerInfo &info, PairBitmap &bitmaps) = 0;
 
     template <std::size_t n>
     void FillDirectRels(std::array<StmtType, n> direct_stmt_types,
@@ -78,14 +67,12 @@ class UsesModifiesStoreBase {
     template <std::size_t n>
     void FillIndirectRels(std::array<StmtType, n> indirect_stmt_types,
                           const TypeStatementsStore &type_statement_store,
-                          const StmtlstStatementsStore &stmtlst_stmt,
-                          const StmtlstParentStore &stmtlst_parent,
-                          const ContainerForest &forest, PairBitmap &bitmaps) {
+                          const ContainerInfo &info, PairBitmap &bitmaps) {
+        auto &[forest, stmtlst_parent, stmtlst_stmt] = info;
         for (const auto stmt_type : indirect_stmt_types) {
             auto &relationships =
                     stmt_var_pairs_[static_cast<int>(stmt_type) - 1];
-            AddIndirectRel(relationships, stmtlst_stmt, stmtlst_parent, forest,
-                           bitmaps);
+            AddIndirectRel(relationships, info, bitmaps);
         }
     }
 
