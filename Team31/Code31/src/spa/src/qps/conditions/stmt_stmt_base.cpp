@@ -4,16 +4,16 @@
 #include "qps/synonym.h"
 
 namespace spa {
-StmtStmtBase::StmtStmtBase() : type_(Type::kWildWild) {}
-StmtStmtBase::StmtStmtBase(int first, int second)
+StmtStmtBase::StmtStmtBase() noexcept : type_(Type::kWildWild) {}
+StmtStmtBase::StmtStmtBase(int first, int second) noexcept
         : type_(Type::kIntInt), first_int_(first), second_int_(second) {}
-StmtStmtBase::StmtStmtBase(int first, Synonym *second)
+StmtStmtBase::StmtStmtBase(int first, Synonym *second) noexcept
         : type_(Type::kIntSyn), first_int_(first), second_syn_(second) {}
-StmtStmtBase::StmtStmtBase(Synonym *first, int second)
+StmtStmtBase::StmtStmtBase(Synonym *first, int second) noexcept
         : type_(Type::kSynInt), first_syn_(first), second_int_(second) {}
-StmtStmtBase::StmtStmtBase(Synonym *first, Synonym *second)
+StmtStmtBase::StmtStmtBase(Synonym *first, Synonym *second) noexcept
         : type_(Type::kSynSyn), first_syn_(first), second_syn_(second) {}
-StmtStmtBase::StmtStmtBase(ArgPos pos, int integer) {
+StmtStmtBase::StmtStmtBase(ArgPos pos, int integer) noexcept {
     if (pos == ArgPos::kFirst) {
         type_ = Type::kIntWild;
         first_int_ = integer;
@@ -22,7 +22,7 @@ StmtStmtBase::StmtStmtBase(ArgPos pos, int integer) {
         second_int_ = integer;
     }
 }
-StmtStmtBase::StmtStmtBase(ArgPos pos, Synonym *syn) {
+StmtStmtBase::StmtStmtBase(ArgPos pos, Synonym *syn) noexcept {
     if (pos == ArgPos::kFirst) {
         type_ = Type::kSynWild;
         first_syn_ = syn;

@@ -7,7 +7,8 @@
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
-ResultTable PatternExactClause::Execute(KnowledgeBase *knowledge_base) const {
+ResultTable PatternExactClause::Execute(
+        KnowledgeBase *knowledge_base) const noexcept {
     switch (type_) {
         case Type::kIdentExpr: {
             auto result = knowledge_base->GetPattern(first_ident_, second_expr_,

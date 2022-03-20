@@ -28,17 +28,17 @@ namespace spa {
 
 class Factory {
   public:
-    void SetRelationship(QueryTokenType type);
-    void SetFirst(int first);
-    void SetFirst(Synonym* syn);
-    void SetFirst(const std::string& value);
-    void SetSecond(int second);
-    void SetSecond(Synonym* syn);
-    void SetSecond(const std::string& value);
-    void SetSecond(std::vector<QueryToken>&& expr);
-    void SetTransPartial();
-    void SetAssign(Synonym* syn);
-    std::unique_ptr<ConditionClause> Build();
+    void SetRelationship(QueryTokenType type) noexcept;
+    void SetFirst(int first) noexcept;
+    void SetFirst(Synonym* syn) noexcept;
+    void SetFirst(const std::string& value) noexcept;
+    void SetSecond(int second) noexcept;
+    void SetSecond(Synonym* syn) noexcept;
+    void SetSecond(const std::string& value) noexcept;
+    void SetSecond(std::vector<QueryToken>&& expr) noexcept;
+    void SetTransPartial() noexcept;
+    void SetAssign(Synonym* syn) noexcept;
+    std::unique_ptr<ConditionClause> Build() noexcept;
 
   private:
     enum Relationship {
@@ -69,7 +69,7 @@ class Factory {
     Synonym* second_syn_;
     std::vector<QueryToken> second_exprs_;
     template <typename T>
-    std::unique_ptr<ConditionClause> BuildStmtStmtClause() {
+    std::unique_ptr<ConditionClause> BuildStmtStmtClause() noexcept {
         static_assert(std::is_base_of_v<StmtStmtBase, T>);
         StmtStmtBase::Type type =
                 StmtStmtBase::GetType(first_param_type_, second_param_type_);
@@ -98,7 +98,7 @@ class Factory {
         }
     }
     template <typename T>
-    std::unique_ptr<ConditionClause> BuildUsesModifiesClause() {
+    std::unique_ptr<ConditionClause> BuildUsesModifiesClause() noexcept {
         static_assert(std::is_base_of_v<UsesModifiesBase, T>);
         UsesModifiesBase::Type type = UsesModifiesBase::GetType(
                 first_param_type_, second_param_type_);
@@ -124,7 +124,7 @@ class Factory {
         }
     }
     template <typename T>
-    std::unique_ptr<ConditionClause> BuildPatternClause() {
+    std::unique_ptr<ConditionClause> BuildPatternClause() noexcept {
         static_assert(std::is_base_of_v<PatternBase, T>);
         PatternBase::Type type =
                 PatternBase::GetType(first_param_type_, second_param_type_);
@@ -145,7 +145,7 @@ class Factory {
                                            std::move(second_exprs_));
         }
     }
-    void Reset();
+    void Reset() noexcept;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_FACTORY_H_

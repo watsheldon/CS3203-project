@@ -9,7 +9,7 @@
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
-ResultTable UsesClause::Execute(KnowledgeBase *knowledge_base) const {
+ResultTable UsesClause::Execute(KnowledgeBase *knowledge_base) const noexcept {
     switch (type_) {
         case Type::kIntSyn: {
             auto result = knowledge_base->GetUses(

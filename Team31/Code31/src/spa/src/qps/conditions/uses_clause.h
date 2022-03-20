@@ -8,7 +8,7 @@
 namespace spa {
 class UsesClause : public UsesModifiesBase {
     using UsesModifiesBase::UsesModifiesBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const final;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const noexcept final;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_USES_CLAUSE_H_

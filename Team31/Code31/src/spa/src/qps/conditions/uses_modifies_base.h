@@ -24,17 +24,17 @@ class UsesModifiesBase : public ConditionClause {
         kIdentWild
     };
 
-    UsesModifiesBase(int first, std::string second);
-    UsesModifiesBase(int first, Synonym *second);
-    explicit UsesModifiesBase(int first);
-    UsesModifiesBase(Synonym *first, std::string second);
-    UsesModifiesBase(Synonym *first, Synonym *second);
-    explicit UsesModifiesBase(Synonym *first);
-    UsesModifiesBase(std::string first, Synonym *second);
-    UsesModifiesBase(std::string first, std::string second);
-    explicit UsesModifiesBase(std::string first);
+    UsesModifiesBase(int first, std::string second) noexcept;
+    UsesModifiesBase(int first, Synonym *second) noexcept;
+    explicit UsesModifiesBase(int first) noexcept;
+    UsesModifiesBase(Synonym *first, std::string second) noexcept;
+    UsesModifiesBase(Synonym *first, Synonym *second) noexcept;
+    explicit UsesModifiesBase(Synonym *first) noexcept;
+    UsesModifiesBase(std::string first, Synonym *second) noexcept;
+    UsesModifiesBase(std::string first, std::string second) noexcept;
+    explicit UsesModifiesBase(std::string first) noexcept;
     static constexpr Type GetType(FirstParamType first,
-                                  SecondParamType second) {
+                                  SecondParamType second) noexcept {
         int first_index = first == FirstParamType::kIdent
                                   ? static_cast<int>(first) - 1
                                   : static_cast<int>(first);

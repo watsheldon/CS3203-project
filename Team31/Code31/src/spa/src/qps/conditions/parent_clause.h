@@ -10,7 +10,7 @@ class ParentClause : public OrderedStmtStmtBase {
     using OrderedStmtStmtBase::OrderedStmtStmtBase;
 
   public:
-    ResultTable Execute(KnowledgeBase *knowledge_base) const final;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const noexcept final;
 };
 
 }  // namespace spa

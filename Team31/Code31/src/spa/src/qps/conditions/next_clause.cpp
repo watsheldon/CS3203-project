@@ -4,7 +4,7 @@
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
-ResultTable NextClause::Execute(KnowledgeBase *knowledge_base) const {
+ResultTable NextClause::Execute(KnowledgeBase *knowledge_base) const noexcept {
     return ResultTable{false};
 }
 }  // namespace spa

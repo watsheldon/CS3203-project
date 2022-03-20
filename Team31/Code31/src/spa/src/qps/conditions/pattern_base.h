@@ -20,17 +20,17 @@ class PatternBase : public ConditionClause {
         kWildWild
     };
     PatternBase(Synonym *assign, std::string first,
-                std::vector<QueryToken> &&second);  // IdentExpr
+                std::vector<QueryToken> &&second) noexcept;  // IdentExpr
     PatternBase(Synonym *assign,
-                std::string first);  // IdentWild
+                std::string first) noexcept;  // IdentWild
     PatternBase(Synonym *assign, Synonym *first,
-                std::vector<QueryToken> &&second);  // SynExpr
-    PatternBase(Synonym *assign, Synonym *first);   // SynWild
+                std::vector<QueryToken> &&second) noexcept;  // SynExpr
+    PatternBase(Synonym *assign, Synonym *first) noexcept;   // SynWild
     PatternBase(Synonym *assign,
-                std::vector<QueryToken> &&second);  // WildExpr
-    explicit PatternBase(Synonym *assign);          // WildWild
+                std::vector<QueryToken> &&second) noexcept;  // WildExpr
+    explicit PatternBase(Synonym *assign) noexcept;          // WildWild
     static constexpr Type GetType(FirstParamType first,
-                                  SecondParamType second) {
+                                  SecondParamType second) noexcept {
         int first_index = static_cast<int>(first) - 1;
         int second_index = static_cast<int>(second) - 2;
         return pattern_type_[first_index][second_index];

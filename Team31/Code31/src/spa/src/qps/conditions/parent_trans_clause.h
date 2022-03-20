@@ -10,7 +10,7 @@ class ParentTransClause : public OrderedStmtStmtBase {
     using OrderedStmtStmtBase::OrderedStmtStmtBase;
 
   public:
-    ResultTable Execute(KnowledgeBase *knowledge_base) const final;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const noexcept final;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_PARENT_TRANS_CLAUSE_H_

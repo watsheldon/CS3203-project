@@ -8,7 +8,7 @@
 namespace spa {
 class FollowsClause : public OrderedStmtStmtBase {
     using OrderedStmtStmtBase::OrderedStmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const final;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const noexcept final;
 };
 }  // namespace spa
 

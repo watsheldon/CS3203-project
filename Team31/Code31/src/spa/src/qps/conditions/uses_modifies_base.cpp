@@ -6,30 +6,31 @@
 #include "qps/synonym.h"
 
 namespace spa {
-UsesModifiesBase::UsesModifiesBase(int first, std::string second)
+UsesModifiesBase::UsesModifiesBase(int first, std::string second) noexcept
         : type_(Type::kIntIdent),
           first_int_(first),
           second_ident_(std::move(second)) {}
-UsesModifiesBase::UsesModifiesBase(int first, Synonym *second)
+UsesModifiesBase::UsesModifiesBase(int first, Synonym *second) noexcept
         : type_(Type::kIntSyn), first_int_(first), second_syn_(second) {}
-UsesModifiesBase::UsesModifiesBase(int first)
+UsesModifiesBase::UsesModifiesBase(int first) noexcept
         : type_(Type::kIntWild), first_int_(first) {}
-UsesModifiesBase::UsesModifiesBase(Synonym *first, std::string second)
+UsesModifiesBase::UsesModifiesBase(Synonym *first, std::string second) noexcept
         : type_(Type::kSynIdent),
           first_syn_(first),
           second_ident_(std::move(second)) {}
-UsesModifiesBase::UsesModifiesBase(Synonym *first, Synonym *second)
+UsesModifiesBase::UsesModifiesBase(Synonym *first, Synonym *second) noexcept
         : type_(Type::kSynSyn), first_syn_(first), second_syn_(second) {}
-UsesModifiesBase::UsesModifiesBase(Synonym *first)
+UsesModifiesBase::UsesModifiesBase(Synonym *first) noexcept
         : type_(Type::kSynWild), first_syn_(first) {}
-UsesModifiesBase::UsesModifiesBase(std::string first, Synonym *second)
+UsesModifiesBase::UsesModifiesBase(std::string first, Synonym *second) noexcept
         : type_(Type::kIdentSyn),
           first_ident_(std::move(first)),
           second_syn_(second) {}
-UsesModifiesBase::UsesModifiesBase(std::string first, std::string second)
+UsesModifiesBase::UsesModifiesBase(std::string first,
+                                   std::string second) noexcept
         : type_(Type::kIdentIdent),
           first_ident_(std::move(first)),
           second_ident_(std::move(second)) {}
-UsesModifiesBase::UsesModifiesBase(std::string first)
+UsesModifiesBase::UsesModifiesBase(std::string first) noexcept
         : type_(Type::kIdentWild), first_ident_(std::move(first)) {}
 }  // namespace spa

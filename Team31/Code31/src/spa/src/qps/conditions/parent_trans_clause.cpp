@@ -10,7 +10,8 @@
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
-ResultTable ParentTransClause::Execute(KnowledgeBase *knowledge_base) const {
+ResultTable ParentTransClause::Execute(
+        KnowledgeBase *knowledge_base) const noexcept {
     switch (type_) {
         case Type::kIntInt: {
             auto result = knowledge_base->ExistParent(

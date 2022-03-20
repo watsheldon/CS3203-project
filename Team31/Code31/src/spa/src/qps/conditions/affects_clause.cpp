@@ -4,7 +4,8 @@
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
-ResultTable AffectsClause::Execute(KnowledgeBase *knowledge_base) const {
+ResultTable AffectsClause::Execute(
+        KnowledgeBase *knowledge_base) const noexcept {
     return ResultTable{false};
 }
 

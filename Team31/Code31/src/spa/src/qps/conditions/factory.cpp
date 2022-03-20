@@ -7,7 +7,7 @@
 #include "stmt_stmt_base.h"
 
 namespace spa {
-void Factory::SetRelationship(QueryTokenType type) {
+void Factory::SetRelationship(QueryTokenType type) noexcept {
     Reset();
     switch (type) {
         case QueryTokenType::kKeywordParent:
@@ -29,35 +29,35 @@ void Factory::SetRelationship(QueryTokenType type) {
             assert(false);
     }
 }
-void Factory::SetFirst(int first) {
+void Factory::SetFirst(int first) noexcept {
     first_int_ = first;
     first_param_type_ = ConditionClause::FirstParamType::kInt;
 }
-void Factory::SetFirst(Synonym* syn) {
+void Factory::SetFirst(Synonym* syn) noexcept {
     first_syn_ = syn;
     first_param_type_ = ConditionClause::FirstParamType::kSyn;
 }
-void Factory::SetFirst(const std::string& value) {
+void Factory::SetFirst(const std::string& value) noexcept {
     first_ident_ = value;
     first_param_type_ = ConditionClause::FirstParamType::kIdent;
 }
-void Factory::SetSecond(int second) {
+void Factory::SetSecond(int second) noexcept {
     second_int_ = second;
     second_param_type_ = ConditionClause::SecondParamType::kInt;
 }
-void Factory::SetSecond(Synonym* syn) {
+void Factory::SetSecond(Synonym* syn) noexcept {
     second_syn_ = syn;
     second_param_type_ = ConditionClause::SecondParamType::kSyn;
 }
-void Factory::SetSecond(const std::string& value) {
+void Factory::SetSecond(const std::string& value) noexcept {
     second_ident_ = value;
     second_param_type_ = ConditionClause::SecondParamType::kIdent;
 }
-void Factory::SetSecond(std::vector<QueryToken>&& expr) {
+void Factory::SetSecond(std::vector<QueryToken>&& expr) noexcept {
     second_exprs_ = std::move(expr);
     second_param_type_ = ConditionClause::SecondParamType::kExpr;
 }
-void Factory::SetTransPartial() {
+void Factory::SetTransPartial() noexcept {
     switch (rel_) {
         case Relationship::kFollows:
             rel_ = Relationship::kFollowsT;
@@ -73,8 +73,8 @@ void Factory::SetTransPartial() {
             assert(false);
     }
 }
-void Factory::SetAssign(Synonym* syn) { assign_ = syn; }
-std::unique_ptr<ConditionClause> Factory::Build() {
+void Factory::SetAssign(Synonym* syn) noexcept { assign_ = syn; }
+std::unique_ptr<ConditionClause> Factory::Build() noexcept {
     switch (rel_) {
         case Relationship::kParent:
             return BuildStmtStmtClause<ParentClause>();
@@ -97,7 +97,7 @@ std::unique_ptr<ConditionClause> Factory::Build() {
     }
 }
 
-void Factory::Reset() {
+void Factory::Reset() noexcept {
     first_param_type_ = ConditionClause::FirstParamType::kWild;
     second_param_type_ = ConditionClause::SecondParamType::kWild;
     second_exprs_.clear();

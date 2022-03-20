@@ -10,7 +10,7 @@ class PatternExactClause : public PatternBase {
     using PatternBase::PatternBase;
 
   public:
-    ResultTable Execute(KnowledgeBase *knowledge_base) const final;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const noexcept final;
 };
 }  // namespace spa
 

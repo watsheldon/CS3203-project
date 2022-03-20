@@ -9,7 +9,7 @@ namespace spa {
 class NextTransClause : public StmtStmtBase {
   public:
     using StmtStmtBase::StmtStmtBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const final;
+    ResultTable Execute(KnowledgeBase *knowledge_base) const noexcept final;
 };
 }  // namespace spa
 

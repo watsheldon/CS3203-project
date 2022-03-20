@@ -21,15 +21,15 @@ class StmtStmtBase : public ConditionClause {
         kWildWild,
     };
 
-    StmtStmtBase();
-    StmtStmtBase(int first, int second);
-    StmtStmtBase(int first, Synonym *second);
-    StmtStmtBase(Synonym *first, int second);
-    StmtStmtBase(Synonym *first, Synonym *second);
-    StmtStmtBase(ArgPos pos, int integer);
-    StmtStmtBase(ArgPos pos, Synonym *syn);
+    StmtStmtBase() noexcept;
+    StmtStmtBase(int first, int second) noexcept;
+    StmtStmtBase(int first, Synonym *second) noexcept;
+    StmtStmtBase(Synonym *first, int second) noexcept;
+    StmtStmtBase(Synonym *first, Synonym *second) noexcept;
+    StmtStmtBase(ArgPos pos, int integer) noexcept;
+    StmtStmtBase(ArgPos pos, Synonym *syn) noexcept;
     static constexpr Type GetType(FirstParamType first,
-                                  SecondParamType second) {
+                                  SecondParamType second) noexcept {
         int first_index = static_cast<int>(first);
         int second_index = static_cast<int>(second);
         return stmt_stmt_type_[first_index][second_index];
