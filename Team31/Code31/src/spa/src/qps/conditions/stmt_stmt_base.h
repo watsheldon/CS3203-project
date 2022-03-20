@@ -38,10 +38,10 @@ class StmtStmtBase : public ConditionClause {
 
   protected:
     Type type_;
-    int first_int_;
-    int second_int_;
-    Synonym *first_syn_;
-    Synonym *second_syn_;
+    int first_int_ = 0;
+    int second_int_ = 0;
+    Synonym *first_syn_ = nullptr;
+    Synonym *second_syn_ = nullptr;
     static constexpr Array2D<Type, 3, 3> stmt_stmt_type_{
             {{Type::kIntInt, Type::kIntSyn, Type::kIntWild},
              {Type::kSynInt, Type::kSynSyn, Type::kSynWild},

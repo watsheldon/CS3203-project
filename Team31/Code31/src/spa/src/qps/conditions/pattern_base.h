@@ -39,9 +39,9 @@ class PatternBase : public ConditionClause {
 
   protected:
     Type type_;
-    Synonym *assign_;
+    Synonym *assign_ = nullptr;
     std::string first_ident_;
-    Synonym *first_syn_;
+    Synonym *first_syn_ = nullptr;
     std::vector<QueryToken> second_expr_;
     static constexpr Array2D<Type, 3, 2> pattern_type_ = {
             {{Type::kSynWild, Type::kSynExpr},

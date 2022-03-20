@@ -47,11 +47,11 @@ class UsesModifiesBase : public ConditionClause {
 
   protected:
     Type type_;
-    int first_int_;
-    Synonym *first_syn_;
+    int first_int_ = 0;
+    Synonym *first_syn_ = nullptr;
     std::string first_ident_;
-    int second_int_;
-    Synonym *second_syn_;
+    int second_int_ = 0;
+    Synonym *second_syn_ = nullptr;
     std::string second_ident_;
     static constexpr Array2D<Type, 3, 3> uses_modifies_type_{
             {{Type::kIntSyn, Type::kIntWild, Type::kIntIdent},
