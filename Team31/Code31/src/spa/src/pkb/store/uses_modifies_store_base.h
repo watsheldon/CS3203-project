@@ -17,6 +17,13 @@
 namespace spa {
 class UsesModifiesStoreBase {
   public:
+    using PairBitmap = Pair<BitVec2D &>;
+    struct ContainerInfo {
+        const ContainerForest &forest;
+        const StmtlstParentStore &stmtlst_parent;
+        const StmtlstStatementsStore &stmtlst_stmt;
+    };
+
     UsesModifiesStoreBase(std::size_t stmt_size, std::size_t var_size);
     [[nodiscard]] const std::vector<int> &GetStmtNo(int var_index) const;
     [[nodiscard]] const std::set<int> &GetAllVar(int stmt_no) const;
@@ -35,8 +42,7 @@ class UsesModifiesStoreBase {
     void AddIndirectRel(const PairVec<int> &basic_pairs,
                         const StmtlstStatementsStore &stmtlst_stmt,
                         const StmtlstParentStore &stmtlst_parent,
-                        const ContainerForest &forest, BitVec2D &if_added,
-                        BitVec2D &while_added);
+                        const ContainerForest &forest, PairBitmap &bitmaps);
     void AddAllContainerRel(const ContainerForest &forest,
                             const StmtlstParentStore &stmtlst_parent,
                             const StmtlstStatementsStore &stmtlst_stmt,
@@ -51,14 +57,13 @@ class UsesModifiesStoreBase {
             const TypeStatementsStore &type_statement_store,
             const StmtlstStatementsStore &stmtlst_stmt,
             const StmtlstParentStore &stmtlst_parent,
-            const ContainerForest &forest, BitVec2D &if_added,
-            BitVec2D &while_added) = 0;
+            const ContainerForest &forest, PairBitmap &bitmaps) = 0;
     virtual void AddConditionRel(
             const ContainerForest &forest,
             const StmtlstParentStore &stmtlst_parent,
             const StmtlstStatementsStore &stmtlst_stmt,
-            const TypeStatementsStore &type_statement_store, BitVec2D &if_added,
-            BitVec2D &while_added) = 0;
+            const TypeStatementsStore &type_statement_store,
+            PairBitmap &bitmaps) = 0;
 
     template <std::size_t n>
     void FillDirectRels(std::array<StmtType, n> direct_stmt_types,
@@ -75,13 +80,12 @@ class UsesModifiesStoreBase {
                           const TypeStatementsStore &type_statement_store,
                           const StmtlstStatementsStore &stmtlst_stmt,
                           const StmtlstParentStore &stmtlst_parent,
-                          const ContainerForest &forest, BitVec2D &if_added,
-                          BitVec2D &while_added) {
+                          const ContainerForest &forest, PairBitmap &bitmaps) {
         for (const auto stmt_type : indirect_stmt_types) {
             auto &relationships =
                     stmt_var_pairs_[static_cast<int>(stmt_type) - 1];
             AddIndirectRel(relationships, stmtlst_stmt, stmtlst_parent, forest,
-                           if_added, while_added);
+                           bitmaps);
         }
     }
 

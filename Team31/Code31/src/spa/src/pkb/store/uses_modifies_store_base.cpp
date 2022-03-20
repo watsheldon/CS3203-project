@@ -73,7 +73,7 @@ void UsesModifiesStoreBase::AddIndirectRel(
         const PairVec<int>& basic_pairs,
         const StmtlstStatementsStore& stmtlst_stmt,
         const StmtlstParentStore& stmtlst_parent, const ContainerForest& forest,
-        BitVec2D& if_added, BitVec2D& while_added) {
+        PairBitmap& bitmaps) {
     auto& [basic_stmts, basic_vars] = basic_pairs;
     for (int i = 0; i < basic_stmts.size(); ++i) {
         auto s = basic_stmts[i], v = basic_vars[i];
@@ -82,6 +82,7 @@ void UsesModifiesStoreBase::AddIndirectRel(
         for (auto j : ancestors) {
             auto& [type, index] = stmtlst_parent.GetParent(j);
             if (type == StmtlstParentStore::kProc) break;
+            auto& [if_added, while_added] = bitmaps;
             auto added =
                     type == StmtlstParentStore::kIf ? if_added : while_added;
             auto& if_var_pairs_ =
@@ -105,12 +106,13 @@ void UsesModifiesStoreBase::AddAllContainerRel(
         const TypeStatementsStore& type_statement_store) {
     BitVec2D if_added(num_stmts + 1, num_vars + 1);
     BitVec2D while_added(num_stmts + 1, num_vars + 1);
+    PairBitmap bitmaps = {if_added, while_added};
 
     AddConditionRel(forest, stmtlst_parent, stmtlst_stmt, type_statement_store,
-                    if_added, while_added);
+                    bitmaps);
 
     AddAllIndirectRel(type_statement_store, stmtlst_stmt, stmtlst_parent,
-                      forest, if_added, while_added);
+                      forest, bitmaps);
 }
 
 void UsesModifiesStoreBase::FillStmts() {
