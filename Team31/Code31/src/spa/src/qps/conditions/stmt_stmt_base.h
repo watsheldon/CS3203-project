@@ -1,6 +1,8 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_
 
+#include <array>
+
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "condition_clause.h"
@@ -32,7 +34,7 @@ class StmtStmtBase : public ConditionClause {
                                   SecondParamType second) noexcept {
         int first_index = static_cast<int>(first);
         int second_index = static_cast<int>(second);
-        return stmt_stmt_type_[first_index][second_index];
+        return kTypeMatrix[first_index][second_index];
     }
     ~StmtStmtBase() override = default;
 
@@ -42,7 +44,7 @@ class StmtStmtBase : public ConditionClause {
     int second_int_ = 0;
     Synonym *first_syn_ = nullptr;
     Synonym *second_syn_ = nullptr;
-    static constexpr Array2D<Type, 3, 3> stmt_stmt_type_{
+    static constexpr Array2D<Type, 3, 3> kTypeMatrix{
             {{Type::kIntInt, Type::kIntSyn, Type::kIntWild},
              {Type::kSynInt, Type::kSynSyn, Type::kSynWild},
              {Type::kWildInt, Type::kWildSyn, Type::kWildWild}}};

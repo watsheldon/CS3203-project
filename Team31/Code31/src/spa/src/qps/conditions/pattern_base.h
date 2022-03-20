@@ -1,6 +1,7 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_
 
+#include <array>
 #include <vector>
 
 #include "common/aliases.h"
@@ -33,7 +34,7 @@ class PatternBase : public ConditionClause {
                                   SecondParamType second) noexcept {
         int first_index = static_cast<int>(first) - 1;
         int second_index = static_cast<int>(second) - 2;
-        return pattern_type_[first_index][second_index];
+        return kTypeMatrix[first_index][second_index];
     }
     ~PatternBase() override = default;
 
@@ -43,7 +44,7 @@ class PatternBase : public ConditionClause {
     std::string first_ident_;
     Synonym *first_syn_ = nullptr;
     std::vector<QueryToken> second_expr_;
-    static constexpr Array2D<Type, 3, 2> pattern_type_ = {
+    static constexpr Array2D<Type, 3, 2> kTypeMatrix = {
             {{Type::kSynWild, Type::kSynExpr},
              {Type::kWildWild, Type::kWildExpr},
              {Type::kIdentWild, Type::kIdentExpr}}};

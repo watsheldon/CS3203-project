@@ -1,6 +1,7 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_
 
+#include <array>
 #include <string>
 
 #include "common/aliases.h"
@@ -41,7 +42,7 @@ class UsesModifiesBase : public ConditionClause {
         int second_index = second == SecondParamType::kIdent
                                    ? static_cast<int>(second) - 2
                                    : static_cast<int>(second) - 1;
-        return uses_modifies_type_[first_index][second_index];
+        return kTypeMatrix[first_index][second_index];
     }
     ~UsesModifiesBase() override = default;
 
@@ -53,7 +54,7 @@ class UsesModifiesBase : public ConditionClause {
     int second_int_ = 0;
     Synonym *second_syn_ = nullptr;
     std::string second_ident_;
-    static constexpr Array2D<Type, 3, 3> uses_modifies_type_{
+    static constexpr Array2D<Type, 3, 3> kTypeMatrix{
             {{Type::kIntSyn, Type::kIntWild, Type::kIntIdent},
              {Type::kSynSyn, Type::kSynWild, Type::kSynIdent},
              {Type::kIdentSyn, Type::kIdentWild, Type::kIdentIdent}}};
