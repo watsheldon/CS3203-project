@@ -28,8 +28,12 @@ class StmtStmtBase : public ConditionClause {
     StmtStmtBase(Synonym *first, Synonym *second);
     StmtStmtBase(ArgPos pos, int integer);
     StmtStmtBase(ArgPos pos, Synonym *syn);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override = 0;
-    static Type StmtStmtType(FirstParamType first, SecondParamType second);
+    static constexpr Type GetType(FirstParamType first,
+                                  SecondParamType second) {
+        int first_index = static_cast<int>(first);
+        int second_index = static_cast<int>(second);
+        return stmt_stmt_type_[first_index][second_index];
+    }
     ~StmtStmtBase() override = default;
 
   protected:

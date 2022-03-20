@@ -29,9 +29,13 @@ class PatternBase : public ConditionClause {
     PatternBase(Synonym *assign,
                 std::vector<QueryToken> &&second);  // WildExpr
     explicit PatternBase(Synonym *assign);          // WildWild
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override = 0;
-    static Type PatternType(FirstParamType first, SecondParamType second);
-    ~PatternBase() override = 0;
+    static constexpr Type GetType(FirstParamType first,
+                                  SecondParamType second) {
+        int first_index = static_cast<int>(first) - 1;
+        int second_index = static_cast<int>(second) - 2;
+        return pattern_type_[first_index][second_index];
+    }
+    ~PatternBase() override = default;
 
   protected:
     Type type_;

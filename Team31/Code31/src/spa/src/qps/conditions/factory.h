@@ -71,8 +71,8 @@ class Factory {
     template <typename T>
     std::unique_ptr<ConditionClause> BuildStmtStmtClause() {
         static_assert(std::is_base_of_v<StmtStmtBase, T>);
-        StmtStmtBase::Type type = StmtStmtBase::StmtStmtType(
-                first_param_type_, second_param_type_);
+        StmtStmtBase::Type type =
+                StmtStmtBase::GetType(first_param_type_, second_param_type_);
         switch (type) {
             case StmtStmtBase::Type::kIntInt:
                 return std::make_unique<T>(first_int_, second_int_);
@@ -100,7 +100,7 @@ class Factory {
     template <typename T>
     std::unique_ptr<ConditionClause> BuildUsesModifiesClause() {
         static_assert(std::is_base_of_v<UsesModifiesBase, T>);
-        UsesModifiesBase::Type type = UsesModifiesBase::UsesModifiesType(
+        UsesModifiesBase::Type type = UsesModifiesBase::GetType(
                 first_param_type_, second_param_type_);
         switch (type) {
             case UsesModifiesBase::Type::kIntSyn:
@@ -127,7 +127,7 @@ class Factory {
     std::unique_ptr<ConditionClause> BuildPatternClause() {
         static_assert(std::is_base_of_v<PatternBase, T>);
         PatternBase::Type type =
-                PatternBase::PatternType(first_param_type_, second_param_type_);
+                PatternBase::GetType(first_param_type_, second_param_type_);
         switch (type) {
             case PatternBase::Type::kWildWild:
                 return std::make_unique<T>(assign_);

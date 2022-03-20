@@ -1,7 +1,6 @@
 #include "stmt_stmt_base.h"
 
 #include "common/entity_type_enum.h"
-#include "condition_clause.h"
 #include "qps/synonym.h"
 
 namespace spa {
@@ -37,12 +36,5 @@ StmtStmtBase::StmtStmtBase(ArgPos pos, Synonym *syn) {
         type_ = Type::kWildSyn;
         second_syn_ = syn;
     }
-}
-StmtStmtBase::Type StmtStmtBase::StmtStmtType(
-        ConditionClause::FirstParamType first,
-        ConditionClause::SecondParamType second) {
-    int first_index = static_cast<int>(first);
-    int second_index = static_cast<int>(second);
-    return stmt_stmt_type_[first_index][second_index];
 }
 }  // namespace spa

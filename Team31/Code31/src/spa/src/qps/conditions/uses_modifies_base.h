@@ -33,8 +33,16 @@ class UsesModifiesBase : public ConditionClause {
     UsesModifiesBase(std::string first, Synonym *second);
     UsesModifiesBase(std::string first, std::string second);
     explicit UsesModifiesBase(std::string first);
-    ResultTable Execute(KnowledgeBase *knowledge_base) const override = 0;
-    static Type UsesModifiesType(FirstParamType first, SecondParamType second);
+    static constexpr Type GetType(FirstParamType first,
+                                  SecondParamType second) {
+        int first_index = first == FirstParamType::kIdent
+                                  ? static_cast<int>(first) - 1
+                                  : static_cast<int>(first);
+        int second_index = second == SecondParamType::kIdent
+                                   ? static_cast<int>(second) - 2
+                                   : static_cast<int>(second) - 1;
+        return uses_modifies_type_[first_index][second_index];
+    }
     ~UsesModifiesBase() override = default;
 
   protected:
