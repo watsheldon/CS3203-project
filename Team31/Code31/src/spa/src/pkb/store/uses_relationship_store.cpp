@@ -1,5 +1,6 @@
 #include "uses_relationship_store.h"
 
+#include <functional>
 #include <vector>
 
 #include "common/bitvec2d.h"
@@ -9,6 +10,9 @@
 #include "type_statements_store.h"
 
 namespace spa {
+template <typename T>
+using Ref = std::reference_wrapper<T>;
+
 void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
     stmt_var_.Set(stmt_no, std::forward<std::vector<int>>(var_indices));
 }
@@ -22,11 +26,11 @@ void UsesRelationshipStore::AddConditionRel(
         const StmtlstStatementsStore& stmtlst_stmt,
         const TypeStatementsStore& type_statement_store, BitVec2D& if_added,
         BitVec2D& while_added) {
-    std::array<BitVec2D, 2> container_bitmaps{{if_added, while_added}};
+    std::array<Ref<BitVec2D>, 2> container_bitmaps{{if_added, while_added}};
     auto& if_var_pairs = stmt_var_pairs_[static_cast<int>(StmtType::kIf) - 1];
     auto& while_var_pairs =
             stmt_var_pairs_[static_cast<int>(StmtType::kWhile) - 1];
-    std::array<PairVec<int>, 2> container_var_pairs{
+    std::array<Ref<PairVec<int>>, 2> container_var_pairs{
             {if_var_pairs, while_var_pairs}};
     auto& all_if_stmts = type_statement_store.GetStatements(StmtType::kIf);
     auto& all_while_stmts =
@@ -35,7 +39,8 @@ void UsesRelationshipStore::AddConditionRel(
             {all_if_stmts, all_while_stmts}};
 
     for (int pos = 0; pos < 2; ++pos) {
-        auto& [container_stmts, container_vars] = container_var_pairs[pos];
+        auto& [container_stmts, container_vars] =
+                container_var_pairs[pos].get();
         for (auto i : all_container_stmts[pos]) {
             // Add indirect Uses of condition variables by ancestors of i.
             auto& var_indices = GetVarIndex(i);
@@ -58,7 +63,7 @@ void UsesRelationshipStore::AddConditionRel(
                 stmts.resize(vars.size(), index);
             }
             // Add direct Uses of condition variables by container statement i.
-            auto& bitmap = container_bitmaps[pos];
+            auto& bitmap = container_bitmaps[pos].get();
             for (auto v : var_indices) {
                 if (bitmap.At(i, v)) continue;
                 container_vars.emplace_back(v);
