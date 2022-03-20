@@ -288,6 +288,13 @@ int FollowsParentRelStore::GetContainerLastStmt(StmtType type,
     int stmtlst = type == StmtType::kWhile
                           ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
                           : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
+    auto child_stmts = stmtlst_stmt_.GetStatements(stmtlst);
+    const int last_child = child_stmts.back();
+    auto last_child_type = type_stmt_.GetType(last_child);
+    if (last_child_type != StmtType::kWhile and
+        last_child_type != StmtType::kIf) {
+        return last_child;
+    }
     int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
     auto grandchild_stmts = stmtlst_stmt_.GetStatements(grandchild);
     last_stmt = grandchild_stmts.back();
