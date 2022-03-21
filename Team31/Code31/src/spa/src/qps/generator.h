@@ -28,6 +28,7 @@ class Generator {
         kFollows,
         kUses,
         kModifies,
+        kCalls,
         kPattern,
         kExpression,
         kIdentifier,

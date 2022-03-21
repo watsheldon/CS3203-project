@@ -2,7 +2,6 @@
 
 #include <cassert>
 
-#include "pattern_base.h"
 #include "qps/query_token.h"
 #include "stmt_stmt_base.h"
 
@@ -27,6 +26,7 @@ void Factory::SetRelationship(QueryTokenType type) noexcept {
             return;
         case QueryTokenType::kKeywordCalls:
             rel_ = Relationship::kCalls;
+            return;
         default:
             assert(false);
     }

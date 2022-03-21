@@ -57,6 +57,8 @@ constexpr Generator::Mode Generator::TokenToClauseMode(
             return Mode::kModifies;
         case QueryTokenType::kKeywordPattern:
             return Mode::kPattern;
+        case QueryTokenType::kKeywordCalls:
+            return Mode::kCalls;
         default:
             assert(false);
     }
@@ -76,6 +78,8 @@ constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
             return type > Synonym::kStmtAssign || type == Synonym::kStmtPrint;
         case Mode::kPattern:
             return type != Synonym::kVar;
+        case Mode::kCalls:
+            return type != Synonym::kProc;
         default:
             assert(false);
     }
@@ -90,6 +94,8 @@ constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
         case Mode::kUses:
         case Mode::kModifies:
             return type != Synonym::kVar;
+        case Mode::kCalls:
+            return type != Synonym::kProc;
         default:
             assert(false);
     }
@@ -317,6 +323,7 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kKeywordParent:
         case QueryTokenType::kKeywordUses:
         case QueryTokenType::kKeywordModifies:
+        case QueryTokenType::kKeywordCalls:
             return BeginClause(token_type);
         case QueryTokenType::kOperatorPlus:
         case QueryTokenType::kOperatorMinus:

@@ -52,12 +52,12 @@ class Factory {
         kModifies,
         kPatternPartial,
         kPatternExact,
+        kCalls,
+        kCallsT,
         kNext,
         kNextT,
         kAffects,
-        kAffectsT,
-        kCalls,
-        kCallsT
+        kAffectsT
     };
     Relationship rel_;
     ConditionClause::FirstParamType first_param_type_;
