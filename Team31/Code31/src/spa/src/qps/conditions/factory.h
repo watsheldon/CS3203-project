@@ -76,13 +76,14 @@ class Factory {
         StmtStmtBase::Type type =
                 StmtStmtBase::GetType(first_param_type_, second_param_type_);
         switch (type) {
-            case StmtStmtBase::Type::kIntInt:
+            case StmtStmtBase::Type::kNumNum:
                 return std::make_unique<T>(first_int_, second_int_);
-            case StmtStmtBase::Type::kIntSyn:
+            case StmtStmtBase::Type::kNumSyn:
                 return std::make_unique<T>(first_int_, second_syn_);
-            case StmtStmtBase::Type::kIntWild:
-                return std::make_unique<T>(ArgPos::kFirst, first_int_);
-            case StmtStmtBase::Type::kSynInt:
+            case StmtStmtBase::Type::kNumWild:
+                return std::make_unique<T>(first_int_,
+                                           ConditionClause::Wildcard{});
+            case StmtStmtBase::Type::kSynNum:
                 return std::make_unique<T>(first_syn_, second_int_);
             case StmtStmtBase::Type::kSynSyn:
                 if constexpr (std::is_base_of_v<OrderedStmtStmtBase, T>) {
@@ -90,11 +91,14 @@ class Factory {
                 }
                 return std::make_unique<T>(first_syn_, second_syn_);
             case StmtStmtBase::Type::kSynWild:
-                return std::make_unique<T>(ArgPos::kFirst, first_syn_);
-            case StmtStmtBase::Type::kWildInt:
-                return std::make_unique<T>(ArgPos::kSecond, second_int_);
+                return std::make_unique<T>(first_syn_,
+                                           ConditionClause::Wildcard{});
+            case StmtStmtBase::Type::kWildNum:
+                return std::make_unique<T>(ConditionClause::Wildcard{},
+                                           second_int_);
             case StmtStmtBase::Type::kWildSyn:
-                return std::make_unique<T>(ArgPos::kSecond, second_syn_);
+                return std::make_unique<T>(ConditionClause::Wildcard{},
+                                           second_syn_);
             case StmtStmtBase::Type::kWildWild:
                 return std::make_unique<T>();
         }

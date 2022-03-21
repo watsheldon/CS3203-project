@@ -1,6 +1,5 @@
 #include "follows_clause.h"
 
-#include <cassert>
 #include <utility>
 
 #include "common/entity_type_enum.h"
@@ -8,61 +7,31 @@
 #include "common/type_convert_helpers.h"
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/result_table.h"
+#include "qps/synonym.h"
 
 namespace spa {
-ResultTable FollowsClause::Execute(
-        KnowledgeBase *knowledge_base) const noexcept {
-    switch (type_) {
-        case Type::kIntInt: {
-            auto result = knowledge_base->ExistFollows(
-                    false, Index<ArgPos::kFirst>(first_int_),
-                    Index<ArgPos::kSecond>(second_int_));
-            return ResultTable(result);
-        }
-        case Type::kIntSyn: {
-            auto result = knowledge_base->GetFollows(
-                    false, Index<ArgPos::kFirst>(first_int_),
-                    SynToPkbType(second_syn_));
-            return {second_syn_, std::move(result)};
-        }
-        case Type::kIntWild: {
-            auto result = knowledge_base->ExistFollows(
-                    Index<ArgPos::kFirst>(first_int_));
-            return ResultTable(result);
-        }
-        case Type::kSynInt: {
-            auto result = knowledge_base->GetFollows(
-                    false, Index<ArgPos::kSecond>(second_int_),
-                    SynToPkbType(first_syn_));
-            return {first_syn_, std::move(result)};
-        }
-        case Type::kSynSyn: {
-            auto [col_1, col_2] = knowledge_base->GetFollowsPairs(
-                    false, SynToPkbType(first_syn_), SynToPkbType(second_syn_));
-            return {first_syn_, std::move(col_1), second_syn_,
-                    std::move(col_2)};
-        }
-        case Type::kSynWild: {
-            auto result = knowledge_base->GetFollows(ArgPos::kFirst,
-                                                     SynToPkbType(first_syn_));
-            return {first_syn_, std::move(result)};
-        }
-        case Type::kWildInt: {
-            auto result = knowledge_base->ExistFollows(
-                    Index<ArgPos::kSecond>(second_int_));
-            return ResultTable(result);
-        }
-        case Type::kWildSyn: {
-            auto result = knowledge_base->GetFollows(ArgPos::kSecond,
-                                                     SynToPkbType(second_syn_));
-            return {second_syn_, std::move(result)};
-        }
-        case Type::kWildWild: {
-            auto result = knowledge_base->ExistFollows();
-            return ResultTable(result);
-        }
-        default:
-            assert(false);
-    }
+ResultTable FollowsClause::NumNum(KnowledgeBase *pkb, StmtNo first,
+                                  StmtNo second) const noexcept {
+    auto result = pkb->ExistFollows(false, Index<ArgPos::kFirst>(first),
+                                    Index<ArgPos::kSecond>(second));
+    return ResultTable(result);
+}
+ResultTable FollowsClause::NumSyn(KnowledgeBase *pkb, StmtNo first,
+                                  Synonym *second) const noexcept {
+    auto result = pkb->GetFollows(false, Index<ArgPos::kFirst>(first),
+                                  SynToPkbType(second));
+    return {second, std::move(result)};
+}
+ResultTable FollowsClause::SynNum(KnowledgeBase *pkb, Synonym *first,
+                                  StmtNo second) const noexcept {
+    auto result = pkb->GetFollows(false, Index<ArgPos::kSecond>(second),
+                                  SynToPkbType(first));
+    return {first, std::move(result)};
+}
+ResultTable FollowsClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
+                                  Synonym *second) const noexcept {
+    auto [col_1, col_2] = pkb->GetFollowsPairs(false, SynToPkbType(first),
+                                               SynToPkbType(second));
+    return {first, std::move(col_1), second, std::move(col_2)};
 }
 }  // namespace spa
