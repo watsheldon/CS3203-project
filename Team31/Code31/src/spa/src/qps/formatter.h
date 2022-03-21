@@ -19,7 +19,7 @@ class Formatter {
     void Use(KnowledgeBase* pkb) noexcept;
     void OutputResults(std::list<std::string>& results,
                        std::vector<const Synonym*>& selected);
-    static constexpr void OutputInvalid(
+    static inline void OutputInvalid(
             std::list<std::string>& results,
             const std::vector<const Synonym*>& selected) {
         if (selected.empty()) results.emplace_back(kFalse);
