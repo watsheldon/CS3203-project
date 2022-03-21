@@ -25,29 +25,38 @@ ResultTable ModifiesClause::NumWild(KnowledgeBase *pkb,
 }
 ResultTable ModifiesClause::SynVar(KnowledgeBase *pkb, Synonym *first,
                                    VarName second) const noexcept {
-    auto result = pkb->GetModifies(second, SynToPkbType(first));
+    auto result = first->type == Synonym::kProc
+                          ? pkb->GetModifies(Name<ArgPos::kSecond>(second))
+                          : pkb->GetModifies(second, SynToPkbType(first));
     return {first, std::move(result)};
 }
 ResultTable ModifiesClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
                                    Synonym *second) const noexcept {
-    auto [col_1, col_2] = pkb->GetModifiesStmtVar(SynToPkbType(first));
+    auto [col_1, col_2] =
+            first->type == Synonym::kProc
+                    ? pkb->GetModifiesProcVar()
+                    : pkb->GetModifiesStmtVar(SynToPkbType(first));
     return {first, std::move(col_1), second, std::move(col_2)};
 }
 ResultTable ModifiesClause::SynWild(KnowledgeBase *pkb,
                                     Synonym *first) const noexcept {
-    auto result = pkb->GetModifies(SynToPkbType(first));
+    auto result = first->type == Synonym::kProc
+                          ? pkb->GetModifiesProc()
+                          : pkb->GetModifies(SynToPkbType(first));
     return {first, std::move(result)};
 }
 ResultTable ModifiesClause::ProcVar(KnowledgeBase *pkb, ProcName first,
                                     VarName second) const noexcept {
-    return ResultTable(false);
+    auto result = pkb->ExistModifies(first, second);
+    return ResultTable(result);
 }
 ResultTable ModifiesClause::ProcSyn(KnowledgeBase *pkb, ProcName first,
                                     Synonym *second) const noexcept {
-    return ResultTable(false);
+    auto result = pkb->GetModifies(Name<ArgPos::kFirst>(first));
+    return {second, std::move(result)};
 }
 ResultTable ModifiesClause::ProcWild(KnowledgeBase *pkb,
                                      ProcName first) const noexcept {
-    return ResultTable(false);
+    return ResultTable(pkb->ExistModifies(first));
 }
 }  // namespace spa
