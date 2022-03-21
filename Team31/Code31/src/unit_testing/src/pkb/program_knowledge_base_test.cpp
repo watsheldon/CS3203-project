@@ -273,7 +273,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.ExistModifies(4, "v1"));
         REQUIRE_FALSE(pkb.ExistModifies(700, "v2"));
     }
-    SECTION("GetModifies") {
+    SECTION("GetModifiesProc") {
         REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(300)).empty());
         REQUIRE(pkb.GetModifies(Index<QueryEntityType::kStmt>(4)) ==
                 std::set<int>{1, 2, 3});

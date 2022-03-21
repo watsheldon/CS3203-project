@@ -296,6 +296,39 @@ PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     return uses_rel_.GetStmtVar(type);
 }
 
+bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name,
+                                         std::string_view var_name) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name) {
+    return false;
+}
+std::set<int> ProgramKnowledgeBase::GetModifies(
+        Name<ArgPos::kFirst> proc_name) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetModifies(
+        Name<ArgPos::kSecond> var_name) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetModifiesProc() { return {}; }
+PairVec<int> ProgramKnowledgeBase::GetModifiesProcVar() { return {}; }
+bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name,
+                                     std::string_view var_name) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name) {
+    return false;
+}
+std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kFirst> proc_name) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kSecond> var_name) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetUsesProc() { return {}; }
+PairVec<int> ProgramKnowledgeBase::GetUsesProcVar() { return {}; }
+
 // ( _, " "), (_, _" "_)
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
                                                bool partial_match) {
@@ -695,54 +728,6 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
         }
     }
     return {PolishNotation(expr), contains_unseen};
-}
-
-int ProgramKnowledgeBase::GetContainerLastStmt(StmtType type, int stmt_no) {
-    int last_stmt;
-    auto follow_vec =
-            GetFollows(false, Index<ArgPos::kFirst>(stmt_no), StmtType::kAll);
-
-    if (follow_vec.size() == 1) {
-        last_stmt = *follow_vec.begin() - 1;
-        return last_stmt;
-    }
-
-    int stmtlst = type == StmtType::kWhile
-                          ? stmtlst_parent_.GetWhileStmtLst(stmt_no)
-                          : stmtlst_parent_.GetIfStmtLst(stmt_no).else_index;
-    int grandchild = container_forest_->GetRightmostGrandchild(stmtlst);
-    auto grandchild_stmt = stmtlst_stmt_.GetStatements(grandchild);
-    last_stmt = grandchild_stmt.back();
-
-    return last_stmt;
-}
-
-Pair<std::vector<int>::const_iterator> ProgramKnowledgeBase::GetStmtBound(
-        StmtType type, int first_stmt, int last_stmt) {
-    std::vector<int>::const_iterator first, second;
-
-    const auto &type_stmts = type_stmt_.GetStatements(type);
-    first = std::lower_bound(type_stmts.begin(), type_stmts.end(), first_stmt);
-    second = std::upper_bound(first, type_stmts.end(), last_stmt);
-
-    return {first, second};
-}
-
-void ProgramKnowledgeBase::AppendVarIndicesModifies(
-        Pair<std::vector<int>::const_iterator> bound, std::set<int> &results) {
-    for (auto i = bound.first; i != bound.second; i++) {
-        results.emplace(modifies_rel_.GetVarIndex(*i));
-    }
-}
-void ProgramKnowledgeBase::AppendVarIndicesUses(
-        std::pair<std::vector<int>::const_iterator,
-                  std::vector<int>::const_iterator>
-                bound,
-        std::set<int> &results) {
-    for (auto i = bound.first; i != bound.second; i++) {
-        auto var_indices = uses_rel_.GetVarIndex(*i);
-        results.insert(var_indices.begin(), var_indices.end());
-    }
 }
 
 }  // namespace spa

@@ -106,6 +106,22 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetUses(StmtType type) override;
     PairVec<int> GetUsesStmtVar(StmtType type) override;
 
+    // Modifies and Uses for Procedure
+    bool ExistModifies(std::string_view proc_name,
+                       std::string_view var_name) override;
+    bool ExistModifies(std::string_view proc_name) override;
+    std::set<int> GetModifies(Name<ArgPos::kFirst> proc_name) override;
+    std::set<int> GetModifies(Name<ArgPos::kSecond> var_name) override;
+    std::set<int> GetModifiesProc() override;
+    PairVec<int> GetModifiesProcVar() override;
+    bool ExistUses(std::string_view proc_name,
+                   std::string_view var_name) override;
+    bool ExistUses(std::string_view proc_name) override;
+    std::set<int> GetUses(Name<ArgPos::kFirst> proc_name) override;
+    std::set<int> GetUses(Name<ArgPos::kSecond> var_name) override;
+    std::set<int> GetUsesProc() override;
+    PairVec<int> GetUsesProcVar() override;
+
     // ( _, " "), (_ , _" "_)
     std::set<int> GetPattern(std::vector<QueryToken> tokens,
                              bool partial_match) override;
@@ -184,15 +200,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::pair<PolishNotation, bool> ConvertFromQueryTokens(
             const std::vector<QueryToken> &tokens);
-
-    int GetContainerLastStmt(StmtType type, int stmt_no);
-    Pair<std::vector<int>::const_iterator> GetStmtBound(StmtType type,
-                                                        int first_stmt,
-                                                        int second_stmt);
-    void AppendVarIndicesModifies(Pair<std::vector<int>::const_iterator> bound,
-                                  std::set<int> &result);
-    void AppendVarIndicesUses(Pair<std::vector<int>::const_iterator> bound,
-                              std::set<int> &result);
 
     int IdentToIndexValue(std::string_view name, QueryEntityType et);
     template <QueryEntityType et>

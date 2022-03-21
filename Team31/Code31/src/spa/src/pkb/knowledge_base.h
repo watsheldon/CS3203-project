@@ -212,7 +212,6 @@ class KnowledgeBase {
      * Check if modifies relationships between stmt# and its variable
      * exist
      */
-
     virtual bool ExistModifies(int stmt_no, std::string_view var_name) = 0;
     virtual bool ExistModifies(int stmt_no, int var_index) = 0;
 
@@ -268,6 +267,34 @@ class KnowledgeBase {
      * For Uses (s,v)
      */
     virtual PairVec<int> GetUsesStmtVar(StmtType type) = 0;
+
+    // Modifies and Uses for Procedure
+    // Modifies ("", "")
+    virtual bool ExistModifies(std::string_view proc_name,
+                               std::string_view var_name) = 0;
+    // Modifies ("", _)
+    virtual bool ExistModifies(std::string_view proc_name) = 0;
+    // Modifies ("", v)
+    virtual std::set<int> GetModifies(Name<ArgPos::kFirst> proc_name) = 0;
+    // Modifies (p, "")
+    virtual std::set<int> GetModifies(Name<ArgPos::kSecond> var_name) = 0;
+    //  Modifies (p, _)
+    virtual std::set<int> GetModifiesProc() = 0;
+    //  Modifies (p, v)
+    virtual PairVec<int> GetModifiesProcVar() = 0;
+    // Uses ("", "")
+    virtual bool ExistUses(std::string_view proc_name,
+                           std::string_view var_name) = 0;
+    // Uses ("", _)
+    virtual bool ExistUses(std::string_view proc_name) = 0;
+    // Uses ("", v)
+    virtual std::set<int> GetUses(Name<ArgPos::kFirst> proc_name) = 0;
+    // Uses (p, "")
+    virtual std::set<int> GetUses(Name<ArgPos::kSecond> var_name) = 0;
+    //  Uses (p, _)
+    virtual std::set<int> GetUsesProc() = 0;
+    //  Uses (p, v)
+    virtual PairVec<int> GetUsesProcVar() = 0;
 
     // ( _, " ") , (_ , _" "_)
     virtual std::set<int> GetPattern(std::vector<QueryToken> tokens,
