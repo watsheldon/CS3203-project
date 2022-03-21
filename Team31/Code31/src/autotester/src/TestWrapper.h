@@ -26,6 +26,7 @@ class TestWrapper : public AbstractWrapper {
 
   private:
     spa::QueryProcessingSubsystem qps_;
+    bool can_evaluate_ = false;
 };
 
 #endif

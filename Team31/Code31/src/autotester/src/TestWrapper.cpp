@@ -33,10 +33,12 @@ void TestWrapper::parse(std::string filename) {
     auto pkb = dae.Extract(std::move(ast));
     if (pkb) {
         qps_.Use(std::move(pkb));
+        can_evaluate_ = true;
     }
 }
 
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string> &results) {
+    if (!can_evaluate_) return;
     qps_.Evaluate(query, results);
 }
