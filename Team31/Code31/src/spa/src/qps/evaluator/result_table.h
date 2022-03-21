@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "common/aliases.h"
+#include "qps/aliases.h"
 #include "qps/synonym.h"
 #include "variable_column.h"
 
@@ -13,8 +14,6 @@ namespace spa {
 
 class ResultTable {
   public:
-    using Domain = VariableColumn::Domain;
-    using Column = VariableColumn::Column;
     using DomainPair = Pair<Domain>;
     using SynonymPair = Pair<const Synonym *>;
     enum ResultType { kBool, kSingle, kDouble };

@@ -4,6 +4,7 @@
 #include <cassert>
 #include <iterator>
 
+#include "qps/aliases.h"
 #include "qps/synonym.h"
 
 namespace spa {
@@ -92,8 +93,8 @@ ResultTable::DomainPair ResultTable::Update(const Synonym *syn_a,
     this_a->column.swap(column_a), this_b->column.swap(column_b);
     return {this_a->domain, this_b->domain};
 }
-const ResultTable::Domain &ResultTable::Update(
-        const Synonym *syn_a, const Domain &domain_a) noexcept {
+const Domain &ResultTable::Update(const Synonym *syn_a,
+                                  const Domain &domain_a) noexcept {
     auto [this_a, this_b] =
             first_->synonym == syn_a
                     ? std::make_pair(first_.get(), second_.get())
@@ -116,8 +117,8 @@ const ResultTable::Domain &ResultTable::Update(
     this_a->column.swap(column_a), this_b->column.swap(column_b);
     return this_b->domain;
 }
-ResultTable::Domain ResultTable::Intersect(const Domain &first,
-                                           const Domain &second) noexcept {
+Domain ResultTable::Intersect(const Domain &first,
+                              const Domain &second) noexcept {
     Domain intersection;
     std::set_intersection(first.begin(), first.end(), second.begin(),
                           second.end(),

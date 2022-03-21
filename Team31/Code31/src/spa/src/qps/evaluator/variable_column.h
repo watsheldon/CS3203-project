@@ -5,12 +5,11 @@
 #include <set>
 #include <vector>
 
+#include "qps/aliases.h"
 #include "qps/synonym.h"
 
 namespace spa {
 struct VariableColumn {
-    using Domain = std::set<int>;
-    using Column = std::vector<int>;
     VariableColumn(Synonym *syn, Domain &&syn_domain) noexcept;
     VariableColumn(Synonym *syn, std::vector<int> &&values) noexcept;
     Synonym *const synonym;
