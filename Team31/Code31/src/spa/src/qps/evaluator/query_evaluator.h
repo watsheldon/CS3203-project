@@ -29,10 +29,14 @@ class QueryEvaluator {
     void Populate(std::list<std::string> &list,
                   const Synonym *selected) noexcept;
     bool UpdateResult(ResultTable &result_table) noexcept;
-    bool UpdateSingle(const VariableColumn &column) noexcept;
+    bool MergeUnary(const VariableColumn &column) noexcept;
     bool Propagate() noexcept;
-    bool UpdateDouble(ResultTable &i) noexcept;
+    bool MergeBinary(ResultTable &result_table) noexcept;
     void Clear() noexcept;
+    void AddBinaryConstraintBothNew(ResultTable &result_table);
+    bool AddBinaryConstraintOneNew(ResultTable &result_table,
+                                   bool is_first_syn_old);
+    bool UpdateExistingBinaryConstraint(ResultTable &result_table);
 };
 }  // namespace spa
 
