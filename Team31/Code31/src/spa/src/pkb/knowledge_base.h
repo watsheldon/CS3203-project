@@ -101,6 +101,10 @@ class KnowledgeBase {
      */
     virtual bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
                               Index<ArgPos::kSecond> second_stmt) = 0;
+    virtual bool ExistFollows(Index<ArgPos::kFirst> first_stmt,
+                              Index<ArgPos::kSecond> second_stmt) = 0;
+    virtual bool ExistFollowsT(Index<ArgPos::kFirst> first_stmt,
+                               Index<ArgPos::kSecond> second_stmt) = 0;
     /**
      * Check if Follows or Follows* (first_stmt, _) exists
      */
@@ -119,6 +123,10 @@ class KnowledgeBase {
      */
     virtual bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
                              Index<ArgPos::kSecond> child_stmt) = 0;
+    virtual bool ExistParent(Index<ArgPos::kFirst> parent_stmt,
+                             Index<ArgPos::kSecond> child_stmt) = 0;
+    virtual bool ExistParentT(Index<ArgPos::kFirst> parent_stmt,
+                              Index<ArgPos::kSecond> child_stmt) = 0;
     /**
      * Check if Parent or Parent* (parent_stmt, _) exists
      */
@@ -148,8 +156,18 @@ class KnowledgeBase {
     virtual std::set<int> GetFollows(bool transitive,
                                      Index<ArgPos::kFirst> stmt_no,
                                      StmtType return_type) = 0;
+    virtual std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no,
+                                     StmtType return_type) = 0;
+    virtual std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
+                                      StmtType return_type) = 0;
     std::set<int> GetFollows(bool transitive, Index<ArgPos::kFirst> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
+    }
+    std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no) {
+        return GetFollows(false, stmt_no, StmtType::kAll);
+    }
+    std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no) {
+        return GetFollows(true, stmt_no, StmtType::kAll);
     }
 
     /**
@@ -159,8 +177,18 @@ class KnowledgeBase {
     virtual std::set<int> GetFollows(bool transitive,
                                      Index<ArgPos::kSecond> stmt_no,
                                      StmtType return_type) = 0;
+    virtual std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no,
+                                     StmtType return_type) = 0;
+    virtual std::set<int> GetFollowsT(Index<ArgPos::kSecond> stmt_no,
+                                      StmtType return_type) = 0;
     std::set<int> GetFollows(bool transitive, Index<ArgPos::kSecond> stmt_no) {
         return GetFollows(transitive, stmt_no, StmtType::kAll);
+    }
+    std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no) {
+        return GetFollows(false, stmt_no, StmtType::kAll);
+    }
+    std::set<int> GetFollowsT(Index<ArgPos::kSecond> stmt_no) {
+        return GetFollows(true, stmt_no, StmtType::kAll);
     }
 
     /**
@@ -168,6 +196,10 @@ class KnowledgeBase {
      */
     virtual PairVec<int> GetFollowsPairs(bool transitive, StmtType first_type,
                                          StmtType second_type) = 0;
+    virtual PairVec<int> GetFollowsPairs(StmtType first_type,
+                                         StmtType second_type) = 0;
+    virtual PairVec<int> GetFollowsPairsT(StmtType first_type,
+                                          StmtType second_type) = 0;
 
     /**
      * Gets a list of stmt# that satisfy Parent/Parent*(stmt#, _) or
@@ -185,9 +217,19 @@ class KnowledgeBase {
     virtual std::set<int> GetParent(bool transitive,
                                     Index<ArgPos::kFirst> parent_stmt,
                                     StmtType return_type) = 0;
+    virtual std::set<int> GetParent(Index<ArgPos::kFirst> parent_stmt,
+                                    StmtType return_type) = 0;
+    virtual std::set<int> GetParentT(Index<ArgPos::kFirst> parent_stmt,
+                                     StmtType return_type) = 0;
     std::set<int> GetParent(bool transitive,
                             Index<ArgPos::kFirst> parent_stmt) {
         return GetParent(transitive, parent_stmt, StmtType::kAll);
+    }
+    std::set<int> GetParent(Index<ArgPos::kFirst> parent_stmt) {
+        return GetParent(false, parent_stmt, StmtType::kAll);
+    }
+    std::set<int> GetParentT(Index<ArgPos::kFirst> parent_stmt) {
+        return GetParent(true, parent_stmt, StmtType::kAll);
     }
 
     /**
@@ -197,9 +239,19 @@ class KnowledgeBase {
     virtual std::set<int> GetParent(bool transitive,
                                     Index<ArgPos::kSecond> child_stmt,
                                     StmtType return_type) = 0;
+    virtual std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt,
+                                    StmtType return_type) = 0;
+    virtual std::set<int> GetParentT(Index<ArgPos::kSecond> child_stmt,
+                                     StmtType return_type) = 0;
     std::set<int> GetParent(bool transitive,
                             Index<ArgPos::kSecond> child_stmt) {
         return GetParent(transitive, child_stmt, StmtType::kAll);
+    }
+    std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt) {
+        return GetParent(false, child_stmt, StmtType::kAll);
+    }
+    std::set<int> GetParentT(Index<ArgPos::kSecond> child_stmt) {
+        return GetParent(true, child_stmt, StmtType::kAll);
     }
 
     /**
@@ -207,6 +259,10 @@ class KnowledgeBase {
      */
     virtual PairVec<int> GetParentPairs(bool transitive, StmtType parent_type,
                                         StmtType child_type) = 0;
+    virtual PairVec<int> GetParentPairs(StmtType parent_type,
+                                        StmtType child_type) = 0;
+    virtual PairVec<int> GetParentPairsT(StmtType parent_type,
+                                         StmtType child_type) = 0;
 
     /**
      * Check if modifies relationships between stmt# and its variable
@@ -296,9 +352,15 @@ class KnowledgeBase {
     //  Uses (p, v)
     virtual PairVec<int> GetUsesProcVar() = 0;
 
+    /**
+     * For pattern related methods, a "P" at the end of the method name
+     * indicates partial matching.
+     */
     // ( _, " ") , (_ , _" "_)
     virtual std::set<int> GetPattern(std::vector<QueryToken> tokens,
                                      bool partial_match) = 0;
+    virtual std::set<int> GetPattern(std::vector<QueryToken> tokens) = 0;
+    virtual std::set<int> GetPatternP(std::vector<QueryToken> tokens) = 0;
 
     //(" ", _)
     virtual std::set<int> GetPattern(std::string_view var_name) = 0;
@@ -308,12 +370,23 @@ class KnowledgeBase {
     virtual std::set<int> GetPattern(std::string_view var_name,
                                      std::vector<QueryToken> second_tokens,
                                      bool partial_match) = 0;
+    virtual std::set<int> GetPattern(std::string_view var_name,
+                                     std::vector<QueryToken> second_tokens) = 0;
+    virtual std::set<int> GetPatternP(
+            std::string_view var_name,
+            std::vector<QueryToken> second_tokens) = 0;
     virtual std::set<int> GetPattern(int var_index,
                                      std::vector<QueryToken> second_tokens,
                                      bool partial_match) = 0;
+    virtual std::set<int> GetPattern(int var_index,
+                                     std::vector<QueryToken> second_tokens) = 0;
+    virtual std::set<int> GetPatternP(
+            int var_index, std::vector<QueryToken> second_tokens) = 0;
     // (v, " ") , (v, _" "_)
     virtual PairVec<int> GetPatternPair(std::vector<QueryToken> tokens,
                                         bool partial_match) = 0;
+    virtual PairVec<int> GetPatternPair(std::vector<QueryToken> tokens) = 0;
+    virtual PairVec<int> GetPatternPairP(std::vector<QueryToken> tokens) = 0;
 
     // (v, _)
     virtual PairVec<int> GetPatternPair() = 0;

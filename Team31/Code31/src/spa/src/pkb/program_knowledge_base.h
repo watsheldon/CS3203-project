@@ -57,12 +57,20 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
                       Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistFollows(Index<ArgPos::kFirst> first_stmt,
+                      Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistFollowsT(Index<ArgPos::kFirst> first_stmt,
+                       Index<ArgPos::kSecond> second_stmt) override;
     bool ExistFollows(Index<ArgPos::kFirst> first_stmt) override;
     bool ExistFollows(Index<ArgPos::kSecond> second_stmt) override;
     bool ExistFollows() override;
 
     bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
                      Index<ArgPos::kSecond> child_stmt) override;
+    bool ExistParent(Index<ArgPos::kFirst> parent_stmt,
+                     Index<ArgPos::kSecond> child_stmt) override;
+    bool ExistParentT(Index<ArgPos::kFirst> parent_stmt,
+                      Index<ArgPos::kSecond> child_stmt) override;
     bool ExistParent(Index<ArgPos::kFirst> parent_stmt) override;
     bool ExistParent(Index<ArgPos::kSecond> child_stmt) override;
     bool ExistParent() override;
@@ -71,21 +79,45 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::set<int> GetFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
                              StmtType return_type) override;
+    std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no,
+                             StmtType return_type) override;
+    std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
+                              StmtType return_type) override;
 
     std::set<int> GetFollows(bool transitive,
                              Index<ArgPos::kSecond> second_stmt,
                              StmtType return_type) override;
+    std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no,
+                             StmtType return_type) override;
+    std::set<int> GetFollowsT(Index<ArgPos::kSecond> stmt_no,
+                              StmtType return_type) override;
     PairVec<int> GetFollowsPairs(bool transitive, StmtType first_type,
                                  StmtType second_type) override;
+    PairVec<int> GetFollowsPairs(StmtType first_type,
+                                 StmtType second_type) override;
+    PairVec<int> GetFollowsPairsT(StmtType first_type,
+                                  StmtType second_type) override;
 
     std::set<int> GetParent(ArgPos return_pos, StmtType return_type) override;
-    std::set<int> GetParent(bool transitive, Index<ArgPos::kFirst> stmt_no,
+    std::set<int> GetParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
                             StmtType return_type) override;
+    std::set<int> GetParent(Index<ArgPos::kFirst> parent_stmt,
+                            StmtType return_type) override;
+    std::set<int> GetParentT(Index<ArgPos::kFirst> parent_stmt,
+                             StmtType return_type) override;
 
-    std::set<int> GetParent(bool transitive, Index<ArgPos::kSecond> stmt_no,
+    std::set<int> GetParent(bool transitive, Index<ArgPos::kSecond> child_stmt,
                             StmtType return_type) override;
+    std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt,
+                            StmtType return_type) override;
+    std::set<int> GetParentT(Index<ArgPos::kSecond> child_stmt,
+                             StmtType return_type) override;
     PairVec<int> GetParentPairs(bool transitive, StmtType parent_type,
                                 StmtType child_type) override;
+    PairVec<int> GetParentPairs(StmtType parent_type,
+                                StmtType child_type) override;
+    PairVec<int> GetParentPairsT(StmtType parent_type,
+                                 StmtType child_type) override;
 
     bool ExistModifies(int stmt_no, std::string_view var_name) override;
     bool ExistModifies(int stmt_no, int var_index) override;
@@ -125,6 +157,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     // ( _, " "), (_ , _" "_)
     std::set<int> GetPattern(std::vector<QueryToken> tokens,
                              bool partial_match) override;
+    std::set<int> GetPattern(std::vector<QueryToken> tokens) override;
+    std::set<int> GetPatternP(std::vector<QueryToken> tokens) override;
 
     //(" ", _)
     std::set<int> GetPattern(std::string_view var_name) override;
@@ -134,12 +168,22 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetPattern(std::string_view var_name,
                              std::vector<QueryToken> second_tokens,
                              bool partial_match) override;
+    std::set<int> GetPattern(std::string_view var_name,
+                             std::vector<QueryToken> second_tokens) override;
+    std::set<int> GetPatternP(std::string_view var_name,
+                              std::vector<QueryToken> second_tokens) override;
     std::set<int> GetPattern(int var_index,
                              std::vector<QueryToken> second_tokens,
                              bool partial_match) override;
+    std::set<int> GetPattern(int var_index,
+                             std::vector<QueryToken> second_tokens) override;
+    std::set<int> GetPatternP(int var_index,
+                              std::vector<QueryToken> second_tokens) override;
     // (v, " ")  , (v, _" "_)
     PairVec<int> GetPatternPair(std::vector<QueryToken> tokens,
                                 bool partial_match) override;
+    PairVec<int> GetPatternPair(std::vector<QueryToken> tokens) override;
+    PairVec<int> GetPatternPairP(std::vector<QueryToken> tokens) override;
 
     // (v, _)
     PairVec<int> GetPatternPair() override;

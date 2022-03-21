@@ -86,9 +86,18 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
 bool ProgramKnowledgeBase::ExistFollows(bool transitive,
                                         Index<ArgPos::kFirst> first_stmt,
                                         Index<ArgPos::kSecond> second_stmt) {
+    return transitive ? ExistFollowsT(first_stmt, second_stmt)
+                      : ExistFollows(first_stmt, second_stmt);
+}
+bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt,
+                                        Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
-    return follows_parent_rel_.ExistFollows(transitive, first_stmt,
-                                            second_stmt);
+    return follows_parent_rel_.ExistFollows(false, first_stmt, second_stmt);
+}
+bool ProgramKnowledgeBase::ExistFollowsT(Index<ArgPos::kFirst> first_stmt,
+                                         Index<ArgPos::kSecond> second_stmt) {
+    assert(compiled);
+    return follows_parent_rel_.ExistFollows(true, first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt) {
     assert(compiled);
@@ -111,30 +120,69 @@ std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
 std::set<int> ProgramKnowledgeBase::GetFollows(bool transitive,
                                                Index<ArgPos::kFirst> first_stmt,
                                                StmtType return_type) {
+    return transitive ? GetFollowsT(first_stmt, return_type)
+                      : GetFollows(first_stmt, return_type);
+}
+std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kFirst> stmt_no,
+                                               StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollows(transitive, first_stmt, return_type);
+    return follows_parent_rel_.GetFollows(false, stmt_no, return_type);
+}
+std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kFirst> stmt_no,
+                                                StmtType return_type) {
+    assert(compiled);
+    return follows_parent_rel_.GetFollows(true, stmt_no, return_type);
 }
 
 std::set<int> ProgramKnowledgeBase::GetFollows(
         bool transitive, Index<ArgPos::kSecond> second_stmt,
         StmtType return_type) {
+    return transitive ? GetFollowsT(second_stmt, return_type)
+                      : GetFollows(second_stmt, return_type);
+}
+std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kSecond> stmt_no,
+                                               StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollows(transitive, second_stmt, return_type);
+    return follows_parent_rel_.GetFollows(false, stmt_no, return_type);
+}
+std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kSecond> stmt_no,
+                                                StmtType return_type) {
+    assert(compiled);
+    return follows_parent_rel_.GetFollows(true, stmt_no, return_type);
 }
 
 PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(bool transitive,
                                                    StmtType first_type,
                                                    StmtType second_type) {
+    return transitive ? GetFollowsPairsT(first_type, second_type)
+                      : GetFollowsPairs(first_type, second_type);
+}
+PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(StmtType first_type,
+                                                   StmtType second_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollowsPairs(transitive, first_type,
-                                               second_type);
+    return follows_parent_rel_.GetFollowsPairs(false, first_type, second_type);
+}
+PairVec<int> ProgramKnowledgeBase::GetFollowsPairsT(StmtType first_type,
+                                                    StmtType second_type) {
+    assert(compiled);
+    return follows_parent_rel_.GetFollowsPairs(true, first_type, second_type);
 }
 
 bool ProgramKnowledgeBase::ExistParent(bool transitive,
                                        Index<ArgPos::kFirst> parent_stmt,
                                        Index<ArgPos::kSecond> child_stmt) {
+    return transitive ? ExistParentT(parent_stmt, child_stmt)
+                      : ExistParent(parent_stmt, child_stmt);
+}
+bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt,
+                                       Index<ArgPos::kSecond> child_stmt) {
     assert(compiled);
-    return follows_parent_rel_.ExistParent(transitive, parent_stmt, child_stmt);
+    return follows_parent_rel_.ExistParent(false, parent_stmt, child_stmt);
+}
+bool ProgramKnowledgeBase::ExistParentT(Index<ArgPos::kFirst> parent_stmt,
+                                        Index<ArgPos::kSecond> child_stmt) {
+    assert(compiled);
+    return follows_parent_rel_.ExistParent(true, parent_stmt, child_stmt);
 }
 bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt) {
     assert(compiled);
@@ -157,22 +205,51 @@ std::set<int> ProgramKnowledgeBase::GetParent(ArgPos return_pos,
 std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
                                               Index<ArgPos::kFirst> parent_stmt,
                                               StmtType return_type) {
+    return transitive ? GetParentT(parent_stmt, return_type)
+                      : GetParent(parent_stmt, return_type);
+}
+std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kFirst> parent_stmt,
+                                              StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParent(transitive, parent_stmt, return_type);
+    return follows_parent_rel_.GetParent(false, parent_stmt, return_type);
+}
+std::set<int> ProgramKnowledgeBase::GetParentT(
+        Index<ArgPos::kFirst> parent_stmt, StmtType return_type) {
+    assert(compiled);
+    return follows_parent_rel_.GetParent(true, parent_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
                                               Index<ArgPos::kSecond> child_stmt,
                                               StmtType return_type) {
+    return transitive ? GetParentT(child_stmt, return_type)
+                      : GetParent(child_stmt, return_type);
+}
+std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kSecond> child_stmt,
+                                              StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParent(transitive, child_stmt, return_type);
+    return follows_parent_rel_.GetParent(false, child_stmt, return_type);
+}
+std::set<int> ProgramKnowledgeBase::GetParentT(
+        Index<ArgPos::kSecond> child_stmt, StmtType return_type) {
+    assert(compiled);
+    return follows_parent_rel_.GetParent(true, child_stmt, return_type);
 }
 
 PairVec<int> ProgramKnowledgeBase::GetParentPairs(bool transitive,
                                                   StmtType parent_type,
                                                   StmtType child_type) {
+    return transitive ? GetParentPairsT(parent_type, child_type)
+                      : GetParentPairs(parent_type, child_type);
+}
+PairVec<int> ProgramKnowledgeBase::GetParentPairs(StmtType parent_type,
+                                                  StmtType child_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParentPairs(transitive, parent_type,
-                                              child_type);
+    return follows_parent_rel_.GetParentPairs(false, parent_type, child_type);
+}
+PairVec<int> ProgramKnowledgeBase::GetParentPairsT(StmtType parent_type,
+                                                   StmtType child_type) {
+    assert(compiled);
+    return follows_parent_rel_.GetParentPairs(true, parent_type, child_type);
 }
 
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
@@ -332,6 +409,9 @@ PairVec<int> ProgramKnowledgeBase::GetUsesProcVar() { return {}; }
 // ( _, " "), (_, _" "_)
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
                                                bool partial_match) {
+    return partial_match ? GetPatternP(tokens) : GetPattern(tokens);
+}
+std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens) {
     assert(compiled);
     auto converted_token = ConvertFromQueryTokens(tokens);
     if (converted_token.second) {
@@ -342,22 +422,7 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
     assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
     PN converted_pn = converted_token.first;
 
-    if (partial_match) {
-        std::set<int> partial_match_stmt;
-
-        for (int i : assign_stmt) {
-            const PN &pn = polish_notation_.GetNotation(
-                    polish_notation_.GetPolishIndex(i));
-            if (pn.Contains(converted_pn)) {
-                partial_match_stmt.emplace(i);
-            }
-        }
-        return partial_match_stmt;
-    }
-
-    assert(partial_match == false);
     std::set<int> full_match_stmt;
-
     for (auto &i : assign_stmt) {
         const PN &pn = polish_notation_.GetNotation(
                 polish_notation_.GetPolishIndex(i));
@@ -367,6 +432,28 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
     }
 
     return full_match_stmt;
+}
+std::set<int> ProgramKnowledgeBase::GetPatternP(
+        std::vector<QueryToken> tokens) {
+    assert(compiled);
+    auto converted_token = ConvertFromQueryTokens(tokens);
+    if (converted_token.second) {
+        return {};
+    }
+
+    std::vector<int> assign_stmt;
+    assign_stmt = type_stmt_.GetStatements(StmtType::kAssign);
+    PN converted_pn = converted_token.first;
+
+    std::set<int> partial_match_stmt;
+    for (int i : assign_stmt) {
+        const PN &pn = polish_notation_.GetNotation(
+                polish_notation_.GetPolishIndex(i));
+        if (pn.Contains(converted_pn)) {
+            partial_match_stmt.emplace(i);
+        }
+    }
+    return partial_match_stmt;
 }
 
 // (" ", _)
@@ -384,18 +471,49 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::string_view var_name) {
 std::set<int> ProgramKnowledgeBase::GetPattern(
         std::string_view var_name, std::vector<QueryToken> second_tokens,
         bool partial_match) {
+    return partial_match ? GetPatternP(var_name, second_tokens)
+                         : GetPattern(var_name, second_tokens);
+}
+std::set<int> ProgramKnowledgeBase::GetPattern(
+        std::string_view var_name, std::vector<QueryToken> second_tokens) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
-    return GetPattern(var_index, second_tokens, partial_match);
+    return GetPattern(var_index, second_tokens, false);
+}
+std::set<int> ProgramKnowledgeBase::GetPatternP(
+        std::string_view var_name, std::vector<QueryToken> second_tokens) {
+    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    if (var_index == 0) return {};
+    return GetPattern(var_index, second_tokens, true);
 }
 std::set<int> ProgramKnowledgeBase::GetPattern(
         int var_index, std::vector<QueryToken> second_tokens,
         bool partial_match) {
+    return partial_match ? GetPatternP(var_index, second_tokens)
+                         : GetPattern(var_index, second_tokens);
+}
+std::set<int> ProgramKnowledgeBase::GetPattern(
+        int var_index, std::vector<QueryToken> second_tokens) {
     assert(compiled);
 
     std::set<int> assign_stmt;
     std::set<int> filtered_assign_stmt;
-    assign_stmt = GetPattern(second_tokens, partial_match);
+    assign_stmt = GetPattern(second_tokens, false);
+
+    for (auto &i : assign_stmt) {
+        if (ExistModifies(i, var_index)) {
+            filtered_assign_stmt.emplace(i);
+        }
+    }
+    return filtered_assign_stmt;
+}
+std::set<int> ProgramKnowledgeBase::GetPatternP(
+        int var_index, std::vector<QueryToken> second_tokens) {
+    assert(compiled);
+
+    std::set<int> assign_stmt;
+    std::set<int> filtered_assign_stmt;
+    assign_stmt = GetPattern(second_tokens, true);
 
     for (auto &i : assign_stmt) {
         if (ExistModifies(i, var_index)) {
@@ -407,12 +525,34 @@ std::set<int> ProgramKnowledgeBase::GetPattern(
 // (v, " ") , (v, _" "_)
 PairVec<int> ProgramKnowledgeBase::GetPatternPair(
         std::vector<QueryToken> tokens, bool partial_match) {
+    return partial_match ? GetPatternPairP(tokens) : GetPatternPair(tokens);
+}
+PairVec<int> ProgramKnowledgeBase::GetPatternPair(
+        std::vector<QueryToken> tokens) {
     assert(compiled);
 
     std::set<int> assign_stmt_set;
     std::vector<int> assign_var;
     std::vector<int> assign_stmt;
-    assign_stmt_set = GetPattern(tokens, partial_match);
+    assign_stmt_set = GetPattern(tokens, false);
+
+    for (auto &i : assign_stmt_set) {
+        auto index = Index<QueryEntityType::kStmt>(i);
+        assign_var.emplace_back(*GetModifies(index).begin());
+    }
+
+    assign_stmt.assign(assign_stmt_set.begin(), assign_stmt_set.end());
+
+    return {assign_stmt, assign_var};
+}
+PairVec<int> ProgramKnowledgeBase::GetPatternPairP(
+        std::vector<QueryToken> tokens) {
+    assert(compiled);
+
+    std::set<int> assign_stmt_set;
+    std::vector<int> assign_var;
+    std::vector<int> assign_stmt;
+    assign_stmt_set = GetPattern(tokens, true);
 
     for (auto &i : assign_stmt_set) {
         auto index = Index<QueryEntityType::kStmt>(i);
@@ -729,5 +869,4 @@ std::pair<PolishNotation, bool> ProgramKnowledgeBase::ConvertFromQueryTokens(
     }
     return {PolishNotation(expr), contains_unseen};
 }
-
 }  // namespace spa
