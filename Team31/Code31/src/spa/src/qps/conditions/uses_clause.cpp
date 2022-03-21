@@ -1,6 +1,5 @@
 #include "uses_clause.h"
 
-#include <cassert>
 #include <utility>
 
 #include "common/index.h"
@@ -9,39 +8,46 @@
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
-ResultTable UsesClause::Execute(KnowledgeBase *knowledge_base) const noexcept {
-    switch (type_) {
-        case Type::kIntSyn: {
-            auto result = knowledge_base->GetUses(
-                    Index<QueryEntityType::kStmt>(first_int_));
-            return {second_syn_, std::move(result)};
-        }
-        case Type::kIntWild: {
-            auto result = knowledge_base->ExistUses(first_int_,
-                                                    KnowledgeBase::kWildCard);
-            return ResultTable(result);
-        }
-        case Type::kIntIdent: {
-            auto result = knowledge_base->ExistUses(first_int_, second_ident_);
-            return ResultTable(result);
-        }
-        case Type::kSynSyn: {
-            auto [col_1, col_2] =
-                    knowledge_base->GetUsesStmtVar(SynToPkbType(first_syn_));
-            return {first_syn_, std::move(col_1), second_syn_,
-                    std::move(col_2)};
-        }
-        case Type::kSynWild: {
-            auto result = knowledge_base->GetUses(SynToPkbType(first_syn_));
-            return {first_syn_, std::move(result)};
-        }
-        case Type::kSynIdent: {
-            auto result = knowledge_base->GetUses(second_ident_,
-                                                  SynToPkbType(first_syn_));
-            return {first_syn_, std::move(result)};
-        }
-        default:
-            assert(false);
-    }
+ResultTable UsesClause::NumVar(KnowledgeBase *pkb, StmtNo first,
+                               VarName second) const noexcept {
+    auto result = pkb->ExistUses(first, second);
+    return ResultTable(result);
+}
+ResultTable UsesClause::NumSyn(KnowledgeBase *pkb, StmtNo first,
+                               Synonym *second) const noexcept {
+    auto result = pkb->GetUses(Index<QueryEntityType::kStmt>(first));
+    return {second, std::move(result)};
+}
+ResultTable UsesClause::NumWild(KnowledgeBase *pkb,
+                                StmtNo first) const noexcept {
+    auto result = pkb->ExistUses(first, KnowledgeBase::kWildCard);
+    return ResultTable(result);
+}
+ResultTable UsesClause::SynVar(KnowledgeBase *pkb, Synonym *first,
+                               VarName second) const noexcept {
+    auto result = pkb->GetUses(second, SynToPkbType(first));
+    return {first, std::move(result)};
+}
+ResultTable UsesClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
+                               Synonym *second) const noexcept {
+    auto [col_1, col_2] = pkb->GetUsesStmtVar(SynToPkbType(first));
+    return {first, std::move(col_1), second, std::move(col_2)};
+}
+ResultTable UsesClause::SynWild(KnowledgeBase *pkb,
+                                Synonym *first) const noexcept {
+    auto result = pkb->GetUses(SynToPkbType(first));
+    return {first, std::move(result)};
+}
+ResultTable UsesClause::ProcVar(KnowledgeBase *pkb, ProcName first,
+                                VarName second) const noexcept {
+    return ResultTable(false);
+}
+ResultTable UsesClause::ProcSyn(KnowledgeBase *pkb, ProcName first,
+                                Synonym *second) const noexcept {
+    return ResultTable(false);
+}
+ResultTable UsesClause::ProcWild(KnowledgeBase *pkb,
+                                 ProcName first) const noexcept {
+    return ResultTable(false);
 }
 }  // namespace spa

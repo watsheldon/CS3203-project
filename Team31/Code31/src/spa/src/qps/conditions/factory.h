@@ -109,23 +109,23 @@ class Factory {
         UsesModifiesBase::Type type = UsesModifiesBase::GetType(
                 first_param_type_, second_param_type_);
         switch (type) {
-            case UsesModifiesBase::Type::kIntSyn:
+            case UsesModifiesBase::Type::kNumSyn:
                 return std::make_unique<T>(first_int_, second_syn_);
-            case UsesModifiesBase::Type::kIntWild:
+            case UsesModifiesBase::Type::kNumWild:
                 return std::make_unique<T>(first_int_);
-            case UsesModifiesBase::Type::kIntIdent:
+            case UsesModifiesBase::Type::kNumVar:
                 return std::make_unique<T>(first_int_, second_ident_);
             case UsesModifiesBase::Type::kSynSyn:
                 return std::make_unique<T>(first_syn_, second_syn_);
             case UsesModifiesBase::Type::kSynWild:
                 return std::make_unique<T>(first_syn_);
-            case UsesModifiesBase::Type::kSynIdent:
+            case UsesModifiesBase::Type::kSynVar:
                 return std::make_unique<T>(first_syn_, second_ident_);
-            case UsesModifiesBase::Type::kIdentSyn:
+            case UsesModifiesBase::Type::kProcSyn:
                 return std::make_unique<T>(first_ident_, second_syn_);
-            case UsesModifiesBase::Type::kIdentIdent:
+            case UsesModifiesBase::Type::kProcVar:
                 return std::make_unique<T>(first_ident_, second_ident_);
-            case UsesModifiesBase::Type::kIdentWild:
+            case UsesModifiesBase::Type::kProcWild:
                 return std::make_unique<T>(second_ident_);
         }
     }

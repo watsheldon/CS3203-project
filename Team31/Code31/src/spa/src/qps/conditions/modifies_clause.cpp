@@ -1,6 +1,5 @@
 #include "modifies_clause.h"
 
-#include <cassert>
 #include <utility>
 
 #include "common/index.h"
@@ -9,41 +8,46 @@
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
-ResultTable ModifiesClause::Execute(
-        KnowledgeBase *knowledge_base) const noexcept {
-    switch (type_) {
-        case Type::kIntSyn: {
-            auto result = knowledge_base->GetModifies(
-                    Index<QueryEntityType::kStmt>(first_int_));
-            return {second_syn_, std::move(result)};
-        }
-        case Type::kIntWild: {
-            auto result = knowledge_base->ExistModifies(
-                    first_int_, KnowledgeBase::kWildCard);
-            return ResultTable(result);
-        }
-        case Type::kIntIdent: {
-            auto result =
-                    knowledge_base->ExistModifies(first_int_, second_ident_);
-            return ResultTable(result);
-        }
-        case Type::kSynSyn: {
-            auto [col_1, col_2] = knowledge_base->GetModifiesStmtVar(
-                    SynToPkbType(first_syn_));
-            return {first_syn_, std::move(col_1), second_syn_,
-                    std::move(col_2)};
-        }
-        case Type::kSynWild: {
-            auto result = knowledge_base->GetModifies(SynToPkbType(first_syn_));
-            return {first_syn_, std::move(result)};
-        }
-        case Type::kSynIdent: {
-            auto result = knowledge_base->GetModifies(second_ident_,
-                                                      SynToPkbType(first_syn_));
-            return {first_syn_, std::move(result)};
-        }
-        default:
-            assert(false);
-    }
+ResultTable ModifiesClause::NumVar(KnowledgeBase *pkb, StmtNo first,
+                                   VarName second) const noexcept {
+    auto result = pkb->ExistModifies(first, second);
+    return ResultTable(result);
+}
+ResultTable ModifiesClause::NumSyn(KnowledgeBase *pkb, StmtNo first,
+                                   Synonym *second) const noexcept {
+    auto result = pkb->GetModifies(Index<QueryEntityType::kStmt>(first));
+    return {second, std::move(result)};
+}
+ResultTable ModifiesClause::NumWild(KnowledgeBase *pkb,
+                                    StmtNo first) const noexcept {
+    auto result = pkb->ExistModifies(first, KnowledgeBase::kWildCard);
+    return ResultTable(result);
+}
+ResultTable ModifiesClause::SynVar(KnowledgeBase *pkb, Synonym *first,
+                                   VarName second) const noexcept {
+    auto result = pkb->GetModifies(second, SynToPkbType(first));
+    return {first, std::move(result)};
+}
+ResultTable ModifiesClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
+                                   Synonym *second) const noexcept {
+    auto [col_1, col_2] = pkb->GetModifiesStmtVar(SynToPkbType(first));
+    return {first, std::move(col_1), second, std::move(col_2)};
+}
+ResultTable ModifiesClause::SynWild(KnowledgeBase *pkb,
+                                    Synonym *first) const noexcept {
+    auto result = pkb->GetModifies(SynToPkbType(first));
+    return {first, std::move(result)};
+}
+ResultTable ModifiesClause::ProcVar(KnowledgeBase *pkb, ProcName first,
+                                    VarName second) const noexcept {
+    return ResultTable(false);
+}
+ResultTable ModifiesClause::ProcSyn(KnowledgeBase *pkb, ProcName first,
+                                    Synonym *second) const noexcept {
+    return ResultTable(false);
+}
+ResultTable ModifiesClause::ProcWild(KnowledgeBase *pkb,
+                                     ProcName first) const noexcept {
+    return ResultTable(false);
 }
 }  // namespace spa

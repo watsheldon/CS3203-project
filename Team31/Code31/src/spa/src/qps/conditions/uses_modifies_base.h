@@ -3,6 +3,8 @@
 
 #include <array>
 #include <string>
+#include <string_view>
+#include <variant>
 
 #include "common/aliases.h"
 #include "condition_clause.h"
@@ -13,27 +15,31 @@
 namespace spa {
 class UsesModifiesBase : public ConditionClause {
   public:
+    using ProcName = IdentView;
+    using VarName = IdentView;
+    using FirstParam = std::variant<StmtNo, Synonym *, ProcName>;
+    using SecondParam = std::variant<Wildcard, Synonym *, VarName>;
     enum Type {
-        kIntIdent,
-        kIntSyn,
-        kIntWild,
-        kSynIdent,
+        kNumVar,
+        kNumSyn,
+        kNumWild,
+        kSynVar,
         kSynSyn,
         kSynWild,
-        kIdentSyn,
-        kIdentIdent,
-        kIdentWild
+        kProcVar,
+        kProcSyn,
+        kProcWild
     };
 
-    UsesModifiesBase(int first, std::string second) noexcept;
-    UsesModifiesBase(int first, Synonym *second) noexcept;
-    explicit UsesModifiesBase(int first) noexcept;
-    UsesModifiesBase(Synonym *first, std::string second) noexcept;
+    UsesModifiesBase(StmtNo first, VarName second) noexcept;
+    UsesModifiesBase(StmtNo first, Synonym *second) noexcept;
+    explicit UsesModifiesBase(StmtNo first) noexcept;
+    UsesModifiesBase(Synonym *first, VarName second) noexcept;
     UsesModifiesBase(Synonym *first, Synonym *second) noexcept;
     explicit UsesModifiesBase(Synonym *first) noexcept;
-    UsesModifiesBase(std::string first, Synonym *second) noexcept;
-    UsesModifiesBase(std::string first, std::string second) noexcept;
-    explicit UsesModifiesBase(std::string first) noexcept;
+    UsesModifiesBase(ProcName first, Synonym *second) noexcept;
+    UsesModifiesBase(ProcName first, VarName second) noexcept;
+    explicit UsesModifiesBase(ProcName first) noexcept;
     static constexpr Type GetType(FirstParamType first,
                                   SecondParamType second) noexcept {
         int first_index = first == FirstParamType::kIdent
@@ -48,16 +54,33 @@ class UsesModifiesBase : public ConditionClause {
 
   protected:
     Type type_;
-    int first_int_ = 0;
-    Synonym *first_syn_ = nullptr;
-    std::string first_ident_;
-    int second_int_ = 0;
-    Synonym *second_syn_ = nullptr;
-    std::string second_ident_;
+    FirstParam first_param_;
+    SecondParam second_param_;
     static constexpr Array2D<Type, 3, 3> kTypeMatrix{
-            {{Type::kIntSyn, Type::kIntWild, Type::kIntIdent},
-             {Type::kSynSyn, Type::kSynWild, Type::kSynIdent},
-             {Type::kIdentSyn, Type::kIdentWild, Type::kIdentIdent}}};
+            {{Type::kNumSyn, Type::kNumWild, Type::kNumVar},
+             {Type::kSynSyn, Type::kSynWild, Type::kSynVar},
+             {Type::kProcSyn, Type::kProcWild, Type::kProcVar}}};
+
+  public:
+    ResultTable Execute(KnowledgeBase *pkb) const noexcept final;
+    virtual ResultTable NumVar(KnowledgeBase *pkb, StmtNo first,
+                               VarName second) const noexcept = 0;
+    virtual ResultTable NumSyn(KnowledgeBase *pkb, StmtNo first,
+                               Synonym *second) const noexcept = 0;
+    virtual ResultTable NumWild(KnowledgeBase *pkb,
+                                StmtNo first) const noexcept = 0;
+    virtual ResultTable SynVar(KnowledgeBase *pkb, Synonym *first,
+                               VarName second) const noexcept = 0;
+    virtual ResultTable SynSyn(KnowledgeBase *pkb, Synonym *first,
+                               Synonym *second) const noexcept = 0;
+    virtual ResultTable SynWild(KnowledgeBase *pkb,
+                                Synonym *first) const noexcept = 0;
+    virtual ResultTable ProcVar(KnowledgeBase *pkb, ProcName first,
+                                VarName second) const noexcept = 0;
+    virtual ResultTable ProcSyn(KnowledgeBase *pkb, ProcName first,
+                                Synonym *second) const noexcept = 0;
+    virtual ResultTable ProcWild(KnowledgeBase *pkb,
+                                 ProcName first) const noexcept = 0;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_
