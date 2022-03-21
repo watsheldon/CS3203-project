@@ -11,12 +11,10 @@
 #include "qps/synonym.h"
 
 namespace spa {
-QueryEvaluator::QueryEvaluator(
-        std::unique_ptr<KnowledgeBase> knowledge_base) noexcept
-        : knowledge_base_(std::move(knowledge_base)) {}
+void QueryEvaluator::Use(KnowledgeBase* pkb) noexcept { pkb_ = pkb; }
 void QueryEvaluator::Evaluate(const QueryObject& query,
                               std::list<std::string>& list) noexcept {
-    if (!knowledge_base_) return;
+    if (!pkb_) return;
     Clear();
     std::queue<const ConditionClause*> queue;
     const auto& clauses = query.clauses;
@@ -26,8 +24,8 @@ void QueryEvaluator::Evaluate(const QueryObject& query,
     // each synonym, overload the operator< since that's what stl uses by
     // default, then change to a priority queue
     while (!queue.empty()) {
-        auto result_table = queue.front()->Execute(knowledge_base_.get());
-        if (!result_table.has_result || !UpdateResult(result_table)) {
+        auto vartable = queue.front()->Execute(pkb_);
+        if (!vartable.has_result || !UpdateResult(vartable)) {
             return;
         }
         queue.pop();
@@ -177,12 +175,11 @@ bool QueryEvaluator::Propagate() noexcept {
 void QueryEvaluator::Populate(std::list<std::string>& list,
                               const Synonym* selected) noexcept {
     auto domain = domains_.find(selected);
-    auto stmt_nos =
-            domain == domains_.end()
-                    ? knowledge_base_->GetAllEntityIndices(selected->type)
-                    : std::vector<int>(domain->second.begin(),
-                                       domain->second.end());
-    knowledge_base_->ToName(selected->type, stmt_nos, list);
+    auto stmt_nos = domain == domains_.end()
+                            ? pkb_->GetAllEntityIndices(selected->type)
+                            : std::vector<int>(domain->second.begin(),
+                                               domain->second.end());
+    pkb_->ToName(selected->type, stmt_nos, list);
 }
 void QueryEvaluator::Clear() noexcept {
     domains_.clear();

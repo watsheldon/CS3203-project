@@ -14,18 +14,18 @@ namespace spa {
 class Synonym;
 class QueryEvaluator {
   public:
-    explicit QueryEvaluator(
-            std::unique_ptr<KnowledgeBase> knowledge_base) noexcept;
+    QueryEvaluator() noexcept = default;
+    void Use(KnowledgeBase *pkb) noexcept;
     void Evaluate(const QueryObject &query,
                   std::list<std::string> &list) noexcept;
 
   private:
-    const std::unique_ptr<KnowledgeBase> knowledge_base_;
+    KnowledgeBase *pkb_{};
     std::map<const Synonym *, std::set<int>> domains_;
     std::vector<ResultTable> vartables_;
     std::map<const Synonym *, std::vector<int>> vartable_map_;
-    std::set<const Synonym *> update_queue_;
 
+    std::set<const Synonym *> update_queue_;
     void Populate(std::list<std::string> &list,
                   const Synonym *selected) noexcept;
     bool UpdateResult(ResultTable &result_table) noexcept;

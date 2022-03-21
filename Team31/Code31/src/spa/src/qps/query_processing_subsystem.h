@@ -13,12 +13,14 @@
 namespace spa {
 class QueryProcessingSubsystem {
   public:
+    QueryProcessingSubsystem() noexcept = default;
     void Use(std::unique_ptr<spa::KnowledgeBase> pkb_ptr) noexcept;
     void Evaluate(std::string_view query_string,
                   std::list<std::string> &result) noexcept;
 
   private:
-    std::unique_ptr<QueryEvaluator> evaluator_;
+    std::unique_ptr<KnowledgeBase> pkb_;
+    QueryEvaluator evaluator_;
     PQLValidator validator_;
     Generator generator_;
 };
