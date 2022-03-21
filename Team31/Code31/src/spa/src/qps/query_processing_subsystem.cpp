@@ -5,6 +5,7 @@
 #include <string_view>
 #include <utility>
 
+#include "formatter.h"
 #include "pkb/knowledge_base.h"
 
 namespace spa {
@@ -25,8 +26,11 @@ void QueryProcessingSubsystem::Evaluate(
     if (tokens.empty()) return;
 
     auto query = generator_.Generate(tokens);
-    if (!query) return;
-    evaluator_.Evaluate(*query, result);
-    formatter_.OutputResults(result, query->selected);
+    if (!query.valid) {
+        Formatter::OutputInvalid(result, query.selected);
+        return;
+    }
+    evaluator_.Evaluate(query, result);
+    formatter_.OutputResults(result, query.selected);
 }
 }  // namespace spa

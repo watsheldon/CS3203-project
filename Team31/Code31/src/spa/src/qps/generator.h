@@ -21,7 +21,7 @@ class Generator {
     using VecTokens = std::vector<QueryToken>;
 
   public:
-    std::unique_ptr<QueryObject> Generate(const VecTokens& tokens) noexcept;
+    QueryObject Generate(const VecTokens& tokens) noexcept;
 
   private:
     enum class Mode {
@@ -40,7 +40,7 @@ class Generator {
         kSecond,
     };
     static constexpr std::string_view kBoolean = "BOOLEAN"sv;
-    bool error_;
+    bool semantic_error_;
     SynonymMap synonym_map_;
     VecUniquePtr<Synonym> synonyms_;
     std::vector<const Synonym*> selected_;

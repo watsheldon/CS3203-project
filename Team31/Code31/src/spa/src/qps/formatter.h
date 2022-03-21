@@ -19,6 +19,11 @@ class Formatter {
     void Use(KnowledgeBase* pkb) noexcept;
     void OutputResults(std::list<std::string>& results,
                        std::vector<const Synonym*>& selected);
+    static constexpr void OutputInvalid(
+            std::list<std::string>& results,
+            const std::vector<const Synonym*>& selected) {
+        if (selected.empty()) results.emplace_back(kFalse);
+    }
 
   private:
     static constexpr std::string_view kTrue = "TRUE"sv;

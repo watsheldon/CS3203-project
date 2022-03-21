@@ -6,15 +6,13 @@
 #include "conditions/condition_clause.h"
 
 namespace spa {
-std::unique_ptr<QueryObject> Generator::Generate(
-        const VecTokens &tokens) noexcept {
+QueryObject Generator::Generate(const VecTokens &tokens) noexcept {
     Reset();
     for (const auto &token : tokens) {
         ParseToken(token);
-        if (error_) return {};
+        if (semantic_error_) return QueryObject(std::move(selected_));
     }
-    return std::make_unique<QueryObject>(
-            std::move(selected_), std::move(synonyms_), std::move(conditions_));
+    return {std::move(selected_), std::move(synonyms_), std::move(conditions_)};
 }
 
 constexpr Synonym::Type Generator::TokenToSynType(
@@ -101,7 +99,7 @@ constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
     }
 }
 void Generator::Reset() noexcept {
-    error_ = false;
+    semantic_error_ = false;
     synonym_map_.clear();
     synonyms_.clear();
     selected_.clear();
@@ -145,7 +143,7 @@ void Generator::BracketR() noexcept {
     mode_.pop_back();
     auto clause = factory_.Build();
     if (clause == nullptr) {
-        error_ = true;
+        semantic_error_ = true;
         return;
     }
     conditions_.emplace_back(std::move(clause));
@@ -185,7 +183,7 @@ void Generator::Constant(const QueryToken &token) noexcept {
     // stmt#
     auto value = std::stoi(val);
     if (value == 0) {
-        error_ = true;
+        semantic_error_ = true;
         return;
     }
     mode_.back() == Mode::kFirst ? factory_.SetFirst(value)
@@ -197,14 +195,14 @@ void Generator::AddDecl(std::string_view name) noexcept {
             synonyms_.emplace_back(std::make_unique<Synonym>(curr_syn_type_));
     auto [itr, inserted] = synonym_map_.try_emplace(name, ptr.get());
     if (!inserted) {
-        error_ = true;
+        semantic_error_ = true;
         return;
     }
 }
 void Generator::Select(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end()) {
-        error_ = name != kBoolean;
+        semantic_error_ = name != kBoolean;
         return;
     }
     selected_.emplace_back(itr->second);
@@ -214,7 +212,7 @@ void Generator::SetZeroth(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end() ||
         itr->second->type != Synonym::kStmtAssign) {
-        error_ = true;
+        semantic_error_ = true;
         return;
     }
     auto syn = itr->second;
@@ -225,12 +223,12 @@ void Generator::SetFirst(std::string_view name) noexcept {
     mode_.pop_back();
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end()) {
-        error_ = true;
+        semantic_error_ = true;
         return;
     }
     auto syn = itr->second;
     if (UnsuitableFirstSynType(mode_.back(), syn->type)) {
-        error_ = true;
+        semantic_error_ = true;
         return;
     }
     syn->IncRef();
@@ -240,13 +238,13 @@ void Generator::SetSecond(std::string_view name) noexcept {
     mode_.pop_back();
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end()) {
-        error_ = true;
+        semantic_error_ = true;
         return;
     }
     auto syn = itr->second;
     if (mode_.back() == Mode::kPattern ||
         UnsuitableSecondSynType(mode_.back(), syn->type)) {
-        error_ = true;
+        semantic_error_ = true;
         return;
     }
     syn->IncRef();
@@ -256,7 +254,7 @@ void Generator::Underscore() noexcept {
     if (mode_.back() == Mode::kFirst) {
         mode_.pop_back();
         if (mode_.back() == Mode::kUses || mode_.back() == Mode::kModifies)
-            error_ = true;
+            semantic_error_ = true;
         return;
     }
     assert(mode_.back() == Mode::kSecond);
@@ -294,13 +292,7 @@ void Generator::Comma() noexcept {
     assert(mode_.back() >= Mode::kParent && mode_.back() <= Mode::kPattern);
     mode_.emplace_back(Mode::kSecond);
 }
-void Generator::Semicolon() noexcept {
-    if (mode_.back() != Mode::kDeclaration) {
-        error_ = true;
-        return;
-    }
-    mode_.pop_back();
-}
+void Generator::Semicolon() noexcept { mode_.pop_back(); }
 void Generator::ParseToken(const QueryToken &token) noexcept {
     const auto &[token_type, name] = token;
     switch (token_type) {
