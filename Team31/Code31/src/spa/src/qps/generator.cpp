@@ -202,7 +202,11 @@ void Generator::AddDecl(std::string_view name) noexcept {
 void Generator::Select(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end()) {
-        semantic_error_ = name != kBoolean;
+        if (name == kBoolean) {
+            selected_.emplace_back(nullptr);
+            return;
+        }
+        semantic_error_ = true;
         return;
     }
     selected_.emplace_back(itr->second);

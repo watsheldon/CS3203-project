@@ -22,7 +22,8 @@ class Formatter {
     static inline void OutputInvalid(
             std::list<std::string>& results,
             const std::vector<const Synonym*>& selected) {
-        if (selected.empty()) results.emplace_back(kFalse);
+        if (selected.size() == 1 && selected.front() == nullptr)
+            results.emplace_back(kFalse);
     }
 
   private:

@@ -15,7 +15,7 @@ Formatter::Formatter(QueryEvaluator::ResultsView results_view) noexcept
 void Formatter::Use(KnowledgeBase *pkb) noexcept { pkb_ = pkb; }
 void Formatter::OutputResults(std::list<std::string> &results,
                               std::vector<const Synonym *> &selected) {
-    if (selected.empty()) {
+    if (selected.front() == nullptr) {
         results.emplace_back(results_valid_ ? kTrue : kFalse);
         return;
     }
