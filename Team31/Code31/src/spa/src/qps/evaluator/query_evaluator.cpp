@@ -13,9 +13,9 @@
 namespace spa {
 void QueryEvaluator::Use(KnowledgeBase* pkb) noexcept { pkb_ = pkb; }
 QueryEvaluator::ResultsView QueryEvaluator::GetResultsView() noexcept {
-    return {domains_, vartable_map_};
+    return {has_result_, domains_, vartable_map_};
 }
-bool QueryEvaluator::Evaluate(const QueryObject& query,
+void QueryEvaluator::Evaluate(const QueryObject& query,
                               std::list<std::string>& list) noexcept {
     Clear();
     std::queue<const ConditionClause*> queue;
@@ -28,11 +28,11 @@ bool QueryEvaluator::Evaluate(const QueryObject& query,
     while (!queue.empty()) {
         auto vartable = queue.front()->Execute(pkb_);
         if (!vartable.has_result || !UpdateResult(vartable)) {
-            return false;
+            has_result_ = false;
+            return;
         }
         queue.pop();
     }
-    return true;
 }
 bool QueryEvaluator::UpdateResult(ResultTable& result_table) noexcept {
     if (!result_table.has_result) {
@@ -175,6 +175,7 @@ bool QueryEvaluator::Propagate() noexcept {
     return true;
 }
 void QueryEvaluator::Clear() noexcept {
+    has_result_ = true;
     domains_.clear();
     vartables_.clear();
     vartable_map_.clear();

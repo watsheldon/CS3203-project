@@ -25,7 +25,8 @@ void QueryProcessingSubsystem::Evaluate(
     if (tokens.empty()) return;
 
     auto query = generator_.Generate(tokens);
-    if (!query || !evaluator_.Evaluate(*query, result)) return;
-    formatter_.OutputResults(result, query->select);
+    if (!query) return;
+    evaluator_.Evaluate(*query, result);
+    formatter_.OutputResults(result, query->selected);
 }
 }  // namespace spa

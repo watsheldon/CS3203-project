@@ -13,8 +13,8 @@ std::unique_ptr<QueryObject> Generator::Generate(
         ParseToken(token);
         if (error_) return {};
     }
-    return std::make_unique<QueryObject>(selected_, std::move(synonyms_),
-                                         std::move(conditions_));
+    return std::make_unique<QueryObject>(
+            std::move(selected_), std::move(synonyms_), std::move(conditions_));
 }
 
 constexpr Synonym::Type Generator::TokenToSynType(
@@ -104,7 +104,7 @@ void Generator::Reset() noexcept {
     error_ = false;
     synonym_map_.clear();
     synonyms_.clear();
-    selected_ = nullptr;
+    selected_.clear();
     mode_.clear();
     curr_syn_type_ = Synonym::kNone;
     conditions_.clear();
@@ -204,10 +204,10 @@ void Generator::AddDecl(std::string_view name) noexcept {
 void Generator::Select(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end()) {
-        error_ = true;
+        error_ = name != kBoolean;
         return;
     }
-    selected_ = itr->second;
+    selected_.emplace_back(itr->second);
     mode_.pop_back();
 }
 void Generator::SetZeroth(std::string_view name) noexcept {

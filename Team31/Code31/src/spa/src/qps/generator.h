@@ -11,8 +11,11 @@
 #include "query_token.h"
 #include "synonym.h"
 
-namespace spa {
+namespace {
+using namespace std::literals::string_view_literals;
+}
 
+namespace spa {
 class Generator {
     using SynonymMap = std::map<std::string_view, Synonym* const>;
     using VecTokens = std::vector<QueryToken>;
@@ -36,10 +39,11 @@ class Generator {
         kFirst,
         kSecond,
     };
+    static constexpr std::string_view kBoolean = "BOOLEAN"sv;
     bool error_;
     SynonymMap synonym_map_;
     VecUniquePtr<Synonym> synonyms_;
-    Synonym* selected_;
+    std::vector<const Synonym*> selected_;
     std::vector<Mode> mode_;
     Synonym::Type curr_syn_type_;
     VecUniquePtr<ConditionClause> conditions_;

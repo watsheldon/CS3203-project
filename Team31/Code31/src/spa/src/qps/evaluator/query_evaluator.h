@@ -19,16 +19,18 @@ class QueryEvaluator {
     using ResultTables = std::vector<ResultTable>;
     using VarTableMap = std::map<const Synonym *, std::vector<int>>;
     struct ResultsView {
+        const bool &has_valid_result;
         const SynonymDomains &synonym_domain;
         const VarTableMap &vartable_map;
     };
     QueryEvaluator() noexcept = default;
     void Use(KnowledgeBase *pkb) noexcept;
-    bool Evaluate(const QueryObject &query,
+    void Evaluate(const QueryObject &query,
                   std::list<std::string> &list) noexcept;
     ResultsView GetResultsView() noexcept;
 
   private:
+    bool has_result_;
     KnowledgeBase *pkb_{};
     SynonymDomains domains_;
     ResultTables vartables_;

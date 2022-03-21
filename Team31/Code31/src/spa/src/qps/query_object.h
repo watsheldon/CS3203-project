@@ -7,12 +7,12 @@
 
 namespace spa {
 struct QueryObject {
-    const Synonym *const select;
+    std::vector<const Synonym *> selected;
     const VecUniquePtr<Synonym> synonyms;
     const VecUniquePtr<ConditionClause> clauses;
-    QueryObject(const Synonym *sel, VecUniquePtr<Synonym> &&syns,
-                VecUniquePtr<ConditionClause> &&cons) noexcept
-            : select(sel),
+    QueryObject(std::vector<const Synonym *> sel, VecUniquePtr<Synonym> syns,
+                VecUniquePtr<ConditionClause> cons) noexcept
+            : selected(std::move(sel)),
               synonyms(std::move(syns)),
               clauses(std::move(cons)) {}
 };
