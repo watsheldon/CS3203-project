@@ -39,7 +39,7 @@ std::vector<int> StmtlstStatementsStore::GetStatements(
 }
 
 bool StmtlstStatementsStore::ExistFollows(
-        bool transitive, Index<ArgPos::kFirst> first_stmt,
+        Index<ArgPos::kFirst> first_stmt,
         Index<ArgPos::kSecond> second_stmt) const {
     // boundary check
     if (first_stmt.value > statement_to_stmtlst_.size() - 2 ||
@@ -49,9 +49,21 @@ bool StmtlstStatementsStore::ExistFollows(
 
     return (first_stmt.value < second_stmt.value) &&
            (GetStmtlst(first_stmt.value) == GetStmtlst(second_stmt.value)) &&
-           (transitive || (GetStmtRelativePos(second_stmt.value) -
-                                   GetStmtRelativePos(first_stmt.value) ==
-                           1));
+           (GetStmtRelativePos(second_stmt.value) -
+                    GetStmtRelativePos(first_stmt.value) ==
+            1);
+}
+bool StmtlstStatementsStore::ExistFollowsT(
+        Index<ArgPos::kFirst> first_stmt,
+        Index<ArgPos::kSecond> second_stmt) const {
+    // boundary check
+    if (first_stmt.value > statement_to_stmtlst_.size() - 2 ||
+        second_stmt.value > statement_to_stmtlst_.size() - 1) {
+        return false;
+    }
+
+    return (first_stmt.value < second_stmt.value) &&
+           (GetStmtlst(first_stmt.value) == GetStmtlst(second_stmt.value));
 }
 
 bool StmtlstStatementsStore::ExistFollows(
@@ -89,7 +101,7 @@ std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
 }
 
 std::vector<int> StmtlstStatementsStore::GetFollows(
-        bool transitive, Index<ArgPos::kFirst> first_stmt) const {
+        Index<ArgPos::kFirst> first_stmt) const {
     if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
         return {};
     }
@@ -99,9 +111,19 @@ std::vector<int> StmtlstStatementsStore::GetFollows(
     }
     int index = GetStmtlst(first_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
-    if (!transitive) {
-        return {stmts[pos + 1]};
+    return {stmts[pos + 1]};
+}
+std::vector<int> StmtlstStatementsStore::GetFollowsT(
+        Index<ArgPos::kFirst> first_stmt) const {
+    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
+        return {};
     }
+    int pos = GetStmtRelativePos(first_stmt.value);
+    if (pos + 1 == GetStmtlstSize(first_stmt.value)) {
+        return {};
+    }
+    int index = GetStmtlst(first_stmt.value);
+    const std::vector<int> &stmts = GetStatements(index);
     auto first = stmts.begin() + pos + 1;
     auto last = stmts.end();
     return {first, last};
@@ -118,7 +140,7 @@ std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
 }
 
 std::vector<int> StmtlstStatementsStore::GetFollows(
-        bool transitive, Index<ArgPos::kSecond> second_stmt) const {
+        Index<ArgPos::kSecond> second_stmt) const {
     if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
         return {};
     }
@@ -128,9 +150,20 @@ std::vector<int> StmtlstStatementsStore::GetFollows(
     }
     int index = GetStmtlst(second_stmt.value);
     const std::vector<int> &stmts = GetStatements(index);
-    if (!transitive) {
-        return {stmts[pos - 1]};
+
+    return {stmts[pos - 1]};
+}
+std::vector<int> StmtlstStatementsStore::GetFollowsT(
+        Index<ArgPos::kSecond> second_stmt) const {
+    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
+        return {};
     }
+    int pos = GetStmtRelativePos(second_stmt.value);
+    if (pos == 0) {
+        return {};
+    }
+    int index = GetStmtlst(second_stmt.value);
+    const std::vector<int> &stmts = GetStatements(index);
     auto first = stmts.begin();
     auto last = stmts.begin() + pos;
     return {first, last};
@@ -166,10 +199,10 @@ PairVec<int> StmtlstStatementsStore::GetNonTransitivePairs() const {
     return results;
 }
 
-PairVec<int> StmtlstStatementsStore::GetFollowsPairs(bool transitive) const {
-    if (transitive) {
-        return GetTransitivePairs();
-    }
+PairVec<int> StmtlstStatementsStore::GetFollowsPairs() const {
     return GetNonTransitivePairs();
+}
+PairVec<int> StmtlstStatementsStore::GetFollowsPairsT() const {
+    return GetTransitivePairs();
 }
 }  // namespace spa

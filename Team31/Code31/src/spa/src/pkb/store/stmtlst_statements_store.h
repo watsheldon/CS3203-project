@@ -21,17 +21,23 @@ class StmtlstStatementsStore {
     [[nodiscard]] int GetStmtRelativePos(int stmt_no) const;
     [[nodiscard]] StmtProperties GetStmtProperties(int stmt_no) const;
     [[nodiscard]] std::vector<int> GetStatements(int stmtlst_index) const;
-    [[nodiscard]] bool ExistFollows(bool transitive,
-                                    Index<ArgPos::kFirst> first_stmt,
+    [[nodiscard]] bool ExistFollows(Index<ArgPos::kFirst> first_stmt,
                                     Index<ArgPos::kSecond> second_stmt) const;
+    [[nodiscard]] bool ExistFollowsT(Index<ArgPos::kFirst> first_stmt,
+                                     Index<ArgPos::kSecond> second_stmt) const;
     [[nodiscard]] bool ExistFollows(Index<ArgPos::kFirst> first_stmt) const;
     [[nodiscard]] bool ExistFollows(Index<ArgPos::kSecond> second_stmt) const;
     [[nodiscard]] bool ExistFollows() const;
     [[nodiscard]] std::vector<int> GetFollows(
-            bool transitive, Index<ArgPos::kFirst> first_stmt) const;
+            Index<ArgPos::kFirst> first_stmt) const;
+    [[nodiscard]] std::vector<int> GetFollowsT(
+            Index<ArgPos::kFirst> first_stmt) const;
     [[nodiscard]] std::vector<int> GetFollows(
-            bool transitive, Index<ArgPos::kSecond> second_stmt) const;
-    [[nodiscard]] PairVec<int> GetFollowsPairs(bool transitive) const;
+            Index<ArgPos::kSecond> second_stmt) const;
+    [[nodiscard]] std::vector<int> GetFollowsT(
+            Index<ArgPos::kSecond> second_stmt) const;
+    [[nodiscard]] PairVec<int> GetFollowsPairs() const;
+    [[nodiscard]] PairVec<int> GetFollowsPairsT() const;
     [[nodiscard]] std::vector<int> GetFollowsWildcard() const;
     [[nodiscard]] std::vector<int> GetFollowedByWildcard() const;
 

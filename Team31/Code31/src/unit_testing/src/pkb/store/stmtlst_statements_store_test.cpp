@@ -19,25 +19,25 @@ TEST_CASE("pkb/store/StmtlstStatementsStore") {
         REQUIRE(sss.GetStatements(2) == std::vector<int>{2});
     }
     SECTION("ExistFollows") {
-        REQUIRE_FALSE(sss.ExistFollows(true, Index<ArgPos::kFirst>(1),
-                                       Index<ArgPos::kSecond>(2)));
-        REQUIRE_FALSE(sss.ExistFollows(false, Index<ArgPos::kFirst>(1),
+        REQUIRE_FALSE(sss.ExistFollowsT(Index<ArgPos::kFirst>(1),
+                                        Index<ArgPos::kSecond>(2)));
+        REQUIRE_FALSE(sss.ExistFollows(Index<ArgPos::kFirst>(1),
                                        Index<ArgPos::kSecond>(10)));
-        REQUIRE(sss.ExistFollows(true, Index<ArgPos::kFirst>(1),
-                                 Index<ArgPos::kSecond>(10)));
+        REQUIRE(sss.ExistFollowsT(Index<ArgPos::kFirst>(1),
+                                  Index<ArgPos::kSecond>(10)));
         REQUIRE(sss.ExistFollows(Index<ArgPos::kFirst>(1)));
         REQUIRE_FALSE(sss.ExistFollows(Index<ArgPos::kSecond>(5)));
         REQUIRE(sss.ExistFollows(Index<ArgPos::kSecond>(9)));
         REQUIRE(sss.ExistFollows());
     }
     SECTION("GetFollows") {
-        REQUIRE(sss.GetFollows(true, Index<ArgPos::kFirst>(1)) ==
+        REQUIRE(sss.GetFollowsT(Index<ArgPos::kFirst>(1)) ==
                 std::vector<int>{3, 4, 10});
-        REQUIRE(sss.GetFollows(false, Index<ArgPos::kFirst>(1)) ==
+        REQUIRE(sss.GetFollows(Index<ArgPos::kFirst>(1)) ==
                 std::vector<int>{3});
-        REQUIRE(sss.GetFollows(true, Index<ArgPos::kSecond>(2)) ==
+        REQUIRE(sss.GetFollowsT(Index<ArgPos::kSecond>(2)) ==
                 std::vector<int>{});
-        REQUIRE(sss.GetFollows(false, Index<ArgPos::kSecond>(6)) ==
+        REQUIRE(sss.GetFollows(Index<ArgPos::kSecond>(6)) ==
                 std::vector<int>{5});
     }
     SECTION("GetFollowsWildcard") {
@@ -49,8 +49,8 @@ TEST_CASE("pkb/store/StmtlstStatementsStore") {
                 std::vector<int>{1, 3, 4, 5, 7, 8});
     }
     SECTION("GetFollowsPairs") {
-        REQUIRE(sss.GetFollowsPairs(false).second.size() == 6);
-        REQUIRE(sss.GetFollowsPairs(true).second.size() == 10);
+        REQUIRE(sss.GetFollowsPairs().second.size() == 6);
+        REQUIRE(sss.GetFollowsPairsT().second.size() == 10);
     }
 }
 }  // namespace spa

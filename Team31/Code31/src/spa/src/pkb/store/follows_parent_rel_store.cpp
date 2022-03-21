@@ -13,12 +13,12 @@ FollowsParentRelStore::FollowsParentRelStore(size_t stmt_count,
 bool FollowsParentRelStore::ExistFollows(
         Index<ArgPos::kFirst> first_stmt,
         Index<ArgPos::kSecond> second_stmt) const noexcept {
-    return stmtlst_stmt_.ExistFollows(false, first_stmt, second_stmt);
+    return stmtlst_stmt_.ExistFollows(first_stmt, second_stmt);
 }
 bool FollowsParentRelStore::ExistFollowsT(
         Index<ArgPos::kFirst> first_stmt,
         Index<ArgPos::kSecond> second_stmt) const noexcept {
-    return stmtlst_stmt_.ExistFollows(true, first_stmt, second_stmt);
+    return stmtlst_stmt_.ExistFollowsT(first_stmt, second_stmt);
 }
 bool FollowsParentRelStore::ExistFollows(
         Index<ArgPos::kFirst> first_stmt) const noexcept {
@@ -69,35 +69,35 @@ std::set<int> FollowsParentRelStore::GetFollows(
 }
 std::set<int> FollowsParentRelStore::GetFollows(
         Index<ArgPos::kFirst> first_stmt, StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollows(false, first_stmt);
+    auto results = stmtlst_stmt_.GetFollows(first_stmt);
     return Extract(std::move(results), return_type);
 }
 std::set<int> FollowsParentRelStore::GetFollowsT(
         Index<ArgPos::kFirst> first_stmt, StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollows(true, first_stmt);
+    auto results = stmtlst_stmt_.GetFollowsT(first_stmt);
     return Extract(std::move(results), return_type);
 }
 std::set<int> FollowsParentRelStore::GetFollows(
         Index<ArgPos::kSecond> second_stmt,
         StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollows(false, second_stmt);
+    auto results = stmtlst_stmt_.GetFollows(second_stmt);
     return Extract(std::move(results), return_type);
 }
 std::set<int> FollowsParentRelStore::GetFollowsT(
         Index<ArgPos::kSecond> second_stmt,
         StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollows(true, second_stmt);
+    auto results = stmtlst_stmt_.GetFollowsT(second_stmt);
     return Extract(std::move(results), return_type);
 }
 
 PairVec<int> FollowsParentRelStore::GetFollowsPairs(
         StmtType first_type, StmtType second_type) const noexcept {
-    PairVec<int> results = stmtlst_stmt_.GetFollowsPairs(false);
+    PairVec<int> results = stmtlst_stmt_.GetFollowsPairs();
     return ExtractPairs(std::move(results), first_type, second_type);
 }
 PairVec<int> FollowsParentRelStore::GetFollowsPairsT(
         StmtType first_type, StmtType second_type) const noexcept {
-    PairVec<int> results = stmtlst_stmt_.GetFollowsPairs(true);
+    PairVec<int> results = stmtlst_stmt_.GetFollowsPairsT();
     return ExtractPairs(std::move(results), first_type, second_type);
 }
 inline bool FollowsParentRelStore::IsParent(int stmt) const noexcept {
@@ -332,8 +332,7 @@ PairVec<int> FollowsParentRelStore::GetParentPairsT(
 int FollowsParentRelStore::GetContainerLastStmt(StmtType type,
                                                 int stmt_no) const noexcept {
     int last_stmt;
-    auto followers =
-            stmtlst_stmt_.GetFollows(false, Index<ArgPos::kFirst>(stmt_no));
+    auto followers = stmtlst_stmt_.GetFollows(Index<ArgPos::kFirst>(stmt_no));
 
     if (followers.size() == 1) {
         last_stmt = *followers.begin() - 1;
