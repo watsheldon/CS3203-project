@@ -11,9 +11,14 @@ FollowsParentRelStore::FollowsParentRelStore(size_t stmt_count,
           stmtlst_parent_(refs.stmtlst_parent),
           stmtlst_stmt_(refs.stmtlst_stmt) {}
 bool FollowsParentRelStore::ExistFollows(
-        bool transitive, Index<ArgPos::kFirst> first_stmt,
+        Index<ArgPos::kFirst> first_stmt,
         Index<ArgPos::kSecond> second_stmt) const noexcept {
-    return stmtlst_stmt_.ExistFollows(transitive, first_stmt, second_stmt);
+    return stmtlst_stmt_.ExistFollows(false, first_stmt, second_stmt);
+}
+bool FollowsParentRelStore::ExistFollowsT(
+        Index<ArgPos::kFirst> first_stmt,
+        Index<ArgPos::kSecond> second_stmt) const noexcept {
+    return stmtlst_stmt_.ExistFollows(true, first_stmt, second_stmt);
 }
 bool FollowsParentRelStore::ExistFollows(
         Index<ArgPos::kFirst> first_stmt) const noexcept {
@@ -63,23 +68,36 @@ std::set<int> FollowsParentRelStore::GetFollows(
     return Extract(std::move(results), return_type);
 }
 std::set<int> FollowsParentRelStore::GetFollows(
-        bool transitive, Index<ArgPos::kFirst> first_stmt,
-        StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollows(transitive, first_stmt);
+        Index<ArgPos::kFirst> first_stmt, StmtType return_type) const noexcept {
+    auto results = stmtlst_stmt_.GetFollows(false, first_stmt);
     return Extract(std::move(results), return_type);
 }
-
+std::set<int> FollowsParentRelStore::GetFollowsT(
+        Index<ArgPos::kFirst> first_stmt, StmtType return_type) const noexcept {
+    auto results = stmtlst_stmt_.GetFollows(true, first_stmt);
+    return Extract(std::move(results), return_type);
+}
 std::set<int> FollowsParentRelStore::GetFollows(
-        bool transitive, Index<ArgPos::kSecond> second_stmt,
+        Index<ArgPos::kSecond> second_stmt,
         StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollows(transitive, second_stmt);
+    auto results = stmtlst_stmt_.GetFollows(false, second_stmt);
+    return Extract(std::move(results), return_type);
+}
+std::set<int> FollowsParentRelStore::GetFollowsT(
+        Index<ArgPos::kSecond> second_stmt,
+        StmtType return_type) const noexcept {
+    auto results = stmtlst_stmt_.GetFollows(true, second_stmt);
     return Extract(std::move(results), return_type);
 }
 
 PairVec<int> FollowsParentRelStore::GetFollowsPairs(
-        bool transitive, StmtType first_type,
-        StmtType second_type) const noexcept {
-    PairVec<int> results = stmtlst_stmt_.GetFollowsPairs(transitive);
+        StmtType first_type, StmtType second_type) const noexcept {
+    PairVec<int> results = stmtlst_stmt_.GetFollowsPairs(false);
+    return ExtractPairs(std::move(results), first_type, second_type);
+}
+PairVec<int> FollowsParentRelStore::GetFollowsPairsT(
+        StmtType first_type, StmtType second_type) const noexcept {
+    PairVec<int> results = stmtlst_stmt_.GetFollowsPairs(true);
     return ExtractPairs(std::move(results), first_type, second_type);
 }
 inline bool FollowsParentRelStore::IsParent(int stmt) const noexcept {
@@ -96,7 +114,7 @@ inline bool FollowsParentRelStore::HasParent(int stmt) const noexcept {
     return type == PType::kWhile || type == PType::kIf;
 }
 bool FollowsParentRelStore::ExistParent(
-        bool transitive, Index<ArgPos::kFirst> parent_stmt,
+        Index<ArgPos::kFirst> parent_stmt,
         Index<ArgPos::kSecond> child_stmt) const noexcept {
     int parent = parent_stmt.value;
     int child = child_stmt.value;
@@ -104,16 +122,26 @@ bool FollowsParentRelStore::ExistParent(
         !IsParent(parent)) {
         return false;
     }
-    if (transitive) {
-        StmtType type = type_stmt_.GetType(parent);
-        int last_stmt = GetContainerLastStmt(type, parent);
-        return child <= last_stmt;
-    }
+
     int stmtlst = stmtlst_stmt_.GetStmtlst(child);
     bool is_while = stmtlst_parent_.GetWhileStmtLst(parent) == stmtlst;
     bool is_then = stmtlst_parent_.GetIfStmtLst(parent).then_index == stmtlst;
     bool is_else = stmtlst_parent_.GetIfStmtLst(parent).else_index == stmtlst;
     return is_while || is_then || is_else;
+}
+bool FollowsParentRelStore::ExistParentT(
+        Index<ArgPos::kFirst> parent_stmt,
+        Index<ArgPos::kSecond> child_stmt) const noexcept {
+    int parent = parent_stmt.value;
+    int child = child_stmt.value;
+    if (child <= parent || parent >= stmt_count_ || child > stmt_count_ ||
+        !IsParent(parent)) {
+        return false;
+    }
+
+    StmtType type = type_stmt_.GetType(parent);
+    int last_stmt = GetContainerLastStmt(type, parent);
+    return child <= last_stmt;
 }
 bool FollowsParentRelStore::ExistParent(
         Index<ArgPos::kFirst> parent_stmt) const noexcept {
@@ -185,12 +213,21 @@ void FollowsParentRelStore::FillChildrenT(
     std::iota(results.begin(), results.end(), parent + 1);
 }
 std::set<int> FollowsParentRelStore::GetParent(
-        bool transitive, Index<ArgPos::kFirst> parent_stmt,
+        Index<ArgPos::kFirst> parent_stmt,
         StmtType return_type) const noexcept {
     int parent = parent_stmt.value;
     if (parent >= stmt_count_ || !IsParent(parent)) return {};
     std::vector<int> results;
-    transitive ? FillChildrenT(parent, results) : FillChildren(parent, results);
+    FillChildren(parent, results);
+    return Extract(std::move(results), return_type);
+}
+std::set<int> FollowsParentRelStore::GetParentT(
+        Index<ArgPos::kFirst> parent_stmt,
+        StmtType return_type) const noexcept {
+    int parent = parent_stmt.value;
+    if (parent >= stmt_count_ || !IsParent(parent)) return {};
+    std::vector<int> results;
+    FillChildrenT(parent, results);
     return Extract(std::move(results), return_type);
 }
 void FollowsParentRelStore::FillParents(
@@ -211,14 +248,25 @@ void FollowsParentRelStore::FillParentsT(
     }
 }
 std::set<int> FollowsParentRelStore::GetParent(
-        bool transitive, Index<ArgPos::kSecond> child_stmt,
+        Index<ArgPos::kSecond> child_stmt,
         StmtType return_type) const noexcept {
     int child = child_stmt.value;
     if (!IsParent(return_type) || child > stmt_count_ || !HasParent(child)) {
         return {};
     }
     std::vector<int> results;
-    transitive ? FillParentsT(child, results) : FillParents(child, results);
+    FillParents(child, results);
+    return Extract(std::move(results), return_type);
+}
+std::set<int> FollowsParentRelStore::GetParentT(
+        Index<ArgPos::kSecond> child_stmt,
+        StmtType return_type) const noexcept {
+    int child = child_stmt.value;
+    if (!IsParent(return_type) || child > stmt_count_ || !HasParent(child)) {
+        return {};
+    }
+    std::vector<int> results;
+    FillParentsT(child, results);
     return Extract(std::move(results), return_type);
 }
 
@@ -267,11 +315,17 @@ void FollowsParentRelStore::FillParentPairs(
     }
 }
 PairVec<int> FollowsParentRelStore::GetParentPairs(
-        bool transitive, StmtType parent_type,
-        StmtType child_type) const noexcept {
+        StmtType parent_type, StmtType child_type) const noexcept {
     if (!IsParent(parent_type)) return {};
     PairVec<int> results;
-    (transitive) ? FillParentTPairs(results) : FillParentPairs(results);
+    FillParentPairs(results);
+    return ExtractPairs(std::move(results), parent_type, child_type);
+}
+PairVec<int> FollowsParentRelStore::GetParentPairsT(
+        StmtType parent_type, StmtType child_type) const noexcept {
+    if (!IsParent(parent_type)) return {};
+    PairVec<int> results;
+    FillParentTPairs(results);
     return ExtractPairs(std::move(results), parent_type, child_type);
 }
 

@@ -26,7 +26,10 @@ class FollowsParentRelStore {
     };
     explicit FollowsParentRelStore(size_t stmt_count, StoreRefs refs) noexcept;
     [[nodiscard]] bool ExistFollows(
-            bool transitive, Index<ArgPos::kFirst> first_stmt,
+            Index<ArgPos::kFirst> first_stmt,
+            Index<ArgPos::kSecond> second_stmt) const noexcept;
+    [[nodiscard]] bool ExistFollowsT(
+            Index<ArgPos::kFirst> first_stmt,
             Index<ArgPos::kSecond> second_stmt) const noexcept;
     [[nodiscard]] bool ExistFollows(
             Index<ArgPos::kFirst> first_stmt) const noexcept;
@@ -35,39 +38,50 @@ class FollowsParentRelStore {
     [[nodiscard]] bool ExistFollows() const noexcept;
 
     [[nodiscard]] bool ExistParent(
-            bool transitive, Index<ArgPos::kFirst> parent_stmt,
+            Index<ArgPos::kFirst> parent_stmt,
+            Index<ArgPos::kSecond> child_stmt) const noexcept;
+    [[nodiscard]] bool ExistParentT(
+            Index<ArgPos::kFirst> parent_stmt,
             Index<ArgPos::kSecond> child_stmt) const noexcept;
     [[nodiscard]] bool ExistParent(
             Index<ArgPos::kFirst> parent_stmt) const noexcept;
     [[nodiscard]] bool ExistParent(
             Index<ArgPos::kSecond> child_stmt) const noexcept;
     [[nodiscard]] bool ExistParent() const noexcept;
+
     [[nodiscard]] std::set<int> GetFollows(ArgPos return_pos,
                                            StmtType return_type) const noexcept;
-
-    [[nodiscard]] std::set<int> GetFollows(bool transitive,
-                                           Index<ArgPos::kFirst> first_stmt,
+    [[nodiscard]] std::set<int> GetFollows(Index<ArgPos::kFirst> first_stmt,
                                            StmtType return_type) const noexcept;
-
-    [[nodiscard]] std::set<int> GetFollows(bool transitive,
-                                           Index<ArgPos::kSecond> second_stmt,
+    [[nodiscard]] std::set<int> GetFollowsT(
+            Index<ArgPos::kFirst> first_stmt,
+            StmtType return_type) const noexcept;
+    [[nodiscard]] std::set<int> GetFollows(Index<ArgPos::kSecond> second_stmt,
                                            StmtType return_type) const noexcept;
+    [[nodiscard]] std::set<int> GetFollowsT(
+            Index<ArgPos::kSecond> second_stmt,
+            StmtType return_type) const noexcept;
+
     [[nodiscard]] PairVec<int> GetFollowsPairs(
-            bool transitive, StmtType first_type,
-            StmtType second_type) const noexcept;
+            StmtType first_type, StmtType second_type) const noexcept;
+    [[nodiscard]] PairVec<int> GetFollowsPairsT(
+            StmtType first_type, StmtType second_type) const noexcept;
 
     [[nodiscard]] std::set<int> GetParent(ArgPos return_pos,
                                           StmtType return_type) const noexcept;
-    [[nodiscard]] std::set<int> GetParent(bool transitive,
-                                          Index<ArgPos::kFirst> stmt_no,
+    [[nodiscard]] std::set<int> GetParent(Index<ArgPos::kFirst> stmt_no,
                                           StmtType return_type) const noexcept;
+    [[nodiscard]] std::set<int> GetParentT(Index<ArgPos::kFirst> stmt_no,
+                                           StmtType return_type) const noexcept;
+    [[nodiscard]] std::set<int> GetParent(Index<ArgPos::kSecond> stmt_no,
+                                          StmtType return_type) const noexcept;
+    [[nodiscard]] std::set<int> GetParentT(Index<ArgPos::kSecond> stmt_no,
+                                           StmtType return_type) const noexcept;
 
-    [[nodiscard]] std::set<int> GetParent(bool transitive,
-                                          Index<ArgPos::kSecond> stmt_no,
-                                          StmtType return_type) const noexcept;
     [[nodiscard]] PairVec<int> GetParentPairs(
-            bool transitive, StmtType parent_type,
-            StmtType child_type) const noexcept;
+            StmtType parent_type, StmtType child_type) const noexcept;
+    [[nodiscard]] PairVec<int> GetParentPairsT(
+            StmtType parent_type, StmtType child_type) const noexcept;
 
   private:
     friend class ProgramKnowledgeBase;

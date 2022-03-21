@@ -92,12 +92,12 @@ bool ProgramKnowledgeBase::ExistFollows(bool transitive,
 bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt,
                                         Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
-    return follows_parent_rel_.ExistFollows(false, first_stmt, second_stmt);
+    return follows_parent_rel_.ExistFollows(first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistFollowsT(Index<ArgPos::kFirst> first_stmt,
                                          Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
-    return follows_parent_rel_.ExistFollows(true, first_stmt, second_stmt);
+    return follows_parent_rel_.ExistFollowsT(first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt) {
     assert(compiled);
@@ -126,12 +126,12 @@ std::set<int> ProgramKnowledgeBase::GetFollows(bool transitive,
 std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kFirst> stmt_no,
                                                StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollows(false, stmt_no, return_type);
+    return follows_parent_rel_.GetFollows(stmt_no, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kFirst> stmt_no,
                                                 StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollows(true, stmt_no, return_type);
+    return follows_parent_rel_.GetFollowsT(stmt_no, return_type);
 }
 
 std::set<int> ProgramKnowledgeBase::GetFollows(
@@ -143,12 +143,12 @@ std::set<int> ProgramKnowledgeBase::GetFollows(
 std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kSecond> stmt_no,
                                                StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollows(false, stmt_no, return_type);
+    return follows_parent_rel_.GetFollows(stmt_no, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kSecond> stmt_no,
                                                 StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollows(true, stmt_no, return_type);
+    return follows_parent_rel_.GetFollowsT(stmt_no, return_type);
 }
 
 PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(bool transitive,
@@ -160,12 +160,12 @@ PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(bool transitive,
 PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(StmtType first_type,
                                                    StmtType second_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollowsPairs(false, first_type, second_type);
+    return follows_parent_rel_.GetFollowsPairs(first_type, second_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetFollowsPairsT(StmtType first_type,
                                                     StmtType second_type) {
     assert(compiled);
-    return follows_parent_rel_.GetFollowsPairs(true, first_type, second_type);
+    return follows_parent_rel_.GetFollowsPairsT(first_type, second_type);
 }
 
 bool ProgramKnowledgeBase::ExistParent(bool transitive,
@@ -177,12 +177,12 @@ bool ProgramKnowledgeBase::ExistParent(bool transitive,
 bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt,
                                        Index<ArgPos::kSecond> child_stmt) {
     assert(compiled);
-    return follows_parent_rel_.ExistParent(false, parent_stmt, child_stmt);
+    return follows_parent_rel_.ExistParent(parent_stmt, child_stmt);
 }
 bool ProgramKnowledgeBase::ExistParentT(Index<ArgPos::kFirst> parent_stmt,
                                         Index<ArgPos::kSecond> child_stmt) {
     assert(compiled);
-    return follows_parent_rel_.ExistParent(true, parent_stmt, child_stmt);
+    return follows_parent_rel_.ExistParentT(parent_stmt, child_stmt);
 }
 bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt) {
     assert(compiled);
@@ -211,12 +211,12 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
 std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kFirst> parent_stmt,
                                               StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParent(false, parent_stmt, return_type);
+    return follows_parent_rel_.GetParent(parent_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParentT(
         Index<ArgPos::kFirst> parent_stmt, StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParent(true, parent_stmt, return_type);
+    return follows_parent_rel_.GetParentT(parent_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
                                               Index<ArgPos::kSecond> child_stmt,
@@ -227,12 +227,12 @@ std::set<int> ProgramKnowledgeBase::GetParent(bool transitive,
 std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kSecond> child_stmt,
                                               StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParent(false, child_stmt, return_type);
+    return follows_parent_rel_.GetParent(child_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParentT(
         Index<ArgPos::kSecond> child_stmt, StmtType return_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParent(true, child_stmt, return_type);
+    return follows_parent_rel_.GetParentT(child_stmt, return_type);
 }
 
 PairVec<int> ProgramKnowledgeBase::GetParentPairs(bool transitive,
@@ -244,12 +244,12 @@ PairVec<int> ProgramKnowledgeBase::GetParentPairs(bool transitive,
 PairVec<int> ProgramKnowledgeBase::GetParentPairs(StmtType parent_type,
                                                   StmtType child_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParentPairs(false, parent_type, child_type);
+    return follows_parent_rel_.GetParentPairs(parent_type, child_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetParentPairsT(StmtType parent_type,
                                                    StmtType child_type) {
     assert(compiled);
-    return follows_parent_rel_.GetParentPairs(true, parent_type, child_type);
+    return follows_parent_rel_.GetParentPairsT(parent_type, child_type);
 }
 
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
