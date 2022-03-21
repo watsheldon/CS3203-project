@@ -55,6 +55,7 @@ class PQLValidator {
 
     bool FollowsParent();
     bool UsesModifies();
+    bool Calls();
     bool IsConstant();
     void FetchToken();
     bool Accept(QueryTokenType type);

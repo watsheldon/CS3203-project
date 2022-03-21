@@ -7,6 +7,8 @@
 #include "affects_clause.h"
 #include "affects_trans_clause.h"
 #include "calls_base.h"
+#include "calls_clause.h"
+#include "calls_trans_clause.h"
 #include "condition_clause.h"
 #include "follows_clause.h"
 #include "follows_trans_clause.h"
@@ -23,8 +25,6 @@
 #include "stmt_stmt_base.h"
 #include "uses_clause.h"
 #include "uses_modifies_base.h"
-#include "calls_clause.h"
-#include "calls_trans_clause.h"
 
 namespace spa {
 

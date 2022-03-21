@@ -88,6 +88,10 @@ bool PQLValidator::SuchThat() {
         Accept(QueryTokenType::kKeywordModifies)) {
         return UsesModifies();
     }
+    if (Accept(QueryTokenType::kKeywordCalls)) {
+        Accept(QueryTokenType::kOperatorTimes);
+        return Calls();
+    }
     return false;
 }
 bool PQLValidator::FollowsParent() {
@@ -97,6 +101,11 @@ bool PQLValidator::FollowsParent() {
 }
 bool PQLValidator::UsesModifies() {
     return Accept(QueryTokenType::kBracketL) && UsesModifiesStmtEntRef() &&
+           Accept(QueryTokenType::kComma) && EntRef() &&
+           Accept(QueryTokenType::kBracketR);
+}
+bool PQLValidator::Calls() {
+    return Accept(QueryTokenType::kBracketL) && EntRef() &&
            Accept(QueryTokenType::kComma) && EntRef() &&
            Accept(QueryTokenType::kBracketR);
 }
