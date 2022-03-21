@@ -12,9 +12,11 @@
 
 namespace spa {
 void QueryEvaluator::Use(KnowledgeBase* pkb) noexcept { pkb_ = pkb; }
-void QueryEvaluator::Evaluate(const QueryObject& query,
+QueryEvaluator::ResultsView QueryEvaluator::GetResultsView() noexcept {
+    return {domains_, vartable_map_};
+}
+bool QueryEvaluator::Evaluate(const QueryObject& query,
                               std::list<std::string>& list) noexcept {
-    if (!pkb_) return;
     Clear();
     std::queue<const ConditionClause*> queue;
     const auto& clauses = query.clauses;
@@ -26,11 +28,11 @@ void QueryEvaluator::Evaluate(const QueryObject& query,
     while (!queue.empty()) {
         auto vartable = queue.front()->Execute(pkb_);
         if (!vartable.has_result || !UpdateResult(vartable)) {
-            return;
+            return false;
         }
         queue.pop();
     }
-    Populate(list, query.select);
+    return true;
 }
 bool QueryEvaluator::UpdateResult(ResultTable& result_table) noexcept {
     if (!result_table.has_result) {
@@ -171,15 +173,6 @@ bool QueryEvaluator::Propagate() noexcept {
         update_queue_.erase(curr);
     }
     return true;
-}
-void QueryEvaluator::Populate(std::list<std::string>& list,
-                              const Synonym* selected) noexcept {
-    auto domain = domains_.find(selected);
-    auto stmt_nos = domain == domains_.end()
-                            ? pkb_->GetAllEntityIndices(selected->type)
-                            : std::vector<int>(domain->second.begin(),
-                                               domain->second.end());
-    pkb_->ToName(selected->type, stmt_nos, list);
 }
 void QueryEvaluator::Clear() noexcept {
     domains_.clear();

@@ -9,25 +9,32 @@
 
 #include "pkb/knowledge_base.h"
 #include "qps/query_object.h"
+#include "variable_column.h"
 
 namespace spa {
 class Synonym;
 class QueryEvaluator {
   public:
+    using SynonymDomains = std::map<const Synonym *, std::set<int>>;
+    using ResultTables = std::vector<ResultTable>;
+    using VarTableMap = std::map<const Synonym *, std::vector<int>>;
+    struct ResultsView {
+        const SynonymDomains &synonym_domain;
+        const VarTableMap &vartable_map;
+    };
     QueryEvaluator() noexcept = default;
     void Use(KnowledgeBase *pkb) noexcept;
-    void Evaluate(const QueryObject &query,
+    bool Evaluate(const QueryObject &query,
                   std::list<std::string> &list) noexcept;
+    ResultsView GetResultsView() noexcept;
 
   private:
     KnowledgeBase *pkb_{};
-    std::map<const Synonym *, std::set<int>> domains_;
-    std::vector<ResultTable> vartables_;
-    std::map<const Synonym *, std::vector<int>> vartable_map_;
+    SynonymDomains domains_;
+    ResultTables vartables_;
+    VarTableMap vartable_map_;
 
     std::set<const Synonym *> update_queue_;
-    void Populate(std::list<std::string> &list,
-                  const Synonym *selected) noexcept;
     bool UpdateResult(ResultTable &result_table) noexcept;
     bool MergeUnary(const VariableColumn &column) noexcept;
     bool Propagate() noexcept;
