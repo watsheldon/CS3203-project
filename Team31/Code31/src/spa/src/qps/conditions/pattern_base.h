@@ -12,18 +12,15 @@
 namespace spa {
 class PatternBase : public ConditionClause {
   public:
-    enum Type {
-        kIdentExpr,
-        kIdentWild,
-        kSynExpr,
-        kSynWild,
-        kWildExpr,
-        kWildWild
-    };
-    PatternBase(Synonym *assign, std::string first,
+    using Expression = std::vector<QueryToken>;
+    using VarName = IdentView;
+    using FirstParam = std::variant<Wildcard, VarName, Synonym *>;
+    using SecondParam = std::variant<Wildcard, Expression>;
+    enum Type { kVarExpr, kVarWild, kSynExpr, kSynWild, kWildExpr, kWildWild };
+    PatternBase(Synonym *assign, VarName first,
                 std::vector<QueryToken> &&second) noexcept;  // IdentExpr
     PatternBase(Synonym *assign,
-                std::string first) noexcept;  // IdentWild
+                VarName first) noexcept;  // IdentWild
     PatternBase(Synonym *assign, Synonym *first,
                 std::vector<QueryToken> &&second) noexcept;  // SynExpr
     PatternBase(Synonym *assign, Synonym *first) noexcept;   // SynWild
@@ -37,17 +34,26 @@ class PatternBase : public ConditionClause {
         return kTypeMatrix[first_index][second_index];
     }
     ~PatternBase() override = default;
+    ResultTable Execute(KnowledgeBase *pkb) const noexcept final;
 
   protected:
     Type type_;
-    Synonym *assign_ = nullptr;
-    std::string first_ident_;
-    Synonym *first_syn_ = nullptr;
-    std::vector<QueryToken> second_expr_;
+    FirstParam first_param_;
+    SecondParam second_param_;
+    Synonym *zeroth_param_;
     static constexpr Array2D<Type, 3, 2> kTypeMatrix = {
             {{Type::kSynWild, Type::kSynExpr},
              {Type::kWildWild, Type::kWildExpr},
-             {Type::kIdentWild, Type::kIdentExpr}}};
+             {Type::kVarWild, Type::kVarExpr}}};
+    virtual ResultTable VarExpr(KnowledgeBase *pkb, VarName first,
+                                Expression second) const noexcept = 0;
+    virtual ResultTable SynExpr(KnowledgeBase *pkb, Synonym *first,
+                                Expression second) const noexcept = 0;
+    virtual ResultTable WildExpr(KnowledgeBase *pkb,
+                                 Expression second) const noexcept = 0;
+    ResultTable VarWild(KnowledgeBase *pkb, VarName first) const noexcept;
+    ResultTable SynWild(KnowledgeBase *pkb, Synonym *first) const noexcept;
+    ResultTable WildWild(KnowledgeBase *pkb) const noexcept;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_CLAUSE_H_

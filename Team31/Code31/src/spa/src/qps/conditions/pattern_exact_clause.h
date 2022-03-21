@@ -7,10 +7,16 @@
 
 namespace spa {
 class PatternExactClause : public PatternBase {
+  public:
     using PatternBase::PatternBase;
 
-  public:
-    ResultTable Execute(KnowledgeBase *knowledge_base) const noexcept final;
+  protected:
+    ResultTable VarExpr(KnowledgeBase *pkb, VarName first,
+                        Expression second) const noexcept final;
+    ResultTable SynExpr(KnowledgeBase *pkb, Synonym *first,
+                        Expression second) const noexcept final;
+    ResultTable WildExpr(KnowledgeBase *pkb,
+                         Expression second) const noexcept final;
 };
 }  // namespace spa
 

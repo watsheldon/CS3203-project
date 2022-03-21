@@ -139,9 +139,9 @@ class Factory {
                 return std::make_unique<T>(assign_);
             case PatternBase::Type::kWildExpr:
                 return std::make_unique<T>(assign_, std::move(second_exprs_));
-            case PatternBase::Type::kIdentWild:
+            case PatternBase::Type::kVarWild:
                 return std::make_unique<T>(assign_, first_ident_);
-            case PatternBase::Type::kIdentExpr:
+            case PatternBase::Type::kVarExpr:
                 return std::make_unique<T>(assign_, first_ident_,
                                            std::move(second_exprs_));
             case PatternBase::Type::kSynWild:

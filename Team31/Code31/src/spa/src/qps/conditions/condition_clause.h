@@ -10,8 +10,7 @@ namespace spa {
 class ConditionClause {
   public:
     using Wildcard = std::monostate;
-    virtual ResultTable Execute(
-            KnowledgeBase *knowledge_base) const noexcept = 0;
+    virtual ResultTable Execute(KnowledgeBase *pkb) const noexcept = 0;
     virtual ~ConditionClause() = 0;
     enum class FirstParamType {
         kInt,
