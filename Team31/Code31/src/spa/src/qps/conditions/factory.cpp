@@ -25,6 +25,8 @@ void Factory::SetRelationship(QueryTokenType type) noexcept {
         case QueryTokenType::kKeywordPattern:
             rel_ = Relationship::kPatternExact;
             return;
+        case QueryTokenType::kKeywordCalls:
+            rel_ = Relationship::kCalls;
         default:
             assert(false);
     }
@@ -65,6 +67,9 @@ void Factory::SetTransPartial() noexcept {
         case Relationship::kParent:
             rel_ = Relationship::kParentT;
             return;
+        case Relationship::kCalls:
+            rel_ = Relationship::kCallsT;
+            return;
         case Relationship::kPatternExact:
         case Relationship::kPatternPartial:
             rel_ = Relationship::kPatternPartial;
@@ -92,6 +97,10 @@ std::unique_ptr<ConditionClause> Factory::Build() noexcept {
             return BuildPatternClause<PatternExactClause>();
         case Relationship::kPatternPartial:
             return BuildPatternClause<PatternPartialClause>();
+        case Relationship::kCalls:
+            return BuildCallsClause<CallsClause>();
+        case Relationship::kCallsT:
+            return BuildCallsClause<CallsTransClause>();
         default:
             assert(false);
     }

@@ -22,7 +22,7 @@ class CallsBase : public ConditionClause {
         kWildIdent,
         kIdentSyn,
         kIdentWild,
-        kIdentIdent;
+        kIdentIdent
     };
 
     CallsBase(Synonym *first, Synonym *second) noexcept;

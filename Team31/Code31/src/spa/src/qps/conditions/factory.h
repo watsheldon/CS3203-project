@@ -23,6 +23,8 @@
 #include "stmt_stmt_base.h"
 #include "uses_clause.h"
 #include "uses_modifies_base.h"
+#include "calls_clause.h"
+#include "calls_trans_clause.h"
 
 namespace spa {
 
@@ -143,6 +145,32 @@ class Factory {
             case PatternBase::Type::kSynExpr:
                 return std::make_unique<T>(assign_, first_syn_,
                                            std::move(second_exprs_));
+        }
+    }
+    template <typename T>
+    std::unique_ptr<ConditionClause> BuildCallsClause() noexcept {
+        static_assert(std::is_base_of_v<CallsBase, T>);
+        CallsBase::Type type =
+                CallsBase::GetType(first_param_type_, second_param_type_);
+        switch (type) {
+            case CallsBase::Type::kSynSyn:
+                return std::make_unique<T>(first_syn_, second_syn_);
+            case CallsBase::Type::kSynWild:
+                return std::make_unique<T>(ArgPos::kFirst, first_syn_);
+            case CallsBase::Type::kSynIdent:
+                return std::make_unique<T>(first_syn_, second_ident_);
+            case CallsBase::Type::kWildSyn:
+                return std::make_unique<T>(ArgPos::kSecond, second_syn_);
+            case CallsBase::Type::kWildWild:
+                return std::make_unique<T>();
+            case CallsBase::Type::kWildIdent:
+                return std::make_unique<T>(ArgPos::kSecond, second_ident_);
+            case CallsBase::Type::kIdentSyn:
+                return std::make_unique<T>(first_ident_, second_syn_);
+            case CallsBase::Type::kIdentWild:
+                return std::make_unique<T>(ArgPos::kFirst, first_ident_);
+            case CallsBase::Type::kIdentIdent:
+                return std::make_unique<T>(first_ident_, second_ident_);
         }
     }
     void Reset() noexcept;
