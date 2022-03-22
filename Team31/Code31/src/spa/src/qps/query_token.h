@@ -28,6 +28,10 @@ enum class QueryTokenType {
     kKeywordCalls,
     kKeywordNext,
     kKeywordAffects,
+    kAttrProc,
+    kAttrVar,
+    kAttrValue,
+    kAttrStmtNum,
     kSemicolon,       // ;
     kComma,           // ,
     kUnderscore,      // _
@@ -67,6 +71,14 @@ inline std::string_view Keyword(QueryTokenType token_type) {
             return "procedure";
         case QueryTokenType::kKeywordSelect:
             return "Select";
+        case QueryTokenType::kKeywordSuch:
+            return "such";
+        case QueryTokenType::kKeywordThat:
+            return "that";
+        case QueryTokenType::kKeywordWith:
+            return "with";
+        case QueryTokenType::kKeywordAnd:
+            return "and";
         case QueryTokenType::kKeywordPattern:
             return "pattern";
         case QueryTokenType::kKeywordFollows:
@@ -83,6 +95,14 @@ inline std::string_view Keyword(QueryTokenType token_type) {
             return "Next";
         case QueryTokenType::kKeywordAffects:
             return "Affects";
+        case QueryTokenType::kAttrProc:
+            return ".procName";
+        case QueryTokenType::kAttrVar:
+            return ".varName";
+        case QueryTokenType::kAttrValue:
+            return ".value";
+        case QueryTokenType::kAttrStmtNum:
+            return ".stmt#";
         case QueryTokenType::kSemicolon:
             return ";";
         case QueryTokenType::kComma:
@@ -105,14 +125,6 @@ inline std::string_view Keyword(QueryTokenType token_type) {
             return "(";
         case QueryTokenType::kBracketR:
             return ")";
-        case QueryTokenType::kKeywordSuch:
-            return "such";
-        case QueryTokenType::kKeywordThat:
-            return "that";
-        case QueryTokenType::kKeywordWith:
-            return "with";
-        case QueryTokenType::kKeywordAnd:
-            return "and";
         case QueryTokenType::kWord:
         case QueryTokenType::kInteger:
             return "";
