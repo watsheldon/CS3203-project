@@ -30,19 +30,12 @@ int PolishNotationStore::GetPolishIndex(int stmt_no) const {
 std::set<int> PolishNotationStore::CheckPattern(PN converted_pn,
                                                 bool partial_match,
                                                 std::vector<int> assign_stmt) {
-    if (partial_match) {
-        std::set<int> partial_match_stmt;
+    return partial_match ? CheckPatternP(converted_pn, assign_stmt)
+                         : CheckPattern(converted_pn, assign_stmt);
+}
 
-        for (int i : assign_stmt) {
-            const PN &pn = index_to_pn_[stmt_to_index_[i]];
-            if (pn.Contains(converted_pn)) {
-                partial_match_stmt.emplace(i);
-            }
-        }
-        return partial_match_stmt;
-    }
-
-    assert(partial_match == false);
+std::set<int> PolishNotationStore::CheckPattern(PN converted_pn,
+                                                std::vector<int> assign_stmt) {
     std::set<int> full_match_stmt;
 
     for (const auto i : assign_stmt) {
@@ -51,8 +44,20 @@ std::set<int> PolishNotationStore::CheckPattern(PN converted_pn,
             full_match_stmt.emplace(i);
         }
     }
-
     return full_match_stmt;
+}
+
+std::set<int> PolishNotationStore::CheckPatternP(PN converted_pn,
+                                                 std::vector<int> assign_stmt) {
+    std::set<int> partial_match_stmt;
+
+    for (int i : assign_stmt) {
+        const PN &pn = index_to_pn_[stmt_to_index_[i]];
+        if (pn.Contains(converted_pn)) {
+            partial_match_stmt.emplace(i);
+        }
+    }
+    return partial_match_stmt;
 }
 
 std::unique_ptr<PolishNotation> PolishNotationStore::ConvertFromQueryTokens(

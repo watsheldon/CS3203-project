@@ -22,6 +22,10 @@ class PolishNotationStore {
     [[nodiscard]] std::set<int> CheckPattern(PN converted_pn,
                                              bool partial_match,
                                              std::vector<int> assign_stmt);
+    [[nodiscard]] std::set<int> CheckPattern(PN converted_pn,
+                                             std::vector<int> assign_stmt);
+    [[nodiscard]] std::set<int> CheckPatternP(PN converted_pn,
+                                              std::vector<int> assign_stmt);
     [[nodiscard]] std::unique_ptr<PolishNotation> ConvertFromQueryTokens(
             const std::vector<QueryToken> &tokens);
     [[nodiscard]] PolishNotationNode TokenToNotation(QueryTokenType token_type);
