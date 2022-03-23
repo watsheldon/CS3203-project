@@ -659,6 +659,79 @@ PairVec<int> ProgramKnowledgeBase::GetCallsTPairs() {
     assert(compiled);
     return call_proc_.GetCallsTPairs();
 }
+bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kFirst> first_stmt,
+                                     Index<ArgPos::kSecond> second_stmt) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistNextT(Index<ArgPos::kFirst> first_stmt,
+                                      Index<ArgPos::kSecond> second_stmt) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kFirst> first_stmt) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kSecond> second_stmt) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistNext() { return false; }
+std::set<int> ProgramKnowledgeBase::GetNext(ArgPos return_pos,
+                                            StmtType return_type) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kFirst> stmt,
+                                            StmtType return_type) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kFirst> stmt,
+                                             StmtType return_type) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kSecond> stmt,
+                                            StmtType return_type) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kSecond> stmt,
+                                             StmtType return_type) {
+    return {};
+}
+PairVec<int> ProgramKnowledgeBase::GetNextPairs(StmtType first_type,
+                                                StmtType second_type) {
+    return {};
+}
+PairVec<int> ProgramKnowledgeBase::GetNextTPairs(StmtType first_type,
+                                                 StmtType second_type) {
+    return {};
+}
+bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign,
+                                        Index<ArgPos::kSecond> second_assign) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistAffectsT(Index<ArgPos::kFirst> first_assign,
+                                         Index<ArgPos::kSecond> second_assign) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kSecond> second_assign) {
+    return false;
+}
+bool ProgramKnowledgeBase::ExistAffects() { return false; }
+std::set<int> ProgramKnowledgeBase::GetAffects(ArgPos return_pos) { return {}; }
+std::set<int> ProgramKnowledgeBase::GetAffects(Index<ArgPos::kFirst> assign) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetAffectsT(Index<ArgPos::kFirst> assign) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetAffects(Index<ArgPos::kSecond> assign) {
+    return {};
+}
+std::set<int> ProgramKnowledgeBase::GetAffectsT(Index<ArgPos::kSecond> assign) {
+    return {};
+}
+PairVec<int> ProgramKnowledgeBase::GetAffectsPairs() { return {}; }
+PairVec<int> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
 
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);

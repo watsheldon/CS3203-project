@@ -213,6 +213,42 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     PairVec<int> GetCallsPairs() override;
     PairVec<int> GetCallsTPairs() override;
 
+    bool ExistNext(Index<ArgPos::kFirst> first_stmt,
+                   Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistNextT(Index<ArgPos::kFirst> first_stmt,
+                    Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistNext(Index<ArgPos::kFirst> first_stmt) override;
+    bool ExistNext(Index<ArgPos::kSecond> second_stmt) override;
+    bool ExistNext() override;
+    std::set<int> GetNext(ArgPos return_pos, StmtType return_type) override;
+    std::set<int> GetNext(Index<ArgPos::kFirst> stmt,
+                          StmtType return_type) override;
+    std::set<int> GetNextT(Index<ArgPos::kFirst> stmt,
+                           StmtType return_type) override;
+    std::set<int> GetNext(Index<ArgPos::kSecond> stmt,
+                          StmtType return_type) override;
+    std::set<int> GetNextT(Index<ArgPos::kSecond> stmt,
+                           StmtType return_type) override;
+    PairVec<int> GetNextPairs(StmtType first_type,
+                              StmtType second_type) override;
+    PairVec<int> GetNextTPairs(StmtType first_type,
+                               StmtType second_type) override;
+
+    bool ExistAffects(Index<ArgPos::kFirst> first_assign,
+                      Index<ArgPos::kSecond> second_assign) override;
+    bool ExistAffectsT(Index<ArgPos::kFirst> first_assign,
+                       Index<ArgPos::kSecond> second_assign) override;
+    bool ExistAffects(Index<ArgPos::kFirst> first_assign) override;
+    bool ExistAffects(Index<ArgPos::kSecond> second_assign) override;
+    bool ExistAffects() override;
+    std::set<int> GetAffects(ArgPos return_pos) override;
+    std::set<int> GetAffects(Index<ArgPos::kFirst> assign) override;
+    std::set<int> GetAffectsT(Index<ArgPos::kFirst> assign) override;
+    std::set<int> GetAffects(Index<ArgPos::kSecond> assign) override;
+    std::set<int> GetAffectsT(Index<ArgPos::kSecond> assign) override;
+    PairVec<int> GetAffectsPairs() override;
+    PairVec<int> GetAffectsTPairs() override;
+
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
     std::vector<int> GetAllEntityIndices(Synonym::Type synType) override;
@@ -241,9 +277,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::unique_ptr<ContainerForest> container_forest_;
 
     FollowsParentRelStore follows_parent_rel_;
-
-    std::pair<PolishNotation, bool> ConvertFromQueryTokens(
-            const std::vector<QueryToken> &tokens);
 
     int IdentToIndexValue(std::string_view name, QueryEntityType et);
     template <QueryEntityType et>

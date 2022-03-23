@@ -445,6 +445,81 @@ class KnowledgeBase {
     virtual PairVec<int> GetCallsPairs() = 0;
     virtual PairVec<int> GetCallsTPairs() = 0;
 
+    // Next("", "")
+    virtual bool ExistNext(Index<ArgPos::kFirst> first_stmt,
+                           Index<ArgPos::kSecond> second_stmt) = 0;
+    // Next*("", "")
+    virtual bool ExistNextT(Index<ArgPos::kFirst> first_stmt,
+                            Index<ArgPos::kSecond> second_stmt) = 0;
+    // Next/Next*("", _)
+    virtual bool ExistNext(Index<ArgPos::kFirst> first_stmt) = 0;
+    // Next/Next*(_, "")
+    virtual bool ExistNext(Index<ArgPos::kSecond> second_stmt) = 0;
+    // Next/Next*(_, _)
+    virtual bool ExistNext() = 0;
+    // Next/Next*(s, _) or (_, s)
+    virtual std::set<int> GetNext(ArgPos return_pos, StmtType return_type) = 0;
+    std::set<int> GetNext(ArgPos return_pos) {
+        return GetNext(return_pos, StmtType::kAll);
+    }
+    // Next("", s)
+    virtual std::set<int> GetNext(Index<ArgPos::kFirst> stmt,
+                                  StmtType return_type) = 0;
+    std::set<int> GetNext(Index<ArgPos::kFirst> stmt) {
+        return GetNext(stmt, StmtType::kAll);
+    }
+    // Next*("", s)
+    virtual std::set<int> GetNextT(Index<ArgPos::kFirst> stmt,
+                                   StmtType return_type) = 0;
+    std::set<int> GetNextT(Index<ArgPos::kFirst> stmt) {
+        return GetNextT(stmt, StmtType::kAll);
+    }
+    // Next(s,"")
+    virtual std::set<int> GetNext(Index<ArgPos::kSecond> stmt,
+                                  StmtType return_type) = 0;
+    std::set<int> GetNext(Index<ArgPos::kSecond> stmt) {
+        return GetNext(stmt, StmtType::kAll);
+    }
+    // Next*(s,"")
+    virtual std::set<int> GetNextT(Index<ArgPos::kSecond> stmt,
+                                   StmtType return_type) = 0;
+    std::set<int> GetNextT(Index<ArgPos::kSecond> stmt) {
+        return GetNextT(stmt, StmtType::kAll);
+    }
+    // Next(s,s)
+    virtual PairVec<int> GetNextPairs(StmtType first_type,
+                                      StmtType second_type) = 0;
+    // Next*(s,s)
+    virtual PairVec<int> GetNextTPairs(StmtType first_type,
+                                       StmtType second_type) = 0;
+
+    // Affects("", "")
+    virtual bool ExistAffects(Index<ArgPos::kFirst> first_assign,
+                              Index<ArgPos::kSecond> second_assign) = 0;
+    // Affects*("", "")
+    virtual bool ExistAffectsT(Index<ArgPos::kFirst> first_assign,
+                               Index<ArgPos::kSecond> second_assign) = 0;
+    // Affects("", _)
+    virtual bool ExistAffects(Index<ArgPos::kFirst> first_assign) = 0;
+    // Affects(_, "")
+    virtual bool ExistAffects(Index<ArgPos::kSecond> second_assign) = 0;
+    // Affects(_, _)
+    virtual bool ExistAffects() = 0;
+    // Affects/Affects*(a, _) or (_, a)
+    virtual std::set<int> GetAffects(ArgPos return_pos) = 0;
+    // Affects("", a)
+    virtual std::set<int> GetAffects(Index<ArgPos::kFirst> assign) = 0;
+    // Affects*("", a)
+    virtual std::set<int> GetAffectsT(Index<ArgPos::kFirst> assign) = 0;
+    // Affects(a,"")
+    virtual std::set<int> GetAffects(Index<ArgPos::kSecond> assign) = 0;
+    // Affects*(a,"")
+    virtual std::set<int> GetAffectsT(Index<ArgPos::kSecond> assign) = 0;
+    // Affects(a,a)
+    virtual PairVec<int> GetAffectsPairs() = 0;
+    // Affects*(a,a)
+    virtual PairVec<int> GetAffectsTPairs() = 0;
+
     /**
      * Gets all indices of the given entity type or stmt type
      */
