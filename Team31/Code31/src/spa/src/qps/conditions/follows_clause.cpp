@@ -12,26 +12,26 @@
 namespace spa {
 ResultTable FollowsClause::NumNum(KnowledgeBase *pkb, StmtNo first,
                                   StmtNo second) const noexcept {
-    auto result = pkb->ExistFollows(false, Index<ArgPos::kFirst>(first),
+    auto result = pkb->ExistFollows(Index<ArgPos::kFirst>(first),
                                     Index<ArgPos::kSecond>(second));
     return ResultTable(result);
 }
 ResultTable FollowsClause::NumSyn(KnowledgeBase *pkb, StmtNo first,
                                   Synonym *second) const noexcept {
-    auto result = pkb->GetFollows(false, Index<ArgPos::kFirst>(first),
-                                  SynToPkbType(second));
+    auto result =
+            pkb->GetFollows(Index<ArgPos::kFirst>(first), SynToPkbType(second));
     return {second, std::move(result)};
 }
 ResultTable FollowsClause::SynNum(KnowledgeBase *pkb, Synonym *first,
                                   StmtNo second) const noexcept {
-    auto result = pkb->GetFollows(false, Index<ArgPos::kSecond>(second),
+    auto result = pkb->GetFollows(Index<ArgPos::kSecond>(second),
                                   SynToPkbType(first));
     return {first, std::move(result)};
 }
 ResultTable FollowsClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
                                   Synonym *second) const noexcept {
-    auto [col_1, col_2] = pkb->GetFollowsPairs(false, SynToPkbType(first),
-                                               SynToPkbType(second));
+    auto [col_1, col_2] =
+            pkb->GetFollowsPairs(SynToPkbType(first), SynToPkbType(second));
     return {first, std::move(col_1), second, std::move(col_2)};
 }
 }  // namespace spa
