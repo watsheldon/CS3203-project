@@ -43,11 +43,9 @@ void PQLTokenizer::ExtractInto(std::string &token) {
     if (std::strchr(kSpecialSingle, token[0])) {
         return KeepFirstOf(token, 1);
     }
-
     // this should not be reached unless an illegal character is present
     error = true;
 }
-
 PQLTokenizer &PQLTokenizer::operator>>(std::string &token) {
     ExtractInto(token);
     return *this;

@@ -14,7 +14,7 @@ class PQLTokenizer {
     std::string Next();
 
   private:
-    static constexpr char kSpecialSingle[] = "%()*+-/;,_\".";
+    static constexpr char kSpecialSingle[] = "%()*+-/;,_\"<>.#";
     std::stringstream buffer_;
     bool error = false;  // triggered by either EOF or unrecognized token
 
