@@ -14,6 +14,25 @@ namespace spa {
 class StmtStmtBase : public ConditionClause {
   public:
     using Param = std::variant<Wildcard, StmtNo, Synonym *>;
+    /**
+     * This is seemingly a violation of OCP, where exhaustive types are
+     * declared, making it appear to be closed for extension. However, condition
+     * clauses in the current design are meant to function mostly as a data
+     * structure, albeit with a bit of logic just to facilitate PKB's job. Most
+     * of the business logic to find the information is located inside the PKB,
+     * extensibility is trivial as more types can easily be added, with a
+     * corresponding method call in the PKB itself. With the design of the PKB,
+     * it is unlikely that the condition clauses can be designed in a way
+     * that's more typical of an implementation that relies on the QPS to do the
+     * calculations.
+     *
+     * Admittedly it is possible to avoid the exhaustive type declaration, by
+     * inferring from the types of the arguments at run time. However, that is
+     * throwing away information that is obtained during the parsing process,
+     * introducing unnecessary overhead to recover the information, while making
+     * the code violate basic OOP principles by having to check the actual type
+     * within the sum types.
+     */
     enum Type {
         kNumNum,
         kNumSyn,

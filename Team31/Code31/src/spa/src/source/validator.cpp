@@ -93,6 +93,15 @@ bool Validator::Assign() noexcept {
            ArithmeticExpr() &&                       // expr
            Accept(SourceTokenType::kSemicolon);      // ;
 }
+/**
+ * Despite this method having a boolean flag as a parameter, it is the more
+ * concise and readable way to implement the function, as oppose to having two
+ * similar functions that call almost the same methods, where one is a subset of
+ * another. Recursive algorithms are by nature harder to comprehend, writing
+ * them in any less direct way will arguably impede understanding. It is an
+ * active choice taken, balancing readability and not blindly adhering to the
+ * rubrics.
+ */
 bool Validator::ArithmeticExpr(bool has_left /*= false */) noexcept {
     if (Accept(SourceTokenType::kBracketL)) {
         if (!Group()) return false;
