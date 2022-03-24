@@ -65,8 +65,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistFollows(Index<ArgPos::kSecond> second_stmt) override;
     bool ExistFollows() override;
 
-    bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
-                     Index<ArgPos::kSecond> child_stmt) override;
     bool ExistParent(Index<ArgPos::kFirst> parent_stmt,
                      Index<ArgPos::kSecond> child_stmt) override;
     bool ExistParentT(Index<ArgPos::kFirst> parent_stmt,
@@ -99,21 +97,15 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                                   StmtType second_type) override;
 
     std::set<int> GetParent(ArgPos return_pos, StmtType return_type) override;
-    std::set<int> GetParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
-                            StmtType return_type) override;
     std::set<int> GetParent(Index<ArgPos::kFirst> parent_stmt,
                             StmtType return_type) override;
     std::set<int> GetParentT(Index<ArgPos::kFirst> parent_stmt,
                              StmtType return_type) override;
 
-    std::set<int> GetParent(bool transitive, Index<ArgPos::kSecond> child_stmt,
-                            StmtType return_type) override;
     std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt,
                             StmtType return_type) override;
     std::set<int> GetParentT(Index<ArgPos::kSecond> child_stmt,
                              StmtType return_type) override;
-    PairVec<int> GetParentPairs(bool transitive, StmtType parent_type,
-                                StmtType child_type) override;
     PairVec<int> GetParentPairs(StmtType parent_type,
                                 StmtType child_type) override;
     PairVec<int> GetParentPairsT(StmtType parent_type,

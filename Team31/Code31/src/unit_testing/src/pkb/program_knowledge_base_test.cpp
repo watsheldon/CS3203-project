@@ -149,16 +149,16 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.ExistFollows());
     }
     SECTION("ExistParent") {
-        REQUIRE(pkb.ExistParent(false, Index<ArgPos::kFirst>(1),
+        REQUIRE(pkb.ExistParent(Index<ArgPos::kFirst>(1),
                                 Index<ArgPos::kSecond>(3)));
-        REQUIRE(pkb.ExistParent(true, Index<ArgPos::kFirst>(4),
-                                Index<ArgPos::kSecond>(7)));
-        REQUIRE_FALSE(pkb.ExistParent(true, Index<ArgPos::kFirst>(4),
-                                      Index<ArgPos::kSecond>(10)));
-        REQUIRE(pkb.ExistParent(false, Index<ArgPos::kFirst>(4),
+        REQUIRE(pkb.ExistParentT(Index<ArgPos::kFirst>(4),
+                                 Index<ArgPos::kSecond>(7)));
+        REQUIRE_FALSE(pkb.ExistParentT(Index<ArgPos::kFirst>(4),
+                                       Index<ArgPos::kSecond>(10)));
+        REQUIRE(pkb.ExistParent(Index<ArgPos::kFirst>(4),
                                 Index<ArgPos::kSecond>(8)));
-        REQUIRE_FALSE(pkb.ExistParent(true, Index<ArgPos::kFirst>(2),
-                                      Index<ArgPos::kSecond>(8)));
+        REQUIRE_FALSE(pkb.ExistParentT(Index<ArgPos::kFirst>(2),
+                                       Index<ArgPos::kSecond>(8)));
         REQUIRE(pkb.ExistParent(Index<ArgPos::kFirst>(4)));
         REQUIRE_FALSE(pkb.ExistParent(Index<ArgPos::kFirst>(2)));
         REQUIRE(pkb.ExistParent(Index<ArgPos::kSecond>(2)));
@@ -183,24 +183,24 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                         .first.size() == 7);
     }
     SECTION("GetParent") {
-        REQUIRE(pkb.GetParent(true, Index<ArgPos::kFirst>(1),
-                              StmtType::kRead) == std::set<int>{2});
-        REQUIRE(pkb.GetParent(false, Index<ArgPos::kFirst>(4),
-                              StmtType::kAll) == std::set<int>{5, 8, 9});
-        REQUIRE(pkb.GetParent(true, Index<ArgPos::kFirst>(4), StmtType::kAll) ==
+        REQUIRE(pkb.GetParentT(Index<ArgPos::kFirst>(1), StmtType::kRead) ==
+                std::set<int>{2});
+        REQUIRE(pkb.GetParent(Index<ArgPos::kFirst>(4), StmtType::kAll) ==
+                std::set<int>{5, 8, 9});
+        REQUIRE(pkb.GetParentT(Index<ArgPos::kFirst>(4), StmtType::kAll) ==
                 std::set<int>{5, 6, 7, 8, 9});
-        REQUIRE(pkb.GetParent(false, Index<ArgPos::kSecond>(7),
-                              StmtType::kWhile) == std::set<int>{5});
-        REQUIRE(pkb.GetParent(true, Index<ArgPos::kSecond>(3), StmtType::kIf)
+        REQUIRE(pkb.GetParent(Index<ArgPos::kSecond>(7), StmtType::kWhile) ==
+                std::set<int>{5});
+        REQUIRE(pkb.GetParentT(Index<ArgPos::kSecond>(3), StmtType::kIf)
                         .empty());
         REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kAssign).empty());
         REQUIRE(pkb.GetParent(ArgPos::kFirst, StmtType::kWhile) ==
                 std::set<int>{1, 5});
         REQUIRE(pkb.GetParent(ArgPos::kSecond, StmtType::kAll) ==
                 std::set<int>{2, 3, 4, 5, 6, 7, 8, 9});
-        REQUIRE(pkb.GetParentPairs(true, StmtType::kAll, StmtType::kAll)
+        REQUIRE(pkb.GetParentPairsT(StmtType::kAll, StmtType::kAll)
                         .first.size() == 15);
-        REQUIRE(pkb.GetParentPairs(false, StmtType::kAll, StmtType::kAll)
+        REQUIRE(pkb.GetParentPairs(StmtType::kAll, StmtType::kAll)
                         .first.size() == 8);
     }
 

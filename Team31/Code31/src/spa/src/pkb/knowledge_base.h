@@ -118,11 +118,6 @@ class KnowledgeBase {
      */
     virtual bool ExistFollows() = 0;
 
-    /**
-     * Check if Parent or Parents* (parent_stmt, child_stmt) exists
-     */
-    virtual bool ExistParent(bool transitive, Index<ArgPos::kFirst> parent_stmt,
-                             Index<ArgPos::kSecond> child_stmt) = 0;
     virtual bool ExistParent(Index<ArgPos::kFirst> parent_stmt,
                              Index<ArgPos::kSecond> child_stmt) = 0;
     virtual bool ExistParentT(Index<ArgPos::kFirst> parent_stmt,
@@ -210,55 +205,19 @@ class KnowledgeBase {
     std::set<int> GetParent(ArgPos return_pos) {
         return GetParent(return_pos, StmtType::kAll);
     }
-    /**
-     * Gets a list of stmt# that
-     * are direct or indirect children of (are nested in) the given stmt#
-     */
-    virtual std::set<int> GetParent(bool transitive,
-                                    Index<ArgPos::kFirst> parent_stmt,
-                                    StmtType return_type) = 0;
     virtual std::set<int> GetParent(Index<ArgPos::kFirst> parent_stmt,
                                     StmtType return_type) = 0;
     virtual std::set<int> GetParentT(Index<ArgPos::kFirst> parent_stmt,
                                      StmtType return_type) = 0;
-    std::set<int> GetParent(bool transitive,
-                            Index<ArgPos::kFirst> parent_stmt) {
-        return GetParent(transitive, parent_stmt, StmtType::kAll);
-    }
-    std::set<int> GetParent(Index<ArgPos::kFirst> parent_stmt) {
-        return GetParent(false, parent_stmt, StmtType::kAll);
-    }
-    std::set<int> GetParentT(Index<ArgPos::kFirst> parent_stmt) {
-        return GetParent(true, parent_stmt, StmtType::kAll);
-    }
 
-    /**
-     * Gets a list of stmt# that are direct or indirect parents of
-     * (contain) the given stmt#.
-     */
-    virtual std::set<int> GetParent(bool transitive,
-                                    Index<ArgPos::kSecond> child_stmt,
-                                    StmtType return_type) = 0;
     virtual std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt,
                                     StmtType return_type) = 0;
     virtual std::set<int> GetParentT(Index<ArgPos::kSecond> child_stmt,
                                      StmtType return_type) = 0;
-    std::set<int> GetParent(bool transitive,
-                            Index<ArgPos::kSecond> child_stmt) {
-        return GetParent(transitive, child_stmt, StmtType::kAll);
-    }
     std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt) {
-        return GetParent(false, child_stmt, StmtType::kAll);
-    }
-    std::set<int> GetParentT(Index<ArgPos::kSecond> child_stmt) {
-        return GetParent(true, child_stmt, StmtType::kAll);
+        return GetParent(child_stmt, StmtType::kAll);
     }
 
-    /**
-     * Gets a list of stmt# pairs that exist in Parent/Parent* relationship
-     */
-    virtual PairVec<int> GetParentPairs(bool transitive, StmtType parent_type,
-                                        StmtType child_type) = 0;
     virtual PairVec<int> GetParentPairs(StmtType parent_type,
                                         StmtType child_type) = 0;
     virtual PairVec<int> GetParentPairsT(StmtType parent_type,
