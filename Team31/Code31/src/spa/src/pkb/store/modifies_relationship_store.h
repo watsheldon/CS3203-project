@@ -23,11 +23,11 @@ class ModifiesRelationshipStore : public UsesModifiesStoreBase {
   private:
     void AddConditionRel(const TypeStatementsStore& type_statement_store,
                          const ContainerInfo& info,
-                         PairBitmap& bitmaps) override;
+                         ContainerBitmap& bitmaps) override;
     void AddAllDirectRel(const TypeStatementsStore& store) override;
     void AddAllIndirectRel(const TypeStatementsStore& type_statement_store,
                            const ContainerInfo& info,
-                           PairBitmap& bitmaps) override;
+                           ContainerBitmap& bitmaps) override;
 
     static constexpr std::array<StmtType, 2> direct_stmt_types_{
             {StmtType::kAssign, StmtType::kRead}};

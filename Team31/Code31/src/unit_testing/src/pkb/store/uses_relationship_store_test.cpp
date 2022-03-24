@@ -4,7 +4,7 @@
 
 namespace spa {
 TEST_CASE("pkb/store/UsesRelationshipStore") {
-    UsesRelationshipStore urs(10, 4);
+    UsesRelationshipStore urs(10, 4, 1);
     urs.Set(1, {1, 4});
     urs.Set(2, {4, 2});
     urs.Set(3, {3, 4});

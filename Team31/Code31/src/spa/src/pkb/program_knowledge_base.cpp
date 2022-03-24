@@ -21,8 +21,10 @@ ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
           stmtlst_parent_(init.procedures.size() - 1, stmt_count_,
                           stmtlst_count_),
           stmtlst_stmt_(stmtlst_count_, stmt_count_),
-          modifies_rel_(stmt_count_, init.variables.size() - 1),
-          uses_rel_(stmt_count_, init.variables.size() - 1),
+          modifies_rel_(stmt_count_, init.variables.size() - 1,
+                        init.procedures.size() - 1),
+          uses_rel_(stmt_count_, init.variables.size() - 1,
+                    init.procedures.size() - 1),
           call_proc_(stmt_count_, init.procedures.size() - 1,
                      std::move(init.proc_call_graph)),
           name_value_(std::move(init.procedures), std::move(init.variables),
@@ -324,39 +326,70 @@ PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     assert(compiled);
     return uses_rel_.GetStmtVar(type);
 }
-
 bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name,
                                          std::string_view var_name) {
-    return false;
+    assert(compiled);
+    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
+    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    assert(proc_index != 0 && var_index != 0);
+    auto modified_vars = modifies_rel_.GetAllVarProc(proc_index);
+    return modified_vars.find(var_index.value) != modified_vars.end();
 }
 bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name) {
-    return false;
+    assert(compiled);
+    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
+    auto modified_vars = modifies_rel_.GetAllVarProc(proc_index);
+    return !modified_vars.empty();
 }
 std::set<int> ProgramKnowledgeBase::GetModifies(
         Name<ArgPos::kFirst> proc_name) {
-    return {};
+    assert(compiled);
+    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
+    return modifies_rel_.GetAllVarProc(proc_index);
 }
 std::set<int> ProgramKnowledgeBase::GetModifies(
         Name<ArgPos::kSecond> var_name) {
-    return {};
+    assert(compiled);
+    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    return modifies_rel_.GetAllProc(var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetModifiesProc() { return {}; }
-PairVec<int> ProgramKnowledgeBase::GetModifiesProcVar() { return {}; }
+std::set<int> ProgramKnowledgeBase::GetModifiesProc() {
+    return modifies_rel_.GetAllProc();
+}
+PairVec<int> ProgramKnowledgeBase::GetModifiesProcVar() {
+    return modifies_rel_.GetProcVar();
+}
 bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name,
                                      std::string_view var_name) {
-    return false;
+    assert(compiled);
+    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
+    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    assert(proc_index != 0 && var_index != 0);
+    auto uses_vars = uses_rel_.GetAllVarProc(proc_index);
+    return uses_vars.find(var_index) != uses_vars.end();
 }
 bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name) {
-    return false;
+    assert(compiled);
+    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
+    auto uses_vars = uses_rel_.GetAllVarProc(proc_index);
+    return !uses_vars.empty();
 }
 std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kFirst> proc_name) {
-    return {};
+    assert(compiled);
+    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
+    return uses_rel_.GetAllVarProc(proc_index);
 }
 std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kSecond> var_name) {
-    return {};
+    assert(compiled);
+    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    return uses_rel_.GetAllProc(var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetUsesProc() { return {}; }
-PairVec<int> ProgramKnowledgeBase::GetUsesProcVar() { return {}; }
+std::set<int> ProgramKnowledgeBase::GetUsesProc() {
+    return uses_rel_.GetAllProc();
+}
+PairVec<int> ProgramKnowledgeBase::GetUsesProcVar() {
+    return modifies_rel_.GetProcVar();
+}
 
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens) {
     assert(compiled);
@@ -668,9 +701,11 @@ void ProgramKnowledgeBase::Compile() {
             stmtlst_parent_, stmtlst_stmt_, stmtlst_count_);
     follows_parent_rel_.container_forest_ = container_forest_.get();
     uses_rel_.Compile(type_stmt_,
-                      {*container_forest_, stmtlst_parent_, stmtlst_stmt_});
+                      {*container_forest_, stmtlst_parent_, stmtlst_stmt_},
+                      call_proc_);
     modifies_rel_.Compile(type_stmt_,
-                          {*container_forest_, stmtlst_parent_, stmtlst_stmt_});
+                          {*container_forest_, stmtlst_parent_, stmtlst_stmt_},
+                          call_proc_);
     compiled = true;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {

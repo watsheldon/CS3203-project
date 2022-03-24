@@ -247,10 +247,11 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                 std::set<int>{1, 2, 3, 4});
         REQUIRE(pkb.GetUses("v1", StmtType::kAssign) == std::set<int>{7});
         REQUIRE(pkb.GetUses("v3", StmtType::kWhile) == std::set<int>{1, 5});
-        REQUIRE(pkb.GetUses("v4", StmtType::kAll) == std::set<int>{1, 4, 5});
+        REQUIRE(pkb.GetUses("v4", StmtType::kAll) ==
+                std::set<int>{1, 4, 5, 11, 12});
         REQUIRE(pkb.GetUses("v4", StmtType::kIf) == std::set<int>{4});
         REQUIRE(pkb.GetUses(StmtType::kAll) ==
-                std::set<int>{1, 5, 4, 3, 6, 7, 8, 9, 14});
+                std::set<int>{1, 5, 4, 3, 6, 7, 8, 9, 11, 12, 14});
         REQUIRE(pkb.GetUses(StmtType::kIf) == std::set<int>{4});
         // pair can contain duplicates
         std::vector<int> first = pkb.GetUsesStmtVar(StmtType::kIf).first;
@@ -282,10 +283,10 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetModifies("v1", StmtType::kRead) == std::set<int>{2, 13});
         REQUIRE(pkb.GetModifies("v1", StmtType::kPrint).empty());
         REQUIRE(pkb.GetModifies("v1", StmtType::kAll) ==
-                std::set<int>{1, 2, 4, 5, 7, 13});
+                std::set<int>{1, 2, 4, 5, 7, 11, 12, 13});
         REQUIRE(pkb.GetModifies("v3", StmtType::kWhile) == std::set<int>{1});
         REQUIRE(pkb.GetModifies(StmtType::kAll) ==
-                std::set<int>{1, 2, 4, 5, 7, 8, 9, 10, 13});
+                std::set<int>{1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13});
         // pairs can have duplication
         std::vector<int> first = pkb.GetModifiesStmtVar(StmtType::kWhile).first;
         std::vector<int> second =

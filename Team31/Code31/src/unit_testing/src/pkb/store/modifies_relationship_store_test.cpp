@@ -4,7 +4,7 @@
 
 namespace spa {
 TEST_CASE("pkb/store/ModifiesRelationshipStore") {
-    ModifiesRelationshipStore mrs(10, 4);
+    ModifiesRelationshipStore mrs(10, 4, 1);
     mrs.Set(1, 1);
     mrs.Set(2, 4);
     mrs.Set(3, 4);

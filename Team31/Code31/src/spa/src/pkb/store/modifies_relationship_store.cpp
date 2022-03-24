@@ -21,13 +21,13 @@ int ModifiesRelationshipStore::GetVarIndex(int stmt_no) const {
 void ModifiesRelationshipStore::AddConditionRel(
 
         const TypeStatementsStore& type_statement_store,
-        const ContainerInfo& info, PairBitmap& bitmaps) {
+        const ContainerInfo& info, ContainerBitmap& bitmaps) {
     return;
 }
 
 void ModifiesRelationshipStore::AddAllIndirectRel(
         const TypeStatementsStore& type_statement_store,
-        const ContainerInfo& info, PairBitmap& bitmaps) {
+        const ContainerInfo& info, ContainerBitmap& bitmaps) {
     FillIndirectRels(indirect_stmt_types_, type_statement_store, info, bitmaps);
 }
 

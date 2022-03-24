@@ -20,12 +20,11 @@ const std::vector<int>& UsesRelationshipStore::GetVarIndex(int stmt_no) const {
 
 void UsesRelationshipStore::AddConditionRel(
         const TypeStatementsStore& type_statement_store,
-        const ContainerInfo& info, PairBitmap& bitmaps) {
-    auto& [if_added, while_added] = bitmaps;
+        const ContainerInfo& info, ContainerBitmap& bitmaps) {
+    auto& [if_added, while_added, proc_added] = bitmaps;
     std::array<Ref<BitVec2D>, 2> container_bitmaps{{if_added, while_added}};
-    auto& if_var_pairs = stmt_var_pairs_[static_cast<int>(StmtType::kIf) - 1];
-    auto& while_var_pairs =
-            stmt_var_pairs_[static_cast<int>(StmtType::kWhile) - 1];
+    auto& if_var_pairs = stmt_var_pairs_[ConvertStmtType(StmtType::kIf)];
+    auto& while_var_pairs = stmt_var_pairs_[ConvertStmtType(StmtType::kWhile)];
     std::array<Ref<PairVec<int>>, 2> container_var_pairs{
             {if_var_pairs, while_var_pairs}};
     auto& all_if_stmts = type_statement_store.GetStatements(StmtType::kIf);
@@ -49,7 +48,7 @@ void UsesRelationshipStore::AddConditionRel(
 
 void UsesRelationshipStore::AddAllIndirectRel(
         const TypeStatementsStore& type_statement_store,
-        const ContainerInfo& info, PairBitmap& bitmaps) {
+        const ContainerInfo& info, ContainerBitmap& bitmaps) {
     FillIndirectRels(relevant_stmt_types_, type_statement_store, info, bitmaps);
 }
 
@@ -75,21 +74,25 @@ void UsesRelationshipStore::AddConditionDirectUses(
 void UsesRelationshipStore::AddConditionIndirectUses(
         int stmt_no, const std::vector<int>& var_indices,
         std::array<Ref<PairVec<int>>, 2>& container_var_pairs,
-        const ContainerInfo& info, PairBitmap& bitmaps) {
+        const ContainerInfo& info, ContainerBitmap& bitmaps) {
     const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
-    auto& [if_added, while_added] = bitmaps;
+    auto& [if_added, while_added, proc_added] = bitmaps;
     auto& [if_var_pairs, while_var_pairs] = container_var_pairs;
     auto stmtlst = stmtlst_stmt.GetStmtlst(stmt_no);
     auto ancestors = forest.GetAncestryTrace(stmtlst);
+    auto& [type, proc_index] = stmtlst_parent.GetParent(ancestors.back());
+    for (auto v : var_indices) {
+        ProcessProcedureAncestor(proc_index, v, proc_added);
+    }
+    ancestors.pop_back();
     for (auto a : ancestors) {
         auto& [type, index] = stmtlst_parent.GetParent(a);
-        if (type == StmtlstParentStore::kProc) break;
         auto& [stmts, vars] = type == StmtlstParentStore::kIf
                                       ? if_var_pairs.get()
                                       : while_var_pairs.get();
         auto& added = type == StmtlstParentStore::kIf ? if_added : while_added;
         for (auto v : var_indices) {
-            if (added.At(a, v)) continue;
+            if (added.At(a, v)) break;
             vars.emplace_back(v);
             added.Set(a, v);
         }

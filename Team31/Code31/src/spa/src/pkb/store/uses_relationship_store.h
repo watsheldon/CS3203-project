@@ -26,18 +26,18 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
   private:
     void AddConditionRel(const TypeStatementsStore& type_statement_store,
                          const ContainerInfo& info,
-                         PairBitmap& bitmaps) override;
+                         ContainerBitmap& bitmaps) override;
     void AddAllDirectRel(const TypeStatementsStore& store) override;
     void AddAllIndirectRel(const TypeStatementsStore& type_statement_store,
                            const ContainerInfo& info,
-                           PairBitmap& bitmaps) override;
+                           ContainerBitmap& bitmaps) override;
     void AddConditionDirectUses(int stmt_no,
                                 const std::vector<int>& var_indices,
                                 PairVec<int>& stmt_var_pairs, BitVec2D& bitmap);
     void AddConditionIndirectUses(
             int stmt_no, const std::vector<int>& var_indices,
             std::array<Ref<PairVec<int>>, 2>& container_var_pairs,
-            const ContainerInfo& info, PairBitmap& bitmaps);
+            const ContainerInfo& info, ContainerBitmap& bitmaps);
 
     static constexpr std::array<StmtType, 2> relevant_stmt_types_{
             {StmtType::kAssign, StmtType::kPrint}};
