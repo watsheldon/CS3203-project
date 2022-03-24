@@ -356,9 +356,6 @@ class KnowledgeBase {
      * For pattern related methods, a "P" at the end of the method name
      * indicates partial matching.
      */
-    // ( _, " ") , (_ , _" "_)
-    virtual std::set<int> GetPattern(std::vector<QueryToken> tokens,
-                                     bool partial_match) = 0;
     virtual std::set<int> GetPattern(std::vector<QueryToken> tokens) = 0;
     virtual std::set<int> GetPatternP(std::vector<QueryToken> tokens) = 0;
 
@@ -366,25 +363,15 @@ class KnowledgeBase {
     virtual std::set<int> GetPattern(std::string_view var_name) = 0;
     virtual std::set<int> GetPattern(int var_index) = 0;
 
-    // (" ", " ") , (" ", _" "_)
-    virtual std::set<int> GetPattern(std::string_view var_name,
-                                     std::vector<QueryToken> second_tokens,
-                                     bool partial_match) = 0;
     virtual std::set<int> GetPattern(std::string_view var_name,
                                      std::vector<QueryToken> second_tokens) = 0;
     virtual std::set<int> GetPatternP(
             std::string_view var_name,
             std::vector<QueryToken> second_tokens) = 0;
     virtual std::set<int> GetPattern(int var_index,
-                                     std::vector<QueryToken> second_tokens,
-                                     bool partial_match) = 0;
-    virtual std::set<int> GetPattern(int var_index,
                                      std::vector<QueryToken> second_tokens) = 0;
     virtual std::set<int> GetPatternP(
             int var_index, std::vector<QueryToken> second_tokens) = 0;
-    // (v, " ") , (v, _" "_)
-    virtual PairVec<int> GetPatternPair(std::vector<QueryToken> tokens,
-                                        bool partial_match) = 0;
     virtual PairVec<int> GetPatternPair(std::vector<QueryToken> tokens) = 0;
     virtual PairVec<int> GetPatternPairP(std::vector<QueryToken> tokens) = 0;
 

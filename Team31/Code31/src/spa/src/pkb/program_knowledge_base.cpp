@@ -406,11 +406,6 @@ std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kSecond> var_name) {
 std::set<int> ProgramKnowledgeBase::GetUsesProc() { return {}; }
 PairVec<int> ProgramKnowledgeBase::GetUsesProcVar() { return {}; }
 
-// ( _, " "), (_, _" "_)
-std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens,
-                                               bool partial_match) {
-    return partial_match ? GetPatternP(tokens) : GetPattern(tokens);
-}
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens) {
     assert(compiled);
     auto converted_token = polish_notation_.ConvertFromQueryTokens(tokens);
@@ -447,30 +442,17 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::string_view var_name) {
     if (var_index == 0) return {};
     return GetPattern(var_index);
 }
-// (" ", " ") , (" ", _" "_)
-std::set<int> ProgramKnowledgeBase::GetPattern(
-        std::string_view var_name, std::vector<QueryToken> second_tokens,
-        bool partial_match) {
-    return partial_match ? GetPatternP(var_name, second_tokens)
-                         : GetPattern(var_name, second_tokens);
-}
 std::set<int> ProgramKnowledgeBase::GetPattern(
         std::string_view var_name, std::vector<QueryToken> second_tokens) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
-    return GetPattern(var_index, second_tokens, false);
+    return GetPattern(var_index, second_tokens);
 }
 std::set<int> ProgramKnowledgeBase::GetPatternP(
         std::string_view var_name, std::vector<QueryToken> second_tokens) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
-    return GetPattern(var_index, second_tokens, true);
-}
-std::set<int> ProgramKnowledgeBase::GetPattern(
-        int var_index, std::vector<QueryToken> second_tokens,
-        bool partial_match) {
-    return partial_match ? GetPatternP(var_index, second_tokens)
-                         : GetPattern(var_index, second_tokens);
+    return GetPatternP(var_index, second_tokens);
 }
 std::set<int> ProgramKnowledgeBase::GetPattern(
         int var_index, std::vector<QueryToken> second_tokens) {
@@ -478,7 +460,7 @@ std::set<int> ProgramKnowledgeBase::GetPattern(
 
     std::set<int> assign_stmt;
     std::set<int> filtered_assign_stmt;
-    assign_stmt = GetPattern(second_tokens, false);
+    assign_stmt = GetPattern(second_tokens);
 
     for (auto &i : assign_stmt) {
         if (ExistModifies(i, var_index)) {
@@ -493,7 +475,7 @@ std::set<int> ProgramKnowledgeBase::GetPatternP(
 
     std::set<int> assign_stmt;
     std::set<int> filtered_assign_stmt;
-    assign_stmt = GetPattern(second_tokens, true);
+    assign_stmt = GetPatternP(second_tokens);
 
     for (auto &i : assign_stmt) {
         if (ExistModifies(i, var_index)) {
@@ -501,11 +483,6 @@ std::set<int> ProgramKnowledgeBase::GetPatternP(
         }
     }
     return filtered_assign_stmt;
-}
-// (v, " ") , (v, _" "_)
-PairVec<int> ProgramKnowledgeBase::GetPatternPair(
-        std::vector<QueryToken> tokens, bool partial_match) {
-    return partial_match ? GetPatternPairP(tokens) : GetPatternPair(tokens);
 }
 PairVec<int> ProgramKnowledgeBase::GetPatternPair(
         std::vector<QueryToken> tokens) {
@@ -514,7 +491,7 @@ PairVec<int> ProgramKnowledgeBase::GetPatternPair(
     std::set<int> assign_stmt_set;
     std::vector<int> assign_var;
     std::vector<int> assign_stmt;
-    assign_stmt_set = GetPattern(tokens, false);
+    assign_stmt_set = GetPattern(tokens);
 
     for (auto &i : assign_stmt_set) {
         auto index = Index<QueryEntityType::kStmt>(i);
@@ -532,7 +509,7 @@ PairVec<int> ProgramKnowledgeBase::GetPatternPairP(
     std::set<int> assign_stmt_set;
     std::vector<int> assign_var;
     std::vector<int> assign_stmt;
-    assign_stmt_set = GetPattern(tokens, true);
+    assign_stmt_set = GetPatternP(tokens);
 
     for (auto &i : assign_stmt_set) {
         auto index = Index<QueryEntityType::kStmt>(i);

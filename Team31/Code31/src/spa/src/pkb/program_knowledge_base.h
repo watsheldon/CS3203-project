@@ -154,9 +154,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetUsesProc() override;
     PairVec<int> GetUsesProcVar() override;
 
-    // ( _, " "), (_ , _" "_)
-    std::set<int> GetPattern(std::vector<QueryToken> tokens,
-                             bool partial_match) override;
     std::set<int> GetPattern(std::vector<QueryToken> tokens) override;
     std::set<int> GetPatternP(std::vector<QueryToken> tokens) override;
 
@@ -164,24 +161,14 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<int> GetPattern(std::string_view var_name) override;
     std::set<int> GetPattern(int var_index) override;
 
-    // (" ", " ") , (" ", _" "_)
-    std::set<int> GetPattern(std::string_view var_name,
-                             std::vector<QueryToken> second_tokens,
-                             bool partial_match) override;
     std::set<int> GetPattern(std::string_view var_name,
                              std::vector<QueryToken> second_tokens) override;
     std::set<int> GetPatternP(std::string_view var_name,
                               std::vector<QueryToken> second_tokens) override;
     std::set<int> GetPattern(int var_index,
-                             std::vector<QueryToken> second_tokens,
-                             bool partial_match) override;
-    std::set<int> GetPattern(int var_index,
                              std::vector<QueryToken> second_tokens) override;
     std::set<int> GetPatternP(int var_index,
                               std::vector<QueryToken> second_tokens) override;
-    // (v, " ")  , (v, _" "_)
-    PairVec<int> GetPatternPair(std::vector<QueryToken> tokens,
-                                bool partial_match) override;
     PairVec<int> GetPatternPair(std::vector<QueryToken> tokens) override;
     PairVec<int> GetPatternPairP(std::vector<QueryToken> tokens) override;
 

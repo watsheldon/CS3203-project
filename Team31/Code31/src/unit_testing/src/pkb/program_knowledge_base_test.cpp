@@ -212,16 +212,16 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetPattern("v1") == std::set<int>{7});
         REQUIRE(pkb.GetPattern("v2") == std::set<int>{8});
         REQUIRE(pkb.GetPattern("v3") == std::set<int>{9});
-        REQUIRE(pkb.GetPattern(queryToken1, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(queryToken2, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(queryToken3, true).empty());
-        REQUIRE(pkb.GetPattern(queryToken4, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(queryToken5, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern(queryToken6, true).empty());
-        REQUIRE(pkb.GetPattern("v1", queryToken4, true) == std::set<int>{7});
-        REQUIRE(pkb.GetPattern("v2", queryToken4, true).empty());
-        REQUIRE(pkb.GetPatternPair(queryToken4, true) == pairTest);
-        REQUIRE(pkb.GetPatternPair(queryToken3, true) == pairTest2);
+        REQUIRE(pkb.GetPatternP(queryToken1) == std::set<int>{7});
+        REQUIRE(pkb.GetPatternP(queryToken2) == std::set<int>{7});
+        REQUIRE(pkb.GetPatternP(queryToken3).empty());
+        REQUIRE(pkb.GetPatternP(queryToken4) == std::set<int>{7});
+        REQUIRE(pkb.GetPatternP(queryToken5) == std::set<int>{7});
+        REQUIRE(pkb.GetPatternP(queryToken6).empty());
+        REQUIRE(pkb.GetPatternP("v1", queryToken4) == std::set<int>{7});
+        REQUIRE(pkb.GetPatternP("v2", queryToken4).empty());
+        REQUIRE(pkb.GetPatternPairP(queryToken4) == pairTest);
+        REQUIRE(pkb.GetPatternPairP(queryToken3) == pairTest2);
         REQUIRE(pkb.GetPatternPair() == pairTest3);
     }
 
