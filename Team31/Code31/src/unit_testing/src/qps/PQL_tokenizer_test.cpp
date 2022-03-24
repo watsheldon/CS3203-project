@@ -30,7 +30,6 @@ TEST_CASE("common/PQLTokenizer") {
         REQUIRE(tokenizer2.Next() == ";");
         REQUIRE(tokenizer2.Next() == "Select");
         REQUIRE(tokenizer2.Next() == "p");
-
         REQUIRE(tokenizer3.Next() == "stmt");
         REQUIRE(tokenizer3.Next() == "s");
         REQUIRE(tokenizer3.Next() == ";");
@@ -113,6 +112,62 @@ TEST_CASE("common/PQLTokenizer") {
         REQUIRE(tokenizer5.Next() == "print");
         REQUIRE(tokenizer5.Next() == "\"");
         REQUIRE(tokenizer5.Next() == "_");
+    }
+    SECTION("test attrName") {
+        std::string_view code1{
+                "read r; Select  r.stmt# such that Follows(r, _)"};
+        PQLTokenizer tokenizer1;
+        tokenizer1(code1);
+        REQUIRE(tokenizer1.Next() == "read");
+        REQUIRE(tokenizer1.Next() == "r");
+        REQUIRE(tokenizer1.Next() == ";");
+        REQUIRE(tokenizer1.Next() == "Select");
+        REQUIRE(tokenizer1.Next() == "r");
+        REQUIRE(tokenizer1.Next() == ".");
+        REQUIRE(tokenizer1.Next() == "stmt");
+        REQUIRE(tokenizer1.Next() == "#");
+        REQUIRE(tokenizer1.Next() == "such");
+        REQUIRE(tokenizer1.Next() == "that");
+        REQUIRE(tokenizer1.Next() == "Follows");
+        REQUIRE(tokenizer1.Next() == "(");
+        REQUIRE(tokenizer1.Next() == "r");
+        REQUIRE(tokenizer1.Next() == ",");
+        REQUIRE(tokenizer1.Next() == "_");
+        REQUIRE(tokenizer1.Next() == ")");
+        std::string_view code2{
+                "procedure p, q; variable v; constant c; Select p.procName "
+                "v.varName c.value such that Calls (p, q) "};
+        PQLTokenizer tokenizer2;
+        tokenizer2(code2);
+        REQUIRE(tokenizer2.Next() == "procedure");
+        REQUIRE(tokenizer2.Next() == "p");
+        REQUIRE(tokenizer2.Next() == ",");
+        REQUIRE(tokenizer2.Next() == "q");
+        REQUIRE(tokenizer2.Next() == ";");
+        REQUIRE(tokenizer2.Next() == "variable");
+        REQUIRE(tokenizer2.Next() == "v");
+        REQUIRE(tokenizer2.Next() == ";");
+        REQUIRE(tokenizer2.Next() == "constant");
+        REQUIRE(tokenizer2.Next() == "c");
+        REQUIRE(tokenizer2.Next() == ";");
+        REQUIRE(tokenizer2.Next() == "Select");
+        REQUIRE(tokenizer2.Next() == "p");
+        REQUIRE(tokenizer2.Next() == ".");
+        REQUIRE(tokenizer2.Next() == "procName");
+        REQUIRE(tokenizer2.Next() == "v");
+        REQUIRE(tokenizer2.Next() == ".");
+        REQUIRE(tokenizer2.Next() == "varName");
+        REQUIRE(tokenizer2.Next() == "c");
+        REQUIRE(tokenizer2.Next() == ".");
+        REQUIRE(tokenizer2.Next() == "value");
+        REQUIRE(tokenizer2.Next() == "such");
+        REQUIRE(tokenizer2.Next() == "that");
+        REQUIRE(tokenizer2.Next() == "Calls");
+        REQUIRE(tokenizer2.Next() == "(");
+        REQUIRE(tokenizer2.Next() == "p");
+        REQUIRE(tokenizer2.Next() == ",");
+        REQUIRE(tokenizer2.Next() == "q");
+        REQUIRE(tokenizer2.Next() == ")");
     }
 }
 }  // namespace spa
