@@ -136,12 +136,12 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
 
     pkb.Compile();
     SECTION("ExistFollows") {
-        REQUIRE(pkb.ExistFollows(false, Index<ArgPos::kFirst>(1),
+        REQUIRE(pkb.ExistFollows(Index<ArgPos::kFirst>(1),
                                  Index<ArgPos::kSecond>(10)));
-        REQUIRE(pkb.ExistFollows(true, Index<ArgPos::kFirst>(2),
-                                 Index<ArgPos::kSecond>(4)));
-        REQUIRE_FALSE(pkb.ExistFollows(true, Index<ArgPos::kFirst>(5),
-                                       Index<ArgPos::kSecond>(9)));
+        REQUIRE(pkb.ExistFollowsT(Index<ArgPos::kFirst>(2),
+                                  Index<ArgPos::kSecond>(4)));
+        REQUIRE_FALSE(pkb.ExistFollowsT(Index<ArgPos::kFirst>(5),
+                                        Index<ArgPos::kSecond>(9)));
         REQUIRE(pkb.ExistFollows(Index<ArgPos::kFirst>(3)));
         REQUIRE(pkb.ExistFollows(Index<ArgPos::kFirst>(5)));
         REQUIRE_FALSE(pkb.ExistFollows(Index<ArgPos::kSecond>(2)));
@@ -166,20 +166,20 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.ExistParent());
     }
     SECTION("GetFollows") {
-        REQUIRE(pkb.GetFollows(false, Index<ArgPos::kFirst>(1),
-                               StmtType::kRead) == std::set<int>{10});
-        REQUIRE(pkb.GetFollows(true, Index<ArgPos::kFirst>(1),
-                               StmtType::kAll) == std::set<int>{10});
-        REQUIRE(pkb.GetFollows(true, Index<ArgPos::kSecond>(4),
-                               StmtType::kAll) == std::set<int>{2, 3});
-        REQUIRE(pkb.GetFollows(true, Index<ArgPos::kSecond>(8),
-                               StmtType::kWhile) == std::set<int>{5});
+        REQUIRE(pkb.GetFollows(Index<ArgPos::kFirst>(1), StmtType::kRead) ==
+                std::set<int>{10});
+        REQUIRE(pkb.GetFollowsT(Index<ArgPos::kFirst>(1), StmtType::kAll) ==
+                std::set<int>{10});
+        REQUIRE(pkb.GetFollowsT(Index<ArgPos::kSecond>(4), StmtType::kAll) ==
+                std::set<int>{2, 3});
+        REQUIRE(pkb.GetFollowsT(Index<ArgPos::kSecond>(8), StmtType::kWhile) ==
+                std::set<int>{5});
         REQUIRE(pkb.GetFollows(ArgPos::kFirst, StmtType::kAssign).empty());
         REQUIRE(pkb.GetFollows(ArgPos::kSecond, StmtType::kAssign) ==
                 std::set<int>{7, 8});
-        REQUIRE(pkb.GetFollowsPairs(true, StmtType::kAll, StmtType::kAll)
+        REQUIRE(pkb.GetFollowsPairsT(StmtType::kAll, StmtType::kAll)
                         .first.size() == 9);
-        REQUIRE(pkb.GetFollowsPairs(false, StmtType::kAll, StmtType::kAll)
+        REQUIRE(pkb.GetFollowsPairs(StmtType::kAll, StmtType::kAll)
                         .first.size() == 7);
     }
     SECTION("GetParent") {

@@ -96,11 +96,6 @@ class KnowledgeBase {
     virtual void SetRel(Index<SetEntityType::kStmt> stmt_no,
                         std::vector<int> var_indices) = 0;
 
-    /**
-     * Check if Follows or Follows* (first_stmt, second_stmt) exist
-     */
-    virtual bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
-                              Index<ArgPos::kSecond> second_stmt) = 0;
     virtual bool ExistFollows(Index<ArgPos::kFirst> first_stmt,
                               Index<ArgPos::kSecond> second_stmt) = 0;
     virtual bool ExistFollowsT(Index<ArgPos::kFirst> first_stmt,
@@ -144,53 +139,19 @@ class KnowledgeBase {
     std::set<int> GetFollows(ArgPos return_pos) {
         return GetFollows(return_pos, StmtType::kAll);
     }
-    /**
-     * Gets a list of stmt# that appear after the given stmt#
-     * at the same nesting level.
-     */
-    virtual std::set<int> GetFollows(bool transitive,
-                                     Index<ArgPos::kFirst> stmt_no,
-                                     StmtType return_type) = 0;
     virtual std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no,
                                      StmtType return_type) = 0;
     virtual std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
                                       StmtType return_type) = 0;
-    std::set<int> GetFollows(bool transitive, Index<ArgPos::kFirst> stmt_no) {
-        return GetFollows(transitive, stmt_no, StmtType::kAll);
-    }
     std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no) {
-        return GetFollows(false, stmt_no, StmtType::kAll);
-    }
-    std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no) {
-        return GetFollows(true, stmt_no, StmtType::kAll);
+        return GetFollows(stmt_no, StmtType::kAll);
     }
 
-    /**
-     * Gets a list of stmt# that appear before the given stmt#
-     * at the same nesting level
-     */
-    virtual std::set<int> GetFollows(bool transitive,
-                                     Index<ArgPos::kSecond> stmt_no,
-                                     StmtType return_type) = 0;
     virtual std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no,
                                      StmtType return_type) = 0;
     virtual std::set<int> GetFollowsT(Index<ArgPos::kSecond> stmt_no,
                                       StmtType return_type) = 0;
-    std::set<int> GetFollows(bool transitive, Index<ArgPos::kSecond> stmt_no) {
-        return GetFollows(transitive, stmt_no, StmtType::kAll);
-    }
-    std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no) {
-        return GetFollows(false, stmt_no, StmtType::kAll);
-    }
-    std::set<int> GetFollowsT(Index<ArgPos::kSecond> stmt_no) {
-        return GetFollows(true, stmt_no, StmtType::kAll);
-    }
 
-    /**
-     * Gets a list of stmt# pairs that exist in Follows relationship
-     */
-    virtual PairVec<int> GetFollowsPairs(bool transitive, StmtType first_type,
-                                         StmtType second_type) = 0;
     virtual PairVec<int> GetFollowsPairs(StmtType first_type,
                                          StmtType second_type) = 0;
     virtual PairVec<int> GetFollowsPairsT(StmtType first_type,

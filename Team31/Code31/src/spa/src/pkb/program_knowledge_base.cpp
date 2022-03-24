@@ -83,12 +83,6 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
     uses_rel_.Set(stmt_no.value, std::move(var_indices));
 }
 
-bool ProgramKnowledgeBase::ExistFollows(bool transitive,
-                                        Index<ArgPos::kFirst> first_stmt,
-                                        Index<ArgPos::kSecond> second_stmt) {
-    return transitive ? ExistFollowsT(first_stmt, second_stmt)
-                      : ExistFollows(first_stmt, second_stmt);
-}
 bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt,
                                         Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
@@ -117,12 +111,6 @@ std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
     assert(compiled);
     return follows_parent_rel_.GetFollows(return_pos, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetFollows(bool transitive,
-                                               Index<ArgPos::kFirst> first_stmt,
-                                               StmtType return_type) {
-    return transitive ? GetFollowsT(first_stmt, return_type)
-                      : GetFollows(first_stmt, return_type);
-}
 std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kFirst> stmt_no,
                                                StmtType return_type) {
     assert(compiled);
@@ -134,12 +122,6 @@ std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kFirst> stmt_no,
     return follows_parent_rel_.GetFollowsT(stmt_no, return_type);
 }
 
-std::set<int> ProgramKnowledgeBase::GetFollows(
-        bool transitive, Index<ArgPos::kSecond> second_stmt,
-        StmtType return_type) {
-    return transitive ? GetFollowsT(second_stmt, return_type)
-                      : GetFollows(second_stmt, return_type);
-}
 std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kSecond> stmt_no,
                                                StmtType return_type) {
     assert(compiled);
@@ -151,12 +133,6 @@ std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kSecond> stmt_no,
     return follows_parent_rel_.GetFollowsT(stmt_no, return_type);
 }
 
-PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(bool transitive,
-                                                   StmtType first_type,
-                                                   StmtType second_type) {
-    return transitive ? GetFollowsPairsT(first_type, second_type)
-                      : GetFollowsPairs(first_type, second_type);
-}
 PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(StmtType first_type,
                                                    StmtType second_type) {
     assert(compiled);

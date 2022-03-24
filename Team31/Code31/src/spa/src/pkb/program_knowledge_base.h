@@ -55,8 +55,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void SetRel(Index<SetEntityType::kStmt> stmt_no,
                 std::vector<int> var_index) override;
 
-    bool ExistFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
-                      Index<ArgPos::kSecond> second_stmt) override;
     bool ExistFollows(Index<ArgPos::kFirst> first_stmt,
                       Index<ArgPos::kSecond> second_stmt) override;
     bool ExistFollowsT(Index<ArgPos::kFirst> first_stmt,
@@ -75,22 +73,15 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::set<int> GetFollows(ArgPos return_pos, StmtType return_type) override;
 
-    std::set<int> GetFollows(bool transitive, Index<ArgPos::kFirst> first_stmt,
-                             StmtType return_type) override;
     std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no,
                              StmtType return_type) override;
     std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
                               StmtType return_type) override;
 
-    std::set<int> GetFollows(bool transitive,
-                             Index<ArgPos::kSecond> second_stmt,
-                             StmtType return_type) override;
     std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no,
                              StmtType return_type) override;
     std::set<int> GetFollowsT(Index<ArgPos::kSecond> stmt_no,
                               StmtType return_type) override;
-    PairVec<int> GetFollowsPairs(bool transitive, StmtType first_type,
-                                 StmtType second_type) override;
     PairVec<int> GetFollowsPairs(StmtType first_type,
                                  StmtType second_type) override;
     PairVec<int> GetFollowsPairsT(StmtType first_type,
