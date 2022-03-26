@@ -137,6 +137,10 @@ struct QueryToken {
     QueryToken(const QueryTokenType &type, std::string string) noexcept
             : type(type), value(std::move(string)){};
     QueryToken(const QueryToken &other) noexcept = default;
+    bool operator==(const QueryToken &other) const noexcept {
+        if (type != other.type) return false;
+        return type < QueryTokenType::kWord || value == other.value;
+    }
 };
 }  // namespace spa
 
