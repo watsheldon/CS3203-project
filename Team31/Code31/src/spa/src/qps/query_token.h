@@ -1,7 +1,14 @@
 #ifndef SRC_SPA_SRC_QPS_TOKEN_H_
 #define SRC_SPA_SRC_QPS_TOKEN_H_
-#include <string>
 
+#include <array>
+#include <string>
+#include <string_view>
+#include <utility>
+
+namespace {
+using namespace std::literals::string_view_literals;
+}
 namespace spa {
 enum class QueryTokenType {
     // Design entities
@@ -31,105 +38,71 @@ enum class QueryTokenType {
     kAttrProc,
     kAttrVar,
     kAttrValue,
-    kAttrStmtNum,
     kSemicolon,       // ;
     kComma,           // ,
     kUnderscore,      // _
     kQuote,           // "
     kOperatorPlus,    // +
-    kOperatorMinus,   // ,
+    kOperatorMinus,   // -
     kOperatorTimes,   // *
     kOperatorDivide,  // /
     kOperatorModulo,  // %
     kBracketL,        // (
     kBracketR,        // )
+    kAngleBracketL,   // <
+    kAngleBracketR,   // >
+    kDot,             // .
+    kHashtag,         // #
     kWord,
     kInteger,
 };
-
-inline std::string_view Keyword(QueryTokenType token_type) {
-    switch (token_type) {
-        case QueryTokenType::kDeclStmt:
-            return "stmt";
-        case QueryTokenType::kDeclRead:
-            return "read";
-        case QueryTokenType::kDeclPrint:
-            return "print";
-        case QueryTokenType::kDeclCall:
-            return "call";
-        case QueryTokenType::kDeclWhile:
-            return "while";
-        case QueryTokenType::kDeclIf:
-            return "if";
-        case QueryTokenType::kDeclAssign:
-            return "assign";
-        case QueryTokenType::kDeclVariable:
-            return "variable";
-        case QueryTokenType::kDeclConstant:
-            return "constant";
-        case QueryTokenType::kDeclProcedure:
-            return "procedure";
-        case QueryTokenType::kKeywordSelect:
-            return "Select";
-        case QueryTokenType::kKeywordSuch:
-            return "such";
-        case QueryTokenType::kKeywordThat:
-            return "that";
-        case QueryTokenType::kKeywordWith:
-            return "with";
-        case QueryTokenType::kKeywordAnd:
-            return "and";
-        case QueryTokenType::kKeywordPattern:
-            return "pattern";
-        case QueryTokenType::kKeywordFollows:
-            return "Follows";
-        case QueryTokenType::kKeywordParent:
-            return "Parent";
-        case QueryTokenType::kKeywordUses:
-            return "Uses";
-        case QueryTokenType::kKeywordModifies:
-            return "Modifies";
-        case QueryTokenType::kKeywordCalls:
-            return "Calls";
-        case QueryTokenType::kKeywordNext:
-            return "Next";
-        case QueryTokenType::kKeywordAffects:
-            return "Affects";
-        case QueryTokenType::kAttrProc:
-            return ".procName";
-        case QueryTokenType::kAttrVar:
-            return ".varName";
-        case QueryTokenType::kAttrValue:
-            return ".value";
-        case QueryTokenType::kAttrStmtNum:
-            return ".stmt#";
-        case QueryTokenType::kSemicolon:
-            return ";";
-        case QueryTokenType::kComma:
-            return ",";
-        case QueryTokenType::kUnderscore:
-            return "_";
-        case QueryTokenType::kQuote:
-            return "\"";
-        case QueryTokenType::kOperatorPlus:
-            return "+";
-        case QueryTokenType::kOperatorMinus:
-            return "-";
-        case QueryTokenType::kOperatorTimes:
-            return "*";
-        case QueryTokenType::kOperatorDivide:
-            return "/";
-        case QueryTokenType::kOperatorModulo:
-            return "%";
-        case QueryTokenType::kBracketL:
-            return "(";
-        case QueryTokenType::kBracketR:
-            return ")";
-        case QueryTokenType::kWord:
-        case QueryTokenType::kInteger:
-            return "";
-    }
-};
+static constexpr const std::array<std::string_view, 43> kQueryTypeStringMap{
+        {"stmt"sv,
+         "read"sv,
+         "print"sv,
+         "call"sv,
+         "while"sv,
+         "if"sv,
+         "assign"sv,
+         "variable"sv,
+         "constant"sv,
+         "procedure"sv,
+         "Select"sv,
+         "such"sv,
+         "that"sv,
+         "pattern"sv,
+         "with"sv,
+         "and"sv,
+         "Follows"sv,
+         "Parent"sv,
+         "Uses"sv,
+         "Modifies"sv,
+         "Calls"sv,
+         "Next"sv,
+         "Affects"sv,
+         "procName"sv,
+         "varName"sv,
+         "value"sv,
+         ";"sv,
+         ","sv,
+         "_"sv,
+         R"(")"sv,
+         "+"sv,
+         "-"sv,
+         "*"sv,
+         "/"sv,
+         "%"sv,
+         "("sv,
+         ")"sv,
+         "<"sv,
+         ">"sv,
+         "."sv,
+         "#"sv,
+         {},
+         {}}};
+constexpr std::string_view GetQueryKeyword(QueryTokenType token_type) noexcept {
+    return kQueryTypeStringMap[static_cast<int>(token_type)];
+}
 struct QueryToken {
     const QueryTokenType type;
     const std::string value;

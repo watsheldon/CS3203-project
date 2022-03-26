@@ -29,7 +29,6 @@ class PQLValidator {
             QueryTokenType::kOperatorPlus, QueryTokenType::kOperatorMinus,
             QueryTokenType::kOperatorTimes, QueryTokenType::kOperatorDivide,
             QueryTokenType::kOperatorModulo};
-
     PQLTokenizer tokenizer_;
     std::vector<QueryToken> tokens_;
     std::string curr_token_;
@@ -37,6 +36,9 @@ class PQLValidator {
     bool Query();
     bool Declaration();
     bool Select();
+    bool Tuple();
+    bool Elem();
+    bool MultipleElem();
     bool SuchThat();
     bool Pattern();
     bool With();
@@ -53,7 +55,7 @@ class PQLValidator {
     bool ArithmeticExpr(bool has_left = false);
     bool Group();
 
-    bool FollowsParent();
+    bool StmtStmt();
     bool UsesModifies();
     bool Calls();
     bool IsConstant();
