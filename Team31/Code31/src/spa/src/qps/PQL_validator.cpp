@@ -23,7 +23,7 @@ void PQLValidator::FetchToken() { tokenizer_ >> curr_token_; }
 bool PQLValidator::Accept(QueryTokenType type) {
     if (curr_token_.empty()) return false;
     if (type < QueryTokenType::kWord) {
-        auto target = Keyword(type);
+        auto target = GetQueryKeyword(type);
         if (curr_token_ != target) return false;
         tokens_.emplace_back(type);
         FetchToken();
@@ -64,7 +64,7 @@ bool PQLValidator::MultipleSynonym() {
 }
 bool PQLValidator::Select() {
     if (!Accept(QueryTokenType::kKeywordSelect)) return false;
-    if (!Accept(QueryTokenType::kWord)) return false;
+    if (!Tuple()) return false;
     bool valid = true;
     while (valid) {
         if (Accept(QueryTokenType::kKeywordSuch)) {
@@ -77,12 +77,35 @@ bool PQLValidator::Select() {
     }
     return valid && curr_token_.empty();
 }
+bool PQLValidator::Tuple() {
+    return Accept(QueryTokenType::kAngleBracketL) ? MultipleElem() : Elem();
+}
+bool PQLValidator::MultipleElem() {
+    bool valid;
+    do {
+        valid = Elem();
+    } while (valid && Accept(QueryTokenType::kComma));
+    return valid && Accept(QueryTokenType::kAngleBracketR);
+}
+bool PQLValidator::Elem() {
+    if (!Accept(QueryTokenType::kWord)) return false;
+    return !Accept(QueryTokenType::kDot) || AttrName();
+}
+bool PQLValidator::AttrName() {
+    if (Accept(QueryTokenType::kDeclStmt))
+        return Accept(QueryTokenType::kHashtag);
+    return Accept(QueryTokenType::kAttrProc) ||
+           Accept(QueryTokenType::kAttrValue) ||
+           Accept(QueryTokenType::kAttrVar);
+}
 bool PQLValidator::SuchThat() {
     if (!Accept(QueryTokenType::kKeywordThat)) return false;
     if (Accept(QueryTokenType::kKeywordFollows) ||
-        Accept(QueryTokenType::kKeywordParent)) {
+        Accept(QueryTokenType::kKeywordParent) ||
+        Accept(QueryTokenType::kKeywordNext) ||
+        Accept(QueryTokenType::kKeywordAffects)) {
         Accept(QueryTokenType::kOperatorTimes);
-        return FollowsParent();
+        return StmtStmt();
     }
     if (Accept(QueryTokenType::kKeywordUses) ||
         Accept(QueryTokenType::kKeywordModifies)) {
@@ -94,7 +117,7 @@ bool PQLValidator::SuchThat() {
     }
     return false;
 }
-bool PQLValidator::FollowsParent() {
+bool PQLValidator::StmtStmt() {
     return Accept(QueryTokenType::kBracketL) && StmtRef() &&
            Accept(QueryTokenType::kComma) && StmtRef() &&
            Accept(QueryTokenType::kBracketR);

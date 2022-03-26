@@ -39,6 +39,7 @@ class PQLValidator {
     bool Tuple();
     bool Elem();
     bool MultipleElem();
+    bool AttrName();
     bool SuchThat();
     bool Pattern();
     bool With();
