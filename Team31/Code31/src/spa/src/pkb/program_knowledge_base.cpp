@@ -364,7 +364,7 @@ bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name,
     assert(compiled);
     int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
     int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
-    assert(proc_index != 0 && var_index != 0);
+    if (proc_index == 0 || var_index == 0) return false;
     auto uses_vars = uses_rel_.GetVarAccessByProc(proc_index);
     return uses_vars.find(var_index) != uses_vars.end();
 }
