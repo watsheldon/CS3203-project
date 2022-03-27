@@ -329,28 +329,28 @@ PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
 bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name,
                                          std::string_view var_name) {
     assert(compiled);
-    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
-    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     assert(proc_index != 0 && var_index != 0);
-    auto modified_vars = modifies_rel_.GetAllVarProc(proc_index);
-    return modified_vars.find(var_index.value) != modified_vars.end();
+    auto modified_vars = modifies_rel_.GetVarAccessByProc(proc_index);
+    return modified_vars.find(var_index) != modified_vars.end();
 }
 bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name) {
     assert(compiled);
-    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
-    auto modified_vars = modifies_rel_.GetAllVarProc(proc_index);
+    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    auto modified_vars = modifies_rel_.GetVarAccessByProc(proc_index);
     return !modified_vars.empty();
 }
 std::set<int> ProgramKnowledgeBase::GetModifies(
         Name<ArgPos::kFirst> proc_name) {
     assert(compiled);
-    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
-    return modifies_rel_.GetAllVarProc(proc_index);
+    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    return modifies_rel_.GetVarAccessByProc(proc_index);
 }
 std::set<int> ProgramKnowledgeBase::GetModifies(
         Name<ArgPos::kSecond> var_name) {
     assert(compiled);
-    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     return modifies_rel_.GetAllProc(var_index);
 }
 std::set<int> ProgramKnowledgeBase::GetModifiesProc() {
@@ -362,32 +362,34 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesProcVar() {
 bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name,
                                      std::string_view var_name) {
     assert(compiled);
-    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
-    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     assert(proc_index != 0 && var_index != 0);
-    auto uses_vars = uses_rel_.GetAllVarProc(proc_index);
+    auto uses_vars = uses_rel_.GetVarAccessByProc(proc_index);
     return uses_vars.find(var_index) != uses_vars.end();
 }
 bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name) {
     assert(compiled);
-    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
-    auto uses_vars = uses_rel_.GetAllVarProc(proc_index);
+    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    auto uses_vars = uses_rel_.GetVarAccessByProc(proc_index);
     return !uses_vars.empty();
 }
 std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kFirst> proc_name) {
     assert(compiled);
-    auto proc_index = IdentToIndex<QueryEntityType::kProc>(proc_name);
-    return uses_rel_.GetAllVarProc(proc_index);
+    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    return uses_rel_.GetVarAccessByProc(proc_index);
 }
 std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kSecond> var_name) {
     assert(compiled);
-    auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     return uses_rel_.GetAllProc(var_index);
 }
 std::set<int> ProgramKnowledgeBase::GetUsesProc() {
+    assert(compiled);
     return uses_rel_.GetAllProc();
 }
 PairVec<int> ProgramKnowledgeBase::GetUsesProcVar() {
+    assert(compiled);
     return modifies_rel_.GetProcVar();
 }
 

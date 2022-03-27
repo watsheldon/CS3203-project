@@ -1,17 +1,18 @@
 #include "uses_modifies_store_base.h"
 
 #include <cassert>
+#include <numeric>
 
 namespace spa {
 UsesModifiesStoreBase::UsesModifiesStoreBase(std::size_t stmt_size,
                                              std::size_t var_size,
                                              std::size_t proc_size)
-        : num_stmts(stmt_size),
-          num_vars(var_size),
-          num_procs(proc_size),
-          stmt_var_(num_stmts, num_vars),
-          complete_stmt_var_(num_stmts, num_vars),
-          proc_vars_(num_procs, num_vars) {}
+        : num_stmts_(stmt_size),
+          num_vars_(var_size),
+          num_procs_(proc_size),
+          stmt_var_(num_stmts_, num_vars_),
+          complete_stmt_var_(num_stmts_, num_vars_),
+          proc_vars_(num_procs_, num_vars_) {}
 
 const std::vector<int>& UsesModifiesStoreBase::GetStmtNo(int var_index) const {
     return stmt_var_.GetKeys(var_index);
@@ -19,7 +20,7 @@ const std::vector<int>& UsesModifiesStoreBase::GetStmtNo(int var_index) const {
 const std::set<int>& UsesModifiesStoreBase::GetAllVar(int stmt_no) const {
     return stmt_no == 0 ? all_vars_ : complete_stmt_var_.GetVals(stmt_no);
 }
-const std::set<int>& UsesModifiesStoreBase::GetAllVarProc(
+const std::set<int>& UsesModifiesStoreBase::GetVarAccessByProc(
         int proc_index) const {
     return proc_vars_.GetVals(proc_index);
 }
@@ -36,14 +37,14 @@ PairVec<int> UsesModifiesStoreBase::GetStmtVar(StmtType stmt_type) const {
     if (stmt_type == StmtType::kAll) {
         return GetAllRel();
     }
-    return stmt_var_pairs_[ConvertStmtType(stmt_type)];
+    return stmt_var_pairs_[StmtTypeToIndex(stmt_type)];
 }
 PairVec<int> UsesModifiesStoreBase::GetProcVar() const {
     return proc_var_pair_;
 }
 PairVec<int> UsesModifiesStoreBase::GetAllRel() const {
     auto [stmts, vars] = PairVec<int>();
-    stmts.reserve(num_rels), vars.reserve(num_rels);
+    stmts.reserve(num_rels_), vars.reserve(num_rels_);
 
     for (const auto& stmt_var_pair : stmt_var_pairs_) {
         stmts.insert(stmts.end(), stmt_var_pair.first.begin(),
@@ -77,8 +78,8 @@ void UsesModifiesStoreBase::AddCallStmtVar(
         int proc_index = calls_rel_store.GetProc(stmt_no);
         auto& var_indices = proc_vars_.GetVals(proc_index);
         auto proc_indices = calls_rel_store.GetCalleeProcsT(proc_index);
-        for (auto proc_index : proc_indices) {
-            auto& indirect_var_indices = proc_vars_.GetVals(proc_index);
+        for (auto index : proc_indices) {
+            auto& indirect_var_indices = proc_vars_.GetVals(index);
             vars.insert(vars.end(), indirect_var_indices.begin(),
                         indirect_var_indices.end());
             stmts.resize(vars.size(), stmt_no);
@@ -98,7 +99,7 @@ void UsesModifiesStoreBase::AddDirectRel(
 }
 void UsesModifiesStoreBase::AddIndirectRel(const PairVec<int>& basic_pairs,
                                            const ContainerInfo& info,
-                                           ContainerBitmap& bitmaps) {
+                                           ContainerAddedTrackers& bitmaps) {
     const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
     auto& [if_added, while_added, proc_added] = bitmaps;
     auto& [basic_stmts, basic_vars] = basic_pairs;
@@ -106,7 +107,7 @@ void UsesModifiesStoreBase::AddIndirectRel(const PairVec<int>& basic_pairs,
         auto s = basic_stmts[i], v = basic_vars[i];
         int stmtlst = stmtlst_stmt.GetStmtlst(s);
         auto ancestors = forest.GetAncestryTrace(stmtlst);
-        auto& [type, proc_index] = stmtlst_parent.GetParent(ancestors.back());
+        int proc_index = stmtlst_parent.GetParent(ancestors.back()).index;
         ProcessProcedureAncestor(proc_index, v, proc_added);
         ancestors.pop_back();
         for (auto j : ancestors) {
@@ -114,9 +115,9 @@ void UsesModifiesStoreBase::AddIndirectRel(const PairVec<int>& basic_pairs,
             auto added =
                     type == StmtlstParentStore::kIf ? if_added : while_added;
             auto& if_var_pairs_ =
-                    stmt_var_pairs_[ConvertStmtType(StmtType::kIf)];
+                    stmt_var_pairs_[StmtTypeToIndex(StmtType::kIf)];
             auto& while_var_pairs_ =
-                    stmt_var_pairs_[ConvertStmtType(StmtType::kWhile)];
+                    stmt_var_pairs_[StmtTypeToIndex(StmtType::kWhile)];
             auto& [stmts, vars] = type == StmtlstParentStore::kIf
                                           ? if_var_pairs_
                                           : while_var_pairs_;
@@ -131,18 +132,18 @@ void UsesModifiesStoreBase::AddAllContainerRel(
         const TypeStatementsStore& type_statement_store,
         const ContainerInfo& info,
         const CallsRelationshipStore& calls_rel_store) {
-    BitVec2D if_added(num_stmts + 1, num_vars + 1);
-    BitVec2D while_added(num_stmts + 1, num_vars + 1);
-    BitVec2D proc_added(num_procs + 1, num_vars + 1);
-    ContainerBitmap bitmaps = {if_added, while_added, proc_added};
+    BitVec2D if_added(num_stmts_ + 1, num_vars_ + 1);
+    BitVec2D while_added(num_stmts_ + 1, num_vars_ + 1);
+    BitVec2D proc_added(num_procs_ + 1, num_vars_ + 1);
+    ContainerAddedTrackers bitmaps = {if_added, while_added, proc_added};
     const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
-
-    AddConditionRel(type_statement_store, info, bitmaps);
-    AddAllIndirectRel(type_statement_store, info, bitmaps);
-    AddCallStmtVar(stmt_var_pairs_[ConvertStmtType(StmtType::kCall)],
+    AuxiliaryData data_store{type_statement_store, info, bitmaps};
+    AddConditionRel(data_store);
+    AddAllIndirectRel(data_store);
+    AddCallStmtVar(stmt_var_pairs_[StmtTypeToIndex(StmtType::kCall)],
                    type_statement_store.GetStatements(StmtType::kCall),
                    calls_rel_store);
-    AddIndirectRel(stmt_var_pairs_[ConvertStmtType(StmtType::kCall)], info,
+    AddIndirectRel(stmt_var_pairs_[StmtTypeToIndex(StmtType::kCall)], info,
                    bitmaps);
 }
 void UsesModifiesStoreBase::FillStmts() {
@@ -155,17 +156,17 @@ void UsesModifiesStoreBase::FillStmts() {
     }
 }
 void UsesModifiesStoreBase::FillVars() {
-    for (int i = 1; i <= num_stmts; ++i) {
+    for (int i = 1; i <= num_stmts_; ++i) {
         auto vars = stmt_var_.GetVals(i);
         all_vars_.insert(vars.begin(), vars.end());
     }
 }
 void UsesModifiesStoreBase::FillRels() {
-    for (int i = 1; i < num_stmts + 1; ++i) {
+    for (int i = 1; i < num_stmts_ + 1; ++i) {
         complete_stmt_var_.Set(i, stmt_var_.GetVals(i));
     }
-    for (const auto stmt_type : KIndirect_stmt_types_) {
-        auto& relationships = stmt_var_pairs_[ConvertStmtType(stmt_type)];
+    for (const auto stmt_type : kIndirectStmtTypes) {
+        auto& relationships = stmt_var_pairs_[StmtTypeToIndex(stmt_type)];
         auto& [stmts, vars] = relationships;
         for (int i = 0; i < stmts.size(); ++i) {
             complete_stmt_var_.Set(stmts[i], vars[i]);
@@ -173,17 +174,25 @@ void UsesModifiesStoreBase::FillRels() {
     }
 }
 void UsesModifiesStoreBase::FillProcs() {
-    for (int i = 1; i <= num_procs; ++i) {
+    for (int i = 1; i <= num_procs_; ++i) {
         if (!proc_vars_.GetVals(i).empty()) {
             all_procs_.emplace(i);
         }
     }
 }
 void UsesModifiesStoreBase::CalculateNumRels() {
-    std::size_t total_size = 0;
-    for (const auto& stmt_var_pair : stmt_var_pairs_) {
-        total_size += stmt_var_pair.first.size();
-    }
-    num_rels = total_size;
+    num_rels_ = std::transform_reduce(
+            stmt_var_pairs_.begin(), stmt_var_pairs_.end(), 0, std::plus<>(),
+            [](PairVec<int>& pair) { return pair.first.size(); });
+}
+void UsesModifiesStoreBase::ProcessProcedureAncestor(int proc_index,
+                                                     int var_index,
+                                                     BitVec2D& proc_added) {
+    if (proc_added.At(proc_index, var_index)) return;
+    proc_added.Set(proc_index, var_index);
+    proc_vars_.Set(proc_index, var_index);
+    auto& [procs, vars] = proc_var_pair_;
+    vars.emplace_back(var_index);
+    procs.emplace_back(proc_index);
 }
 }  // namespace spa

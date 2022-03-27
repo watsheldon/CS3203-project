@@ -24,20 +24,13 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
     [[nodiscard]] const std::vector<int>& GetVarIndex(int stmt_no) const;
 
   private:
-    void AddConditionRel(const TypeStatementsStore& type_statement_store,
-                         const ContainerInfo& info,
-                         ContainerBitmap& bitmaps) override;
+    void AddConditionRel(const AuxiliaryData& data_store) override;
     void AddAllDirectRel(const TypeStatementsStore& store) override;
-    void AddAllIndirectRel(const TypeStatementsStore& type_statement_store,
-                           const ContainerInfo& info,
-                           ContainerBitmap& bitmaps) override;
-    void AddConditionDirectUses(int stmt_no,
-                                const std::vector<int>& var_indices,
-                                PairVec<int>& stmt_var_pairs, BitVec2D& bitmap);
-    void AddConditionIndirectUses(
-            int stmt_no, const std::vector<int>& var_indices,
-            std::array<Ref<PairVec<int>>, 2>& container_var_pairs,
-            const ContainerInfo& info, ContainerBitmap& bitmaps);
+    void AddAllIndirectRel(const AuxiliaryData& data_store) override;
+    void AddConditionDirectUses(int stmt_no, PairVec<int>& stmt_var_pairs,
+                                BitVec2D& bitmap) const;
+    void AddConditionIndirectUses(int stmt_no, const ContainerInfo& info,
+                                  ContainerAddedTrackers& bitmaps);
 
     static constexpr std::array<StmtType, 2> relevant_stmt_types_{
             {StmtType::kAssign, StmtType::kPrint}};

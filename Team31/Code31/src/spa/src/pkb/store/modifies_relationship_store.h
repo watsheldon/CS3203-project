@@ -18,16 +18,11 @@ class ModifiesRelationshipStore : public UsesModifiesStoreBase {
   public:
     using UsesModifiesStoreBase::UsesModifiesStoreBase;
     void Set(int stmt_no, int var_index);
-    [[nodiscard]] int GetVarIndex(int stmt_no) const;
 
   private:
-    void AddConditionRel(const TypeStatementsStore& type_statement_store,
-                         const ContainerInfo& info,
-                         ContainerBitmap& bitmaps) override;
-    void AddAllDirectRel(const TypeStatementsStore& store) override;
-    void AddAllIndirectRel(const TypeStatementsStore& type_statement_store,
-                           const ContainerInfo& info,
-                           ContainerBitmap& bitmaps) override;
+    void AddConditionRel(const AuxiliaryData &data_store) override;
+    void AddAllDirectRel(const TypeStatementsStore &store) override;
+    void AddAllIndirectRel(const AuxiliaryData &data_store) override;
 
     static constexpr std::array<StmtType, 2> direct_stmt_types_{
             {StmtType::kAssign, StmtType::kRead}};

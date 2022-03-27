@@ -11,7 +11,6 @@ TEST_CASE("pkb/store/ModifiesRelationshipStore") {
     SECTION("GetStmtNo") {
         REQUIRE(mrs.GetStmtNo(4) == std::vector<int>{2, 3});
     }
-    SECTION("GetVarIndex") { REQUIRE(mrs.GetVarIndex(1) == 1); }
 }
 
 }  // namespace spa
