@@ -71,9 +71,9 @@ constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
         case Mode::kFollows:
             return type > Synonym::kStmtAssign;
         case Mode::kUses:
-            return type > Synonym::kStmtAssign || type == Synonym::kStmtRead;
+            return type > Synonym::kProc || type == Synonym::kStmtRead;
         case Mode::kModifies:
-            return type > Synonym::kStmtAssign || type == Synonym::kStmtPrint;
+            return type > Synonym::kProc || type == Synonym::kStmtPrint;
         case Mode::kPattern:
             return type != Synonym::kVar;
         case Mode::kCalls:

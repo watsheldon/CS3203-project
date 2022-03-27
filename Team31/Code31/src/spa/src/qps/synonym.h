@@ -14,9 +14,9 @@ struct Synonym {
         kStmtWhile,
         kStmtIf,
         kStmtAssign,
+        kProc,
         kVar,
         kConst,
-        kProc,
         kNone
     } type;
     explicit Synonym(Type t) noexcept : type(t) { assert(t != kNone); }
