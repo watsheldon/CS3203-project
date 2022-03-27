@@ -8,6 +8,9 @@
 
 #include "common/map.h"
 
+namespace {
+using namespace std::literals::string_view_literals;
+}  // namespace
 namespace spa {
 enum class SourceTokenType {
     kKeywordProcedure = 1,
@@ -41,7 +44,6 @@ enum class SourceTokenType {
     kName,
     kInteger,
 };
-using namespace std::literals::string_view_literals;
 static constexpr const std::array<std::string_view, 30> kTypeStringMap{
         {"procedure"sv, "read"sv, "print"sv, "call"sv, "while"sv, "if"sv,
          "then"sv,      "else"sv, "("sv,     ")"sv,    "{"sv,     "}"sv,
