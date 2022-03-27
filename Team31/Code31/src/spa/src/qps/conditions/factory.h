@@ -126,7 +126,7 @@ class Factory {
             case UsesModifiesBase::Type::kProcVar:
                 return std::make_unique<T>(first_ident_, second_ident_);
             case UsesModifiesBase::Type::kProcWild:
-                return std::make_unique<T>(second_ident_);
+                return std::make_unique<T>(first_ident_);
         }
     }
     template <typename T>
