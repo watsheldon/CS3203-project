@@ -64,8 +64,8 @@ class Factory {
     ConditionClause::SecondParamType second_param_type_;
     int first_int_;
     int second_int_;
-    std::string first_ident_;
-    std::string second_ident_;
+    std::string_view first_ident_;
+    std::string_view second_ident_;
     Synonym* assign_;
     Synonym* first_syn_;
     Synonym* second_syn_;
@@ -160,20 +160,25 @@ class Factory {
             case CallsBase::Type::kSynSyn:
                 return std::make_unique<T>(first_syn_, second_syn_);
             case CallsBase::Type::kSynWild:
-                return std::make_unique<T>(ArgPos::kFirst, first_syn_);
-            case CallsBase::Type::kSynIdent:
+                return std::make_unique<T>(first_syn_,
+                                           ConditionClause::Wildcard{});
+            case CallsBase::Type::kSynProc:
                 return std::make_unique<T>(first_syn_, second_ident_);
             case CallsBase::Type::kWildSyn:
-                return std::make_unique<T>(ArgPos::kSecond, second_syn_);
+                return std::make_unique<T>(ConditionClause::Wildcard{},
+                                           second_syn_);
             case CallsBase::Type::kWildWild:
-                return std::make_unique<T>();
-            case CallsBase::Type::kWildIdent:
-                return std::make_unique<T>(ArgPos::kSecond, second_ident_);
-            case CallsBase::Type::kIdentSyn:
+                return std::make_unique<T>(ConditionClause::Wildcard{},
+                                           ConditionClause::Wildcard{});
+            case CallsBase::Type::kWildProc:
+                return std::make_unique<T>(ConditionClause::Wildcard{},
+                                           second_ident_);
+            case CallsBase::Type::kProcSyn:
                 return std::make_unique<T>(first_ident_, second_syn_);
-            case CallsBase::Type::kIdentWild:
-                return std::make_unique<T>(ArgPos::kFirst, first_ident_);
-            case CallsBase::Type::kIdentIdent:
+            case CallsBase::Type::kProcWild:
+                return std::make_unique<T>(first_ident_,
+                                           ConditionClause::Wildcard{});
+            case CallsBase::Type::kProcProc:
                 return std::make_unique<T>(first_ident_, second_ident_);
         }
     }
