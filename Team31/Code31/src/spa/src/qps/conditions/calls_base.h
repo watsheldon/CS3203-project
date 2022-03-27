@@ -2,7 +2,8 @@
 #define SRC_SPA_SRC_QPS_CONDITIONS_CALLBASE_H_
 
 #include <array>
-#include <string>
+#include <string_view>
+#include <variant>
 
 #include "common/aliases.h"
 #include "condition_clause.h"
@@ -13,25 +14,18 @@
 namespace spa {
 class CallsBase : public ConditionClause {
   public:
+    using Param = std::variant<Wildcard, Synonym *, ProcName>;
     enum Type {
         kSynSyn,
         kSynWild,
-        kSynIdent,
+        kSynProc,
         kWildSyn,
         kWildWild,
-        kWildIdent,
-        kIdentSyn,
-        kIdentWild,
-        kIdentIdent
+        kWildProc,
+        kProcSyn,
+        kProcWild,
+        kProcProc
     };
-
-    CallsBase(Synonym *first, Synonym *second) noexcept;
-    CallsBase(ArgPos pos, Synonym *syn) noexcept;
-    CallsBase(Synonym *first, std::string second) noexcept;
-    CallsBase(std::string first, Synonym *second) noexcept;
-    CallsBase(ArgPos pos, std::string ident) noexcept;
-    CallsBase(std::string first, std::string second) noexcept;
-    CallsBase();
     static constexpr Type GetType(FirstParamType first,
                                   SecondParamType second) noexcept {
         int first_index = static_cast<int>(first) - 1;
@@ -40,17 +34,33 @@ class CallsBase : public ConditionClause {
                                    : static_cast<int>(second) - 1;
         return kTypeMatrix[first_index][second_index];
     }
+    CallsBase(Synonym *first, Synonym *second) noexcept;
+    CallsBase(Synonym *syn, Wildcard) noexcept;
+    CallsBase(Synonym *first, ProcName second) noexcept;
+    CallsBase(Wildcard, Synonym *syn) noexcept;
+    CallsBase(Wildcard, Wildcard) noexcept;
+    CallsBase(Wildcard, ProcName second) noexcept;
+    CallsBase(ProcName first, Synonym *second) noexcept;
+    CallsBase(ProcName first, Wildcard) noexcept;
+    CallsBase(ProcName first, ProcName second) noexcept;
+    ResultTable Execute(KnowledgeBase *pkb) const noexcept final;
 
   protected:
     Type type_;
-    Synonym *first_syn_ = nullptr;
-    std::string first_ident_;
-    Synonym *second_syn_ = nullptr;
-    std::string second_ident_;
+    Param first_param_;
+    Param second_param_;
     static constexpr Array2D<Type, 3, 3> kTypeMatrix{
-            {{Type::kSynSyn, Type::kSynWild, Type::kSynIdent},
-             {Type::kWildSyn, Type::kWildWild, Type::kWildIdent},
-             {Type::kIdentSyn, Type::kIdentWild, Type::kIdentIdent}}};
+            {{Type::kSynSyn, Type::kSynWild, Type::kSynProc},
+             {Type::kWildSyn, Type::kWildWild, Type::kWildProc},
+             {Type::kProcSyn, Type::kProcWild, Type::kProcProc}}};
+    virtual ResultTable SynSyn(KnowledgeBase *pkb, Synonym *first,
+                               Synonym *second) const noexcept = 0;
+    virtual ResultTable SynProc(KnowledgeBase *pkb, Synonym *first,
+                                ProcName second) const noexcept = 0;
+    virtual ResultTable ProcSyn(KnowledgeBase *pkb, ProcName first,
+                                Synonym *second) const noexcept = 0;
+    virtual ResultTable ProcProc(KnowledgeBase *pkb, ProcName first,
+                                 ProcName second) const noexcept = 0;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_CALLBASE_H_

@@ -15,8 +15,6 @@
 namespace spa {
 class UsesModifiesBase : public ConditionClause {
   public:
-    using ProcName = IdentView;
-    using VarName = IdentView;
     using FirstParam = std::variant<StmtNo, Synonym *, ProcName>;
     using SecondParam = std::variant<Wildcard, Synonym *, VarName>;
     enum Type {

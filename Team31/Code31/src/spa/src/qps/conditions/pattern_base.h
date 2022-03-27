@@ -13,7 +13,6 @@ namespace spa {
 class PatternBase : public ConditionClause {
   public:
     using Expression = std::vector<QueryToken>;
-    using VarName = IdentView;
     using FirstParam = std::variant<Wildcard, VarName, Synonym *>;
     using SecondParam = std::variant<Wildcard, Expression>;
     enum Type { kVarExpr, kVarWild, kSynExpr, kSynWild, kWildExpr, kWildWild };

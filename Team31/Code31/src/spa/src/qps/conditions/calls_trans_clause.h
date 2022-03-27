@@ -7,8 +7,18 @@
 
 namespace spa {
 class CallsTransClause : public CallsBase {
+  public:
     using CallsBase::CallsBase;
-    ResultTable Execute(KnowledgeBase *knowledge_base) const noexcept final;
+
+  protected:
+    ResultTable SynSyn(KnowledgeBase *pkb, Synonym *first,
+                       Synonym *second) const noexcept final;
+    ResultTable SynProc(KnowledgeBase *pkb, Synonym *first,
+                        ProcName second) const noexcept final;
+    ResultTable ProcSyn(KnowledgeBase *pkb, ProcName first,
+                        Synonym *second) const noexcept final;
+    ResultTable ProcProc(KnowledgeBase *pkb, ProcName first,
+                         ProcName second) const noexcept final;
 };
 }  // namespace spa
 
