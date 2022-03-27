@@ -390,7 +390,7 @@ std::set<int> ProgramKnowledgeBase::GetUsesProc() {
 }
 PairVec<int> ProgramKnowledgeBase::GetUsesProcVar() {
     assert(compiled);
-    return modifies_rel_.GetProcVar();
+    return uses_rel_.GetProcVar();
 }
 
 std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens) {
