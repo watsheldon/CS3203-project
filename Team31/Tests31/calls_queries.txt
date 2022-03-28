@@ -1,0 +1,130 @@
+1 - Calls (syn, syn) : select caller
+procedure p, q;
+Select p such that Calls (p, q)
+Calls1, Calls2
+5000
+2 - Calls (syn, syn): select callee
+procedure p, q;
+Select q such that Calls (p, q)
+Calls2, Calls3, Calls4
+5000
+3 - Calls (syn, _)
+procedure p;
+Select p such that Calls (p, _)
+Calls1, Calls2
+5000
+4 - Calls (syn, IDENT)
+procedure p;
+Select p such that Calls (p, "Calls2")
+Calls1
+5000
+5 - Calls (_, syn)
+procedure q;
+Select q such that Calls (_, q)
+Calls2, Calls3, Calls4
+5000
+6 - Calls (_, IDENT)
+print pn;
+Select pn such that Calls (_, "Calls3")
+8, 9
+5000
+7 - Calls (_, NotFound) => none
+print pn;
+Select pn such that Calls (_, "NotFound")
+
+5000
+8 - invalid: procedure calling itself => none
+print pn;
+Select pn such that Calls ("Calls4", "Calls4")
+
+5000
+9 - Calls (IDENT, syn)
+procedure q;
+Select q such that Calls ("Calls2", q)
+Calls3, Calls4
+5000
+10 - Calls (IDENT, syn) => none
+procedure q;
+Select q such that Calls ("Calls3", q)
+none
+5000
+11 - Calls (IDENT, _)
+variable v;
+Select v such that Calls ("Calls2", _)
+v1, v2, call
+5000
+12 - Calls (IDENT, IDENT) => true
+variable v;
+Select v such that Calls ("Calls1", "Calls2")
+v1, v2, call
+5000
+13 - Calls (IDENT, IDENT) => false (indirect calling)
+variable v;
+Select v such that Calls ("Calls1", "Calls3")
+none
+5000
+14 - Calls* (syn, syn) : select caller
+procedure p, q;
+Select p such that Calls* (p, q)
+Calls1, Calls2
+5000
+15 - Calls* (syn, syn) : select callee
+procedure p, q;
+Select q such that Calls* (p, q)
+Calls2, Calls3, Calls4
+5000
+16 - Calls* (syn _)
+procedure p;
+Select p such that Calls* (p, _)
+Calls1, Calls2
+5000
+17 - Calls* (syn IDENT)
+procedure p;
+Select p such that Calls* (p, "Calls3")
+Calls1, Calls2
+5000
+18 - Calls* (_, syn)
+procedure q;
+Select q such that Calls* (_, q)
+Calls2, Calls3, Calls4
+5000
+19 - Calls* (_, IDENT)
+print pn;
+Select pn such that Calls* (_, "Calls3")
+8, 9
+5000
+20 - Calls* (_, NotFound) => none
+print pn;
+Select pn such that Calls* (_, "NotFound")
+
+5000
+21 - invalid: procedure calling itself => none
+print pn;
+Select pn such that Calls* ("Calls4", "Calls4")
+
+5000
+22 - Calls* (IDENT, syn)
+procedure q;
+Select q such that Calls* ("Calls1", q)
+Calls2, Calls3, Calls4
+5000
+23 - Calls* (IDENT, syn) => none
+procedure q;
+Select q such that Calls* ("Calls3", q)
+none
+5000
+24 - Calls* (IDENT, _)
+variable v;
+Select v such that Calls* ("Calls2", _)
+v1, v2, call
+5000
+25 - Calls* (IDENT, IDENT)  - indirect calling
+variable v;
+Select v such that Calls* ("Calls1", "Calls4")
+v1, v2, call
+5000
+26 - Calls* (IDENT, IDENT) => false
+variable v;
+Select v such that Calls* ("Calls4", "Calls3")
+none
+5000

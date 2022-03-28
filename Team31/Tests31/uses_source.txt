@@ -1,0 +1,27 @@
+procedure Uses1 {
+    a = b + b1 / (b2 * (b3 % b4) - b5);
+    read c;
+    print c;
+    if (d == e) then {
+        print Used1;
+        while (g != h) {
+            print Used5; } } else {
+        read j;
+        while (k >= l) {
+            print Used6; }}
+    while ((!(n <= o)) || ((p > q) && (r < s))) {
+        print Used2; }
+    call Uses2;
+    call Uses3; }
+procedure Uses2 {
+    read u; }
+procedure Uses3 {
+    print Used7; 
+    call Uses4; }
+procedure Uses4 {
+    if (c1 == c2) then {
+        print Used3; } else {
+        call Uses5; }}
+procedure Uses5 {
+    while (c3 == c4) {
+        print Used4; }}
