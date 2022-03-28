@@ -1,5 +1,6 @@
 #include "polish_notation.h"
 
+#include <cassert>
 #include <stack>
 #include <utility>
 
@@ -10,28 +11,11 @@ PolishNotation::PolishNotation(
     std::vector<PolishNotationNode> pn;
     std::stack<PolishNotationNode> s;
     for (auto node : expr) {
-        switch (node.type) {
-            case ExprNodeType::kVariable:
-            case ExprNodeType::kConstant:
-                pn.emplace_back(node);
-                break;
-            case ExprNodeType::kBracketL:
-                s.emplace(node);
-                break;
-            case ExprNodeType::kBracketR:
-                while (s.top().type != ExprNodeType::kBracketL) {
-                    pn.emplace_back(s.top());
-                    s.pop();
-                }
-                s.pop();
-                break;
-            case ExprNodeType::kOperator:
-                while (!s.empty() && s.top().type != ExprNodeType::kBracketL &&
-                       s.top().HasHigherPrecedence(node)) {
-                    pn.emplace_back(s.top());
-                    s.pop();
-                }
-                s.emplace(node);
+        if (node.type == ExprNodeType::kVariable ||
+            node.type == ExprNodeType::kConstant) {
+            pn.emplace_back(node);
+        } else {
+            HandleOperator(node, pn, s);
         }
     }
     while (!s.empty()) {
@@ -73,7 +57,7 @@ std::vector<int> PolishNotation::GetAllVarIndices() const noexcept {
     std::vector<int> var_indices;
     for (auto node : expr_) {
         if (node.type == ExprNodeType::kVariable) {
-            var_indices.emplace_back(node.id);
+            var_indices.emplace_back(std::get<int>(node.id));
         }
     }
     return var_indices;

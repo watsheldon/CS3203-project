@@ -3,14 +3,10 @@
 #include <cassert>
 
 namespace spa {
-PolishNotationNode::PolishNotationNode(OperatorType opr) noexcept
-        : type(ExprNodeType::kOperator), id(static_cast<int>(opr)) {}
-PolishNotationNode::PolishNotationNode(ExprNodeType node_type, int id) noexcept
+PolishNotationNode::PolishNotationNode(ExprNodeType node_type, ID id) noexcept
         : type(node_type), id(id) {
-    if (id == 0) {
-        assert(node_type != ExprNodeType::kVariable);
-        assert(node_type != ExprNodeType::kConstant);
-    }
+    auto *ptr = std::get_if<int>(&id);
+    assert(ptr == nullptr || *ptr != 0);
 }
 bool PolishNotationNode::operator==(
         const PolishNotationNode &other) const noexcept {
@@ -18,15 +14,24 @@ bool PolishNotationNode::operator==(
 }
 bool PolishNotationNode::HasHigherPrecedence(
         const PolishNotationNode &other) const noexcept {
-    assert(type == ExprNodeType::kOperator);
-    assert(other.type == ExprNodeType::kOperator);
-    if (id >= static_cast<int>(OperatorType::kTimes)) {
+    if (type != ExprNodeType::kOperator ||
+        other.type != ExprNodeType::kOperator) {
+        assert(false);
+    }
+    auto op1 = std::get<OperatorType>(id);
+    auto op2 = std::get<OperatorType>(other.id);
+    if (op1 >= OperatorType::kTimes) {
         return true;
     }
-    if (other.id >= static_cast<int>(OperatorType::kTimes)) {
+    if (op1 <= OperatorType::kBracketR) {
+        if (op2 <= OperatorType::kBracketR) {
+            return true;
+        }
         return false;
-    } else {
-        return true;
     }
+    if (op2 >= OperatorType::kTimes) {
+        return false;
+    }
+    return true;
 }
 }  // namespace spa

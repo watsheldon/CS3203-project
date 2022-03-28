@@ -100,8 +100,8 @@ PolishNotationNode PolishNotationStore::TokenTypeToPNNode(
         QueryTokenType token_type) noexcept {
     assert(token_type >= QueryTokenType::kOperatorPlus &&
            token_type <= QueryTokenType::kBracketR);
-    auto arg = kOperatorMap[static_cast<int>(token_type) -
+    auto opr = kOperatorMap[static_cast<int>(token_type) -
                             static_cast<int>(QueryTokenType::kOperatorPlus)];
-    return std::visit([](auto opr) { return PolishNotationNode(opr); }, arg);
+    return PolishNotationNode(ExprNodeType::kOperator, opr);
 }
 }  // namespace spa

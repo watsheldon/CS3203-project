@@ -10,32 +10,34 @@ TEST_CASE("pkb/store/PolishNotation") {
     // v+3*x
     PolishNotation pn1(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 6),
-            PolishNotationNode(OperatorType::kPlus),
+            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
             PolishNotationNode(ExprNodeType::kConstant, 1),
-            PolishNotationNode(OperatorType::kTimes),
+            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 233)});
     notations.emplace_back(pn1);
     notations.emplace_back(pn1);
     // v+(3*x)
     PolishNotation pn2(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 6),
-            PolishNotationNode(OperatorType::kPlus),
-            PolishNotationNode(ExprNodeType::kBracketL),
+            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
+            PolishNotationNode(ExprNodeType::kOperator,
+                               OperatorType::kBracketL),
             PolishNotationNode(ExprNodeType::kConstant, 1),
-            PolishNotationNode(OperatorType::kTimes),
+            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 233),
-            PolishNotationNode(ExprNodeType::kBracketR)});
+            PolishNotationNode(ExprNodeType::kOperator,
+                               OperatorType::kBracketR)});
     notations.emplace_back(pn2);
     // v+3
     PolishNotation pn3(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 6),
-            PolishNotationNode(OperatorType::kPlus),
+            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
             PolishNotationNode(ExprNodeType::kConstant, 1)});
     notations.emplace_back(pn3);
     // 3*x
     PolishNotation pn4(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kConstant, 1),
-            PolishNotationNode(OperatorType::kTimes),
+            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 233)});
     notations.emplace_back(pn4);
 
