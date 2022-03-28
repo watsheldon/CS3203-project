@@ -1,14 +1,24 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_NEXT_TRANS_CLAUSE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_NEXT_TRANS_CLAUSE_H_
 
+#include "next_base.h"
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/result_table.h"
-#include "stmt_stmt_base.h"
 
 namespace spa {
-class NextTransClause : public StmtStmtBase {
+class NextTransClause : public NextBase {
   public:
-    using StmtStmtBase::StmtStmtBase;
+    using NextBase::NextBase;
+
+  protected:
+    ResultTable NumNum(KnowledgeBase *pkb, StmtNo first,
+                       StmtNo second) const noexcept override;
+    ResultTable NumSyn(KnowledgeBase *pkb, StmtNo first,
+                       Synonym *second) const noexcept override;
+    ResultTable SynNum(KnowledgeBase *pkb, Synonym *first,
+                       StmtNo second) const noexcept override;
+    ResultTable SynSyn(KnowledgeBase *pkb, Synonym *first,
+                       Synonym *second) const noexcept override;
 };
 }  // namespace spa
 
