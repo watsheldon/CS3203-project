@@ -57,6 +57,9 @@ class PQLValidator {
     bool Group();
 
     bool RelRef();
+    bool AttrCompare();
+    bool Ref();
+    bool AttrRef();
     bool StmtStmt();
     bool UsesModifies();
     bool Calls();

@@ -71,6 +71,8 @@ bool PQLValidator::Select() {
             valid = SuchThat();
         } else if (Accept(QueryTokenType::kKeywordPattern)) {
             valid = Pattern();
+        } else if (Accept(QueryTokenType::kKeywordWith)) {
+            valid = With();
         } else {
             break;
         }
@@ -198,7 +200,20 @@ bool PQLValidator::Factor() {
     return Accept(QueryTokenType::kInteger) || Accept(QueryTokenType::kWord);
 }
 bool PQLValidator::With() {
-    // todo : new condition clause
-    return false;
+    bool valid;
+    do {
+        valid = AttrCompare();
+    } while (valid && Accept(QueryTokenType::kKeywordAnd));
+    return valid;
+}
+bool PQLValidator::AttrCompare() {
+    return Ref() && Accept(QueryTokenType::kEqual) && Ref();
+}
+bool PQLValidator::Ref() {
+    return Identifier() || Accept(QueryTokenType::kInteger) || AttrRef();
+}
+bool PQLValidator::AttrRef() {
+    return Accept(QueryTokenType::kWord) && Accept(QueryTokenType::kDot) &&
+           AttrName();
 }
 }  // namespace spa
