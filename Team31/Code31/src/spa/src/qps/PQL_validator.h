@@ -56,6 +56,7 @@ class PQLValidator {
     bool ArithmeticExpr(bool has_left = false);
     bool Group();
 
+    bool RelRef();
     bool StmtStmt();
     bool UsesModifies();
     bool Calls();

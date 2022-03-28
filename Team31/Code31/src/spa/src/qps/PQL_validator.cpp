@@ -100,6 +100,13 @@ bool PQLValidator::AttrName() {
 }
 bool PQLValidator::SuchThat() {
     if (!Accept(QueryTokenType::kKeywordThat)) return false;
+    bool valid;
+    do {
+        valid = RelRef();
+    } while (valid && Accept(QueryTokenType::kKeywordAnd));
+    return valid;
+}
+bool PQLValidator::RelRef() {
     if (Accept(QueryTokenType::kKeywordFollows) ||
         Accept(QueryTokenType::kKeywordParent) ||
         Accept(QueryTokenType::kKeywordNext) ||
