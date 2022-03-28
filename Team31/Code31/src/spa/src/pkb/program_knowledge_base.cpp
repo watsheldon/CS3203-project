@@ -331,7 +331,7 @@ bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name,
     assert(compiled);
     int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
     int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
-    assert(proc_index != 0 && var_index != 0);
+    if (proc_index == 0 || var_index == 0) return false;
     auto modified_vars = modifies_rel_.GetVarAccessByProc(proc_index);
     return modified_vars.find(var_index) != modified_vars.end();
 }
