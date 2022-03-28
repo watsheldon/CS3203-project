@@ -1,0 +1,245 @@
+1 - a(_, _INTEGER_)
+assign a;
+Select a pattern a (_, _"0"_)
+1
+5000
+2 - a(VARNAME, INTEGER)
+assign a;
+Select a pattern a ("a0", "0")
+1
+5000
+3 - a(_, _INTEGER_) - many digits
+assign a;
+Select a pattern a (_, _"123456789"_)
+2
+5000
+4 - a(_, _VARNAME_) - many letters
+assign a;
+Select a pattern a (_, _"abcdefg"_)
+3
+5000
+5 - a(_, _VARNAME_) - variable with digits
+assign a;
+Select a pattern a (_, _"b123"_)
+4
+5000
+6 - a(VARNAME, _) 
+assign a;
+Select a pattern a ("b", _)
+2
+5000
+7 - a(VARNAME, _) - variable with digits
+assign a;
+Select a pattern a ("a123", _)
+5
+5000
+8 - a(_, _NAME + DIGIT_)
+assign a;
+Select a pattern a (_, _"b + 1"_)
+6, 25
+5000
+9 - a(_, _NAME - DIGIT_)
+assign a;
+Select a pattern a (_, _"b - 1"_)
+7, 26
+5000
+10 - a(_, _NAME * DIGIT_)
+assign a;
+Select a pattern a (_, _"b * 1"_)
+8, 27
+5000
+11 - a(_, _NAME / DIGIT_)
+assign a;
+Select a pattern a (_, _"b / 1"_)
+9, 28
+5000
+12 - a(_, _NAME % DIGIT_)
+assign a;
+Select a pattern a (_, _"b % 1"_)
+10, 29
+5000
+13 - a(_, _DIGIT + NAME_)
+assign a;
+Select a pattern a (_, _"1 + b"_)
+11
+5000
+14 - a(_, _DIGIT - NAME_)
+assign a;
+Select a pattern a (_, _"1 - b"_)
+12
+5000
+15 - a(_, _DIGIT * NAME_)
+assign a;
+Select a pattern a (_, _"1 * b"_)
+13
+5000
+16 - a(_, _DIGIT / NAME_)
+assign a;
+Select a pattern a (_, _"1 / b"_)
+14
+5000
+17 - a(_, _DIGIT % NAME_)
+assign a;
+Select a pattern a (_, _"1 % b"_)
+15
+5000
+18 - a(_, _DIGIT + DIGIT_)
+assign a;
+Select a pattern a (_, _"1 + 1"_)
+16
+5000
+19 - a(_, _DIGIT - DIGIT_)
+assign a;
+Select a pattern a (_, _"2 - 2"_)
+17
+5000
+20 - a(_, _DIGIT * DIGIT_)
+assign a;
+Select a pattern a (_, _"3 * 3"_)
+18
+5000
+21 - a(_, _DIGIT / DIGIT_)
+assign a;
+Select a pattern a (_, _"4 / 4"_)
+19
+5000
+22 - a(_, _DIGIT % DIGIT_)
+assign a;
+Select a pattern a (_, _"5 % 5"_)
+20
+5000
+23 - RHS: bracketed number
+assign a;
+Select a pattern a (_, _"1"_)
+6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 21, 25, 26, 27, 28, 29
+5000
+24 - RHS: with different brackets
+assign a;
+Select a pattern a (_, _"a0"_)
+22, 23, 24, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47
+5000
+25 - RHS: wth different whitespaces
+assign a;
+Select a pattern a (_, _"b+b"_)
+30, 31, 32
+5000
+26 - Left Associativity: +
+assign a;
+Select a pattern a (_, _"b + c"_)
+35, 49
+5000
+27 - Left Associativity: -
+assign a;
+Select a pattern a (_, _"b - c"_)
+38
+5000
+28 - Left Associativity: *
+assign a;
+Select a pattern a (_, _"b * c"_)
+41
+5000
+29 - Left Associativity: /
+assign a;
+Select a pattern a (_, _"b / c"_)
+44
+5000
+30 - Left Associativity: %
+assign a;
+Select a pattern a (_, _"b % c"_)
+47
+5000
+31 - Wrong Associativity: %
+assign a;
+Select a pattern a (_, _"y % v"_)
+
+5000
+32 - exact match
+assign a;
+Select a pattern a (_, "x * y % v - z / t")
+48
+5000
+33 - correct operator precedence
+assign a;
+Select a pattern a (_, _"b + c"_)
+35, 49
+5000
+34 - wrong * operator precedence
+assign a;
+Select a pattern a (_, _"c * d"_)
+
+5000
+35 - correct matching with additional brackets
+assign a;
+Select a pattern a (_, _"((b) + (c)) * d"_)
+49
+5000
+36 - wrong % operator precedence
+assign a;
+Select a pattern a (_, _"d % e"_)
+
+5000
+37 - correct matching with additional brackets
+assign a;
+Select a pattern a (_, _"(b) / ((c - d) % (e) )"_)
+50
+5000
+38 - a(_, _)
+assign a;
+Select a pattern a (_, _)
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+5000
+39 - a(v, _)
+assign a; variable v;
+Select a pattern a (v, _)
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+5000
+40 - a(v, _) - select v
+assign a; variable v;
+Select v pattern a (v, _)
+a0, b, a123
+5000
+41 - a(v, _VARNAME_)
+assign a; variable v;
+Select a pattern a (v, _"abcdefg"_)
+3
+5000
+42 - a(v, _VARNAME_): select v
+assign a; variable v;
+Select v pattern a (v, _"b"_)
+a123, a0
+5000
+43 - a(v, _INTEGER_): select a
+assign a; variable v;
+Select a pattern a (v, _"123456789"_)
+2
+5000
+44 - a(v, _INTEGER_): select v
+assign a; variable v;
+Select v pattern a (v, _"1"_)
+a0
+5000
+45 - unfound variable name: LHS
+assign a; 
+Select a pattern a ("notFound", _)
+
+5000
+46 - unfound variable name: RHS
+assign a; 
+Select a pattern a (v, _"notFound"_)
+
+5000
+47 - unfound constant
+assign a; 
+Select a pattern a (v, _"404"_)
+
+5000
+48 - unrelated synonym: select another assign
+assign a, a1;
+Select a1 pattern a (_, _)
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+5000
+49 - unrelated synonym: select another variable
+assign a; variable v, v1;
+Select v1 pattern a (v, _"0"_)
+a0, b, abcdefg, b123, a123, c, x, y, v, z, t, d, e
+5000
