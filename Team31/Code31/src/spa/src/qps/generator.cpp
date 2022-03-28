@@ -17,49 +17,16 @@ QueryObject Generator::Generate(const VecTokens &tokens) noexcept {
 
 constexpr Synonym::Type Generator::TokenToSynType(
         QueryTokenType type) noexcept {
-    switch (type) {
-        case QueryTokenType::kDeclStmt:
-            return Synonym::kStmtAny;
-        case QueryTokenType::kDeclRead:
-            return Synonym::kStmtRead;
-        case QueryTokenType::kDeclPrint:
-            return Synonym::kStmtPrint;
-        case QueryTokenType::kDeclCall:
-            return Synonym::kStmtCall;
-        case QueryTokenType::kDeclAssign:
-            return Synonym::kStmtAssign;
-        case QueryTokenType::kDeclIf:
-            return Synonym::kStmtIf;
-        case QueryTokenType::kDeclWhile:
-            return Synonym::kStmtWhile;
-        case QueryTokenType::kDeclVariable:
-            return Synonym::kVar;
-        case QueryTokenType::kDeclConstant:
-            return Synonym::kConst;
-        case QueryTokenType::kDeclProcedure:
-            return Synonym::kProc;
-        default:
-            assert(false);
-    }
+    assert(type < QueryTokenType::kKeywordSelect);
+    return static_cast<Synonym::Type>(type);
 }
 constexpr Generator::Mode Generator::TokenToClauseMode(
         QueryTokenType type) noexcept {
-    switch (type) {
-        case QueryTokenType::kKeywordParent:
-            return Mode::kParent;
-        case QueryTokenType::kKeywordFollows:
-            return Mode::kFollows;
-        case QueryTokenType::kKeywordUses:
-            return Mode::kUses;
-        case QueryTokenType::kKeywordModifies:
-            return Mode::kModifies;
-        case QueryTokenType::kKeywordPattern:
-            return Mode::kPattern;
-        case QueryTokenType::kKeywordCalls:
-            return Mode::kCalls;
-        default:
-            assert(false);
-    }
+    assert(type > QueryTokenType::kKeywordAnd &&
+           type < QueryTokenType::kAttrProc);
+    return Mode{static_cast<int>(type) -
+                static_cast<int>(QueryTokenType::kKeywordWith) +
+                static_cast<int>(Mode::kWith)};
 }
 constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
                                                  Synonym::Type type) noexcept {
@@ -80,6 +47,7 @@ constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
             return type != Synonym::kProc;
         default:
             assert(false);
+            return false;
     }
 }
 constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
@@ -96,6 +64,7 @@ constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
             return type != Synonym::kProc;
         default:
             assert(false);
+            return false;
     }
 }
 void Generator::Reset() noexcept {
@@ -140,7 +109,7 @@ void Generator::BracketR() noexcept {
         mode_.pop_back();
         return BracketR();
     }
-    assert(mode_.back() >= Mode::kParent && mode_.back() <= Mode::kPattern);
+    assert(mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression);
     mode_.pop_back();
     auto clause = factory_.Build();
     if (clause == nullptr) {
@@ -294,7 +263,7 @@ void Generator::Comma() noexcept {
     if (mode_.back() == Mode::kDeclaration) {
         return;
     }
-    assert(mode_.back() >= Mode::kParent && mode_.back() <= Mode::kPattern);
+    assert(mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression);
     mode_.emplace_back(Mode::kSecond);
 }
 void Generator::Semicolon() noexcept { mode_.pop_back(); }

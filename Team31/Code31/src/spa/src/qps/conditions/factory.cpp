@@ -103,6 +103,7 @@ std::unique_ptr<ConditionClause> Factory::Build() noexcept {
             return BuildCallsClause<CallsTransClause>();
         default:
             assert(false);
+            return {};
     }
 }
 

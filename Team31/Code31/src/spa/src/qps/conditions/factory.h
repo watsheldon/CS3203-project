@@ -102,6 +102,8 @@ class Factory {
             case StmtStmtBase::Type::kWildWild:
                 return std::make_unique<T>();
         }
+        assert(false);
+        return {};
     }
     template <typename T>
     std::unique_ptr<ConditionClause> BuildUsesModifiesClause() noexcept {
@@ -128,6 +130,8 @@ class Factory {
             case UsesModifiesBase::Type::kProcWild:
                 return std::make_unique<T>(first_ident_);
         }
+        assert(false);
+        return {};
     }
     template <typename T>
     std::unique_ptr<ConditionClause> BuildPatternClause() noexcept {
@@ -150,6 +154,8 @@ class Factory {
                 return std::make_unique<T>(assign_, first_syn_,
                                            std::move(second_exprs_));
         }
+        assert(false);
+        return {};
     }
     template <typename T>
     std::unique_ptr<ConditionClause> BuildCallsClause() noexcept {
@@ -181,6 +187,8 @@ class Factory {
             case CallsBase::Type::kProcProc:
                 return std::make_unique<T>(first_ident_, second_ident_);
         }
+        assert(false);
+        return {};
     }
     void Reset() noexcept;
 };

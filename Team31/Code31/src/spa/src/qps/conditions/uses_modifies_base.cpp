@@ -71,5 +71,7 @@ ResultTable UsesModifiesBase::Execute(KnowledgeBase *pkb) const noexcept {
             return ProcWild(pkb, first_proc_name);
         }
     }
+    assert(false);
+    return ResultTable{false};
 }
 }  // namespace spa

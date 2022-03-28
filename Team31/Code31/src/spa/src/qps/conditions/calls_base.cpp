@@ -70,5 +70,7 @@ ResultTable CallsBase::Execute(KnowledgeBase *pkb) const noexcept {
             return ProcProc(pkb, first_proc, second_proc);
         }
     }
+    assert(false);
+    return ResultTable{false};
 }
 }  // namespace spa

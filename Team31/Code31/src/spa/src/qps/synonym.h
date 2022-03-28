@@ -7,7 +7,7 @@
 namespace spa {
 struct Synonym {
     const enum Type {
-        kStmtAny,
+        kStmtAny = 0,
         kStmtRead,
         kStmtPrint,
         kStmtCall,

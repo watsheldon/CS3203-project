@@ -8,24 +8,8 @@
 
 namespace spa {
 constexpr StmtType SynToPkbType(const Synonym* synonym) noexcept {
-    switch (synonym->type) {
-        case Synonym::kStmtAny:
-            return StmtType::kAll;
-        case Synonym::kStmtRead:
-            return StmtType::kRead;
-        case Synonym::kStmtPrint:
-            return StmtType::kPrint;
-        case Synonym::kStmtCall:
-            return StmtType::kCall;
-        case Synonym::kStmtWhile:
-            return StmtType::kWhile;
-        case Synonym::kStmtIf:
-            return StmtType::kIf;
-        case Synonym::kStmtAssign:
-            return StmtType::kAssign;
-        default:
-            assert(false);
-    }
+    assert(synonym->type < Synonym::kProc);
+    return static_cast<StmtType>(synonym->type);
 }
 }  // namespace spa
 

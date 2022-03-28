@@ -310,9 +310,9 @@ void AbstractSyntaxTree::ParseToken(const Token &token) noexcept {
         case SourceTokenType::kName:
             Name(name);
             break;
-        case SourceTokenType::kInteger: {
+        case SourceTokenType::kInteger:
             Constant(name);
-        } break;
+            break;
     }
 }
 void AbstractSyntaxTree::BuildTree() noexcept {
@@ -352,26 +352,8 @@ bool AbstractSyntaxTree::HasCycle(int curr,
 }
 constexpr AbstractSyntaxTree::Mode AbstractSyntaxTree::KeywordToMode(
         SourceTokenType keyword) noexcept {
-    switch (keyword) {
-        case SourceTokenType::kKeywordProcedure:
-            return Mode::kProc;
-        case SourceTokenType::kKeywordRead:
-            return Mode::kRead;
-        case SourceTokenType::kKeywordPrint:
-            return Mode::kPrint;
-        case SourceTokenType::kKeywordCall:
-            return Mode::kCall;
-        case SourceTokenType::kKeywordWhile:
-            return Mode::kWhile;
-        case SourceTokenType::kKeywordIf:
-            return Mode::kIf;
-        case SourceTokenType::kKeywordThen:
-            return Mode::kThen;
-        case SourceTokenType::kKeywordElse:
-            return Mode::kElse;
-        default:
-            assert(false);
-    }
+    assert(keyword < SourceTokenType::kBracketL);
+    return static_cast<Mode>(keyword);
 }
 constexpr OperatorType AbstractSyntaxTree::OperatorForRpn(
         SourceTokenType keyword) noexcept {
@@ -388,6 +370,7 @@ constexpr OperatorType AbstractSyntaxTree::OperatorForRpn(
             return OperatorType::kModulo;
         default:
             assert(false);
+            return static_cast<OperatorType>(0);
     }
 }
 }  // namespace spa

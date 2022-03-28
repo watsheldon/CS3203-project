@@ -19,7 +19,7 @@ class PQLValidator {
     static constexpr const auto kDeclTypes = []() constexpr {
         std::array<QueryTokenType, 10> result{};
         for (int i = static_cast<int>(QueryTokenType::kDeclStmt);
-             i <= static_cast<int>(QueryTokenType::kDeclProcedure); i++) {
+             i < static_cast<int>(QueryTokenType::kKeywordSelect); i++) {
             result[i] = QueryTokenType{i};
         }
         return result;

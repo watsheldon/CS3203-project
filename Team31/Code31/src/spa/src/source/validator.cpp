@@ -130,6 +130,7 @@ bool Validator::CondExpr() noexcept {
             return CondInfix();
         default:
             assert(false);
+            return false;
     }
 }
 Validator::CondExprSubTypes Validator::CondPrefix() noexcept {

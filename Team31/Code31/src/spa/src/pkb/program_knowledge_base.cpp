@@ -745,7 +745,6 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(StmtType st) {
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(
         Synonym::Type synType) {
     assert(compiled);
-    std::vector<int> results;
     switch (synType) {
         case Synonym::kProc:
             return GetAllEntityIndices(QueryEntityType::kProc);
@@ -769,6 +768,7 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(
             return GetAllEntityIndices(StmtType::kWhile);
         default:
             assert(false);
+            return {};
     }
 }
 

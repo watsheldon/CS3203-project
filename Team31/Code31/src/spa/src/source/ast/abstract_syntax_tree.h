@@ -35,17 +35,17 @@ class AbstractSyntaxTree {
 
   private:
     enum class Mode {
-        kProc,
-        kStmtLst,
+        kProc = 1,
         kRead,
         kPrint,
         kCall,
-        kCond,
         kWhile,
         kIf,
         kThen,
         kElse,
+        kCond,
         kAssign,
+        kStmtLst
     };
     std::vector<Token> tokens_;
     std::stack<Mode> mode_history_;

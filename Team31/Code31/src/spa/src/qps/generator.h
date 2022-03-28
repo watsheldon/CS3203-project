@@ -27,17 +27,21 @@ class Generator {
     enum class Mode {
         kDeclaration = 0,
         kSelect,
-        kParent,
+        kWith,
+        kPattern,
         kFollows,
+        kParent,
         kUses,
         kModifies,
         kCalls,
-        kPattern,
+        kNext,
+        kAffects,
         kExpression,
         kIdentifier,
         kZeroth,
         kFirst,
         kSecond,
+        kNone
     };
     static constexpr std::string_view kBoolean = "BOOLEAN"sv;
     bool semantic_error_;

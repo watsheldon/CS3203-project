@@ -61,6 +61,8 @@ ResultTable PatternBase::Execute(KnowledgeBase *pkb) const noexcept {
             return WildWild(pkb);
         }
     }
+    assert(false);
+    return ResultTable{false};
 }
 ResultTable PatternBase::VarWild(KnowledgeBase *pkb,
                                  VarName first) const noexcept {

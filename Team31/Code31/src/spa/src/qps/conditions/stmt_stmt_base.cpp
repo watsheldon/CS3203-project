@@ -67,5 +67,7 @@ ResultTable StmtStmtBase::Execute(KnowledgeBase *pkb) const noexcept {
             return WildWild(pkb);
         }
     }
+    assert(false);
+    return ResultTable{false};
 }
 }  // namespace spa
