@@ -16,16 +16,14 @@ bool PolishNotationNode::operator==(
         const PolishNotationNode &other) const noexcept {
     return type == other.type && id == other.id;
 }
-bool PolishNotationNode::operator>=(
+bool PolishNotationNode::HasHigherPrecedence(
         const PolishNotationNode &other) const noexcept {
     assert(type == ExprNodeType::kOperator);
     assert(other.type == ExprNodeType::kOperator);
-    int p = static_cast<int>(id);
-    int q = static_cast<int>(other.id);
-    if (p >= static_cast<int>(OperatorType::kTimes)) {
+    if (id >= static_cast<int>(OperatorType::kTimes)) {
         return true;
     }
-    if (q >= static_cast<int>(OperatorType::kTimes)) {
+    if (other.id >= static_cast<int>(OperatorType::kTimes)) {
         return false;
     } else {
         return true;

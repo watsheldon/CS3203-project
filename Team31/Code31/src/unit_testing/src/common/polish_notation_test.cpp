@@ -76,6 +76,61 @@ TEST_CASE("common/PolishNotation") {
             PolishNotationNode(ExprNodeType::kVariable, 3),
             PolishNotationNode(ExprNodeType::kBracketR),
             PolishNotationNode(ExprNodeType::kBracketR)});
+    // a+b
+    PolishNotation pn10(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 1),
+            PolishNotationNode(OperatorType::kPlus),
+            PolishNotationNode(ExprNodeType::kVariable, 2)});
+    // b-c
+    PolishNotation pn11(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 2),
+            PolishNotationNode(OperatorType::kMinus),
+            PolishNotationNode(ExprNodeType::kVariable, 3)});
+    // a+b-c
+    PolishNotation pn12(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 1),
+            PolishNotationNode(OperatorType::kPlus),
+            PolishNotationNode(ExprNodeType::kVariable, 2),
+            PolishNotationNode(OperatorType::kMinus),
+            PolishNotationNode(ExprNodeType::kVariable, 3)});
+    // a/b*c%d
+    PolishNotation pn13(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 1),
+            PolishNotationNode(OperatorType::kDivide),
+            PolishNotationNode(ExprNodeType::kVariable, 2),
+            PolishNotationNode(OperatorType::kTimes),
+            PolishNotationNode(ExprNodeType::kVariable, 3),
+            PolishNotationNode(OperatorType::kModulo),
+            PolishNotationNode(ExprNodeType::kVariable, 4)});
+    // a/b*c
+    PolishNotation pn14(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 1),
+            PolishNotationNode(OperatorType::kDivide),
+            PolishNotationNode(ExprNodeType::kVariable, 2),
+            PolishNotationNode(OperatorType::kTimes),
+            PolishNotationNode(ExprNodeType::kVariable, 3)});
+    // b*c%d
+    PolishNotation pn15(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 2),
+            PolishNotationNode(OperatorType::kTimes),
+            PolishNotationNode(ExprNodeType::kVariable, 3),
+            PolishNotationNode(OperatorType::kModulo),
+            PolishNotationNode(ExprNodeType::kVariable, 4)});
+    // a/b
+    PolishNotation pn16(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 1),
+            PolishNotationNode(OperatorType::kDivide),
+            PolishNotationNode(ExprNodeType::kVariable, 2)});
+    // b*c
+    PolishNotation pn17(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 2),
+            PolishNotationNode(OperatorType::kTimes),
+            PolishNotationNode(ExprNodeType::kVariable, 3)});
+    // c%d
+    PolishNotation pn18(std::vector<PolishNotationNode>{
+            PolishNotationNode(ExprNodeType::kVariable, 3),
+            PolishNotationNode(OperatorType::kModulo),
+            PolishNotationNode(ExprNodeType::kVariable, 4)});
 
     SECTION("equals operator") { REQUIRE(pn1 == pn2); }
     SECTION("basic contains") {
@@ -92,6 +147,25 @@ TEST_CASE("common/PolishNotation") {
         REQUIRE_FALSE(pn7.Contains(pn5));
         REQUIRE_FALSE(pn8.Contains(pn5));
     }
-    SECTION("extra parenthesis equality") { REQUIRE(pn5 == pn9); }
+    SECTION("extra parenthesis equality") {
+        REQUIRE(pn5 == pn9);
+        REQUIRE(pn5.Contains(pn9));
+        REQUIRE(pn9.Contains(pn5));
+    }
+    SECTION("consecutive +-") {
+        REQUIRE(pn12.Contains(pn12));
+        REQUIRE(pn12.Contains(pn10));
+        REQUIRE_FALSE(pn12.Contains(pn11));
+    }
+    SECTION("consecutive /*%") {
+        REQUIRE(pn13.Contains(pn13));
+        REQUIRE(pn13.Contains(pn14));
+        REQUIRE_FALSE(pn13.Contains(pn15));
+        REQUIRE(pn13.Contains(pn16));
+        REQUIRE_FALSE(pn13.Contains(pn17));
+        REQUIRE_FALSE(pn13.Contains(pn18));
+        REQUIRE(pn15.Contains(pn17));
+        REQUIRE_FALSE(pn15.Contains(pn18));
+    }
 }
 }  // namespace spa

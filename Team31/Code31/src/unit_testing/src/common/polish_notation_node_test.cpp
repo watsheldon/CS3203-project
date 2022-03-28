@@ -17,35 +17,35 @@ TEST_CASE("common/PolishNotationNode") {
         REQUIRE_FALSE(divide == modulo);
     }
     SECTION("operator precedence") {
-        REQUIRE(plus >= plus);
-        REQUIRE(plus >= minus);
-        REQUIRE_FALSE(plus >= times);
-        REQUIRE_FALSE(plus >= divide);
-        REQUIRE_FALSE(plus >= modulo);
+        REQUIRE(plus.HasHigherPrecedence(plus));
+        REQUIRE(plus.HasHigherPrecedence(minus));
+        REQUIRE_FALSE(plus.HasHigherPrecedence(times));
+        REQUIRE_FALSE(plus.HasHigherPrecedence(divide));
+        REQUIRE_FALSE(plus.HasHigherPrecedence(modulo));
 
-        REQUIRE(minus >= plus);
-        REQUIRE(minus >= minus);
-        REQUIRE_FALSE(minus >= times);
-        REQUIRE_FALSE(minus >= divide);
-        REQUIRE_FALSE(minus >= modulo);
+        REQUIRE(minus.HasHigherPrecedence(plus));
+        REQUIRE(minus.HasHigherPrecedence(minus));
+        REQUIRE_FALSE(minus.HasHigherPrecedence(times));
+        REQUIRE_FALSE(minus.HasHigherPrecedence(divide));
+        REQUIRE_FALSE(minus.HasHigherPrecedence(modulo));
 
-        REQUIRE(times >= plus);
-        REQUIRE(times >= minus);
-        REQUIRE(times >= times);
-        REQUIRE(times >= divide);
-        REQUIRE(times >= modulo);
+        REQUIRE(times.HasHigherPrecedence(plus));
+        REQUIRE(times.HasHigherPrecedence(minus));
+        REQUIRE(times.HasHigherPrecedence(times));
+        REQUIRE(times.HasHigherPrecedence(divide));
+        REQUIRE(times.HasHigherPrecedence(modulo));
 
-        REQUIRE(divide >= plus);
-        REQUIRE(divide >= minus);
-        REQUIRE(divide >= times);
-        REQUIRE(divide >= divide);
-        REQUIRE(divide >= modulo);
+        REQUIRE(divide.HasHigherPrecedence(plus));
+        REQUIRE(divide.HasHigherPrecedence(minus));
+        REQUIRE(divide.HasHigherPrecedence(times));
+        REQUIRE(divide.HasHigherPrecedence(divide));
+        REQUIRE(divide.HasHigherPrecedence(modulo));
 
-        REQUIRE(modulo >= plus);
-        REQUIRE(modulo >= minus);
-        REQUIRE(modulo >= times);
-        REQUIRE(modulo >= divide);
-        REQUIRE(modulo >= modulo);
+        REQUIRE(modulo.HasHigherPrecedence(plus));
+        REQUIRE(modulo.HasHigherPrecedence(minus));
+        REQUIRE(modulo.HasHigherPrecedence(times));
+        REQUIRE(modulo.HasHigherPrecedence(divide));
+        REQUIRE(modulo.HasHigherPrecedence(modulo));
     }
 }
 }  // namespace spa

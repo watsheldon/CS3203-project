@@ -27,7 +27,7 @@ PolishNotation::PolishNotation(
                 break;
             case ExprNodeType::kOperator:
                 while (!s.empty() && s.top().type != ExprNodeType::kBracketL &&
-                       s.top() >= node) {
+                       s.top().HasHigherPrecedence(node)) {
                     pn.emplace_back(s.top());
                     s.pop();
                 }

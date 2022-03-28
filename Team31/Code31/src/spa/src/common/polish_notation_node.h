@@ -15,9 +15,9 @@ struct PolishNotationNode {
     const int id;
     explicit PolishNotationNode(OperatorType opr) noexcept;
     explicit PolishNotationNode(ExprNodeType node_type, int id = 0) noexcept;
+    // higher or equal precedence
+    bool HasHigherPrecedence(const PolishNotationNode &other) const noexcept;
     bool operator==(const PolishNotationNode &other) const noexcept;
-    // precedence comparator
-    bool operator>=(const PolishNotationNode &other) const noexcept;
 };
 
 }  // namespace spa
