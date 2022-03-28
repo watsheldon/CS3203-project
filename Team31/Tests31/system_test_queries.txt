@@ -51,7 +51,7 @@ Select s such that Uses (s, _)
 11 - comment
 stmt s; variable v; 
 Select s such that Uses (s, "temp")
-none 
+3, 38, 4, 51 
 5000
 12 - comment
 stmt s; variable v; 
