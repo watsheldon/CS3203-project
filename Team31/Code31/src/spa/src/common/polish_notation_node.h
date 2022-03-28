@@ -9,19 +9,15 @@ enum class ExprNodeType {
     kBracketR,
     kOperator
 };
-enum class OperatorType : int {
-    kPlus = 1,
-    kMinus = 1,
-    kTimes = 2,
-    kDivide = 2,
-    kModulo = 2
-};
+enum class OperatorType : int { kPlus = 1, kMinus, kTimes, kDivide, kModulo };
 struct PolishNotationNode {
     const ExprNodeType type;
     const int id;
     explicit PolishNotationNode(OperatorType opr) noexcept;
     explicit PolishNotationNode(ExprNodeType node_type, int id = 0) noexcept;
     bool operator==(const PolishNotationNode &other) const noexcept;
+    // precedence comparator
+    bool operator>=(const PolishNotationNode &other) const noexcept;
 };
 
 }  // namespace spa

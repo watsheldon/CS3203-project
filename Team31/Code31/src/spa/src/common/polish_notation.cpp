@@ -26,7 +26,8 @@ PolishNotation::PolishNotation(
                 s.pop();
                 break;
             case ExprNodeType::kOperator:
-                while (!s.empty() && s.top().id >= node.id) {
+                while (!s.empty() && s.top().type != ExprNodeType::kBracketL &&
+                       s.top() >= node) {
                     pn.emplace_back(s.top());
                     s.pop();
                 }
