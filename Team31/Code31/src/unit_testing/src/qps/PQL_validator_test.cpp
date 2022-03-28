@@ -10,6 +10,7 @@ TEST_CASE("common/PQLValidator") {
     QueryToken decl_assign = QueryToken(QueryTokenType::kDeclAssign);
     QueryToken decl_proc = QueryToken(QueryTokenType::kDeclProcedure);
     QueryToken decl_while = QueryToken(QueryTokenType::kDeclWhile);
+    QueryToken decl_if = QueryToken(QueryTokenType::kDeclIf);
     QueryToken comma = QueryToken(QueryTokenType::kComma);
     QueryToken semicolon = QueryToken(QueryTokenType::kSemicolon);
     QueryToken decl_variable = QueryToken(QueryTokenType::kDeclVariable);
@@ -107,6 +108,30 @@ TEST_CASE("common/PQLValidator") {
                 with,      word_token_q,     dot,   attr_proc,    equal,
                 quote,     word_token_Third, quote};
         REQUIRE(expected == tokens3);
+    }
+    SECTION("next (queries of full pattern-cl)") {
+        std::string_view query_string4{
+                "assign a; while w; if ifs; Select w pattern w(\"i\", _) "
+                "pattern ifs(\"x\", _, _) and a ( _ , \"x\")"};
+        PQLValidator pql_validator4;
+        auto tokens4 = pql_validator4.Validate(query_string4);
+        QueryToken word_token_a = QueryToken(QueryTokenType::kWord, "a");
+        QueryToken word_token_w = QueryToken(QueryTokenType::kWord, "w");
+        QueryToken word_token_ifs = QueryToken(QueryTokenType::kWord, "ifs");
+        QueryToken word_token_i = QueryToken(QueryTokenType::kWord, "i");
+        QueryToken word_token_x = QueryToken(QueryTokenType::kWord, "x");
+        std::vector<QueryToken> expected{
+                decl_assign,  word_token_a,   semicolon,    decl_while,
+                word_token_w, semicolon,      decl_if,      word_token_ifs,
+                semicolon,    select,         word_token_w, pattern,
+                word_token_w, bracket_l,      quote,        word_token_i,
+                quote,        comma,          wildcard,     bracket_r,
+                pattern,      word_token_ifs, bracket_l,    quote,
+                word_token_x, quote,          comma,        wildcard,
+                comma,        wildcard,       bracket_r,    and_token,
+                word_token_a, bracket_l,      wildcard,     comma,
+                quote,        word_token_x,   quote,        bracket_r};
+        REQUIRE(expected == tokens4);
     }
 }
 }  // namespace spa
