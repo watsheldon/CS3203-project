@@ -135,6 +135,7 @@ void Generator::BracketL() noexcept {
 void Generator::BracketR() noexcept {
     if (mode_.back() == Mode::kExpression) {
         expression_.emplace_back(QueryTokenType::kBracketR);
+        return;
     } else if (mode_.back() == Mode::kSecond) {
         mode_.pop_back();
         return BracketR();
