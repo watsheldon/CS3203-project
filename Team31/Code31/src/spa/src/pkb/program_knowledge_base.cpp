@@ -140,7 +140,7 @@ PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(StmtType first_type,
     assert(compiled);
     return follows_parent_rel_.GetFollowsPairs(first_type, second_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetFollowsPairsT(StmtType first_type,
+PairVec<int> ProgramKnowledgeBase::GetFollowsTPairs(StmtType first_type,
                                                     StmtType second_type) {
     assert(compiled);
     return follows_parent_rel_.GetFollowsPairsT(first_type, second_type);
@@ -200,7 +200,7 @@ PairVec<int> ProgramKnowledgeBase::GetParentPairs(StmtType parent_type,
     assert(compiled);
     return follows_parent_rel_.GetParentPairs(parent_type, child_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetParentPairsT(StmtType parent_type,
+PairVec<int> ProgramKnowledgeBase::GetParentTPairs(StmtType parent_type,
                                                    StmtType child_type) {
     assert(compiled);
     return follows_parent_rel_.GetParentPairsT(parent_type, child_type);
