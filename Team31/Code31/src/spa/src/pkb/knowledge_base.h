@@ -154,7 +154,7 @@ class KnowledgeBase {
 
     virtual PairVec<int> GetFollowsPairs(StmtType first_type,
                                          StmtType second_type) = 0;
-    virtual PairVec<int> GetFollowsPairsT(StmtType first_type,
+    virtual PairVec<int> GetFollowsTPairs(StmtType first_type,
                                           StmtType second_type) = 0;
 
     /**
@@ -181,7 +181,7 @@ class KnowledgeBase {
 
     virtual PairVec<int> GetParentPairs(StmtType parent_type,
                                         StmtType child_type) = 0;
-    virtual PairVec<int> GetParentPairsT(StmtType parent_type,
+    virtual PairVec<int> GetParentTPairs(StmtType parent_type,
                                          StmtType child_type) = 0;
 
     /**

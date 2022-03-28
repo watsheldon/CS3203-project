@@ -177,7 +177,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetFollows(ArgPos::kFirst, StmtType::kAssign).empty());
         REQUIRE(pkb.GetFollows(ArgPos::kSecond, StmtType::kAssign) ==
                 std::set<int>{7, 8});
-        REQUIRE(pkb.GetFollowsPairsT(StmtType::kAll, StmtType::kAll)
+        REQUIRE(pkb.GetFollowsTPairs(StmtType::kAll, StmtType::kAll)
                         .first.size() == 9);
         REQUIRE(pkb.GetFollowsPairs(StmtType::kAll, StmtType::kAll)
                         .first.size() == 7);
@@ -198,7 +198,7 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
                 std::set<int>{1, 5});
         REQUIRE(pkb.GetParent(ArgPos::kSecond, StmtType::kAll) ==
                 std::set<int>{2, 3, 4, 5, 6, 7, 8, 9});
-        REQUIRE(pkb.GetParentPairsT(StmtType::kAll, StmtType::kAll)
+        REQUIRE(pkb.GetParentTPairs(StmtType::kAll, StmtType::kAll)
                         .first.size() == 15);
         REQUIRE(pkb.GetParentPairs(StmtType::kAll, StmtType::kAll)
                         .first.size() == 8);

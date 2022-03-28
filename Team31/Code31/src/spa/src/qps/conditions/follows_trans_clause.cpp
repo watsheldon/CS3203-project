@@ -30,7 +30,7 @@ ResultTable FollowsTransClause::SynNum(KnowledgeBase *pkb, Synonym *first,
 ResultTable FollowsTransClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
                                        Synonym *second) const noexcept {
     auto [col_1, col_2] =
-            pkb->GetFollowsPairsT(SynToPkbType(first), SynToPkbType(second));
+            pkb->GetFollowsTPairs(SynToPkbType(first), SynToPkbType(second));
     return {first, std::move(col_1), second, std::move(col_2)};
 }
 }  // namespace spa

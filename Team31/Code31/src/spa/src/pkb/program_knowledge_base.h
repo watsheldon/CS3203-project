@@ -84,7 +84,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                               StmtType return_type) override;
     PairVec<int> GetFollowsPairs(StmtType first_type,
                                  StmtType second_type) override;
-    PairVec<int> GetFollowsPairsT(StmtType first_type,
+    PairVec<int> GetFollowsTPairs(StmtType first_type,
                                   StmtType second_type) override;
 
     std::set<int> GetParent(ArgPos return_pos, StmtType return_type) override;
@@ -99,7 +99,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                              StmtType return_type) override;
     PairVec<int> GetParentPairs(StmtType parent_type,
                                 StmtType child_type) override;
-    PairVec<int> GetParentPairsT(StmtType parent_type,
+    PairVec<int> GetParentTPairs(StmtType parent_type,
                                  StmtType child_type) override;
 
     bool ExistModifies(int stmt_no, std::string_view var_name) override;

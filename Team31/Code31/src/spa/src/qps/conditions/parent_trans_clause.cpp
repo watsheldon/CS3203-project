@@ -30,7 +30,7 @@ ResultTable ParentTransClause::SynNum(KnowledgeBase *pkb, Synonym *first,
 ResultTable ParentTransClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
                                       Synonym *second) const noexcept {
     auto [col_1, col_2] =
-            pkb->GetParentPairsT(SynToPkbType(first), SynToPkbType(second));
+            pkb->GetParentTPairs(SynToPkbType(first), SynToPkbType(second));
     return {first, std::move(col_1), second, std::move(col_2)};
 }
 }  // namespace spa
