@@ -1,0 +1,24 @@
+procedure Calls1 {
+  call Calls2;
+}
+
+procedure Calls2 {
+  while (v1 > v2 ) {
+    while (v1 > v2) {
+      call Calls3;
+    }
+    if ( v1 > v2) then {
+      call Calls3;
+    } else {
+      call Calls4;
+    }
+  }
+}
+
+procedure Calls3 {
+  print call;
+}
+
+procedure Calls4 {
+  print call;
+}
