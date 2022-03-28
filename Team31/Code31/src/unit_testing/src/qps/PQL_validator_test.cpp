@@ -27,7 +27,9 @@ TEST_CASE("common/PQLValidator") {
     QueryToken quote = QueryToken(QueryTokenType::kQuote);
     QueryToken wildcard = QueryToken(QueryTokenType::kUnderscore);
     QueryToken times = QueryToken(QueryTokenType::kOperatorTimes);
+    QueryToken equal = QueryToken(QueryTokenType::kEqual);
     QueryToken and_token = QueryToken(QueryTokenType::kKeywordAnd);
+    QueryToken with = QueryToken(QueryTokenType::kKeywordWith);
     SECTION("next (basic queries)") {
         std::string_view query_string1{
                 "procedure p, q; Select p.procName such that Calls (p, q)"};
@@ -87,6 +89,24 @@ TEST_CASE("common/PQLValidator") {
                                          word_token_a,
                                          bracket_r};
         REQUIRE(expected == tokens2);
+    }
+    SECTION("next (queries of with-cl)") {
+        std::string_view query_string3{
+                "procedure p, q;Select p such that Calls(p, q) with q.procName "
+                "= \"Third\""};
+        PQLValidator pql_validator3;
+        auto tokens3 = pql_validator3.Validate(query_string3);
+        QueryToken word_token_p = QueryToken(QueryTokenType::kWord, "p");
+        QueryToken word_token_q = QueryToken(QueryTokenType::kWord, "q");
+        QueryToken word_token_Third =
+                QueryToken(QueryTokenType::kWord, "Third");
+        std::vector<QueryToken> expected{
+                decl_proc, word_token_p,     comma, word_token_q, semicolon,
+                select,    word_token_p,     such,  that,         calls,
+                bracket_l, word_token_p,     comma, word_token_q, bracket_r,
+                with,      word_token_q,     dot,   attr_proc,    equal,
+                quote,     word_token_Third, quote};
+        REQUIRE(expected == tokens3);
     }
 }
 }  // namespace spa
