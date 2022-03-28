@@ -70,7 +70,7 @@ bool PQLValidator::Select() {
         if (Accept(QueryTokenType::kKeywordSuch)) {
             valid = SuchThat();
         } else if (Accept(QueryTokenType::kKeywordPattern)) {
-            valid = Pattern();
+            valid = PatternCond();
         } else if (Accept(QueryTokenType::kKeywordWith)) {
             valid = With();
         } else {
@@ -147,10 +147,23 @@ bool PQLValidator::UsesModifiesStmtEntRef() {
     return Accept(QueryTokenType::kWord) || Accept(QueryTokenType::kInteger) ||
            Identifier();
 }
+bool PQLValidator::PatternCond() {
+    bool valid;
+    do {
+        valid = Pattern();
+    } while (valid && Accept(QueryTokenType::kKeywordAnd));
+    return valid;
+}
 bool PQLValidator::Pattern() {
-    return Accept(QueryTokenType::kWord) && Accept(QueryTokenType::kBracketL) &&
-           EntRef() && Accept(QueryTokenType::kComma) && ExpressionSpec() &&
-           Accept(QueryTokenType::kBracketR);
+    bool valid_first_part;
+    valid_first_part = Accept(QueryTokenType::kWord) &&
+                       Accept(QueryTokenType::kBracketL) && EntRef() &&
+                       Accept(QueryTokenType::kComma) && ExpressionSpec();
+    if (!valid_first_part) return false;
+    return Accept(QueryTokenType::kComma)
+                   ? Accept(QueryTokenType::kUnderscore) &&
+                             Accept(QueryTokenType::kBracketR)
+                   : Accept(QueryTokenType::kBracketR);
 }
 bool PQLValidator::StmtRef() {
     return Accept(QueryTokenType::kWord) ||

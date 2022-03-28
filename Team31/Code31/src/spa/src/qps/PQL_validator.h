@@ -41,7 +41,7 @@ class PQLValidator {
     bool MultipleElem();
     bool AttrName();
     bool SuchThat();
-    bool Pattern();
+    bool PatternCond();
     bool With();
 
     bool SynDecl();
@@ -56,6 +56,7 @@ class PQLValidator {
     bool ArithmeticExpr(bool has_left = false);
     bool Group();
 
+    bool Pattern();
     bool RelRef();
     bool AttrCompare();
     bool Ref();
