@@ -68,11 +68,12 @@ bool PQLValidator::Select() {
     bool valid = true;
     while (valid) {
         if (Accept(QueryTokenType::kKeywordSuch)) {
-            valid = SuchThat();
+            if (!Accept(QueryTokenType::kKeywordThat)) return false;
+            valid = RelCond();
         } else if (Accept(QueryTokenType::kKeywordPattern)) {
             valid = PatternCond();
         } else if (Accept(QueryTokenType::kKeywordWith)) {
-            valid = With();
+            valid = AttrCond();
         } else {
             break;
         }
@@ -100,8 +101,7 @@ bool PQLValidator::AttrName() {
            Accept(QueryTokenType::kAttrValue) ||
            Accept(QueryTokenType::kAttrVar);
 }
-bool PQLValidator::SuchThat() {
-    if (!Accept(QueryTokenType::kKeywordThat)) return false;
+bool PQLValidator::RelCond() {
     bool valid;
     do {
         valid = RelRef();
@@ -212,7 +212,7 @@ bool PQLValidator::Group() {
 bool PQLValidator::Factor() {
     return Accept(QueryTokenType::kInteger) || Accept(QueryTokenType::kWord);
 }
-bool PQLValidator::With() {
+bool PQLValidator::AttrCond() {
     bool valid;
     do {
         valid = AttrCompare();

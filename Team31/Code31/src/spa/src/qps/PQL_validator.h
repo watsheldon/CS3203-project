@@ -40,9 +40,9 @@ class PQLValidator {
     bool Elem();
     bool MultipleElem();
     bool AttrName();
-    bool SuchThat();
+    bool RelCond();
     bool PatternCond();
-    bool With();
+    bool AttrCond();
 
     bool SynDecl();
     bool MultipleSynonym();
