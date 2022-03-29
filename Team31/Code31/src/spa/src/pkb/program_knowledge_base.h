@@ -13,9 +13,10 @@
 #include "common/polish_notation_node.h"
 #include "knowledge_base.h"
 #include "pkb/store/calls_relationship_store.h"
-#include "pkb/store/follows_parent_rel_store.h"
+#include "pkb/store/follows_relationship_store.h"
 #include "pkb/store/modifies_relationship_store.h"
 #include "pkb/store/name_value_store.h"
+#include "pkb/store/parent_relationship_store.h"
 #include "pkb/store/polish_notation_store.h"
 #include "pkb/store/stmtlst_statements_store.h"
 #include "pkb/store/type_statements_store.h"
@@ -254,8 +255,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     TypeStatementsStore type_stmt_;
 
     std::unique_ptr<ContainerForest> container_forest_;
-
-    FollowsParentRelStore follows_parent_rel_;
+    FollowsRelationshipStore follows_store_;
+    ParentRelationshipStore parent_store_;
 
     int IdentToIndexValue(std::string_view name, QueryEntityType et);
     template <QueryEntityType et>
