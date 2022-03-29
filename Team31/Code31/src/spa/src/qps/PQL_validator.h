@@ -49,7 +49,6 @@ class PQLValidator {
     bool StmtRef();
     bool UsesModifiesStmtEntRef();
     bool EntRef();
-    bool ExpressionSpec();
     bool Identifier();
     bool Factor();
     bool ArithOpr();
@@ -67,6 +66,7 @@ class PQLValidator {
     bool IsConstant();
     void FetchToken();
     bool Accept(QueryTokenType type);
+    bool PatternCommonPreamble();
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_PQL_VALIDATOR_H_

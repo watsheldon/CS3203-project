@@ -155,15 +155,27 @@ bool PQLValidator::PatternCond() {
     return valid;
 }
 bool PQLValidator::Pattern() {
-    bool valid_first_part;
-    valid_first_part = Accept(QueryTokenType::kWord) &&
-                       Accept(QueryTokenType::kBracketL) && EntRef() &&
-                       Accept(QueryTokenType::kComma) && ExpressionSpec();
-    if (!valid_first_part) return false;
-    return Accept(QueryTokenType::kComma)
-                   ? Accept(QueryTokenType::kUnderscore) &&
-                             Accept(QueryTokenType::kBracketR)
-                   : Accept(QueryTokenType::kBracketR);
+    if (!PatternCommonPreamble()) return false;
+    bool need_underscore = false, need_expr = true;
+    if (Accept(QueryTokenType::kUnderscore)) {
+        if (Accept(QueryTokenType::kBracketR)) return true;
+        need_underscore = true;
+        if (Accept(QueryTokenType::kComma))
+            need_expr = false;
+        else if (!Accept(QueryTokenType::kQuote))
+            return false;
+    } else if (Accept(QueryTokenType::kQuote)) {
+        need_expr = true;
+    } else {
+        return false;
+    }
+    return (!need_expr || ArithmeticExpr() && Accept(QueryTokenType::kQuote)) &&
+           (!need_underscore || Accept(QueryTokenType::kUnderscore)) &&
+           Accept(QueryTokenType::kBracketR);
+}
+bool PQLValidator::PatternCommonPreamble() {
+    return Accept(QueryTokenType::kWord) && Accept(QueryTokenType::kBracketL) &&
+           EntRef() && Accept(QueryTokenType::kComma);
 }
 bool PQLValidator::StmtRef() {
     return Accept(QueryTokenType::kWord) ||
@@ -178,17 +190,6 @@ bool PQLValidator::EntRef() {
 bool PQLValidator::Identifier() {
     return Accept(QueryTokenType::kQuote) && Accept(QueryTokenType::kWord) &&
            Accept(QueryTokenType::kQuote);
-}
-bool PQLValidator::ExpressionSpec() {
-    bool not_wild = true;
-    if (Accept(QueryTokenType::kUnderscore)) {
-        if (!Accept(QueryTokenType::kQuote)) return true;
-        not_wild = false;
-    } else if (!Accept(QueryTokenType::kQuote)) {
-        return false;
-    }
-    return ArithmeticExpr() && Accept(QueryTokenType::kQuote) &&
-           (not_wild || Accept(QueryTokenType::kUnderscore));
 }
 bool PQLValidator::ArithOpr() {
     return std::any_of(kArithmeticOpr.begin(), kArithmeticOpr.end(),
