@@ -9,7 +9,7 @@ PolishNotation::PolishNotation(
         const std::vector<PolishNotationNode>& expr) noexcept {
     // Convert to reverse Polish Notation for ease of implementation
     std::vector<PolishNotationNode> pn;
-    std::stack<PolishNotationNode> s;
+    std::stack<PolishNotationNode, std::vector<PolishNotationNode>> s;
     for (auto node : expr) {
         if (node.type == ExprNodeType::kVariable ||
             node.type == ExprNodeType::kConstant) {

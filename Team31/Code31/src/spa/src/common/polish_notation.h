@@ -23,7 +23,8 @@ class PolishNotation {
             const PolishNotation &pattern) noexcept;
     static void HandleOperator(const PolishNotationNode &node,
                                std::vector<PolishNotationNode> &pn,
-                               std::stack<PolishNotationNode> &s) {
+                               std::stack<PolishNotationNode,
+                                          std::vector<PolishNotationNode>> &s) {
         assert(node.type == ExprNodeType::kOperator);
         auto op_type = std::get<OperatorType>(node.id);
         if (op_type == OperatorType::kBracketL) {
