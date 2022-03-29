@@ -27,6 +27,10 @@ void Factory::SetRelationship(QueryTokenType type) noexcept {
         case QueryTokenType::kKeywordCalls:
             rel_ = Relationship::kCalls;
             return;
+        case QueryTokenType::kKeywordNext:
+            rel_ = Relationship::kNext;
+        case QueryTokenType::kKeywordAffects:
+            rel_ = Relationship::kAffects;
         default:
             assert(false);
     }
@@ -69,6 +73,12 @@ void Factory::SetTransPartial() noexcept {
             return;
         case Relationship::kCalls:
             rel_ = Relationship::kCallsT;
+            return;
+        case Relationship::kNext:
+            rel_ = Relationship::kNextT;
+            return;
+        case Relationship::kAffects:
+            rel_ = Relationship::kAffectsT;
             return;
         case Relationship::kPatternExact:
         case Relationship::kPatternPartial:
