@@ -84,59 +84,59 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
 bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt,
                                         Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
-    return follows_store_.ExistFollows(first_stmt, second_stmt);
+    return follows_store_.IsNonTransitive(first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistFollowsT(Index<ArgPos::kFirst> first_stmt,
                                          Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
-    return follows_store_.ExistFollowsT(first_stmt, second_stmt);
+    return follows_store_.IsTransitive(first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kFirst> first_stmt) {
     assert(compiled);
-    return follows_store_.ExistFollows(first_stmt);
+    return follows_store_.HasSecondValues(first_stmt);
 }
 bool ProgramKnowledgeBase::ExistFollows(Index<ArgPos::kSecond> second_stmt) {
     assert(compiled);
-    return follows_store_.ExistFollows(second_stmt);
+    return follows_store_.HasFirstValues(second_stmt);
 }
 bool ProgramKnowledgeBase::ExistFollows() {
     assert(compiled);
-    return follows_store_.ExistFollows();
+    return follows_store_.ExistRelationship();
 }
 std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
                                                StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetFollows(return_pos, return_type);
+    return follows_store_.GetOneArg(return_pos, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kFirst> stmt_no,
                                                StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetFollows(stmt_no, return_type);
+    return follows_store_.GetOneArg(stmt_no, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kFirst> stmt_no,
                                                 StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetFollowsT(stmt_no, return_type);
+    return follows_store_.GetOneArgT(stmt_no, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kSecond> stmt_no,
                                                StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetFollows(stmt_no, return_type);
+    return follows_store_.GetOneArg(stmt_no, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kSecond> stmt_no,
                                                 StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetFollowsT(stmt_no, return_type);
+    return follows_store_.GetOneArgT(stmt_no, return_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(StmtType first_type,
                                                    StmtType second_type) {
     assert(compiled);
-    return follows_store_.GetFollowsPairs(first_type, second_type);
+    return follows_store_.GetBothArgs(first_type, second_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetFollowsTPairs(StmtType first_type,
                                                     StmtType second_type) {
     assert(compiled);
-    return follows_store_.GetFollowsPairsT(first_type, second_type);
+    return follows_store_.GetBothArgsT(first_type, second_type);
 }
 bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt,
                                        Index<ArgPos::kSecond> child_stmt) {
