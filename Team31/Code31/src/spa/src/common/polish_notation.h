@@ -21,32 +21,8 @@ class PolishNotation {
     std::vector<PolishNotationNode> expr_;
     [[nodiscard]] static std::vector<int> ComputeLps(
             const PolishNotation &pattern) noexcept;
-    static void HandleOperator(const PolishNotationNode &node,
-                               std::vector<PolishNotationNode> &pn,
-                               std::stack<PolishNotationNode,
-                                          std::vector<PolishNotationNode>> &s) {
-        assert(node.type == ExprNodeType::kOperator);
-        auto op_type = std::get<OperatorType>(node.id);
-        if (op_type == OperatorType::kBracketL) {
-            s.emplace(node);
-            return;
-        }
-        if (op_type == OperatorType::kBracketR) {
-            auto top_op_type = std::get<OperatorType>(s.top().id);
-            while (top_op_type != OperatorType::kBracketL) {
-                pn.emplace_back(s.top());
-                s.pop();
-                top_op_type = std::get<OperatorType>(s.top().id);
-            }
-            s.pop();
-            return;
-        }
-        while (!s.empty() && s.top().HasHigherEqualPrecedence(node)) {
-            pn.emplace_back(s.top());
-            s.pop();
-        }
-        s.emplace(node);
-    }
+    void HandleOperator(OperatorType operator_type,
+                        std::stack<OperatorType, std::vector<OperatorType>> &s);
 };
 }  // namespace spa
 

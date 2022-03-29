@@ -2,28 +2,45 @@
 
 #include <cassert>
 #include <stack>
-#include <utility>
 
 namespace spa {
 PolishNotation::PolishNotation(
         const std::vector<PolishNotationNode>& expr) noexcept {
     // Convert to reverse Polish Notation for ease of implementation
-    std::vector<PolishNotationNode> pn;
-    std::stack<PolishNotationNode, std::vector<PolishNotationNode>> s;
-    for (auto node : expr) {
+    std::stack<OperatorType, std::vector<OperatorType>> stack;
+    for (const auto& node : expr) {
         if (node.type == ExprNodeType::kVariable ||
             node.type == ExprNodeType::kConstant) {
-            pn.emplace_back(node);
-        } else {
-            HandleOperator(node, pn, s);
+            expr_.emplace_back(node);
+            continue;
         }
+        HandleOperator(std::get<OperatorType>(node.id), stack);
     }
-    while (!s.empty()) {
-        pn.emplace_back(s.top());
-        s.pop();
+    while (!stack.empty()) {
+        expr_.emplace_back(stack.top());
+        stack.pop();
     }
-
-    expr_ = std::move(pn);
+}
+void PolishNotation::HandleOperator(
+        OperatorType op_type,
+        std::stack<OperatorType, std::vector<OperatorType>>& stack) {
+    if (op_type == OperatorType::kBracketL) {
+        stack.emplace(op_type);
+        return;
+    }
+    if (op_type == OperatorType::kBracketR) {
+        while (stack.top() != OperatorType::kBracketL) {
+            expr_.emplace_back(stack.top());
+            stack.pop();
+        }
+        stack.pop();
+        return;
+    }
+    while (!stack.empty() && OprHigherEqual(stack.top(), op_type)) {
+        expr_.emplace_back(stack.top());
+        stack.pop();
+    }
+    stack.emplace(op_type);
 }
 bool PolishNotation::operator==(const PolishNotation& other) const noexcept {
     if (this == &other) return true;
@@ -52,7 +69,6 @@ bool PolishNotation::Contains(const PolishNotation& other) const noexcept {
     }
     return false;
 }
-
 std::vector<int> PolishNotation::GetAllVarIndices() const noexcept {
     std::vector<int> var_indices;
     for (auto node : expr_) {
@@ -62,7 +78,6 @@ std::vector<int> PolishNotation::GetAllVarIndices() const noexcept {
     }
     return var_indices;
 }
-
 std::vector<int> PolishNotation::ComputeLps(
         const PolishNotation& pattern) noexcept {
     // Compute the longest proper prefix suffix array

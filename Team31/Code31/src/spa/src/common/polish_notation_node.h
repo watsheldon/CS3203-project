@@ -14,14 +14,22 @@ enum class OperatorType : int {
     kBracketL,
     kBracketR
 };
+constexpr bool OprHigherEqual(OperatorType op1, OperatorType op2) noexcept {
+    if (op1 >= OperatorType::kTimes && op1 <= OperatorType::kModulo) {
+        return true;
+    }
+    if (op1 == OperatorType::kBracketL || op1 == OperatorType::kBracketR) {
+        return (op2 == OperatorType::kBracketL ||
+                op2 == OperatorType::kBracketR);
+    }
+    return (op2 <= OperatorType::kMinus || op2 >= OperatorType::kBracketL);
+}
 struct PolishNotationNode {
     using ID = std::variant<int, OperatorType>;
     const ExprNodeType type;
     const ID id;
     explicit PolishNotationNode(ExprNodeType node_type, int id) noexcept;
     explicit PolishNotationNode(OperatorType opr) noexcept;
-    bool HasHigherEqualPrecedence(
-            const PolishNotationNode &other) const noexcept;
     bool operator==(const PolishNotationNode &other) const noexcept;
 };
 
