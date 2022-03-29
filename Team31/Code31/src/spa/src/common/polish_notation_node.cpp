@@ -3,19 +3,19 @@
 #include <cassert>
 
 namespace spa {
-PolishNotationNode::PolishNotationNode(ExprNodeType node_type, ID id) noexcept
+PolishNotationNode::PolishNotationNode(ExprNodeType node_type, int id) noexcept
         : type(node_type), id(id) {
-    auto *ptr = std::get_if<int>(&id);
-    assert(ptr == nullptr || *ptr != 0);
+    assert(node_type != ExprNodeType::kOperator && id != 0);
 }
+PolishNotationNode::PolishNotationNode(OperatorType opr) noexcept
+        : type(ExprNodeType::kOperator), id(opr) {}
 bool PolishNotationNode::operator==(
         const PolishNotationNode &other) const noexcept {
     return type == other.type && id == other.id;
 }
-bool PolishNotationNode::HasHigherPrecedence(
+bool PolishNotationNode::HasHigherEqualPrecedence(
         const PolishNotationNode &other) const noexcept {
-    if (type != ExprNodeType::kOperator ||
-        other.type != ExprNodeType::kOperator) {
+    if (other.type != type || type != ExprNodeType::kOperator) {
         assert(false);
     }
     auto op1 = std::get<OperatorType>(id);
@@ -23,15 +23,10 @@ bool PolishNotationNode::HasHigherPrecedence(
     if (op1 >= OperatorType::kTimes && op1 <= OperatorType::kModulo) {
         return true;
     }
-    if (op1 >= OperatorType::kBracketL && op1 <= OperatorType::kBracketR) {
-        if (op2 >= OperatorType::kBracketL && op2 <= OperatorType::kBracketR) {
-            return true;
-        }
-        return false;
+    if (op1 == OperatorType::kBracketL || op1 == OperatorType::kBracketR) {
+        return (op2 == OperatorType::kBracketL ||
+                op2 == OperatorType::kBracketR);
     }
-    if (op2 <= OperatorType::kMinus || op2 >= OperatorType::kBracketL) {
-        return true;
-    }
-    return false;
+    return (op2 <= OperatorType::kMinus || op2 >= OperatorType::kBracketL);
 }
 }  // namespace spa

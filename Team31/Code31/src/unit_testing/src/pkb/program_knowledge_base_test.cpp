@@ -29,25 +29,23 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     // v1+1*v3
     PolishNotation pn1(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
+            PolishNotationNode(OperatorType::kPlus),
             PolishNotationNode(ExprNodeType::kConstant, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 3)});
     // v2+(2*v3)
     PolishNotation pn2(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketL),
+            PolishNotationNode(OperatorType::kPlus),
+            PolishNotationNode(OperatorType::kBracketL),
             PolishNotationNode(ExprNodeType::kConstant, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketR)});
+            PolishNotationNode(OperatorType::kBracketR)});
     // v3+3
     PolishNotation pn3(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
+            PolishNotationNode(OperatorType::kPlus),
             PolishNotationNode(ExprNodeType::kConstant, 3)});
     be.notations = std::vector<PN>{pn0, pn1, pn2, pn3};
 

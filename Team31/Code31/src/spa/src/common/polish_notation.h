@@ -32,15 +32,16 @@ class PolishNotation {
             return;
         }
         if (op_type == OperatorType::kBracketR) {
-            while (std::get<OperatorType>(s.top().id) !=
-                   OperatorType::kBracketL) {
+            auto top_op_type = std::get<OperatorType>(s.top().id);
+            while (top_op_type != OperatorType::kBracketL) {
                 pn.emplace_back(s.top());
                 s.pop();
+                top_op_type = std::get<OperatorType>(s.top().id);
             }
             s.pop();
             return;
         }
-        while (!s.empty() && s.top().HasHigherPrecedence(node)) {
+        while (!s.empty() && s.top().HasHigherEqualPrecedence(node)) {
             pn.emplace_back(s.top());
             s.pop();
         }

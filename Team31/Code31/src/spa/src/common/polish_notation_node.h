@@ -6,7 +6,6 @@
 namespace spa {
 enum class ExprNodeType { kVariable, kConstant, kOperator };
 enum class OperatorType : int {
-
     kPlus,
     kMinus,
     kTimes,
@@ -19,9 +18,10 @@ struct PolishNotationNode {
     using ID = std::variant<int, OperatorType>;
     const ExprNodeType type;
     const ID id;
-    explicit PolishNotationNode(ExprNodeType node_type, ID id) noexcept;
-    // higher or equal precedence
-    bool HasHigherPrecedence(const PolishNotationNode &other) const noexcept;
+    explicit PolishNotationNode(ExprNodeType node_type, int id) noexcept;
+    explicit PolishNotationNode(OperatorType opr) noexcept;
+    bool HasHigherEqualPrecedence(
+            const PolishNotationNode &other) const noexcept;
     bool operator==(const PolishNotationNode &other) const noexcept;
 };
 

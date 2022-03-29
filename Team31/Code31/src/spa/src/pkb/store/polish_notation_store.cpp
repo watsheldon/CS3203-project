@@ -103,6 +103,6 @@ PolishNotationNode PolishNotationStore::TokenTypeToPNNode(
     auto opr = static_cast<OperatorType>(
             static_cast<int>(token_type) -
             static_cast<int>(QueryTokenType::kOperatorPlus));
-    return PolishNotationNode(ExprNodeType::kOperator, opr);
+    return PolishNotationNode(opr);
 }
 }  // namespace spa

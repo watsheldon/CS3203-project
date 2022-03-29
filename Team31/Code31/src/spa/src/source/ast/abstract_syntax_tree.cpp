@@ -1,7 +1,6 @@
 #include "abstract_syntax_tree.h"
 
 #include <cassert>
-#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
@@ -61,8 +60,7 @@ const ConstantNode *AbstractSyntaxTree::AddConstant(std::string name) noexcept {
 }
 void AbstractSyntaxTree::BracketL() noexcept {
     if (mode_history_.top() == Mode::kAssign) {
-        curr_expr_.emplace_back(PolishNotationNode(ExprNodeType::kOperator,
-                                                   OperatorType::kBracketL));
+        curr_expr_.emplace_back(OperatorType::kBracketL);
     } else if (mode_history_.top() == Mode::kWhile ||
                mode_history_.top() == Mode::kIf) {
         mode_history_.emplace(Mode::kCond);
@@ -76,8 +74,7 @@ void AbstractSyntaxTree::BracketL() noexcept {
 }
 void AbstractSyntaxTree::BracketR() noexcept {
     if (mode_history_.top() == Mode::kAssign) {
-        curr_expr_.emplace_back(PolishNotationNode(ExprNodeType::kOperator,
-                                                   OperatorType::kBracketR));
+        curr_expr_.emplace_back(OperatorType::kBracketR);
         return;
     }
     assert(mode_history_.top() == Mode::kCond);
@@ -195,8 +192,7 @@ void AbstractSyntaxTree::Name(const std::string &name) noexcept {
 void AbstractSyntaxTree::Constant(std::string name) noexcept {
     auto constant = AddConstant(std::move(name));
     if (mode_history_.top() == Mode::kAssign) {
-        curr_expr_.emplace_back(PolishNotationNode(ExprNodeType::kConstant,
-                                                   constant->GetIndex()));
+        curr_expr_.emplace_back(ExprNodeType::kConstant, constant->GetIndex());
         return;
     }
     assert(mode_history_.top() == Mode::kCond);
@@ -254,8 +250,7 @@ void AbstractSyntaxTree::LastCondAddVar(std::string name) noexcept {
 }
 void AbstractSyntaxTree::ExprAddVar(std::string name) noexcept {
     const auto variable = AddVariable(std::move(name));
-    curr_expr_.emplace_back(
-            PolishNotationNode(ExprNodeType::kVariable, variable->GetIndex()));
+    curr_expr_.emplace_back(ExprNodeType::kVariable, variable->GetIndex());
 }
 void AbstractSyntaxTree::ParseToken(const Token &token) noexcept {
     auto &[type, name] = token;
@@ -292,8 +287,7 @@ void AbstractSyntaxTree::ParseToken(const Token &token) noexcept {
         case SourceTokenType::kOperatorDivide:
         case SourceTokenType::kOperatorModulo:
             if (mode_history_.top() == Mode::kAssign)
-                curr_expr_.emplace_back(PolishNotationNode(
-                        ExprNodeType::kOperator, OperatorForRpn(type)));
+                curr_expr_.emplace_back(OperatorForRpn(type));
             // nothing to do but just ensure that it is the case
             else
                 assert(mode_history_.top() == Mode::kCond);

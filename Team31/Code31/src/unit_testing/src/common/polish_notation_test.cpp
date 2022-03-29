@@ -10,140 +10,126 @@ TEST_CASE("common/PolishNotation") {
     // v+3*x
     PolishNotation pn1(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 6),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
+            PolishNotationNode(OperatorType::kPlus),
             PolishNotationNode(ExprNodeType::kConstant, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 233)});
     // v+(3*x)
     PolishNotation pn2(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 6),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketL),
+            PolishNotationNode(OperatorType::kPlus),
+            PolishNotationNode(OperatorType::kBracketL),
             PolishNotationNode(ExprNodeType::kConstant, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 233),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketR)});
+            PolishNotationNode(OperatorType::kBracketR)});
     // v+3
     PolishNotation pn3(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 6),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
+            PolishNotationNode(OperatorType::kPlus),
             PolishNotationNode(ExprNodeType::kConstant, 1)});
     // 3*x
     PolishNotation pn4(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kConstant, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 233)});
     // b/c
     PolishNotation pn5(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kDivide),
+            PolishNotationNode(OperatorType::kDivide),
             PolishNotationNode(ExprNodeType::kVariable, 3)});
     // a/(b/c)
     PolishNotation pn6(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kDivide),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketL),
+            PolishNotationNode(OperatorType::kDivide),
+            PolishNotationNode(OperatorType::kBracketL),
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kDivide),
+            PolishNotationNode(OperatorType::kDivide),
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketR)});
+            PolishNotationNode(OperatorType::kBracketR)});
     // a*(b*c)
     PolishNotation pn7(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketL),
+            PolishNotationNode(OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kBracketL),
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketR)});
+            PolishNotationNode(OperatorType::kBracketR)});
     // a%(b%c)
     PolishNotation pn8(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kModulo),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketL),
+            PolishNotationNode(OperatorType::kModulo),
+            PolishNotationNode(OperatorType::kBracketL),
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kModulo),
+            PolishNotationNode(OperatorType::kModulo),
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketR)});
+            PolishNotationNode(OperatorType::kBracketR)});
     // ((b)/(c))
     PolishNotation pn9(std::vector<PolishNotationNode>{
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketL),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketL),
+            PolishNotationNode(OperatorType::kBracketL),
+            PolishNotationNode(OperatorType::kBracketL),
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketR),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kDivide),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketL),
+            PolishNotationNode(OperatorType::kBracketR),
+            PolishNotationNode(OperatorType::kDivide),
+            PolishNotationNode(OperatorType::kBracketL),
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketR),
-            PolishNotationNode(ExprNodeType::kOperator,
-                               OperatorType::kBracketR)});
+            PolishNotationNode(OperatorType::kBracketR),
+            PolishNotationNode(OperatorType::kBracketR)});
     // a+b
     PolishNotation pn10(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
+            PolishNotationNode(OperatorType::kPlus),
             PolishNotationNode(ExprNodeType::kVariable, 2)});
     // b-c
     PolishNotation pn11(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kMinus),
+            PolishNotationNode(OperatorType::kMinus),
             PolishNotationNode(ExprNodeType::kVariable, 3)});
     // a+b-c
     PolishNotation pn12(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus),
+            PolishNotationNode(OperatorType::kPlus),
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kMinus),
+            PolishNotationNode(OperatorType::kMinus),
             PolishNotationNode(ExprNodeType::kVariable, 3)});
     // a/b*c%d
     PolishNotation pn13(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kDivide),
+            PolishNotationNode(OperatorType::kDivide),
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kModulo),
+            PolishNotationNode(OperatorType::kModulo),
             PolishNotationNode(ExprNodeType::kVariable, 4)});
     // a/b*c
     PolishNotation pn14(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kDivide),
+            PolishNotationNode(OperatorType::kDivide),
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 3)});
     // b*c%d
     PolishNotation pn15(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kModulo),
+            PolishNotationNode(OperatorType::kModulo),
             PolishNotationNode(ExprNodeType::kVariable, 4)});
     // a/b
     PolishNotation pn16(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 1),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kDivide),
+            PolishNotationNode(OperatorType::kDivide),
             PolishNotationNode(ExprNodeType::kVariable, 2)});
     // b*c
     PolishNotation pn17(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 2),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes),
+            PolishNotationNode(OperatorType::kTimes),
             PolishNotationNode(ExprNodeType::kVariable, 3)});
     // c%d
     PolishNotation pn18(std::vector<PolishNotationNode>{
             PolishNotationNode(ExprNodeType::kVariable, 3),
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kModulo),
+            PolishNotationNode(OperatorType::kModulo),
             PolishNotationNode(ExprNodeType::kVariable, 4)});
 
     SECTION("equals operator") { REQUIRE(pn1 == pn2); }

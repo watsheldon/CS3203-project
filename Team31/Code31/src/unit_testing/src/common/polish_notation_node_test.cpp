@@ -4,20 +4,13 @@
 
 namespace spa {
 TEST_CASE("common/PolishNotationNode") {
-    auto bl = PolishNotationNode(ExprNodeType::kOperator,
-                                 OperatorType::kBracketL);
-    auto br = PolishNotationNode(ExprNodeType::kOperator,
-                                 OperatorType::kBracketR);
-    auto plus =
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kPlus);
-    auto minus =
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kMinus);
-    auto times =
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kTimes);
-    auto divide =
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kDivide);
-    auto modulo =
-            PolishNotationNode(ExprNodeType::kOperator, OperatorType::kModulo);
+    auto bl = PolishNotationNode(OperatorType::kBracketL);
+    auto br = PolishNotationNode(OperatorType::kBracketR);
+    auto plus = PolishNotationNode(OperatorType::kPlus);
+    auto minus = PolishNotationNode(OperatorType::kMinus);
+    auto times = PolishNotationNode(OperatorType::kTimes);
+    auto divide = PolishNotationNode(OperatorType::kDivide);
+    auto modulo = PolishNotationNode(OperatorType::kModulo);
 
     SECTION("distinguish between operators with the same precedence") {
         REQUIRE(bl == bl);
@@ -28,61 +21,61 @@ TEST_CASE("common/PolishNotationNode") {
         REQUIRE_FALSE(divide == modulo);
     }
     SECTION("operator precedence") {
-        REQUIRE(bl.HasHigherPrecedence(bl));
-        REQUIRE(bl.HasHigherPrecedence(br));
-        REQUIRE_FALSE(bl.HasHigherPrecedence(plus));
-        REQUIRE_FALSE(bl.HasHigherPrecedence(minus));
-        REQUIRE_FALSE(bl.HasHigherPrecedence(times));
-        REQUIRE_FALSE(bl.HasHigherPrecedence(divide));
-        REQUIRE_FALSE(bl.HasHigherPrecedence(modulo));
+        REQUIRE(bl.HasHigherEqualPrecedence(bl));
+        REQUIRE(bl.HasHigherEqualPrecedence(br));
+        REQUIRE_FALSE(bl.HasHigherEqualPrecedence(plus));
+        REQUIRE_FALSE(bl.HasHigherEqualPrecedence(minus));
+        REQUIRE_FALSE(bl.HasHigherEqualPrecedence(times));
+        REQUIRE_FALSE(bl.HasHigherEqualPrecedence(divide));
+        REQUIRE_FALSE(bl.HasHigherEqualPrecedence(modulo));
 
-        REQUIRE(br.HasHigherPrecedence(bl));
-        REQUIRE(br.HasHigherPrecedence(br));
-        REQUIRE_FALSE(br.HasHigherPrecedence(plus));
-        REQUIRE_FALSE(br.HasHigherPrecedence(minus));
-        REQUIRE_FALSE(br.HasHigherPrecedence(times));
-        REQUIRE_FALSE(br.HasHigherPrecedence(divide));
-        REQUIRE_FALSE(br.HasHigherPrecedence(modulo));
+        REQUIRE(br.HasHigherEqualPrecedence(bl));
+        REQUIRE(br.HasHigherEqualPrecedence(br));
+        REQUIRE_FALSE(br.HasHigherEqualPrecedence(plus));
+        REQUIRE_FALSE(br.HasHigherEqualPrecedence(minus));
+        REQUIRE_FALSE(br.HasHigherEqualPrecedence(times));
+        REQUIRE_FALSE(br.HasHigherEqualPrecedence(divide));
+        REQUIRE_FALSE(br.HasHigherEqualPrecedence(modulo));
 
-        REQUIRE(plus.HasHigherPrecedence(bl));
-        REQUIRE(plus.HasHigherPrecedence(br));
-        REQUIRE(plus.HasHigherPrecedence(plus));
-        REQUIRE(plus.HasHigherPrecedence(minus));
-        REQUIRE_FALSE(plus.HasHigherPrecedence(times));
-        REQUIRE_FALSE(plus.HasHigherPrecedence(divide));
-        REQUIRE_FALSE(plus.HasHigherPrecedence(modulo));
+        REQUIRE(plus.HasHigherEqualPrecedence(bl));
+        REQUIRE(plus.HasHigherEqualPrecedence(br));
+        REQUIRE(plus.HasHigherEqualPrecedence(plus));
+        REQUIRE(plus.HasHigherEqualPrecedence(minus));
+        REQUIRE_FALSE(plus.HasHigherEqualPrecedence(times));
+        REQUIRE_FALSE(plus.HasHigherEqualPrecedence(divide));
+        REQUIRE_FALSE(plus.HasHigherEqualPrecedence(modulo));
 
-        REQUIRE(minus.HasHigherPrecedence(bl));
-        REQUIRE(minus.HasHigherPrecedence(br));
-        REQUIRE(minus.HasHigherPrecedence(plus));
-        REQUIRE(minus.HasHigherPrecedence(minus));
-        REQUIRE_FALSE(minus.HasHigherPrecedence(times));
-        REQUIRE_FALSE(minus.HasHigherPrecedence(divide));
-        REQUIRE_FALSE(minus.HasHigherPrecedence(modulo));
+        REQUIRE(minus.HasHigherEqualPrecedence(bl));
+        REQUIRE(minus.HasHigherEqualPrecedence(br));
+        REQUIRE(minus.HasHigherEqualPrecedence(plus));
+        REQUIRE(minus.HasHigherEqualPrecedence(minus));
+        REQUIRE_FALSE(minus.HasHigherEqualPrecedence(times));
+        REQUIRE_FALSE(minus.HasHigherEqualPrecedence(divide));
+        REQUIRE_FALSE(minus.HasHigherEqualPrecedence(modulo));
 
-        REQUIRE(times.HasHigherPrecedence(bl));
-        REQUIRE(times.HasHigherPrecedence(br));
-        REQUIRE(times.HasHigherPrecedence(plus));
-        REQUIRE(times.HasHigherPrecedence(minus));
-        REQUIRE(times.HasHigherPrecedence(times));
-        REQUIRE(times.HasHigherPrecedence(divide));
-        REQUIRE(times.HasHigherPrecedence(modulo));
+        REQUIRE(times.HasHigherEqualPrecedence(bl));
+        REQUIRE(times.HasHigherEqualPrecedence(br));
+        REQUIRE(times.HasHigherEqualPrecedence(plus));
+        REQUIRE(times.HasHigherEqualPrecedence(minus));
+        REQUIRE(times.HasHigherEqualPrecedence(times));
+        REQUIRE(times.HasHigherEqualPrecedence(divide));
+        REQUIRE(times.HasHigherEqualPrecedence(modulo));
 
-        REQUIRE(divide.HasHigherPrecedence(bl));
-        REQUIRE(divide.HasHigherPrecedence(br));
-        REQUIRE(divide.HasHigherPrecedence(plus));
-        REQUIRE(divide.HasHigherPrecedence(minus));
-        REQUIRE(divide.HasHigherPrecedence(times));
-        REQUIRE(divide.HasHigherPrecedence(divide));
-        REQUIRE(divide.HasHigherPrecedence(modulo));
+        REQUIRE(divide.HasHigherEqualPrecedence(bl));
+        REQUIRE(divide.HasHigherEqualPrecedence(br));
+        REQUIRE(divide.HasHigherEqualPrecedence(plus));
+        REQUIRE(divide.HasHigherEqualPrecedence(minus));
+        REQUIRE(divide.HasHigherEqualPrecedence(times));
+        REQUIRE(divide.HasHigherEqualPrecedence(divide));
+        REQUIRE(divide.HasHigherEqualPrecedence(modulo));
 
-        REQUIRE(modulo.HasHigherPrecedence(bl));
-        REQUIRE(modulo.HasHigherPrecedence(br));
-        REQUIRE(modulo.HasHigherPrecedence(plus));
-        REQUIRE(modulo.HasHigherPrecedence(minus));
-        REQUIRE(modulo.HasHigherPrecedence(times));
-        REQUIRE(modulo.HasHigherPrecedence(divide));
-        REQUIRE(modulo.HasHigherPrecedence(modulo));
+        REQUIRE(modulo.HasHigherEqualPrecedence(bl));
+        REQUIRE(modulo.HasHigherEqualPrecedence(br));
+        REQUIRE(modulo.HasHigherEqualPrecedence(plus));
+        REQUIRE(modulo.HasHigherEqualPrecedence(minus));
+        REQUIRE(modulo.HasHigherEqualPrecedence(times));
+        REQUIRE(modulo.HasHigherEqualPrecedence(divide));
+        REQUIRE(modulo.HasHigherEqualPrecedence(modulo));
     }
 }
 }  // namespace spa
