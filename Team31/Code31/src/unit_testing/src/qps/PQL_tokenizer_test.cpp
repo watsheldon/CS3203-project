@@ -124,8 +124,7 @@ TEST_CASE("common/PQLTokenizer") {
         REQUIRE(tokenizer1.Next() == "Select");
         REQUIRE(tokenizer1.Next() == "r");
         REQUIRE(tokenizer1.Next() == ".");
-        REQUIRE(tokenizer1.Next() == "stmt");
-        REQUIRE(tokenizer1.Next() == "#");
+        REQUIRE(tokenizer1.Next() == "stmt#");
         REQUIRE(tokenizer1.Next() == "such");
         REQUIRE(tokenizer1.Next() == "that");
         REQUIRE(tokenizer1.Next() == "Follows");
@@ -168,6 +167,23 @@ TEST_CASE("common/PQLTokenizer") {
         REQUIRE(tokenizer2.Next() == ",");
         REQUIRE(tokenizer2.Next() == "q");
         REQUIRE(tokenizer2.Next() == ")");
+    }
+    SECTION("test attrName with spaces in between") {
+        std::string_view code1{"p . procName v .varName c. value s . stmt#"};
+        PQLTokenizer tokenizer1;
+        tokenizer1(code1);
+        REQUIRE(tokenizer1.Next() == "p");
+        REQUIRE(tokenizer1.Next() == ".");
+        REQUIRE(tokenizer1.Next() == "procName");
+        REQUIRE(tokenizer1.Next() == "v");
+        REQUIRE(tokenizer1.Next() == ".");
+        REQUIRE(tokenizer1.Next() == "varName");
+        REQUIRE(tokenizer1.Next() == "c");
+        REQUIRE(tokenizer1.Next() == ".");
+        REQUIRE(tokenizer1.Next() == "value");
+        REQUIRE(tokenizer1.Next() == "s");
+        REQUIRE(tokenizer1.Next() == ".");
+        REQUIRE(tokenizer1.Next() == "stmt#");
     }
 }
 }  // namespace spa
