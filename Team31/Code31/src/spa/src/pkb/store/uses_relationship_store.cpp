@@ -12,7 +12,9 @@ UsesRelationshipStore::UsesRelationshipStore(std::size_t stmt_size,
                                              std::size_t var_size,
                                              std::size_t proc_size)
         : UsesModifiesStoreBase(stmt_size, var_size, proc_size),
-          condition_direct_uses_(stmt_size, var_size) {}
+          condition_direct_uses_(
+                  {IndexBimap<std::set<int>>(stmt_size, var_size),
+                   IndexBimap<std::set<int>>(stmt_size, var_size)}) {}
 void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
     stmt_var_.Set(stmt_no, std::forward<std::vector<int>>(var_indices));
 }
@@ -47,7 +49,7 @@ void UsesRelationshipStore::AddConditionDirectUses(StmtType type, int stmt_no,
     const auto& condition_vars = GetVarIndex(stmt_no);
     auto& [condition_direct_stmts, condition_direct_vars] =
             condition_direct_pairs_[GetIndex(type)];
-    condition_direct_uses_.Set(stmt_no, condition_vars);
+    condition_direct_uses_[GetIndex(type)].Set(stmt_no, condition_vars);
     for (auto v : condition_vars) {
         condition_direct_vars.emplace_back(v);
         if (bitmap.At(stmt_no, v)) continue;
@@ -105,7 +107,7 @@ bool UsesRelationshipStore::ExistUsesP(int proc_index) {
 }
 const std::set<int>& UsesRelationshipStore::GetContainers(StmtType type,
                                                           int var_index) const {
-    return condition_direct_uses_.GetKeys(var_index);
+    return condition_direct_uses_[GetIndex(type)].GetKeys(var_index);
 }
 std::set<int> UsesRelationshipStore::GetContainers(StmtType type) const {
     auto containers = condition_direct_pairs_[GetIndex(type)].first;

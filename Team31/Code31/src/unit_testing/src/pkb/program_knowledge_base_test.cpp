@@ -224,6 +224,18 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
         REQUIRE(pkb.GetPatternPairP(queryToken3) == pairTest2);
         REQUIRE(pkb.GetPatternPair() == pairTest3);
     }
+    SECTION("GetPatternIfWhile") {
+        std::pair<std::vector<int>, std::vector<int>> pair_while = {{5}, {4}};
+        std::pair<std::vector<int>, std::vector<int>> pair_if = {{4}, {4}};
+        REQUIRE(pkb.GetPattern(StmtType::kWhile, "v4") == std::set<int>{5});
+        REQUIRE(pkb.GetPattern(StmtType::kIf, "v4") == std::set<int>{4});
+        REQUIRE(pkb.GetPattern(StmtType::kWhile, "v3").empty());
+        REQUIRE(pkb.GetPattern(StmtType::kIf, "notFound").empty());
+        REQUIRE(pkb.GetPattern(StmtType::kWhile) == std::set<int>{5});
+        REQUIRE(pkb.GetPattern(StmtType::kIf) == std::set<int>{4});
+        REQUIRE(pkb.GetPatternPairs(StmtType::kWhile) == pair_while);
+        REQUIRE(pkb.GetPatternPairs(StmtType::kIf) == pair_if);
+    }
 
     SECTION("Uses") {
         REQUIRE(pkb.ExistUses(7, "v1"));

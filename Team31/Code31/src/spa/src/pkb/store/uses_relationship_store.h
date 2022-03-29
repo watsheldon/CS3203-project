@@ -42,8 +42,8 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
 
     static constexpr std::array<StmtType, 2> relevant_stmt_types_{
             {StmtType::kAssign, StmtType::kPrint}};
-    IndexBimap<std::set<int>> condition_direct_uses_;
     // while_var, if_var
+    std::array<IndexBimap<std::set<int>>, 2> condition_direct_uses_;
     std::array<PairVec<int>, 2> condition_direct_pairs_;
     static constexpr int GetIndex(StmtType container_type) {
         return static_cast<int>(container_type) -
