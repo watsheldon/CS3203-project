@@ -39,6 +39,21 @@ CallsRelationshipStore::CallsRelationshipStore(size_t stmt_count,
 void CallsRelationshipStore::Set(int call_stmt, int proc_index) {
     stmt_proc_.Set(call_stmt, std::move(std::vector<int>{proc_index}));
 }
+bool CallsRelationshipStore::ExistCalls(int first_proc, int second_proc) const {
+    const auto& callees = GetCalleeProcs(first_proc);
+    return callees.find(second_proc) != callees.end();
+}
+bool CallsRelationshipStore::ExistCallsT(int first_proc,
+                                         int second_proc) const {
+    const auto& callees = GetCalleeProcsT(first_proc);
+    return callees.find(second_proc) != callees.end();
+}
+bool CallsRelationshipStore::ExistCalls(int first_proc) const {
+    return !GetCalleeProcs(first_proc).empty();
+}
+std::set<int> CallsRelationshipStore::GetCalls(ArgPos return_pos) const {
+    return return_pos == ArgPos::kFirst ? GetAllCallers() : GetAllCallees();
+}
 const std::set<int>& CallsRelationshipStore::GetCallerProcs(int callee) const {
     return proc_proc_.GetKeys(callee);
 }

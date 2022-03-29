@@ -1,6 +1,7 @@
 #ifndef SRC_SPA_SRC_PKB_STORE_CALLS_RELATIONSHIP_STORE_H_
 #define SRC_SPA_SRC_PKB_STORE_CALLS_RELATIONSHIP_STORE_H_
 
+#include "common/entity_type_enum.h"
 #include "index_bimap.h"
 
 namespace spa {
@@ -9,6 +10,10 @@ class CallsRelationshipStore {
     CallsRelationshipStore(size_t stmt_count, size_t proc_count,
                            std::vector<std::set<int>> procs);
     void Set(int call_stmt, int proc_index);
+    [[nodiscard]] bool ExistCalls(int first_proc, int second_proc) const;
+    [[nodiscard]] bool ExistCallsT(int first_proc, int second_proc) const;
+    [[nodiscard]] bool ExistCalls(int first_proc) const;
+    [[nodiscard]] std::set<int> GetCalls(ArgPos return_pos) const;
     [[nodiscard]] const std::set<int> &GetCallerProcs(int callee) const;
     [[nodiscard]] const std::set<int> &GetCalleeProcs(int caller) const;
     [[nodiscard]] const std::set<int> &GetCallerProcsT(int callee) const;
