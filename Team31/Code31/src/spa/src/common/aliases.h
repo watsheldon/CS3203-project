@@ -17,6 +17,7 @@ using Vec2D = std::vector<std::vector<T>>;
 template <typename T, size_t row, size_t col>
 using Array2D = std::array<std::array<T, col>, row>;
 using StmtNo = int;
+using StmtLstIndex = int;
 using Ident = std::string;
 using IdentView = std::string_view;
 }  // namespace spa
