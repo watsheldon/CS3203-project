@@ -441,20 +441,34 @@ PairVec<int> ProgramKnowledgeBase::GetPatternPair() {
     assert(compiled);
     return GetModifiesStmtVar(StmtType::kAssign);
 }
-std::set<int> ProgramKnowledgeBase::GetPatternIf(std::string_view var_name) {
-    return {};
+std::set<int> ProgramKnowledgeBase::GetPattern(StmtType container_type,
+                                               std::string_view var_name) {
+    assert(compiled);
+    assert(container_type == StmtType::kWhile ||
+           container_type == StmtType::kIf);
+    int var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    if (var_index == 0) return {};
+    return GetPattern(container_type, var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetPatternIf(int var_index) { return {}; }
-PairVec<int> ProgramKnowledgeBase::GetPatternPairIf() { return {}; }
-std::set<int> ProgramKnowledgeBase::GetPatternIf() { return {}; }
-std::set<int> ProgramKnowledgeBase::GetPatternWhile(std::string_view var_name) {
-    return {};
+std::set<int> ProgramKnowledgeBase::GetPattern(StmtType container_type,
+                                               int var_index) {
+    assert(compiled);
+    assert(container_type == StmtType::kWhile ||
+           container_type == StmtType::kIf);
+    return uses_rel_.GetContainers(container_type, var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetPatternWhile(int var_index) {
-    return {};
+PairVec<int> ProgramKnowledgeBase::GetPatternPairs(StmtType container_type) {
+    assert(compiled);
+    assert(container_type == StmtType::kWhile ||
+           container_type == StmtType::kIf);
+    return uses_rel_.GetContainerVarPairs(container_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetPatternPairWhile() { return {}; }
-std::set<int> ProgramKnowledgeBase::GetPatternWhile() { return {}; }
+std::set<int> ProgramKnowledgeBase::GetPattern(StmtType container_type) {
+    assert(compiled);
+    assert(container_type == StmtType::kWhile ||
+           container_type == StmtType::kIf);
+    return uses_rel_.GetContainers(container_type);
+}
 bool ProgramKnowledgeBase::ExistCalls(Index<ArgPos::kFirst> first_proc,
                                       Index<ArgPos::kSecond> second_proc) {
     assert(compiled);

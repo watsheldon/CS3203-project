@@ -298,20 +298,15 @@ class KnowledgeBase {
     // (v, _)
     virtual PairVec<int> GetPatternPair() = 0;
 
-    // if("v",_,_)
-    virtual std::set<int> GetPatternIf(std::string_view var_name) = 0;
-    virtual std::set<int> GetPatternIf(int var_index) = 0;
-    // if(v,_,_)
-    virtual PairVec<int> GetPatternPairIf() = 0;
-    // if(_,_,_)
-    virtual std::set<int> GetPatternIf() = 0;
-    // while("v",_)
-    virtual std::set<int> GetPatternWhile(std::string_view var_name) = 0;
-    virtual std::set<int> GetPatternWhile(int var_index) = 0;
-    // while(v,_)
-    virtual PairVec<int> GetPatternPairWhile() = 0;
-    // while(_,_)
-    virtual std::set<int> GetPatternWhile() = 0;
+    // while("v",_) or if("v",_,_)
+    virtual std::set<int> GetPattern(StmtType container_type,
+                                     std::string_view var_name) = 0;
+    virtual std::set<int> GetPattern(StmtType container_type,
+                                     int var_index) = 0;
+    // while(v,_) or if(v,_,_)
+    virtual PairVec<int> GetPatternPairs(StmtType container_type) = 0;
+    // while(_,_) or if(_,_,_)
+    virtual std::set<int> GetPattern(StmtType container_type) = 0;
 
     /**
      * Check if Calls (first_proc, second_proc) exist

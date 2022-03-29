@@ -159,14 +159,11 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     // (v, _)
     PairVec<int> GetPatternPair() override;
 
-    std::set<int> GetPatternIf(std::string_view var_name) override;
-    std::set<int> GetPatternIf(int var_index) override;
-    PairVec<int> GetPatternPairIf() override;
-    std::set<int> GetPatternIf() override;
-    std::set<int> GetPatternWhile(std::string_view var_name) override;
-    std::set<int> GetPatternWhile(int var_index) override;
-    PairVec<int> GetPatternPairWhile() override;
-    std::set<int> GetPatternWhile() override;
+    std::set<int> GetPattern(StmtType container_type,
+                             std::string_view var_name) override;
+    std::set<int> GetPattern(StmtType container_type, int var_index) override;
+    PairVec<int> GetPatternPairs(StmtType container_type) override;
+    std::set<int> GetPattern(StmtType container_type) override;
 
     bool ExistCalls(Index<ArgPos::kFirst> first_proc,
                     Index<ArgPos::kSecond> second_proc) override;

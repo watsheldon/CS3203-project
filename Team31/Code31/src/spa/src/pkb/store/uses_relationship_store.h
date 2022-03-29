@@ -17,8 +17,7 @@
 namespace spa {
 class UsesRelationshipStore : public UsesModifiesStoreBase {
   public:
-    UsesRelationshipStore(std::size_t stmt_size,
-                          std::size_t var_size,
+    UsesRelationshipStore(std::size_t stmt_size, std::size_t var_size,
                           std::size_t proc_size);
     void Set(int stmt_no, std::vector<int>&& var_indices);
     [[nodiscard]] const std::vector<int>& GetVarIndex(int stmt_no) const;
@@ -36,8 +35,8 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
     void AddConditionRel(const AuxiliaryData& data_store) override;
     void AddAllDirectRel(const TypeStatementsStore& store) override;
     void AddAllIndirectRel(const AuxiliaryData& data_store) override;
-    void AddConditionDirectUses(StmtType type, int stmt_no, PairVec<int>& stmt_var_pairs,
-                                BitVec2D& bitmap);
+    void AddConditionDirectUses(StmtType type, int stmt_no,
+                                PairVec<int>& stmt_var_pairs, BitVec2D& bitmap);
     void AddConditionIndirectUses(int stmt_no, const ContainerInfo& info,
                                   ContainerAddedTrackers& bitmaps);
 
@@ -47,7 +46,8 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
     // while_var, if_var
     std::array<PairVec<int>, 2> condition_direct_pairs_;
     static constexpr int GetIndex(StmtType container_type) {
-        return static_cast<int>(container_type) - static_cast<int>(StmtType::kWhile);
+        return static_cast<int>(container_type) -
+               static_cast<int>(StmtType::kWhile);
     }
 };
 }  // namespace spa
