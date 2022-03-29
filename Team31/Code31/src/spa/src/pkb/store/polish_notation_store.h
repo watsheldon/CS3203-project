@@ -35,11 +35,6 @@ class PolishNotationStore {
   private:
     [[nodiscard]] bool AddSingleToken(const QueryToken& token);
     [[nodiscard]] bool AddConstant(const QueryToken& token);
-    static constexpr std::array<OperatorType, 7> kOperatorMap{
-            OperatorType::kPlus,    OperatorType::kMinus,
-            OperatorType::kTimes,   OperatorType::kDivide,
-            OperatorType::kModulo,  OperatorType::kBracketL,
-            OperatorType::kBracketR};
     static PolishNotationNode TokenTypeToPNNode(
             QueryTokenType token_type) noexcept;
 

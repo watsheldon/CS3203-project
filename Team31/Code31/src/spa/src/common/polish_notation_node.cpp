@@ -20,18 +20,18 @@ bool PolishNotationNode::HasHigherPrecedence(
     }
     auto op1 = std::get<OperatorType>(id);
     auto op2 = std::get<OperatorType>(other.id);
-    if (op1 >= OperatorType::kTimes) {
+    if (op1 >= OperatorType::kTimes && op1 <= OperatorType::kModulo) {
         return true;
     }
-    if (op1 <= OperatorType::kBracketR) {
-        if (op2 <= OperatorType::kBracketR) {
+    if (op1 >= OperatorType::kBracketL && op1 <= OperatorType::kBracketR) {
+        if (op2 >= OperatorType::kBracketL && op2 <= OperatorType::kBracketR) {
             return true;
         }
         return false;
     }
-    if (op2 >= OperatorType::kTimes) {
-        return false;
+    if (op2 <= OperatorType::kMinus || op2 >= OperatorType::kBracketL) {
+        return true;
     }
-    return true;
+    return false;
 }
 }  // namespace spa

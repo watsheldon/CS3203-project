@@ -6,13 +6,14 @@
 namespace spa {
 enum class ExprNodeType { kVariable, kConstant, kOperator };
 enum class OperatorType : int {
-    kBracketL,
-    kBracketR,
+
     kPlus,
     kMinus,
     kTimes,
     kDivide,
-    kModulo
+    kModulo,
+    kBracketL,
+    kBracketR
 };
 struct PolishNotationNode {
     using ID = std::variant<int, OperatorType>;
