@@ -9,9 +9,9 @@ namespace spa {
 template <typename T>
 using VecUniquePtr = std::vector<std::unique_ptr<T>>;
 template <typename T>
-using Pair = std::pair<T, T>;
+using PairOf = std::pair<T, T>;
 template <typename T>
-using PairVec = Pair<std::vector<T>>;
+using PairVec = PairOf<std::vector<T>>;
 template <typename T>
 using Vec2D = std::vector<std::vector<T>>;
 template <typename T, size_t row, size_t col>

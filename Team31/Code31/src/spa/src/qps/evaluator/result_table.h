@@ -14,8 +14,8 @@ namespace spa {
 
 class ResultTable {
   public:
-    using DomainPair = Pair<Domain>;
-    using SynonymPair = Pair<const Synonym *>;
+    using DomainPair = PairOf<Domain>;
+    using SynonymPair = PairOf<const Synonym *>;
     enum ResultType { kBool, kSingle, kDouble };
 
     static Domain Intersect(const Domain &first, const Domain &second) noexcept;
