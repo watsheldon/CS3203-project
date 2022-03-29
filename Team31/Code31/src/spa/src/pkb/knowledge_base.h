@@ -305,12 +305,12 @@ class KnowledgeBase {
     virtual PairVec<int> GetPatternPairIf() = 0;
     // if(_,_,_)
     virtual std::set<int> GetPatternIf() = 0;
-    // while("v",_,_)
+    // while("v",_)
     virtual std::set<int> GetPatternWhile(std::string_view var_name) = 0;
     virtual std::set<int> GetPatternWhile(int var_index) = 0;
-    // while(v,_,_)
+    // while(v,_)
     virtual PairVec<int> GetPatternPairWhile() = 0;
-    // while(_,_,_)
+    // while(_,_)
     virtual std::set<int> GetPatternWhile() = 0;
 
     /**
