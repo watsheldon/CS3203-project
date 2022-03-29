@@ -8,11 +8,20 @@
 #include <string_view>
 
 namespace spa {
-// keep chars of token until pred is not met
-void PQLTokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
-    auto last = std::find_if_not(token.begin() + 1, token.end(), pred);
+void PQLTokenizer::KeepDigit(std::string &token) {
+    auto last = std::find_if_not(token.begin() + 1, token.end(),
+                                 [](auto c) { return std::isdigit(c); });
     if (last == token.end()) return;
     KeepFirstOf(token, last - token.begin());
+}
+void PQLTokenizer::KeepAlnum(std::string &token) {
+    auto last = std::find_if_not(token.begin() + 1, token.end(),
+                                 [](auto c) { return std::isalnum(c); });
+    if (last == token.end()) return;
+    long keep_length = last - token.begin();
+    if (token.substr(0, keep_length) == kStmt && *last == kHashtag)
+        ++keep_length;
+    KeepFirstOf(token, keep_length);
 }
 // keep first size len chars of the token
 void PQLTokenizer::KeepFirstOf(std::string &token, long len) {
@@ -22,11 +31,6 @@ void PQLTokenizer::KeepFirstOf(std::string &token, long len) {
     buffer_.seekg(len - (long)token.length(), std::ios_base::cur);
     token.resize(len);
 }
-void PQLTokenizer::KeepStmtNum(std::string &token) {
-    return token[kStmt.length()] == kHashtag
-                   ? KeepFirstOf(token, kStmt.length() + 1)
-                   : KeepWhile(token, std::isalnum);
-}
 void PQLTokenizer::ExtractInto(std::string &token) {
     buffer_ >> token;
     if (!buffer_) error = true;
@@ -34,17 +38,13 @@ void PQLTokenizer::ExtractInto(std::string &token) {
         token.resize(0);
         return;
     }
-    // special case for stmt#
-    if (token.substr(0, kStmt.length()) == kStmt) {
-        return KeepStmtNum(token);
-    }
     // identifiers / keywords
     if (std::isalpha(token[0])) {
-        return KeepWhile(token, std::isalnum);
+        return KeepAlnum(token);
     }
     // constants
     if (std::isdigit(token[0])) {
-        return KeepWhile(token, std::isdigit);
+        return KeepDigit(token);
     }
     // operators
     if (std::strchr(kSpecial, token[0])) {

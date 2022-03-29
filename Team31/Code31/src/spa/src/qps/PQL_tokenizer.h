@@ -6,6 +6,8 @@
 #include <string>
 #include <string_view>
 
+#include "query_token.h"
+
 namespace spa {
 class PQLTokenizer {
   public:
@@ -16,13 +18,14 @@ class PQLTokenizer {
   private:
     static constexpr char kSpecial[] = "%()*+-/;,_\"<>.=";
     static constexpr char kHashtag = '#';
-    const std::string kStmt = "stmt";
+    static constexpr std::string_view kStmt =
+            GetQueryKeyword(QueryTokenType::kDeclStmt);
     std::stringstream buffer_;
     bool error = false;  // triggered by either EOF or unrecognized token
 
-    void KeepWhile(std::string &token, int (*pred)(int));
+    void KeepAlnum(std::string &token);
+    void KeepDigit(std::string &token);
     void KeepFirstOf(std::string &token, long len);
-    void KeepStmtNum(std::string &token);
     void ExtractInto(std::string &token);
 };
 }  // namespace spa
