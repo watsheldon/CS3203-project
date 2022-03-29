@@ -14,11 +14,8 @@
 namespace spa {
 ParentRelationshipStore::ParentRelationshipStore(std::size_t stmt_count,
                                                  StoreRefs refs) noexcept
-        : stmt_count_(stmt_count),
-          type_stmt_(refs.type_stmt),
-          stmtlst_parent_(refs.stmtlst_parent),
-          stmtlst_stmt_(refs.stmtlst_stmt) {}
-bool ParentRelationshipStore::ExistParent(
+        : FollowsParentRelationshipBase(refs), stmt_count_(stmt_count) {}
+bool ParentRelationshipStore::IsNonTransitive(
         Index<ArgPos::kFirst> parent_stmt,
         Index<ArgPos::kSecond> child_stmt) const noexcept {
     StmtNo parent = parent_stmt.value;
@@ -33,7 +30,7 @@ bool ParentRelationshipStore::ExistParent(
     bool is_else = stmtlst_parent_.GetIfStmtLst(parent).else_index == stmtlst;
     return is_while || is_then || is_else;
 }
-bool ParentRelationshipStore::ExistParentT(
+bool ParentRelationshipStore::IsTransitive(
         Index<ArgPos::kFirst> parent_stmt,
         Index<ArgPos::kSecond> child_stmt) const noexcept {
     StmtNo parent = parent_stmt.value;
@@ -46,47 +43,44 @@ bool ParentRelationshipStore::ExistParentT(
     StmtNo last_stmt = GetContainerLastStmt(type, parent);
     return child <= last_stmt;
 }
-bool ParentRelationshipStore::ExistParent(
+bool ParentRelationshipStore::HasSecondValues(
         Index<ArgPos::kFirst> parent_stmt) const noexcept {
     StmtNo parent = parent_stmt.value;
     return parent < stmt_count_ && IsParent(parent);
 }
-bool ParentRelationshipStore::ExistParent(
+bool ParentRelationshipStore::HasFirstValues(
         Index<ArgPos::kSecond> child_stmt) const noexcept {
     StmtNo child = child_stmt.value;
     return child <= stmt_count_ && HasParent(child);
 }
-bool ParentRelationshipStore::ExistParent() const noexcept {
+bool ParentRelationshipStore::ExistRelationship() const noexcept {
     return !type_stmt_.GetStatements(StmtType::kWhile).empty() ||
            !type_stmt_.GetStatements(StmtType::kIf).empty();
 }
-std::set<StmtNo> ParentRelationshipStore::GetParent(
+std::set<StmtNo> ParentRelationshipStore::GetOneArg(
         ArgPos return_pos, StmtType return_type) const noexcept {
     return (return_pos == ArgPos::kFirst) ? GetAllParents(return_type)
                                           : GetAllChildren(return_type);
 }
-std::set<StmtNo> ParentRelationshipStore::GetParent(
-        Index<ArgPos::kFirst> parent_stmt,
-        StmtType return_type) const noexcept {
-    StmtNo parent = parent_stmt.value;
+std::set<StmtNo> ParentRelationshipStore::GetOneArg(
+        Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept {
+    StmtNo parent = stmt_no.value;
     if (parent >= stmt_count_ || !IsParent(parent)) return {};
     std::vector<StmtNo> results;
     FillChildren(parent, results);
     return Extract(std::move(results), return_type);
 }
-std::set<StmtNo> ParentRelationshipStore::GetParentT(
-        Index<ArgPos::kFirst> parent_stmt,
-        StmtType return_type) const noexcept {
-    StmtNo parent = parent_stmt.value;
+std::set<StmtNo> ParentRelationshipStore::GetOneArgT(
+        Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept {
+    StmtNo parent = stmt_no.value;
     if (parent >= stmt_count_ || !IsParent(parent)) return {};
     std::vector<StmtNo> results;
     FillChildrenT(parent, results);
     return Extract(std::move(results), return_type);
 }
-std::set<StmtNo> ParentRelationshipStore::GetParent(
-        Index<ArgPos::kSecond> child_stmt,
-        StmtType return_type) const noexcept {
-    StmtNo child = child_stmt.value;
+std::set<StmtNo> ParentRelationshipStore::GetOneArg(
+        Index<ArgPos::kSecond> stmt_no, StmtType return_type) const noexcept {
+    StmtNo child = stmt_no.value;
     if (!IsParent(return_type) || child > stmt_count_ || !HasParent(child)) {
         return {};
     }
@@ -94,10 +88,9 @@ std::set<StmtNo> ParentRelationshipStore::GetParent(
     FillParents(child, results);
     return Extract(std::move(results), return_type);
 }
-std::set<StmtNo> ParentRelationshipStore::GetParentT(
-        Index<ArgPos::kSecond> child_stmt,
-        StmtType return_type) const noexcept {
-    StmtNo child = child_stmt.value;
+std::set<StmtNo> ParentRelationshipStore::GetOneArgT(
+        Index<ArgPos::kSecond> stmt_no, StmtType return_type) const noexcept {
+    StmtNo child = stmt_no.value;
     if (!IsParent(return_type) || child > stmt_count_ || !HasParent(child)) {
         return {};
     }
@@ -105,32 +98,19 @@ std::set<StmtNo> ParentRelationshipStore::GetParentT(
     FillParentsT(child, results);
     return Extract(std::move(results), return_type);
 }
-PairVec<StmtNo> ParentRelationshipStore::GetParentPairs(
+PairVec<StmtNo> ParentRelationshipStore::GetBothArgs(
         StmtType parent_type, StmtType child_type) const noexcept {
     if (!IsParent(parent_type)) return {};
     PairVec<StmtNo> results;
     FillParentPairs(results);
     return ExtractPairs(std::move(results), parent_type, child_type);
 }
-PairVec<StmtNo> ParentRelationshipStore::GetParentPairsT(
+PairVec<StmtNo> ParentRelationshipStore::GetBothArgsT(
         StmtType parent_type, StmtType child_type) const noexcept {
     if (!IsParent(parent_type)) return {};
     PairVec<StmtNo> results;
     FillParentTPairs(results);
     return ExtractPairs(std::move(results), parent_type, child_type);
-}
-std::set<StmtNo> ParentRelationshipStore::Extract(
-        std::vector<StmtNo> results, StmtType return_type) const noexcept {
-    if (return_type == StmtType::kAll) {
-        return {results.begin(), results.end()};
-    }
-    std::set<StmtNo> extracted_results;
-    std::copy_if(results.begin(), results.end(),
-                 std::inserter(extracted_results, extracted_results.end()),
-                 [this, return_type](StmtNo i) {
-                     return type_stmt_.GetType(i) == return_type;
-                 });
-    return extracted_results;
 }
 inline bool ParentRelationshipStore::IsParent(StmtNo stmt) const noexcept {
     StmtType type = type_stmt_.GetType(stmt);
@@ -258,23 +238,6 @@ void ParentRelationshipStore::FillParentPairs(
             children.emplace_back(child_stmt);
         }
     }
-}
-PairVec<StmtNo> ParentRelationshipStore::ExtractPairs(
-        PairVec<StmtNo> results, StmtType first,
-        StmtType second) const noexcept {
-    if (first == StmtType::kAll && second == StmtType::kAll) return results;
-    PairVec<StmtNo> extracted_results;
-    for (StmtNo i = 0; i < results.first.size(); ++i) {
-        bool has_first = first == StmtType::kAll ||
-                         first == type_stmt_.GetType(results.first[i]);
-        bool has_second = second == StmtType::kAll ||
-                          second == type_stmt_.GetType(results.second[i]);
-        if (has_first && has_second) {
-            extracted_results.first.emplace_back(results.first[i]);
-            extracted_results.second.emplace_back(results.second[i]);
-        }
-    }
-    return extracted_results;
 }
 StmtNo ParentRelationshipStore::GetContainerLastStmt(
         StmtType type, StmtNo stmt_no) const noexcept {

@@ -9,50 +9,47 @@
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "common/index.h"
+#include "follows_parent_relationship_base.h"
 #include "pkb/secondary_structure/container_forest.h"
 #include "stmtlst_parent_store.h"
 #include "stmtlst_statements_store.h"
 #include "type_statements_store.h"
 
 namespace spa {
-class ParentRelationshipStore {
+class ParentRelationshipStore : public FollowsParentRelationshipBase {
   public:
-    struct StoreRefs {
-        const TypeStatementsStore &type_stmt;
-        const StmtlstParentStore &stmtlst_parent;
-        const StmtlstStatementsStore &stmtlst_stmt;
-    };
     explicit ParentRelationshipStore(std::size_t stmt_count,
                                      StoreRefs refs) noexcept;
 
-    [[nodiscard]] bool ExistParent(
+    [[nodiscard]] bool IsNonTransitive(
             Index<ArgPos::kFirst> parent_stmt,
-            Index<ArgPos::kSecond> child_stmt) const noexcept;
-    [[nodiscard]] bool ExistParentT(
+            Index<ArgPos::kSecond> child_stmt) const noexcept final;
+    [[nodiscard]] bool IsTransitive(
             Index<ArgPos::kFirst> parent_stmt,
-            Index<ArgPos::kSecond> child_stmt) const noexcept;
-    [[nodiscard]] bool ExistParent(
-            Index<ArgPos::kFirst> parent_stmt) const noexcept;
-    [[nodiscard]] bool ExistParent(
-            Index<ArgPos::kSecond> child_stmt) const noexcept;
-    [[nodiscard]] bool ExistParent() const noexcept;
-    [[nodiscard]] std::set<StmtNo> GetParent(
-            ArgPos return_pos, StmtType return_type) const noexcept;
-    [[nodiscard]] std::set<StmtNo> GetParent(
-            Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept;
-    [[nodiscard]] std::set<StmtNo> GetParentT(
-            Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept;
-    [[nodiscard]] std::set<StmtNo> GetParent(
+            Index<ArgPos::kSecond> child_stmt) const noexcept final;
+    [[nodiscard]] bool HasSecondValues(
+            Index<ArgPos::kFirst> parent_stmt) const noexcept final;
+    [[nodiscard]] bool HasFirstValues(
+            Index<ArgPos::kSecond> child_stmt) const noexcept final;
+    [[nodiscard]] bool ExistRelationship() const noexcept final;
+    [[nodiscard]] std::set<StmtNo> GetOneArg(
+            ArgPos return_pos, StmtType return_type) const noexcept final;
+    [[nodiscard]] std::set<StmtNo> GetOneArg(
+            Index<ArgPos::kFirst> stmt_no,
+            StmtType return_type) const noexcept final;
+    [[nodiscard]] std::set<StmtNo> GetOneArgT(
+            Index<ArgPos::kFirst> stmt_no,
+            StmtType return_type) const noexcept final;
+    [[nodiscard]] std::set<StmtNo> GetOneArg(
             Index<ArgPos::kSecond> stmt_no,
-            StmtType return_type) const noexcept;
-    [[nodiscard]] std::set<StmtNo> GetParentT(
+            StmtType return_type) const noexcept final;
+    [[nodiscard]] std::set<StmtNo> GetOneArgT(
             Index<ArgPos::kSecond> stmt_no,
-            StmtType return_type) const noexcept;
-
-    [[nodiscard]] PairVec<StmtNo> GetParentPairs(
-            StmtType parent_type, StmtType child_type) const noexcept;
-    [[nodiscard]] PairVec<StmtNo> GetParentPairsT(
-            StmtType parent_type, StmtType child_type) const noexcept;
+            StmtType return_type) const noexcept final;
+    [[nodiscard]] PairVec<StmtNo> GetBothArgs(
+            StmtType parent_type, StmtType child_type) const noexcept final;
+    [[nodiscard]] PairVec<StmtNo> GetBothArgsT(
+            StmtType parent_type, StmtType child_type) const noexcept final;
 
   private:
     friend class ProgramKnowledgeBase;
@@ -60,16 +57,8 @@ class ParentRelationshipStore {
             StmtType::kAll, StmtType::kWhile, StmtType::kIf};
 
     std::size_t stmt_count_;
-    const TypeStatementsStore &type_stmt_;
-    const StmtlstParentStore &stmtlst_parent_;
-    const StmtlstStatementsStore &stmtlst_stmt_;
     const ContainerForest *container_forest_{};
 
-    [[nodiscard]] std::set<StmtNo> Extract(std::vector<StmtNo> results,
-                                           StmtType return_type) const noexcept;
-    [[nodiscard]] PairVec<StmtNo> ExtractPairs(PairVec<StmtNo> results,
-                                               StmtType first,
-                                               StmtType second) const noexcept;
     [[nodiscard]] std::set<StmtNo> GetAllParents(
             StmtType return_type) const noexcept;
     [[nodiscard]] std::set<StmtNo> GetAllChildren(

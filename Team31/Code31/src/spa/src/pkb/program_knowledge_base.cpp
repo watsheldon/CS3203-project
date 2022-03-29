@@ -141,59 +141,59 @@ PairVec<int> ProgramKnowledgeBase::GetFollowsTPairs(StmtType first_type,
 bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt,
                                        Index<ArgPos::kSecond> child_stmt) {
     assert(compiled);
-    return parent_store_.ExistParent(parent_stmt, child_stmt);
+    return parent_store_.IsNonTransitive(parent_stmt, child_stmt);
 }
 bool ProgramKnowledgeBase::ExistParentT(Index<ArgPos::kFirst> parent_stmt,
                                         Index<ArgPos::kSecond> child_stmt) {
     assert(compiled);
-    return parent_store_.ExistParentT(parent_stmt, child_stmt);
+    return parent_store_.IsTransitive(parent_stmt, child_stmt);
 }
 bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kFirst> parent_stmt) {
     assert(compiled);
-    return parent_store_.ExistParent(parent_stmt);
+    return parent_store_.HasSecondValues(parent_stmt);
 }
 bool ProgramKnowledgeBase::ExistParent(Index<ArgPos::kSecond> child_stmt) {
     assert(compiled);
-    return parent_store_.ExistParent(child_stmt);
+    return parent_store_.HasFirstValues(child_stmt);
 }
 bool ProgramKnowledgeBase::ExistParent() {
     assert(compiled);
-    return parent_store_.ExistParent();
+    return parent_store_.ExistRelationship();
 }
 std::set<int> ProgramKnowledgeBase::GetParent(ArgPos return_pos,
                                               StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetParent(return_pos, return_type);
+    return parent_store_.GetOneArg(return_pos, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kFirst> parent_stmt,
                                               StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetParent(parent_stmt, return_type);
+    return parent_store_.GetOneArg(parent_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParentT(
         Index<ArgPos::kFirst> parent_stmt, StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetParentT(parent_stmt, return_type);
+    return parent_store_.GetOneArgT(parent_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kSecond> child_stmt,
                                               StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetParent(child_stmt, return_type);
+    return parent_store_.GetOneArg(child_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParentT(
         Index<ArgPos::kSecond> child_stmt, StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetParentT(child_stmt, return_type);
+    return parent_store_.GetOneArgT(child_stmt, return_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetParentPairs(StmtType parent_type,
                                                   StmtType child_type) {
     assert(compiled);
-    return parent_store_.GetParentPairs(parent_type, child_type);
+    return parent_store_.GetBothArgs(parent_type, child_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetParentTPairs(StmtType parent_type,
                                                    StmtType child_type) {
     assert(compiled);
-    return parent_store_.GetParentPairsT(parent_type, child_type);
+    return parent_store_.GetBothArgsT(parent_type, child_type);
 }
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
     assert(compiled);
