@@ -69,7 +69,7 @@ bool PQLValidator::Select() {
     while (valid) {
         if (Accept(QueryTokenType::kKeywordSuch)) {
             if (!Accept(QueryTokenType::kKeywordThat)) return false;
-            valid = RelCond();
+            valid = SuchThat();
         } else if (Accept(QueryTokenType::kKeywordPattern)) {
             valid = PatternCond();
         } else if (Accept(QueryTokenType::kKeywordWith)) {
@@ -101,14 +101,14 @@ bool PQLValidator::AttrName() {
            Accept(QueryTokenType::kAttrValue) ||
            Accept(QueryTokenType::kAttrVar);
 }
-bool PQLValidator::RelCond() {
+bool PQLValidator::SuchThat() {
     bool valid;
     do {
-        valid = RelRef();
+        valid = Relationship();
     } while (valid && Accept(QueryTokenType::kKeywordAnd));
     return valid;
 }
-bool PQLValidator::RelRef() {
+bool PQLValidator::Relationship() {
     if (Accept(QueryTokenType::kKeywordFollows) ||
         Accept(QueryTokenType::kKeywordParent) ||
         Accept(QueryTokenType::kKeywordNext) ||

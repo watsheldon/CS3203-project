@@ -40,7 +40,7 @@ class PQLValidator {
     bool Elem();
     bool MultipleElem();
     bool AttrName();
-    bool RelCond();
+    bool SuchThat();
     bool PatternCond();
     bool AttrCond();
 
@@ -57,7 +57,7 @@ class PQLValidator {
     bool Group();
 
     bool Pattern();
-    bool RelRef();
+    bool Relationship();
     bool AttrCompare();
     bool Ref();
     bool AttrRef();
