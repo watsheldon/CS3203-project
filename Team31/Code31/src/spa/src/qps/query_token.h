@@ -38,6 +38,7 @@ enum class QueryTokenType {
     kAttrProc,
     kAttrVar,
     kAttrValue,
+    kAttrStmtNum,
     kSemicolon,       // ;
     kComma,           // ,
     kUnderscore,      // _
@@ -56,20 +57,18 @@ enum class QueryTokenType {
     kWord,
     kInteger,
 };
-// clang-format off
-static constexpr const std::array<std::string_view, 43> kQueryTypeStringMap{
-        {"stmt"sv,     "read"sv,     "print"sv,   "call"sv,
-         "while"sv,    "if"sv,       "assign"sv,  "procedure"sv,
-         "variable"sv, "constant"sv, "Select"sv,  "such"sv,
-         "that"sv,     "and"sv,      "with"sv,    "pattern"sv,
-         "Follows"sv,  "Parent"sv,   "Uses"sv,    "Modifies"sv,
-         "Calls"sv,    "Next"sv,     "Affects"sv, "procName"sv,
-         "varName"sv,  "value"sv,    ";"sv,       ","sv,
-         "_"sv,        R"(")"sv,     "+"sv,       "-"sv,
-         "*"sv,        "/"sv,        "%"sv,       "("sv,
-         ")"sv,        "<"sv,        ">"sv,       "."sv,
-         "#"sv,        {},           {}}};
-// clang-format on
+static constexpr const std::array<std::string_view, 44> kQueryTypeStringMap{
+        "stmt"sv,     "read"sv,     "print"sv,   "call"sv,
+        "while"sv,    "if"sv,       "assign"sv,  "procedure"sv,
+        "variable"sv, "constant"sv, "Select"sv,  "such"sv,
+        "that"sv,     "and"sv,      "with"sv,    "pattern"sv,
+        "Follows"sv,  "Parent"sv,   "Uses"sv,    "Modifies"sv,
+        "Calls"sv,    "Next"sv,     "Affects"sv, "procName"sv,
+        "varName"sv,  "value"sv,    "stmt#"sv,   ";"sv,
+        ","sv,        "_"sv,        R"(")"sv,    "+"sv,
+        "-"sv,        "*"sv,        "/"sv,       "%"sv,
+        "("sv,        ")"sv,        "<"sv,       ">"sv,
+        "."sv,        "#"sv,        {},          {}};
 constexpr std::string_view GetQueryKeyword(QueryTokenType token_type) noexcept {
     return kQueryTypeStringMap[static_cast<int>(token_type)];
 }
