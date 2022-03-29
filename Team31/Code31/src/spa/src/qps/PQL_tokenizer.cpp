@@ -14,7 +14,6 @@ void PQLTokenizer::KeepWhile(std::string &token, int (*pred)(int)) {
     if (last == token.end()) return;
     KeepFirstOf(token, last - token.begin());
 }
-
 // keep first size len chars of the token
 void PQLTokenizer::KeepFirstOf(std::string &token, long len) {
     assert(len <= token.length());
@@ -23,13 +22,21 @@ void PQLTokenizer::KeepFirstOf(std::string &token, long len) {
     buffer_.seekg(len - (long)token.length(), std::ios_base::cur);
     token.resize(len);
 }
-
+void PQLTokenizer::KeepStmtNum(std::string &token) {
+    return token[kStmt.length()] == kHashtag
+                   ? KeepFirstOf(token, kStmt.length() + 1)
+                   : KeepWhile(token, std::isalnum);
+}
 void PQLTokenizer::ExtractInto(std::string &token) {
     buffer_ >> token;
     if (!buffer_) error = true;
     if (error) {
         token.resize(0);
         return;
+    }
+    // special case for stmt#
+    if (token.substr(0, kStmt.length()) == kStmt) {
+        return KeepStmtNum(token);
     }
     // identifiers / keywords
     if (std::isalpha(token[0])) {
@@ -40,7 +47,7 @@ void PQLTokenizer::ExtractInto(std::string &token) {
         return KeepWhile(token, std::isdigit);
     }
     // operators
-    if (std::strchr(kSpecialSingle, token[0])) {
+    if (std::strchr(kSpecial, token[0])) {
         return KeepFirstOf(token, 1);
     }
     // this should not be reached unless an illegal character is present

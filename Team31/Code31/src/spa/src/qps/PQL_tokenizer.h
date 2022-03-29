@@ -14,12 +14,15 @@ class PQLTokenizer {
     std::string Next();
 
   private:
-    static constexpr char kSpecialSingle[] = "%()*+-/;,_\"<>.#";
+    static constexpr char kSpecial[] = "%()*+-/;,_\"<>.=";
+    static constexpr char kHashtag = '#';
+    const std::string kStmt = "stmt";
     std::stringstream buffer_;
     bool error = false;  // triggered by either EOF or unrecognized token
 
     void KeepWhile(std::string &token, int (*pred)(int));
     void KeepFirstOf(std::string &token, long len);
+    void KeepStmtNum(std::string &token);
     void ExtractInto(std::string &token);
 };
 }  // namespace spa
