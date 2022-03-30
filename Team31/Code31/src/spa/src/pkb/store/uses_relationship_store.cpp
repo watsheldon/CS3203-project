@@ -1,5 +1,6 @@
 #include "uses_relationship_store.h"
 
+#include <cassert>
 #include <vector>
 
 #include "common/bitvec2d.h"
@@ -74,5 +75,41 @@ void UsesRelationshipStore::AddConditionIndirectUses(
         if (stmts.size() == vars.size()) break;
         stmts.resize(vars.size(), index);
     }
+}
+bool UsesRelationshipStore::ExistUses(int stmt_no, int var_index) {
+    assert(stmt_no != 0);
+    if (stmt_no > num_stmts_) {
+        return false;
+    }
+    auto used_vars = GetAllVar(stmt_no);
+    return var_index == 0 ? !used_vars.empty()
+                          : used_vars.find(var_index) != used_vars.end();
+}
+std::set<int> UsesRelationshipStore::GetUses(int stmt_no) {
+    return stmt_no > num_stmts_ ? std::set<int>() : GetAllVar(stmt_no);
+}
+std::set<int> UsesRelationshipStore::GetUses(int var_index, StmtType type,
+                                             const TypeStatementsStore& store) {
+    assert(var_index != 0);
+    auto stmts = GetAllStmt(var_index);
+    if (type == StmtType::kAll) {
+        return stmts;
+    }
+    for (auto it = stmts.begin(); it != stmts.end();) {
+        if (store.GetType(*it) != type) {
+            it = stmts.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    return stmts;
+}
+bool UsesRelationshipStore::ExistUsesP(int proc_index, int var_index) {
+    auto used_vars = GetVarAccessByProc(proc_index);
+    return used_vars.find(var_index) != used_vars.end();
+}
+bool UsesRelationshipStore::ExistUsesP(int proc_index) {
+    auto used_vars = GetVarAccessByProc(proc_index);
+    return !used_vars.empty();
 }
 }  // namespace spa

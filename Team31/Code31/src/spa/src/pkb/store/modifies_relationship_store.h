@@ -18,6 +18,12 @@ class ModifiesRelationshipStore : public UsesModifiesStoreBase {
   public:
     using UsesModifiesStoreBase::UsesModifiesStoreBase;
     void Set(int stmt_no, int var_index);
+    [[nodiscard]] bool ExistModifies(int stmt_no, int var_index);
+    [[nodiscard]] std::set<int> GetModifies(int stmt_no);
+    [[nodiscard]] std::set<int> GetModifies(int var_index, StmtType type,
+                                            const TypeStatementsStore &store);
+    [[nodiscard]] bool ExistModifiesP(int proc_index, int var_index);
+    [[nodiscard]] bool ExistModifiesP(int proc_index);
 
   private:
     void AddConditionRel(const AuxiliaryData &data_store) override;
