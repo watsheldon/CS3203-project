@@ -95,6 +95,7 @@ void UsesModifiesStoreBase::Compile(
         const TypeStatementsStore& type_statement_store,
         const ContainerInfo& info,
         const CallsRelationshipStore& calls_rel_store) {
+    PrecompileStep(type_statement_store);
     const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
     AddAllDirectRel(type_statement_store);
     AddAllContainerRel(type_statement_store, info, calls_rel_store);
@@ -229,4 +230,8 @@ void UsesModifiesStoreBase::ProcessProcedureAncestor(int proc_index,
     vars.emplace_back(var_index);
     procs.emplace_back(proc_index);
 }
+void UsesModifiesStoreBase::PrecompileStep(
+        const TypeStatementsStore& type_store) {}
+void UsesModifiesStoreBase::AddConditionRel(
+        const UsesModifiesStoreBase::AuxiliaryData& data_store) {}
 }  // namespace spa

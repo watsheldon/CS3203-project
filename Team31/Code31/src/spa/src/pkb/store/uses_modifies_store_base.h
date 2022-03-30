@@ -77,10 +77,10 @@ class UsesModifiesStoreBase {
     void FillProcs();
     void CalculateNumRels();
 
+    virtual void PrecompileStep(const TypeStatementsStore &type_store);
     virtual void AddAllDirectRel(const TypeStatementsStore &store) = 0;
     virtual void AddAllIndirectRel(const AuxiliaryData &data_store) = 0;
-    virtual void AddConditionRel(const AuxiliaryData &data_store) = 0;
-    virtual void AddPatternRelated(StmtType type, int stmt_no) = 0;
+    virtual void AddConditionRel(const AuxiliaryData &data_store);
 
     template <std::size_t n>
     void FillDirectRels(std::array<StmtType, n> direct_stmt_types,

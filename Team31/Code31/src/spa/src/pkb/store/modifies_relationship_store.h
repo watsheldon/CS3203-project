@@ -26,10 +26,8 @@ class ModifiesRelationshipStore : public UsesModifiesStoreBase {
     [[nodiscard]] bool ExistModifiesP(int proc_index);
 
   private:
-    void AddConditionRel(const AuxiliaryData &data_store) override;
     void AddAllDirectRel(const TypeStatementsStore &store) override;
     void AddAllIndirectRel(const AuxiliaryData &data_store) override;
-    void AddPatternRelated(StmtType type, int stmt_no) override;
     static constexpr std::array<StmtType, 2> direct_stmt_types_{
             {StmtType::kAssign, StmtType::kRead}};
     static constexpr std::array<StmtType, 4> indirect_stmt_types_{

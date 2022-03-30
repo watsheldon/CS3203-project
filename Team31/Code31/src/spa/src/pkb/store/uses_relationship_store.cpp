@@ -3,6 +3,7 @@
 #include <cassert>
 #include <vector>
 
+#include "common/aliases.h"
 #include "common/bitvec2d.h"
 #include "stmtlst_parent_store.h"
 #include "type_statements_store.h"
@@ -28,7 +29,6 @@ void UsesRelationshipStore::AddConditionRel(const AuxiliaryData& data_store) {
         auto& bitmap = stmt_type == StmtType::kIf ? bitmaps.if_added
                                                   : bitmaps.while_added;
         for (auto stmt_no : stmts) {
-            AddPatternRelated(stmt_type, stmt_no);
             AddConditionIndirectUses(stmt_no, cont_info, bitmaps);
             auto& stmt_var_pairs = stmt_var_pairs_[StmtTypeToIndex(stmt_type)];
             AddConditionDirectUses(stmt_no, stmt_var_pairs, bitmap);
@@ -41,14 +41,26 @@ void UsesRelationshipStore::AddAllIndirectRel(const AuxiliaryData& data_store) {
 void UsesRelationshipStore::AddAllDirectRel(const TypeStatementsStore& store) {
     FillDirectRels(relevant_stmt_types_, store);
 }
-void UsesRelationshipStore::AddPatternRelated(StmtType type, int stmt_no) {
-    const auto& condition_vars = GetVarIndex(stmt_no);
-    auto& [condition_direct_stmts, condition_direct_vars] =
-            condition_direct_pairs_[GetIndex(type)];
-    condition_direct_uses_[GetIndex(type)].Set(stmt_no, condition_vars);
-    condition_direct_vars.insert(condition_direct_vars.end(),
-                                 condition_vars.begin(), condition_vars.end());
-    condition_direct_stmts.resize(condition_direct_vars.size(), stmt_no);
+void UsesRelationshipStore::PrecompileStep(
+        const TypeStatementsStore& type_store) {
+    // make a copy of the stmt_var relationships before indirect uses are added
+    for (auto stmt_type : kContainerStmtTypes) {
+        auto& stmt_var_map =
+                condition_direct_uses_[GetCondTypeIndex(stmt_type)];
+        auto& [direct_stmts, direct_vars] =
+                condition_direct_pairs_[GetCondTypeIndex(stmt_type)];
+        auto& stmt_set = condition_direct_stmts_[GetCondTypeIndex(stmt_type)];
+        const std::vector<int>& statements =
+                type_store.GetStatements(stmt_type);
+        for (StmtNo stmt_no : statements) {
+            const auto& vars = GetVarIndex(stmt_no);
+            if (vars.empty()) continue;
+            stmt_var_map.Set(stmt_no, vars);
+            direct_vars.insert(direct_vars.end(), vars.begin(), vars.end());
+            direct_stmts.resize(direct_vars.size(), stmt_no);
+            stmt_set.emplace(stmt_no);
+        }
+    }
 }
 // Add direct Uses of condition variables by container stmt with the given
 // index.
@@ -111,14 +123,13 @@ bool UsesRelationshipStore::ExistUsesP(int proc_index) {
 }
 const std::set<int>& UsesRelationshipStore::GetContainers(StmtType type,
                                                           int var_index) const {
-    return condition_direct_uses_[GetIndex(type)].GetKeys(var_index);
+    return condition_direct_uses_[GetCondTypeIndex(type)].GetKeys(var_index);
 }
 std::set<int> UsesRelationshipStore::GetContainers(StmtType type) const {
-    auto containers = condition_direct_pairs_[GetIndex(type)].first;
-    return {containers.begin(), containers.end()};
+    return condition_direct_stmts_[GetCondTypeIndex(type)];
 }
 const PairVec<int>& UsesRelationshipStore::GetContainerVarPairs(
         StmtType type) const {
-    return condition_direct_pairs_[GetIndex(type)];
+    return condition_direct_pairs_[GetCondTypeIndex(type)];
 }
 }  // namespace spa

@@ -6,6 +6,7 @@
 #include <set>
 #include <vector>
 
+#include "common/aliases.h"
 #include "common/bitvec2d.h"
 #include "index_bimap.h"
 #include "pkb/secondary_structure/container_forest.h"
@@ -33,7 +34,7 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
     [[nodiscard]] const PairVec<int>& GetContainerVarPairs(StmtType type) const;
 
   private:
-    void AddPatternRelated(StmtType type, int stmt_no) override;
+    void PrecompileStep(const TypeStatementsStore& type_store) override;
     void AddConditionRel(const AuxiliaryData& data_store) override;
     void AddAllDirectRel(const TypeStatementsStore& store) override;
     void AddAllIndirectRel(const AuxiliaryData& data_store) override;
@@ -41,16 +42,16 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
                                 BitVec2D& bitmap) const;
     void AddConditionIndirectUses(int stmt_no, const ContainerInfo& info,
                                   ContainerAddedTrackers& bitmaps);
+    static constexpr int GetCondTypeIndex(StmtType stmt_type) {
+        return static_cast<int>(stmt_type) - static_cast<int>(StmtType::kWhile);
+    }
 
     static constexpr std::array<StmtType, 2> relevant_stmt_types_{
             {StmtType::kAssign, StmtType::kPrint}};
     // while_var, if_var
     std::array<IndexBimap<std::set<int>>, 2> condition_direct_uses_;
     std::array<PairVec<int>, 2> condition_direct_pairs_;
-    static constexpr int GetIndex(StmtType container_type) {
-        return static_cast<int>(container_type) -
-               static_cast<int>(StmtType::kWhile);
-    }
+    std::array<std::set<StmtNo>, 2> condition_direct_stmts_;
 };
 }  // namespace spa
 
