@@ -7,6 +7,7 @@
 
 #include "evaluator/query_evaluator.h"
 #include "pkb/knowledge_base.h"
+#include "synonym_with_attr.h"
 
 namespace {
 using namespace std::literals::string_view_literals;
@@ -18,11 +19,10 @@ class Formatter {
     explicit Formatter(QueryEvaluator::ResultsView results_view) noexcept;
     void Use(KnowledgeBase* pkb) noexcept;
     void OutputResults(std::list<std::string>& results,
-                       std::vector<const Synonym*>& selected);
-    static inline void OutputInvalid(
-            std::list<std::string>& results,
-            const std::vector<const Synonym*>& selected) {
-        if (selected.size() == 1 && selected.front() == nullptr)
+                       std::vector<SynonymWithAttr>& selected);
+    static inline void OutputInvalid(std::list<std::string>& results,
+                                     std::vector<SynonymWithAttr>& selected) {
+        if (selected.size() == 1 && selected.front().synonym == nullptr)
             results.emplace_back(kFalse);
     }
 

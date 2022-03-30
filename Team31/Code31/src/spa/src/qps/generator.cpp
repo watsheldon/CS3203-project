@@ -28,6 +28,14 @@ constexpr Generator::Mode Generator::TokenToClauseMode(
                 static_cast<int>(QueryTokenType::kKeywordWith) +
                 static_cast<int>(Mode::kWith)};
 }
+constexpr SynonymWithAttr::Attribute Generator::TokenToAttrType(
+        QueryTokenType type) noexcept {
+    assert(type >= QueryTokenType::kAttrProc &&
+           type <= QueryTokenType::kAttrStmtNum);
+    return SynonymWithAttr::Attribute{
+            static_cast<int>(type) -
+            static_cast<int>(QueryTokenType::kAttrProc)};
+}
 constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
                                                  Synonym::Type type) noexcept {
     assert(type != Synonym::kNone);
@@ -180,7 +188,7 @@ void Generator::AddDecl(std::string_view name) noexcept {
 void Generator::Select(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end()) {
-        if (name == kBoolean) {
+        if (name == kBoolean && selected_.empty()) {
             selected_.emplace_back(nullptr);
             return;
         }
@@ -188,7 +196,14 @@ void Generator::Select(std::string_view name) noexcept {
         return;
     }
     selected_.emplace_back(itr->second);
-    mode_.pop_back();
+}
+void Generator::Attr(QueryTokenType token_type) noexcept {
+    if (mode_.back() == Mode::kSelect) {
+        assert(!selected_.empty());
+        auto syn = selected_.back().synonym;
+        selected_.pop_back();
+        selected_.emplace_back(syn, TokenToAttrType(token_type));
+    }
 }
 void Generator::SetZeroth(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
@@ -325,6 +340,17 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
             return Comma();
         case QueryTokenType::kSemicolon:
             return Semicolon();
+        case QueryTokenType::kAttrStmtNum:
+        case QueryTokenType::kAttrVar:
+        case QueryTokenType::kAttrValue:
+        case QueryTokenType::kAttrProc:
+            return Attr(token_type);
+        case QueryTokenType::kAngleBracketL:
+            break;
+        case QueryTokenType::kAngleBracketR:
+            assert(mode_.back() == Mode::kSelect);
+            mode_.pop_back();
+            return;
         case QueryTokenType::kKeywordSuch:
         case QueryTokenType::kKeywordThat:
             break;

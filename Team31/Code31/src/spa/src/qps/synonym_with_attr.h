@@ -5,15 +5,15 @@
 
 namespace spa {
 struct SynonymWithAttr {
-    enum Attribute {
-        kNone,
+    enum class Attribute {
         kProcName,
         kVarName,
         kValue,
         kStmtNum,
+        kNone,
     };
     explicit SynonymWithAttr(const Synonym* synonym,
-                             Attribute attribute = kNone)
+                             Attribute attribute = Attribute::kNone)
             : synonym(synonym), attribute(attribute){};
     const Synonym* const synonym;
     const Attribute attribute;

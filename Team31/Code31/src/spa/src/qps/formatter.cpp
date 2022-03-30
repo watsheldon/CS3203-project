@@ -14,13 +14,13 @@ Formatter::Formatter(QueryEvaluator::ResultsView results_view) noexcept
           vartable_map_(results_view.vartable_map) {}
 void Formatter::Use(KnowledgeBase *pkb) noexcept { pkb_ = pkb; }
 void Formatter::OutputResults(std::list<std::string> &results,
-                              std::vector<const Synonym *> &selected) {
-    if (selected.front() == nullptr) {
+                              std::vector<SynonymWithAttr> &selected) {
+    if (selected.front().synonym == nullptr) {
         results.emplace_back(results_valid_ ? kTrue : kFalse);
         return;
     }
     if (!results_valid_) return;
-    auto sel = selected.front();
+    auto sel = selected.front().synonym;
     auto domain = synonym_domains_.find(sel);
     auto stmt_nos = domain == synonym_domains_.end()
                             ? pkb_->GetAllEntityIndices(sel->type)

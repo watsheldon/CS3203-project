@@ -10,6 +10,7 @@
 #include "query_object.h"
 #include "query_token.h"
 #include "synonym.h"
+#include "synonym_with_attr.h"
 
 namespace {
 using namespace std::literals::string_view_literals;
@@ -47,7 +48,7 @@ class Generator {
     bool semantic_error_;
     SynonymMap synonym_map_;
     VecUniquePtr<Synonym> synonyms_;
-    std::vector<const Synonym*> selected_;
+    std::vector<SynonymWithAttr> selected_;
     std::vector<Mode> mode_;
     Synonym::Type curr_syn_type_;
     VecUniquePtr<ConditionClause> conditions_;
@@ -71,9 +72,12 @@ class Generator {
     void Quote() noexcept;
     void Comma() noexcept;
     void Semicolon() noexcept;
+    void Attr(QueryTokenType token_type) noexcept;
 
     static constexpr Synonym::Type TokenToSynType(QueryTokenType type) noexcept;
     static constexpr Mode TokenToClauseMode(QueryTokenType type) noexcept;
+    static constexpr SynonymWithAttr::Attribute TokenToAttrType(
+            QueryTokenType type) noexcept;
     static constexpr bool UnsuitableFirstSynType(Mode mode,
                                                  Synonym::Type type) noexcept;
     static constexpr bool UnsuitableSecondSynType(Mode mode,
