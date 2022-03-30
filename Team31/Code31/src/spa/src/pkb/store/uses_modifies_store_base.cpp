@@ -2,6 +2,14 @@
 
 #include <cassert>
 #include <numeric>
+#include <set>
+#include <vector>
+
+#include "calls_relationship_store.h"
+#include "common/aliases.h"
+#include "common/bitvec2d.h"
+#include "stmtlst_parent_store.h"
+#include "type_statements_store.h"
 
 namespace spa {
 UsesModifiesStoreBase::UsesModifiesStoreBase(std::size_t stmt_size,
