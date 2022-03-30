@@ -16,7 +16,7 @@ UsesRelationshipStore::UsesRelationshipStore(std::size_t stmt_size,
                   {IndexBimap<std::set<int>>(stmt_size, var_size),
                    IndexBimap<std::set<int>>(stmt_size, var_size)}) {}
 void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
-    stmt_var_.Set(stmt_no, std::forward<std::vector<int>>(var_indices));
+    stmt_var_.Set(stmt_no, std::move(var_indices));
 }
 const std::vector<int>& UsesRelationshipStore::GetVarIndex(int stmt_no) const {
     return stmt_var_.GetVals(stmt_no);
