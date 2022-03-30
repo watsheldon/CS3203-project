@@ -28,9 +28,10 @@ void UsesRelationshipStore::AddConditionRel(const AuxiliaryData& data_store) {
         auto& bitmap = stmt_type == StmtType::kIf ? bitmaps.if_added
                                                   : bitmaps.while_added;
         for (auto stmt_no : stmts) {
+            AddPatternRelated(stmt_type, stmt_no);
             AddConditionIndirectUses(stmt_no, cont_info, bitmaps);
             auto& stmt_var_pairs = stmt_var_pairs_[StmtTypeToIndex(stmt_type)];
-            AddConditionDirectUses(stmt_type, stmt_no, stmt_var_pairs, bitmap);
+            AddConditionDirectUses(stmt_no, stmt_var_pairs, bitmap);
         }
     }
 }
@@ -40,23 +41,26 @@ void UsesRelationshipStore::AddAllIndirectRel(const AuxiliaryData& data_store) {
 void UsesRelationshipStore::AddAllDirectRel(const TypeStatementsStore& store) {
     FillDirectRels(relevant_stmt_types_, store);
 }
-// Add direct Uses of condition variables by container stmt with the given
-// index.
-void UsesRelationshipStore::AddConditionDirectUses(StmtType type, int stmt_no,
-                                                   PairVec<int>& stmt_var_pairs,
-                                                   BitVec2D& bitmap) {
-    auto& [container_stmts, container_vars] = stmt_var_pairs;
+void UsesRelationshipStore::AddPatternRelated(StmtType type, int stmt_no) {
     const auto& condition_vars = GetVarIndex(stmt_no);
     auto& [condition_direct_stmts, condition_direct_vars] =
             condition_direct_pairs_[GetIndex(type)];
     condition_direct_uses_[GetIndex(type)].Set(stmt_no, condition_vars);
-    for (auto v : condition_vars) {
-        condition_direct_vars.emplace_back(v);
+    condition_direct_vars.insert(condition_direct_vars.end(),
+                                 condition_vars.begin(), condition_vars.end());
+    condition_direct_stmts.resize(condition_direct_vars.size(), stmt_no);
+}
+// Add direct Uses of condition variables by container stmt with the given
+// index.
+void UsesRelationshipStore::AddConditionDirectUses(int stmt_no,
+                                                   PairVec<int>& stmt_var_pairs,
+                                                   BitVec2D& bitmap) const {
+    auto& [container_stmts, container_vars] = stmt_var_pairs;
+    for (auto v : GetVarIndex(stmt_no)) {
         if (bitmap.At(stmt_no, v)) continue;
         container_vars.emplace_back(v);
         bitmap.Set(stmt_no, v);
     }
-    condition_direct_stmts.resize(condition_direct_vars.size(), stmt_no);
     container_stmts.resize(container_vars.size(), stmt_no);
 }
 // Add indirect Uses of condition variables by ancestors of stmt_no.

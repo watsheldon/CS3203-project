@@ -27,16 +27,18 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
                                         const TypeStatementsStore& store);
     [[nodiscard]] bool ExistUsesP(int proc_index, int var_index);
     [[nodiscard]] bool ExistUsesP(int proc_index);
-    [[nodiscard]] const std::set<int> &GetContainers(StmtType type, int var_index) const;
+    [[nodiscard]] const std::set<int>& GetContainers(StmtType type,
+                                                     int var_index) const;
     [[nodiscard]] std::set<int> GetContainers(StmtType type) const;
-    [[nodiscard]] const PairVec<int> &GetContainerVarPairs(StmtType type) const;
+    [[nodiscard]] const PairVec<int>& GetContainerVarPairs(StmtType type) const;
 
   private:
+    void AddPatternRelated(StmtType type, int stmt_no) override;
     void AddConditionRel(const AuxiliaryData& data_store) override;
     void AddAllDirectRel(const TypeStatementsStore& store) override;
     void AddAllIndirectRel(const AuxiliaryData& data_store) override;
-    void AddConditionDirectUses(StmtType type, int stmt_no,
-                                PairVec<int>& stmt_var_pairs, BitVec2D& bitmap);
+    void AddConditionDirectUses(int stmt_no, PairVec<int>& stmt_var_pairs,
+                                BitVec2D& bitmap) const;
     void AddConditionIndirectUses(int stmt_no, const ContainerInfo& info,
                                   ContainerAddedTrackers& bitmaps);
 

@@ -35,4 +35,5 @@ bool ModifiesRelationshipStore::ExistModifiesP(int proc_index, int var_index) {
 bool ModifiesRelationshipStore::ExistModifiesP(int proc_index) {
     return ExistRelP(proc_index);
 }
+void ModifiesRelationshipStore::AddPatternRelated(StmtType type, int stmt_no) {}
 }  // namespace spa
