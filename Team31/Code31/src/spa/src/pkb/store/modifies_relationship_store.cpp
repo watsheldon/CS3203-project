@@ -20,40 +20,19 @@ void ModifiesRelationshipStore::AddAllDirectRel(
     FillDirectRels(direct_stmt_types_, store);
 }
 bool ModifiesRelationshipStore::ExistModifies(int stmt_no, int var_index) {
-    assert(stmt_no != 0);
-    if (stmt_no > num_stmts_) {
-        return false;
-    }
-    auto modified_vars = GetAllVar(stmt_no);
-    return var_index == 0
-                   ? !modified_vars.empty()
-                   : modified_vars.find(var_index) != modified_vars.end();
+    return ExistRel(stmt_no, var_index);
 }
 std::set<int> ModifiesRelationshipStore::GetModifies(int stmt_no) {
-    return stmt_no > num_stmts_ ? std::set<int>() : GetAllVar(stmt_no);
+    return GetRelRelatedVars(stmt_no);
 }
 std::set<int> ModifiesRelationshipStore::GetModifies(
         int var_index, StmtType type, const TypeStatementsStore& store) {
-    assert(var_index != 0);
-    auto stmts = GetAllStmt(var_index);
-    if (type == StmtType::kAll) {
-        return stmts;
-    }
-    for (auto it = stmts.begin(); it != stmts.end();) {
-        if (store.GetType(*it) != type) {
-            it = stmts.erase(it);
-        } else {
-            ++it;
-        }
-    }
-    return stmts;
+    return GetRelRelatedVars(var_index, type, store);
 }
 bool ModifiesRelationshipStore::ExistModifiesP(int proc_index, int var_index) {
-    auto modified_vars = GetVarAccessByProc(proc_index);
-    return modified_vars.find(var_index) != modified_vars.end();
+    return ExistRelP(proc_index, var_index);
 }
 bool ModifiesRelationshipStore::ExistModifiesP(int proc_index) {
-    auto modified_vars = GetVarAccessByProc(proc_index);
-    return !modified_vars.empty();
+    return ExistRelP(proc_index);
 }
 }  // namespace spa
