@@ -14,6 +14,40 @@ UsesModifiesStoreBase::UsesModifiesStoreBase(std::size_t stmt_size,
           complete_stmt_var_(num_stmts_, num_vars_),
           proc_vars_(num_procs_, num_vars_) {}
 
+bool UsesModifiesStoreBase::ExistRel(int stmt_no, int var_index) const {
+    assert(stmt_no != 0);
+    if (stmt_no > num_stmts_) {
+        return false;
+    }
+    auto vars = GetAllVar(stmt_no);
+    return var_index == 0 ? !vars.empty() : vars.find(var_index) != vars.end();
+}
+bool UsesModifiesStoreBase::ExistRelP(int proc_index) const {
+    return !GetVarAccessByProc(proc_index).empty();
+}
+bool UsesModifiesStoreBase::ExistRelP(int proc_index, int var_index) const {
+    auto vars = GetVarAccessByProc(proc_index);
+    return vars.find(var_index) != vars.end();
+}
+std::set<int> UsesModifiesStoreBase::GetRelRelatedVars(int stmt_no) const {
+    return stmt_no > num_stmts_ ? std::set<int>() : GetAllVar(stmt_no);
+}
+std::set<int> UsesModifiesStoreBase::GetRelRelatedVars(
+        int var_index, StmtType type, const TypeStatementsStore& store) const {
+    assert(var_index != 0);
+    auto stmts = GetAllStmt(var_index);
+    if (type == StmtType::kAll) {
+        return stmts;
+    }
+    for (auto it = stmts.begin(); it != stmts.end();) {
+        if (store.GetType(*it) != type) {
+            it = stmts.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    return stmts;
+}
 const std::vector<int>& UsesModifiesStoreBase::GetStmtNo(int var_index) const {
     return stmt_var_.GetKeys(var_index);
 }

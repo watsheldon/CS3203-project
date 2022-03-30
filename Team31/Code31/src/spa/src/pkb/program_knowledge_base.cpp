@@ -197,14 +197,7 @@ PairVec<int> ProgramKnowledgeBase::GetParentTPairs(StmtType parent_type,
 }
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
     assert(compiled);
-    assert(stmt_no != 0);
-    if (stmt_no > stmt_count_) {
-        return false;
-    }
-    auto modified_vars = modifies_rel_.GetAllVar(stmt_no);
-    return var_index == 0
-                   ? !modified_vars.empty()
-                   : modified_vars.find(var_index) != modified_vars.end();
+    return modifies_rel_.ExistModifies(stmt_no, var_index);
 }
 bool ProgramKnowledgeBase::ExistModifies(int stmt_no,
                                          std::string_view var_name) {
@@ -214,13 +207,7 @@ bool ProgramKnowledgeBase::ExistModifies(int stmt_no,
 }
 bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
     assert(compiled);
-    assert(stmt_no != 0);
-    if (stmt_no > stmt_count_) {
-        return false;
-    }
-    auto used_vars = uses_rel_.GetAllVar(stmt_no);
-    return var_index == 0 ? !used_vars.empty()
-                          : used_vars.find(var_index) != used_vars.end();
+    return uses_rel_.ExistUses(stmt_no, var_index);
 }
 bool ProgramKnowledgeBase::ExistUses(int stmt_no, std::string_view var_name) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
@@ -230,10 +217,7 @@ bool ProgramKnowledgeBase::ExistUses(int stmt_no, std::string_view var_name) {
 std::set<int> ProgramKnowledgeBase::GetModifies(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
-    if (stmt_no.value > stmt_count_) {
-        return {};
-    }
-    return modifies_rel_.GetAllVar(stmt_no.value);
+    return modifies_rel_.GetModifies(stmt_no);
 }
 std::set<int> ProgramKnowledgeBase::GetModifies(std::string_view var_name,
                                                 StmtType type) {
@@ -244,19 +228,7 @@ std::set<int> ProgramKnowledgeBase::GetModifies(std::string_view var_name,
 std::set<int> ProgramKnowledgeBase::GetModifies(
         Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
-    assert(var_index.value != 0);
-    auto stmts = modifies_rel_.GetAllStmt(var_index.value);
-    if (type == StmtType::kAll) {
-        return stmts;
-    }
-    for (auto it = stmts.begin(); it != stmts.end();) {
-        if (type_stmt_.GetType(*it) != type) {
-            it = stmts.erase(it);
-        } else {
-            ++it;
-        }
-    }
-    return stmts;
+    return modifies_rel_.GetModifies(var_index, type, type_stmt_);
 }
 std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
     assert(compiled);
@@ -269,27 +241,12 @@ PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
 std::set<int> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
-    if (stmt_no.value > stmt_count_) {
-        return {};
-    }
-    return uses_rel_.GetAllVar(stmt_no.value);
+    return uses_rel_.GetUses(stmt_no);
 }
 std::set<int> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
-    assert(var_index.value != 0);
-    auto stmts = uses_rel_.GetAllStmt(var_index.value);
-    if (type == StmtType::kAll) {
-        return stmts;
-    }
-    for (auto it = stmts.begin(); it != stmts.end();) {
-        if (type_stmt_.GetType(*it) != type) {
-            it = stmts.erase(it);
-        } else {
-            ++it;
-        }
-    }
-    return stmts;
+    return uses_rel_.GetUses(var_index, type, type_stmt_);
 }
 std::set<int> ProgramKnowledgeBase::GetUses(std::string_view var_name,
                                             StmtType type) {
@@ -310,14 +267,12 @@ bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name,
     int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
     int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     if (proc_index == 0 || var_index == 0) return false;
-    auto modified_vars = modifies_rel_.GetVarAccessByProc(proc_index);
-    return modified_vars.find(var_index) != modified_vars.end();
+    return modifies_rel_.ExistModifiesP(proc_index, var_index);
 }
 bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name) {
     assert(compiled);
     int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
-    auto modified_vars = modifies_rel_.GetVarAccessByProc(proc_index);
-    return !modified_vars.empty();
+    return modifies_rel_.ExistModifiesP(proc_index);
 }
 std::set<int> ProgramKnowledgeBase::GetModifies(
         Name<ArgPos::kFirst> proc_name) {
@@ -343,14 +298,12 @@ bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name,
     int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
     int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     if (proc_index == 0 || var_index == 0) return false;
-    auto uses_vars = uses_rel_.GetVarAccessByProc(proc_index);
-    return uses_vars.find(var_index) != uses_vars.end();
+    return uses_rel_.ExistUsesP(proc_index, var_index);
 }
 bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name) {
     assert(compiled);
     int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
-    auto uses_vars = uses_rel_.GetVarAccessByProc(proc_index);
-    return !uses_vars.empty();
+    return uses_rel_.ExistUsesP(proc_index);
 }
 std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kFirst> proc_name) {
     assert(compiled);

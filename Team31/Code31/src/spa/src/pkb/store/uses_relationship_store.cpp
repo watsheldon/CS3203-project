@@ -1,5 +1,6 @@
 #include "uses_relationship_store.h"
 
+#include <cassert>
 #include <vector>
 
 #include "common/bitvec2d.h"
@@ -74,5 +75,21 @@ void UsesRelationshipStore::AddConditionIndirectUses(
         if (stmts.size() == vars.size()) break;
         stmts.resize(vars.size(), index);
     }
+}
+bool UsesRelationshipStore::ExistUses(int stmt_no, int var_index) {
+    return ExistRel(stmt_no, var_index);
+}
+std::set<int> UsesRelationshipStore::GetUses(int stmt_no) {
+    return GetRelRelatedVars(stmt_no);
+}
+std::set<int> UsesRelationshipStore::GetUses(int var_index, StmtType type,
+                                             const TypeStatementsStore& store) {
+    return GetRelRelatedVars(var_index, type, store);
+}
+bool UsesRelationshipStore::ExistUsesP(int proc_index, int var_index) {
+    return ExistRelP(proc_index, var_index);
+}
+bool UsesRelationshipStore::ExistUsesP(int proc_index) {
+    return ExistRelP(proc_index);
 }
 }  // namespace spa

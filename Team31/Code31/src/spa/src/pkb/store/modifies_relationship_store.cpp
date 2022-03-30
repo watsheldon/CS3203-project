@@ -1,5 +1,6 @@
 #include "modifies_relationship_store.h"
 
+#include <cassert>
 #include <vector>
 
 #include "type_statements_store.h"
@@ -17,5 +18,21 @@ void ModifiesRelationshipStore::AddAllIndirectRel(
 void ModifiesRelationshipStore::AddAllDirectRel(
         const TypeStatementsStore& store) {
     FillDirectRels(direct_stmt_types_, store);
+}
+bool ModifiesRelationshipStore::ExistModifies(int stmt_no, int var_index) {
+    return ExistRel(stmt_no, var_index);
+}
+std::set<int> ModifiesRelationshipStore::GetModifies(int stmt_no) {
+    return GetRelRelatedVars(stmt_no);
+}
+std::set<int> ModifiesRelationshipStore::GetModifies(
+        int var_index, StmtType type, const TypeStatementsStore& store) {
+    return GetRelRelatedVars(var_index, type, store);
+}
+bool ModifiesRelationshipStore::ExistModifiesP(int proc_index, int var_index) {
+    return ExistRelP(proc_index, var_index);
+}
+bool ModifiesRelationshipStore::ExistModifiesP(int proc_index) {
+    return ExistRelP(proc_index);
 }
 }  // namespace spa

@@ -25,7 +25,13 @@ class UsesModifiesStoreBase {
     };
     UsesModifiesStoreBase(std::size_t stmt_size, std::size_t var_size,
                           std::size_t proc_size);
-
+    [[nodiscard]] bool ExistRel(int stmt_no, int var_index) const;
+    [[nodiscard]] bool ExistRelP(int proc_index) const;
+    [[nodiscard]] bool ExistRelP(int proc_index, int var_index) const;
+    [[nodiscard]] std::set<int> GetRelRelatedVars(int stmt_no) const;
+    [[nodiscard]] std::set<int> GetRelRelatedVars(
+            int var_index, StmtType type,
+            const TypeStatementsStore &store) const;
     [[nodiscard]] const std::vector<int> &GetStmtNo(int var_index) const;
     [[nodiscard]] const std::set<int> &GetAllVar(int stmt_no) const;
     [[nodiscard]] const std::set<int> &GetVarAccessByProc(int proc_index) const;

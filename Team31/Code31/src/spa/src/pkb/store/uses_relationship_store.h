@@ -22,6 +22,12 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
     using UsesModifiesStoreBase::UsesModifiesStoreBase;
     void Set(int stmt_no, std::vector<int>&& var_indices);
     [[nodiscard]] const std::vector<int>& GetVarIndex(int stmt_no) const;
+    [[nodiscard]] bool ExistUses(int stmt_no, int var_index);
+    [[nodiscard]] std::set<int> GetUses(int stmt_no);
+    [[nodiscard]] std::set<int> GetUses(int var_index, StmtType type,
+                                        const TypeStatementsStore& store);
+    [[nodiscard]] bool ExistUsesP(int proc_index, int var_index);
+    [[nodiscard]] bool ExistUsesP(int proc_index);
 
   private:
     void AddConditionRel(const AuxiliaryData& data_store) override;
