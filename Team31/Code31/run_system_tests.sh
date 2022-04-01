@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
+#
+# Searches and run all system tests located within a directory
+
 BUILD_DIR="cmake-build-release"
 OUTPUT_DIR="tests"
 SOURCE_SUFFIX="_source.txt"
