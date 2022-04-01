@@ -1,7 +1,5 @@
 #include "follows_relationship_store.h"
 
-#include <algorithm>
-#include <iterator>
 #include <set>
 #include <utility>
 
@@ -31,44 +29,62 @@ bool FollowsRelationshipStore::HasFirstValues(
 bool FollowsRelationshipStore::ExistRelationship() const noexcept {
     return stmtlst_stmt_.ExistFollows();
 }
-std::set<int> FollowsRelationshipStore::GetOneArg(
-        ArgPos return_pos, StmtType return_type) const noexcept {
-    auto results = return_pos == ArgPos::kFirst
-                           ? stmtlst_stmt_.GetFollowedByWildcard()
-                           : stmtlst_stmt_.GetFollowsWildcard();
-    return Extract(std::move(results), return_type);
-}
-std::set<int> FollowsRelationshipStore::GetOneArg(
-        Index<ArgPos::kFirst> first_stmt, StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollows(first_stmt);
-    return Extract(std::move(results), return_type);
-}
-std::set<int> FollowsRelationshipStore::GetOneArgT(
-        Index<ArgPos::kFirst> first_stmt, StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollowsT(first_stmt);
-    return Extract(std::move(results), return_type);
-}
-std::set<int> FollowsRelationshipStore::GetOneArg(
-        Index<ArgPos::kSecond> second_stmt,
+std::set<StmtNo> FollowsRelationshipStore::GetFirstArg(
         StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollows(second_stmt);
-    return Extract(std::move(results), return_type);
+    return Filter(stmtlst_stmt_.GetFollowedByWildcard(), return_type);
 }
-std::set<int> FollowsRelationshipStore::GetOneArgT(
-        Index<ArgPos::kSecond> second_stmt,
+std::set<StmtNo> FollowsRelationshipStore::GetSecondArg(
         StmtType return_type) const noexcept {
-    auto results = stmtlst_stmt_.GetFollowsT(second_stmt);
-    return Extract(std::move(results), return_type);
+    return Filter(stmtlst_stmt_.GetFollowsWildcard(), return_type);
+}
+std::set<int> FollowsRelationshipStore::GetSecondArg(
+        Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept {
+    StmtNo second_arg = stmtlst_stmt_.GetFollowsSecondArg(stmt_no);
+    return second_arg == 0 ? std::set<StmtNo>{}
+                           : Filter(second_arg, return_type);
+}
+std::set<int> FollowsRelationshipStore::GetSecondArgT(
+        Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept {
+    auto results = stmtlst_stmt_.GetFollowsTSecondArg(stmt_no);
+    return Filter(results, return_type);
+}
+std::set<StmtNo> FollowsRelationshipStore::GetFirstArg(
+        Index<ArgPos::kSecond> stmt_no, StmtType return_type) const noexcept {
+    auto first_arg = stmtlst_stmt_.GetFollowsFirstArg(stmt_no);
+    return first_arg == 0 ? std::set<StmtNo>{} : Filter(first_arg, return_type);
+}
+std::set<int> FollowsRelationshipStore::GetFirstArgT(
+        Index<ArgPos::kSecond> stmt_no, StmtType return_type) const noexcept {
+    auto results = stmtlst_stmt_.GetFollowsTFirstArg(stmt_no);
+    return Filter(results, return_type);
 }
 PairVec<int> FollowsRelationshipStore::GetBothArgs(
         StmtType first_type, StmtType second_type) const noexcept {
     PairVec<int> results = stmtlst_stmt_.GetFollowsPairs();
     return ExtractPairs(std::move(results), first_type, second_type);
 }
-
 PairVec<int> FollowsRelationshipStore::GetBothArgsT(
         StmtType first_type, StmtType second_type) const noexcept {
     PairVec<int> results = stmtlst_stmt_.GetFollowsPairsT();
     return ExtractPairs(std::move(results), first_type, second_type);
+}
+PairVec<StmtNo> FollowsRelationshipStore::ExtractPairs(
+        PairVec<StmtNo> results, StmtType first_type,
+        StmtType second_type) const noexcept {
+    if (first_type == StmtType::kAll && second_type == StmtType::kAll)
+        return results;
+    PairVec<int> extracted_results;
+    auto &[first, second] = results;
+    for (int i = 0; i < results.first.size(); ++i) {
+        bool has_first = first_type == StmtType::kAll ||
+                         first_type == type_stmt_.GetType(first[i]);
+        bool has_second = second_type == StmtType::kAll ||
+                          second_type == type_stmt_.GetType(second[i]);
+        if (has_first && has_second) {
+            extracted_results.first.emplace_back(first[i]);
+            extracted_results.second.emplace_back(second[i]);
+        }
+    }
+    return extracted_results;
 }
 }  // namespace spa

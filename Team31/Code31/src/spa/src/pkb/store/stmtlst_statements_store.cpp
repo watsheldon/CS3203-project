@@ -1,208 +1,162 @@
 #include "stmtlst_statements_store.h"
 
-#include <algorithm>
+#include <numeric>
+#include <vector>
+
+#include "common/aliases.h"
+#include "common/entity_type_enum.h"
+#include "common/index.h"
 
 namespace spa {
-StmtlstStatementsStore::StmtlstStatementsStore(size_t stmtlst_count,
-                                               size_t stmt_count)
+StmtlstStatementsStore::StmtlstStatementsStore(std::size_t stmtlst_count,
+                                               std::size_t stmt_count)
         : stmtlst_to_statements_(stmtlst_count + 1),
           statement_to_stmtlst_(stmt_count + 1) {}
-
-void StmtlstStatementsStore::Set(int stmtlst_index,
-                                 std::vector<int> &&stmtlst) {
+void StmtlstStatementsStore::Set(int stmtlst_index, std::vector<int> stmtlst) {
     for (int i = 0; i < stmtlst.size(); ++i) {
         statement_to_stmtlst_[stmtlst[i]] = {stmtlst_index, i};
     }
     stmtlst_to_statements_[stmtlst_index] = std::move(stmtlst);
 }
-
 int StmtlstStatementsStore::GetStmtlst(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no].stmtlst_index;
 }
-
 int StmtlstStatementsStore::GetStmtRelativePos(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no].pos_in_stmtlst;
 }
-
-size_t StmtlstStatementsStore::GetStmtlstSize(int stmt_no) const {
+std::size_t StmtlstStatementsStore::GetStmtlstSize(int stmt_no) const {
     return stmtlst_to_statements_[statement_to_stmtlst_[stmt_no].stmtlst_index]
             .size();
 }
-
 StmtProperties StmtlstStatementsStore::GetStmtProperties(int stmt_no) const {
     return statement_to_stmtlst_[stmt_no];
 }
-
-std::vector<int> StmtlstStatementsStore::GetStatements(
+const std::vector<int> &StmtlstStatementsStore::GetStatements(
         int stmtlst_index) const {
     return stmtlst_to_statements_[stmtlst_index];
 }
-
-bool StmtlstStatementsStore::ExistFollows(
-        Index<ArgPos::kFirst> first_stmt,
-        Index<ArgPos::kSecond> second_stmt) const {
-    // boundary check
-    if (first_stmt.value > statement_to_stmtlst_.size() - 2 ||
-        second_stmt.value > statement_to_stmtlst_.size() - 1) {
+bool StmtlstStatementsStore::ExistFollows(Index<ArgPos::kFirst> first,
+                                          Index<ArgPos::kSecond> second) const {
+    if (first >= second || second + 1 > statement_to_stmtlst_.size()) {
         return false;
     }
-
-    return (first_stmt.value < second_stmt.value) &&
-           (GetStmtlst(first_stmt.value) == GetStmtlst(second_stmt.value)) &&
-           (GetStmtRelativePos(second_stmt.value) -
-                    GetStmtRelativePos(first_stmt.value) ==
-            1);
+    return GetStmtRelativePos(first) + 1 == GetStmtRelativePos(second) &&
+           GetStmtlst(first) == GetStmtlst(second);
 }
 bool StmtlstStatementsStore::ExistFollowsT(
-        Index<ArgPos::kFirst> first_stmt,
-        Index<ArgPos::kSecond> second_stmt) const {
-    // boundary check
-    if (first_stmt.value > statement_to_stmtlst_.size() - 2 ||
-        second_stmt.value > statement_to_stmtlst_.size() - 1) {
+        Index<ArgPos::kFirst> first, Index<ArgPos::kSecond> second) const {
+    if (first >= second || second + 1 > statement_to_stmtlst_.size()) {
         return false;
     }
-
-    return (first_stmt.value < second_stmt.value) &&
-           (GetStmtlst(first_stmt.value) == GetStmtlst(second_stmt.value));
+    return GetStmtlst(first) == GetStmtlst(second);
 }
-
 bool StmtlstStatementsStore::ExistFollows(
         Index<ArgPos::kFirst> first_stmt) const {
-    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
+    if (first_stmt + 2 > statement_to_stmtlst_.size()) {
         return false;
     }
-    return GetStmtRelativePos(first_stmt.value) <
-           GetStmtlstSize(first_stmt.value) - 1;
+    return GetStmtRelativePos(first_stmt) + 1 < GetStmtlstSize(first_stmt);
 }
-
 bool StmtlstStatementsStore::ExistFollows(
         Index<ArgPos::kSecond> second_stmt) const {
     // boundary check
-    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
+    if (second_stmt + 1 > statement_to_stmtlst_.size()) {
         return false;
     }
-    return GetStmtRelativePos(second_stmt.value) > 0;
+    return GetStmtRelativePos(second_stmt) > 0;
 }
-
 bool StmtlstStatementsStore::ExistFollows() const {
-    return std::any_of(stmtlst_to_statements_.begin() + 1,
-                       stmtlst_to_statements_.end(),
-                       [](auto &stmtlst) { return stmtlst.size() > 1; });
+    return GetFollowColumnSize() > 0;
 }
-
 std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
     std::vector<int> followers;
-    for (auto &stmtlst : stmtlst_to_statements_) {
-        for (int i = 1; i < stmtlst.size(); ++i) {
-            followers.emplace_back(stmtlst[i]);
-        }
+    followers.reserve(GetFollowColumnSize());
+    for (auto stmtlst = ++stmtlst_to_statements_.begin();
+         stmtlst != stmtlst_to_statements_.end(); ++stmtlst) {
+        followers.insert(followers.end(), ++stmtlst->begin(), stmtlst->end());
     }
     return followers;
 }
-
-std::vector<int> StmtlstStatementsStore::GetFollows(
+StmtNo StmtlstStatementsStore::GetFollowsSecondArg(
         Index<ArgPos::kFirst> first_stmt) const {
-    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
-        return {};
-    }
-    int pos = GetStmtRelativePos(first_stmt.value);
-    if (pos + 1 == GetStmtlstSize(first_stmt.value)) {
-        return {};
-    }
-    int index = GetStmtlst(first_stmt.value);
-    const std::vector<int> &stmts = GetStatements(index);
-    return {stmts[pos + 1]};
+    if (first_stmt + 2 > statement_to_stmtlst_.size()) return 0;
+    int second_pos = GetStmtRelativePos(first_stmt) + 1;
+    if (second_pos == GetStmtlstSize(first_stmt)) return 0;
+    int index = GetStmtlst(first_stmt);
+    const std::vector<StmtNo> &stmts = GetStatements(index);
+    return stmts[second_pos];
 }
-std::vector<int> StmtlstStatementsStore::GetFollowsT(
+std::vector<int> StmtlstStatementsStore::GetFollowsTSecondArg(
         Index<ArgPos::kFirst> first_stmt) const {
-    if (first_stmt.value > statement_to_stmtlst_.size() - 2) {
-        return {};
-    }
-    int pos = GetStmtRelativePos(first_stmt.value);
-    if (pos + 1 == GetStmtlstSize(first_stmt.value)) {
-        return {};
-    }
-    int index = GetStmtlst(first_stmt.value);
-    const std::vector<int> &stmts = GetStatements(index);
-    auto first = stmts.begin() + pos + 1;
-    auto last = stmts.end();
-    return {first, last};
+    if (first_stmt + 2 > statement_to_stmtlst_.size()) return {};
+    int start_index = GetStmtRelativePos(first_stmt) + 1;
+    if (start_index == GetStmtlstSize(first_stmt)) return {};
+    int index = GetStmtlst(first_stmt);
+    const auto &stmts = GetStatements(index);
+    return {stmts.begin() + start_index, stmts.end()};
 }
-
 std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
     std::vector<int> followees;
-    for (auto &stmtlst : stmtlst_to_statements_) {
-        for (int i = 0; i < (int)stmtlst.size() - 1; ++i) {
-            followees.emplace_back(stmtlst[i]);
-        }
+    followees.reserve(GetFollowColumnSize());
+    for (auto stmtlst = ++stmtlst_to_statements_.begin();
+         stmtlst != stmtlst_to_statements_.end(); ++stmtlst) {
+        followees.insert(followees.end(), stmtlst->begin(), --stmtlst->end());
     }
     return followees;
 }
-
-std::vector<int> StmtlstStatementsStore::GetFollows(
+StmtNo StmtlstStatementsStore::GetFollowsFirstArg(
         Index<ArgPos::kSecond> second_stmt) const {
-    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
-        return {};
-    }
-    int pos = GetStmtRelativePos(second_stmt.value);
-    if (pos == 0) {
-        return {};
-    }
-    int index = GetStmtlst(second_stmt.value);
-    const std::vector<int> &stmts = GetStatements(index);
-
-    return {stmts[pos - 1]};
+    if (second_stmt + 1 > statement_to_stmtlst_.size()) return 0;
+    int relative_pos = GetStmtRelativePos(second_stmt);
+    if (relative_pos == 0) return 0;
+    int index = GetStmtlst(second_stmt);
+    const auto &stmts = GetStatements(index);
+    return stmts[relative_pos - 1];
 }
-std::vector<int> StmtlstStatementsStore::GetFollowsT(
+std::vector<int> StmtlstStatementsStore::GetFollowsTFirstArg(
         Index<ArgPos::kSecond> second_stmt) const {
-    if (second_stmt.value > statement_to_stmtlst_.size() - 1) {
-        return {};
-    }
-    int pos = GetStmtRelativePos(second_stmt.value);
-    if (pos == 0) {
-        return {};
-    }
-    int index = GetStmtlst(second_stmt.value);
-    const std::vector<int> &stmts = GetStatements(index);
-    auto first = stmts.begin();
-    auto last = stmts.begin() + pos;
-    return {first, last};
+    if (second_stmt + 1 > statement_to_stmtlst_.size()) return {};
+    int pos = GetStmtRelativePos(second_stmt);
+    if (pos == 0) return {};
+    int index = GetStmtlst(second_stmt);
+    const std::vector<StmtNo> &stmts = GetStatements(index);
+    return {stmts.begin(), stmts.begin() + pos};
 }
-
-void StmtlstStatementsStore::AddPairs(const std::vector<int> &stmtlst,
-                                      PairVec<int> &results) const {
-    int size = (int)stmtlst.size();
-    for (int i = 0; i < size - 1; ++i) {
-        for (int j = i + 1; j < size; ++j) {
-            results.first.emplace_back(stmtlst[i]);
-            results.second.emplace_back(stmtlst[j]);
-        }
-    }
-}
-
-PairVec<int> StmtlstStatementsStore::GetTransitivePairs() const {
-    PairVec<int> results;
-    for (auto &stmtlst : stmtlst_to_statements_) {
-        AddPairs(stmtlst, results);
-    }
-    return results;
-}
-
-PairVec<int> StmtlstStatementsStore::GetNonTransitivePairs() const {
-    PairVec<int> results;
-    for (auto &stmtlst : stmtlst_to_statements_) {
-        for (int i = 0; i < (int)stmtlst.size() - 1; ++i) {
-            results.first.emplace_back(stmtlst[i]);
-            results.second.emplace_back(stmtlst[i + 1]);
-        }
-    }
-    return results;
-}
-
 PairVec<int> StmtlstStatementsStore::GetFollowsPairs() const {
-    return GetNonTransitivePairs();
+    PairVec<int> results;
+    auto &[first, second] = results;
+    first.reserve(GetFollowColumnSize()), second.reserve(GetFollowColumnSize());
+    for (auto stmtlst = ++stmtlst_to_statements_.begin();
+         stmtlst != stmtlst_to_statements_.end(); ++stmtlst) {
+        first.insert(first.end(), stmtlst->begin(), --stmtlst->end());
+        second.insert(second.end(), ++stmtlst->begin(), stmtlst->end());
+    }
+    return results;
 }
 PairVec<int> StmtlstStatementsStore::GetFollowsPairsT() const {
-    return GetTransitivePairs();
+    static const std::size_t kColumnLength = std::transform_reduce(
+            ++stmtlst_to_statements_.begin(), stmtlst_to_statements_.end(), 0ul,
+            std::plus<>(), [](const auto &s) {
+                auto n = s.size();
+                return (n - 1) * (n) / 2;
+            });
+    PairVec<int> results;
+    auto &[first, second] = results;
+    first.reserve(kColumnLength), second.reserve(kColumnLength);
+    for (const auto &stmtlst : stmtlst_to_statements_) {
+        const auto size = stmtlst.size();
+        for (int i = 0; i + 1 < size; ++i) {
+            auto num_pairs = size - i - 1;
+            first.resize(first.size() + num_pairs, stmtlst[i]);
+            second.insert(second.end(), stmtlst.begin() + i + 1, stmtlst.end());
+        }
+    }
+    return results;
+}
+std::size_t StmtlstStatementsStore::GetFollowColumnSize() const {
+    static const std::size_t kColumnSize = std::transform_reduce(
+            ++stmtlst_to_statements_.begin(), stmtlst_to_statements_.end(), 0ul,
+            std::plus<>(), [](const auto &s) { return s.size() - 1; });
+    return kColumnSize;
 }
 }  // namespace spa

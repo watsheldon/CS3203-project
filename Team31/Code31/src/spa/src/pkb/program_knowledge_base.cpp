@@ -106,27 +106,29 @@ bool ProgramKnowledgeBase::ExistFollows() {
 std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
                                                StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetOneArg(return_pos, return_type);
+    return return_pos == ArgPos::kFirst
+                   ? follows_store_.GetFirstArg(return_type)
+                   : follows_store_.GetSecondArg(return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kFirst> stmt_no,
                                                StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetOneArg(stmt_no, return_type);
+    return follows_store_.GetSecondArg(stmt_no, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kFirst> stmt_no,
                                                 StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetOneArgT(stmt_no, return_type);
+    return follows_store_.GetSecondArgT(stmt_no, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kSecond> stmt_no,
                                                StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetOneArg(stmt_no, return_type);
+    return follows_store_.GetFirstArg(stmt_no, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kSecond> stmt_no,
                                                 StmtType return_type) {
     assert(compiled);
-    return follows_store_.GetOneArgT(stmt_no, return_type);
+    return follows_store_.GetFirstArgT(stmt_no, return_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(StmtType first_type,
                                                    StmtType second_type) {
@@ -163,27 +165,29 @@ bool ProgramKnowledgeBase::ExistParent() {
 std::set<int> ProgramKnowledgeBase::GetParent(ArgPos return_pos,
                                               StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetOneArg(return_pos, return_type);
+    return return_pos == ArgPos::kFirst
+                   ? parent_store_.GetFirstArg(return_type)
+                   : parent_store_.GetSecondArg(return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kFirst> parent_stmt,
                                               StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetOneArg(parent_stmt, return_type);
+    return parent_store_.GetSecondArg(parent_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParentT(
         Index<ArgPos::kFirst> parent_stmt, StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetOneArgT(parent_stmt, return_type);
+    return parent_store_.GetSecondArgT(parent_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kSecond> child_stmt,
                                               StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetOneArg(child_stmt, return_type);
+    return parent_store_.GetFirstArg(child_stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetParentT(
         Index<ArgPos::kSecond> child_stmt, StmtType return_type) {
     assert(compiled);
-    return parent_store_.GetOneArgT(child_stmt, return_type);
+    return parent_store_.GetFirstArgT(child_stmt, return_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetParentPairs(StmtType parent_type,
                                                   StmtType child_type) {

@@ -31,14 +31,11 @@ TEST_CASE("pkb/store/StmtlstStatementsStore") {
         REQUIRE(sss.ExistFollows());
     }
     SECTION("GetFollows") {
-        REQUIRE(sss.GetFollowsT(Index<ArgPos::kFirst>(1)) ==
+        REQUIRE(sss.GetFollowsTSecondArg(Index<ArgPos::kFirst>(1)) ==
                 std::vector<int>{3, 4, 10});
-        REQUIRE(sss.GetFollows(Index<ArgPos::kFirst>(1)) ==
-                std::vector<int>{3});
-        REQUIRE(sss.GetFollowsT(Index<ArgPos::kSecond>(2)) ==
-                std::vector<int>{});
-        REQUIRE(sss.GetFollows(Index<ArgPos::kSecond>(6)) ==
-                std::vector<int>{5});
+        REQUIRE(sss.GetFollowsSecondArg(Index<ArgPos::kFirst>(1)) == 3);
+        REQUIRE(sss.GetFollowsTFirstArg(Index<ArgPos::kSecond>(2)).empty());
+        REQUIRE(sss.GetFollowsFirstArg(Index<ArgPos::kSecond>(6)) == 5);
     }
     SECTION("GetFollowsWildcard") {
         REQUIRE(sss.GetFollowsWildcard() ==
