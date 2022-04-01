@@ -2,51 +2,121 @@
 #
 # Searches and run all system tests located within a directory
 
-BUILD_DIR="cmake-build-release"
-OUTPUT_DIR="tests"
-SOURCE_SUFFIX="_source.txt"
-QUERY_SUFFIX="_queries.txt"
-XML_EXT="_analysis.xml"
-BOLD=$(tput bold)
-NO_STYLE=$(tput sgr 0)
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
+#######################################
+# Display help info
+# Arguments:
+#   None
+#######################################
+function print_usage() {
+  printf "Usage: %s [ OPTIONS ]\n" "$0"
+  printf "   -d\t directory containing system tests\n"
+  printf "   -s\t strict mode, exit on failed tests\n"
+}
 
-autotester="${BUILD_DIR}/src/autotester/autotester"
-if [ "$(uname)" == "Windows" ]; then
-  dev_null="NUL"
-else
-  dev_null="/dev/null"
-  # For WSL
-  if grep -q "microsoft" /proc/version; then
-    autotester+=".exe"
-  fi
-fi
-
-if [[ -n $1 && -d $1 ]]; then
-  test_dir=$1
-else
-  test_dir=$OUTPUT_DIR
-fi
-echo "System test directory: ${test_dir}"
-
-readarray -d '' simple_sources < <(find $test_dir -type f -name "*${SOURCE_SUFFIX}" -print0)
-for source in "${simple_sources[@]}"; do
-  queries="${source/${SOURCE_SUFFIX}/${QUERY_SUFFIX}}"
+#######################################
+# Run a single test
+# Arguments:
+#  Name of test case
+#######################################
+function run_test() {
+  local queries="${1/${source_suffix}/${query_suffix}}"
   if [ ! -f "${queries}" ]; then
     echo "Matching file for ${source} does not exist, skipping..."
-    continue
+    return
   fi
-  name=$(basename "${source}" ${SOURCE_SUFFIX})
+  local name
+  name=$(basename "${source}" "${source_suffix}")
   echo -n "Running ${name}... "
-  output="${OUTPUT_DIR}/${name}${XML_EXT}"
-  cmd="${autotester} ${source} ${queries} ${output}"
-  if $cmd &>$dev_null; then
+  local output="${output_dir}/${name}${xml_ext}"
+  local cmd="${autotester} ${source} ${queries} ${output}"
+  local ret=0
+  if $cmd &>"$dev_null"; then
+    local total_queries
     total_queries=$(grep -o "</query>" "${output}" | wc -l)
+    local failed_queries
     failed_queries=$(grep -o "</failed>" "${output}" | wc -l)
-    if [ "${failed_queries}" -eq 0 ]; then color=$GREEN; else color=$RED; fi
-    echo -e "${color}${BOLD}$((total_queries - failed_queries))/${total_queries} passed${NO_STYLE}"
+    if [[ ${failed_queries} -eq 0 ]]; then
+      local color=$green
+    else
+      color=$red
+      ret=-1
+    fi
+    echo -e "${color}${bold}$((total_queries - failed_queries))/${total_queries} passed${no_style}"
   else
-    echo -e "${RED}${BOLD}error encountered!${NO_STYLE}"
+    echo -e "${red}${bold}error encountered!${no_style}"
+    ret=-1
   fi
-done
+  return $ret
+}
+
+#######################################
+# Main procedure to run tests
+# Globals:
+#   OPTARG
+#   autotester
+#   bold
+#   dev_null
+#   green
+#   no_style
+#   output_dir
+#   query_suffix
+#   red
+#   source
+#   source_suffix
+#   xml_ext
+# Arguments:
+#  None
+#######################################
+function main() {
+  output_dir="tests"
+  source_suffix="_source.txt"
+  query_suffix="_queries.txt"
+  xml_ext="_analysis.xml"
+  bold=$(tput bold)
+  no_style=$(tput sgr 0)
+  red=$(tput setaf 1)
+  green=$(tput setaf 2)
+  local build_dir="cmake-build-release"
+  local strict='false'
+  local test_dir=$output_dir
+  local flag
+  while getopts 'd:s' flag; do
+    case "${flag}" in
+      d)
+        if [[ -n $OPTARG && -d $OPTARG ]]; then
+          test_dir=$OPTARG
+        fi
+        ;;
+      s) strict='true' ;;
+      *)
+        print_usage
+        exit 1
+        ;;
+    esac
+  done
+
+  autotester="${build_dir}/src/autotester/autotester"
+  if [ "$(uname)" == "Windows" ]; then
+    dev_null="NUL"
+  else
+    dev_null="/dev/null"
+    # For WSL
+    if grep -q "microsoft" /proc/version; then
+      autotester+=".exe"
+    fi
+  fi
+
+  echo "System test directory: ${test_dir}"
+  local simple_sources
+  readarray -d '' simple_sources < <(find "$test_dir" -type f -name "*${source_suffix}" -print0)
+
+  for source in "${simple_sources[@]}"; do
+    run_test "$source"
+    local retval=$?
+    if [[ $strict == 'true' && $retval -ne 0 ]]; then
+      exit 1
+    fi
+  done
+}
+
+main "$@"
