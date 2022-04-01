@@ -52,7 +52,6 @@ function run_test() {
 #######################################
 # Main procedure to run tests
 # Globals:
-#   OPTARG
 #   autotester
 #   bold
 #   dev_null
@@ -107,8 +106,10 @@ function main() {
   fi
 
   echo "System test directory: ${test_dir}"
-  local simple_sources
-  readarray -d '' simple_sources < <(find "$test_dir" -type f -name "*${source_suffix}" -print0)
+  local simple_sources=()
+  while IFS= read -r -d $'\0'; do
+    simple_sources+=("${REPLY}")
+  done < <(find "${test_dir}" -type f -name "*${source_suffix}" -print0)
 
   for source in "${simple_sources[@]}"; do
     run_test "$source"
