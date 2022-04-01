@@ -5,26 +5,23 @@
 
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
-#include "follows_parent_relationship_base.h"
 
 namespace spa {
 bool FollowsRelationshipStore::IsNonTransitive(
-        Index<ArgPos::kFirst> first_stmt,
-        Index<ArgPos::kSecond> second_stmt) const noexcept {
+        StmtNo first_stmt, StmtNo second_stmt) const noexcept {
     return stmtlst_stmt_.ExistFollows(first_stmt, second_stmt);
 }
-bool FollowsRelationshipStore::IsTransitive(
-        Index<ArgPos::kFirst> first_stmt,
-        Index<ArgPos::kSecond> second_stmt) const noexcept {
-    return stmtlst_stmt_.ExistFollowsT(first_stmt, second_stmt);
+bool FollowsRelationshipStore::IsTransitive(StmtNo parent,
+                                            StmtNo child) const noexcept {
+    return stmtlst_stmt_.ExistFollowsT(parent, child);
 }
 bool FollowsRelationshipStore::HasSecondValues(
-        Index<ArgPos::kFirst> first_stmt) const noexcept {
-    return stmtlst_stmt_.ExistFollows(first_stmt);
+        StmtNo first_stmt) const noexcept {
+    return stmtlst_stmt_.ExistFollowsSecondArg(first_stmt);
 }
 bool FollowsRelationshipStore::HasFirstValues(
-        Index<ArgPos::kSecond> second_stmt) const noexcept {
-    return stmtlst_stmt_.ExistFollows(second_stmt);
+        StmtNo second_stmt) const noexcept {
+    return stmtlst_stmt_.ExistFollowsFirstArg(second_stmt);
 }
 bool FollowsRelationshipStore::ExistRelationship() const noexcept {
     return stmtlst_stmt_.ExistFollows();
@@ -38,23 +35,23 @@ std::set<StmtNo> FollowsRelationshipStore::GetSecondArg(
     return Filter(stmtlst_stmt_.GetFollowsWildcard(), return_type);
 }
 std::set<int> FollowsRelationshipStore::GetSecondArg(
-        Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept {
-    StmtNo second_arg = stmtlst_stmt_.GetFollowsSecondArg(stmt_no);
+        StmtNo parent, StmtType return_type) const noexcept {
+    StmtNo second_arg = stmtlst_stmt_.GetFollowsSecondArg(parent);
     return second_arg == 0 ? std::set<StmtNo>{}
                            : Filter(second_arg, return_type);
 }
 std::set<int> FollowsRelationshipStore::GetSecondArgT(
-        Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept {
+        StmtNo stmt_no, StmtType return_type) const noexcept {
     auto results = stmtlst_stmt_.GetFollowsTSecondArg(stmt_no);
     return Filter(results, return_type);
 }
 std::set<StmtNo> FollowsRelationshipStore::GetFirstArg(
-        Index<ArgPos::kSecond> stmt_no, StmtType return_type) const noexcept {
+        StmtNo stmt_no, StmtType return_type) const noexcept {
     auto first_arg = stmtlst_stmt_.GetFollowsFirstArg(stmt_no);
     return first_arg == 0 ? std::set<StmtNo>{} : Filter(first_arg, return_type);
 }
 std::set<int> FollowsRelationshipStore::GetFirstArgT(
-        Index<ArgPos::kSecond> stmt_no, StmtType return_type) const noexcept {
+        StmtNo stmt_no, StmtType return_type) const noexcept {
     auto results = stmtlst_stmt_.GetFollowsTFirstArg(stmt_no);
     return Filter(results, return_type);
 }

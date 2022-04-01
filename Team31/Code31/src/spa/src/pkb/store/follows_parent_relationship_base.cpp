@@ -20,8 +20,9 @@ std::set<StmtNo> FollowsParentRelationshipBase::Filter(
     return type_stmt_.GetType(result) == return_type ? std::set<StmtNo>{result}
                                                      : std::set<StmtNo>{};
 }
-std::set<int> FollowsParentRelationshipBase::Filter(
-        const std::vector<int> &results, StmtType return_type) const noexcept {
+std::set<StmtNo> FollowsParentRelationshipBase::Filter(
+        const std::vector<StmtNo> &results,
+        StmtType return_type) const noexcept {
     if (return_type == StmtType::kAll) return {results.begin(), results.end()};
     std::set<int> filtered_results;
     std::copy_if(results.begin(), results.end(),

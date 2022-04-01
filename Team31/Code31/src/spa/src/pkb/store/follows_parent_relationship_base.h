@@ -21,32 +21,26 @@ class FollowsParentRelationshipBase {
     };
     explicit FollowsParentRelationshipBase(StoreRefs refs) noexcept;
     [[nodiscard]] virtual bool IsNonTransitive(
-            Index<ArgPos::kFirst> first_stmt,
-            Index<ArgPos::kSecond> second_stmt) const noexcept = 0;
+            StmtNo first_stmt, StmtNo second_stmt) const noexcept = 0;
     [[nodiscard]] virtual bool IsTransitive(
-            Index<ArgPos::kFirst> first_stmt,
-            Index<ArgPos::kSecond> second_stmt) const noexcept = 0;
+            StmtNo first_stmt, StmtNo second_stmt) const noexcept = 0;
     [[nodiscard]] virtual bool HasSecondValues(
-            Index<ArgPos::kFirst> first_stmt) const noexcept = 0;
+            StmtNo first_stmt) const noexcept = 0;
     [[nodiscard]] virtual bool HasFirstValues(
-            Index<ArgPos::kSecond> second_stmt) const noexcept = 0;
+            StmtNo second_stmt) const noexcept = 0;
     [[nodiscard]] virtual bool ExistRelationship() const noexcept = 0;
     [[nodiscard]] virtual std::set<StmtNo> GetFirstArg(
             StmtType return_type) const noexcept = 0;
     [[nodiscard]] virtual std::set<StmtNo> GetSecondArg(
             StmtType return_type) const noexcept = 0;
     [[nodiscard]] virtual std::set<StmtNo> GetSecondArg(
-            Index<ArgPos::kFirst> first_stmt,
-            StmtType return_type) const noexcept = 0;
+            StmtNo first_stmt, StmtType return_type) const noexcept = 0;
     [[nodiscard]] virtual std::set<StmtNo> GetSecondArgT(
-            Index<ArgPos::kFirst> first_stmt,
-            StmtType return_type) const noexcept = 0;
+            StmtNo first_stmt, StmtType return_type) const noexcept = 0;
     [[nodiscard]] virtual std::set<StmtNo> GetFirstArg(
-            Index<ArgPos::kSecond> second_stmt,
-            StmtType return_type) const noexcept = 0;
+            StmtNo second_stmt, StmtType return_type) const noexcept = 0;
     [[nodiscard]] virtual std::set<StmtNo> GetFirstArgT(
-            Index<ArgPos::kSecond> second_stmt,
-            StmtType return_type) const noexcept = 0;
+            StmtNo second_stmt, StmtType return_type) const noexcept = 0;
     [[nodiscard]] virtual PairVec<StmtNo> GetBothArgs(
             StmtType first_type, StmtType second_type) const noexcept = 0;
     [[nodiscard]] virtual PairVec<StmtNo> GetBothArgsT(
@@ -59,7 +53,7 @@ class FollowsParentRelationshipBase {
 
     [[nodiscard]] std::set<StmtNo> Filter(StmtNo result,
                                           StmtType return_type) const noexcept;
-    [[nodiscard]] std::set<StmtNo> Filter(const std::vector<int> &results,
+    [[nodiscard]] std::set<StmtNo> Filter(const std::vector<StmtNo> &results,
                                           StmtType return_type) const noexcept;
 };
 }  // namespace spa

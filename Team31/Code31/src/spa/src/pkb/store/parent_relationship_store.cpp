@@ -16,8 +16,7 @@ ParentRelationshipStore::ParentRelationshipStore(std::size_t stmt_count,
                                                  StoreRefs refs) noexcept
         : FollowsParentRelationshipBase(refs), stmt_count_(stmt_count) {}
 bool ParentRelationshipStore::IsNonTransitive(
-        Index<ArgPos::kFirst> parent_stmt,
-        Index<ArgPos::kSecond> child_stmt) const noexcept {
+        StmtNo parent_stmt, StmtNo child_stmt) const noexcept {
     if (child_stmt <= parent_stmt || parent_stmt >= stmt_count_ ||
         child_stmt > stmt_count_) {
         return false;
@@ -31,11 +30,8 @@ bool ParentRelationshipStore::IsNonTransitive(
     auto [then_idx, else_idx] = stmtlst_parent_.GetIfStmtLst(parent_stmt);
     return child_stmtlst == then_idx || child_stmtlst == else_idx;
 }
-bool ParentRelationshipStore::IsTransitive(
-        Index<ArgPos::kFirst> parent_stmt,
-        Index<ArgPos::kSecond> child_stmt) const noexcept {
-    StmtNo parent = parent_stmt.value;
-    StmtNo child = child_stmt.value;
+bool ParentRelationshipStore::IsTransitive(StmtNo parent,
+                                           StmtNo child) const noexcept {
     if (child <= parent || parent >= stmt_count_ || child > stmt_count_) {
         return false;
     }
@@ -45,11 +41,10 @@ bool ParentRelationshipStore::IsTransitive(
     return child <= last_stmt;
 }
 bool ParentRelationshipStore::HasSecondValues(
-        Index<ArgPos::kFirst> parent_stmt) const noexcept {
+        StmtNo parent_stmt) const noexcept {
     return parent_stmt < stmt_count_ && IsParent(parent_stmt);
 }
-bool ParentRelationshipStore::HasFirstValues(
-        Index<ArgPos::kSecond> child_stmt) const noexcept {
+bool ParentRelationshipStore::HasFirstValues(StmtNo child_stmt) const noexcept {
     return child_stmt <= stmt_count_ && HasParent(child_stmt);
 }
 bool ParentRelationshipStore::ExistRelationship() const noexcept {
@@ -85,8 +80,7 @@ std::set<StmtNo> ParentRelationshipStore::GetSecondArg(
     return children;
 }
 std::set<StmtNo> ParentRelationshipStore::GetSecondArg(
-        Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept {
-    StmtNo parent = stmt_no.value;
+        StmtNo parent, StmtType return_type) const noexcept {
     if (parent >= stmt_count_ || !IsParent(parent)) return {};
     StmtType type = type_stmt_.GetType(parent);
     if (type == StmtType::kWhile) {
@@ -100,8 +94,7 @@ std::set<StmtNo> ParentRelationshipStore::GetSecondArg(
     return then_set;
 }
 std::set<StmtNo> ParentRelationshipStore::GetSecondArgT(
-        Index<ArgPos::kFirst> stmt_no, StmtType return_type) const noexcept {
-    StmtNo parent = stmt_no.value;
+        StmtNo parent, StmtType return_type) const noexcept {
     if (parent >= stmt_count_ || !IsParent(parent)) return {};
     std::vector<StmtNo> results;
     StmtType type = type_stmt_.GetType(parent);
@@ -112,8 +105,7 @@ std::set<StmtNo> ParentRelationshipStore::GetSecondArgT(
     return Filter(results, return_type);
 }
 std::set<StmtNo> ParentRelationshipStore::GetFirstArg(
-        Index<ArgPos::kSecond> stmt_no, StmtType return_type) const noexcept {
-    StmtNo child = stmt_no.value;
+        StmtNo child, StmtType return_type) const noexcept {
     if (!IsParentType(return_type) || child > stmt_count_) return {};
     int stmtlst_index = stmtlst_stmt_.GetStmtlst(child);
     auto parent = stmtlst_parent_.GetParent(stmtlst_index);
@@ -127,8 +119,7 @@ std::set<StmtNo> ParentRelationshipStore::GetFirstArg(
     }
 }
 std::set<StmtNo> ParentRelationshipStore::GetFirstArgT(
-        Index<ArgPos::kSecond> stmt_no, StmtType return_type) const noexcept {
-    StmtNo child = stmt_no.value;
+        StmtNo child, StmtType return_type) const noexcept {
     if (!IsParentType(return_type) || child > stmt_count_ ||
         !HasParent(child)) {
         return {};

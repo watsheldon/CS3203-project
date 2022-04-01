@@ -4,12 +4,10 @@
 #include <vector>
 
 #include "common/aliases.h"
-#include "common/entity_type_enum.h"
-#include "common/index.h"
 
 namespace spa {
 StmtlstStatementsStore::StmtlstStatementsStore(std::size_t stmtlst_count,
-                                               std::size_t stmt_count)
+                                               std::size_t stmt_count) noexcept
         : stmtlst_to_statements_(stmtlst_count + 1),
           statement_to_stmtlst_(stmt_count + 1) {}
 void StmtlstStatementsStore::Set(int stmtlst_index, std::vector<int> stmtlst) {
@@ -18,58 +16,61 @@ void StmtlstStatementsStore::Set(int stmtlst_index, std::vector<int> stmtlst) {
     }
     stmtlst_to_statements_[stmtlst_index] = std::move(stmtlst);
 }
-int StmtlstStatementsStore::GetStmtlst(int stmt_no) const {
+int StmtlstStatementsStore::GetStmtlst(StmtNo stmt_no) const noexcept {
     return statement_to_stmtlst_[stmt_no].stmtlst_index;
 }
-int StmtlstStatementsStore::GetStmtRelativePos(int stmt_no) const {
+int StmtlstStatementsStore::GetStmtRelativePos(StmtNo stmt_no) const noexcept {
     return statement_to_stmtlst_[stmt_no].pos_in_stmtlst;
 }
-std::size_t StmtlstStatementsStore::GetStmtlstSize(int stmt_no) const {
+std::size_t StmtlstStatementsStore::GetStmtlstSize(
+        StmtNo stmt_no) const noexcept {
     return stmtlst_to_statements_[statement_to_stmtlst_[stmt_no].stmtlst_index]
             .size();
 }
-StmtProperties StmtlstStatementsStore::GetStmtProperties(int stmt_no) const {
+StmtProperties StmtlstStatementsStore::GetStmtProperties(
+        StmtNo stmt_no) const noexcept {
     return statement_to_stmtlst_[stmt_no];
 }
 const std::vector<int> &StmtlstStatementsStore::GetStatements(
-        int stmtlst_index) const {
+        int stmtlst_index) const noexcept {
     return stmtlst_to_statements_[stmtlst_index];
 }
-bool StmtlstStatementsStore::ExistFollows(Index<ArgPos::kFirst> first,
-                                          Index<ArgPos::kSecond> second) const {
+bool StmtlstStatementsStore::ExistFollows(StmtNo first,
+                                          StmtNo second) const noexcept {
     if (first >= second || second + 1 > statement_to_stmtlst_.size()) {
         return false;
     }
     return GetStmtRelativePos(first) + 1 == GetStmtRelativePos(second) &&
            GetStmtlst(first) == GetStmtlst(second);
 }
-bool StmtlstStatementsStore::ExistFollowsT(
-        Index<ArgPos::kFirst> first, Index<ArgPos::kSecond> second) const {
+bool StmtlstStatementsStore::ExistFollowsT(StmtNo first,
+                                           StmtNo second) const noexcept {
     if (first >= second || second + 1 > statement_to_stmtlst_.size()) {
         return false;
     }
     return GetStmtlst(first) == GetStmtlst(second);
 }
-bool StmtlstStatementsStore::ExistFollows(
-        Index<ArgPos::kFirst> first_stmt) const {
+bool StmtlstStatementsStore::ExistFollowsSecondArg(
+        StmtNo first_stmt) const noexcept {
     if (first_stmt + 2 > statement_to_stmtlst_.size()) {
         return false;
     }
     return GetStmtRelativePos(first_stmt) + 1 < GetStmtlstSize(first_stmt);
 }
-bool StmtlstStatementsStore::ExistFollows(
-        Index<ArgPos::kSecond> second_stmt) const {
+bool StmtlstStatementsStore::ExistFollowsFirstArg(
+        StmtNo second_stmt) const noexcept {
     // boundary check
     if (second_stmt + 1 > statement_to_stmtlst_.size()) {
         return false;
     }
     return GetStmtRelativePos(second_stmt) > 0;
 }
-bool StmtlstStatementsStore::ExistFollows() const {
+bool StmtlstStatementsStore::ExistFollows() const noexcept {
     return GetFollowColumnSize() > 0;
 }
-std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
-    std::vector<int> followers;
+std::vector<StmtNo> StmtlstStatementsStore::GetFollowsWildcard()
+        const noexcept {
+    std::vector<StmtNo> followers;
     followers.reserve(GetFollowColumnSize());
     for (auto stmtlst = ++stmtlst_to_statements_.begin();
          stmtlst != stmtlst_to_statements_.end(); ++stmtlst) {
@@ -78,7 +79,7 @@ std::vector<int> StmtlstStatementsStore::GetFollowsWildcard() const {
     return followers;
 }
 StmtNo StmtlstStatementsStore::GetFollowsSecondArg(
-        Index<ArgPos::kFirst> first_stmt) const {
+        StmtNo first_stmt) const noexcept {
     if (first_stmt + 2 > statement_to_stmtlst_.size()) return 0;
     int second_pos = GetStmtRelativePos(first_stmt) + 1;
     if (second_pos == GetStmtlstSize(first_stmt)) return 0;
@@ -86,8 +87,8 @@ StmtNo StmtlstStatementsStore::GetFollowsSecondArg(
     const std::vector<StmtNo> &stmts = GetStatements(index);
     return stmts[second_pos];
 }
-std::vector<int> StmtlstStatementsStore::GetFollowsTSecondArg(
-        Index<ArgPos::kFirst> first_stmt) const {
+std::vector<StmtNo> StmtlstStatementsStore::GetFollowsTSecondArg(
+        StmtNo first_stmt) const noexcept {
     if (first_stmt + 2 > statement_to_stmtlst_.size()) return {};
     int start_index = GetStmtRelativePos(first_stmt) + 1;
     if (start_index == GetStmtlstSize(first_stmt)) return {};
@@ -95,8 +96,9 @@ std::vector<int> StmtlstStatementsStore::GetFollowsTSecondArg(
     const auto &stmts = GetStatements(index);
     return {stmts.begin() + start_index, stmts.end()};
 }
-std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
-    std::vector<int> followees;
+std::vector<StmtNo> StmtlstStatementsStore::GetFollowedByWildcard()
+        const noexcept {
+    std::vector<StmtNo> followees;
     followees.reserve(GetFollowColumnSize());
     for (auto stmtlst = ++stmtlst_to_statements_.begin();
          stmtlst != stmtlst_to_statements_.end(); ++stmtlst) {
@@ -105,7 +107,7 @@ std::vector<int> StmtlstStatementsStore::GetFollowedByWildcard() const {
     return followees;
 }
 StmtNo StmtlstStatementsStore::GetFollowsFirstArg(
-        Index<ArgPos::kSecond> second_stmt) const {
+        StmtNo second_stmt) const noexcept {
     if (second_stmt + 1 > statement_to_stmtlst_.size()) return 0;
     int relative_pos = GetStmtRelativePos(second_stmt);
     if (relative_pos == 0) return 0;
@@ -113,8 +115,8 @@ StmtNo StmtlstStatementsStore::GetFollowsFirstArg(
     const auto &stmts = GetStatements(index);
     return stmts[relative_pos - 1];
 }
-std::vector<int> StmtlstStatementsStore::GetFollowsTFirstArg(
-        Index<ArgPos::kSecond> second_stmt) const {
+std::vector<StmtNo> StmtlstStatementsStore::GetFollowsTFirstArg(
+        StmtNo second_stmt) const noexcept {
     if (second_stmt + 1 > statement_to_stmtlst_.size()) return {};
     int pos = GetStmtRelativePos(second_stmt);
     if (pos == 0) return {};
@@ -122,8 +124,8 @@ std::vector<int> StmtlstStatementsStore::GetFollowsTFirstArg(
     const std::vector<StmtNo> &stmts = GetStatements(index);
     return {stmts.begin(), stmts.begin() + pos};
 }
-PairVec<int> StmtlstStatementsStore::GetFollowsPairs() const {
-    PairVec<int> results;
+PairVec<StmtNo> StmtlstStatementsStore::GetFollowsPairs() const noexcept {
+    PairVec<StmtNo> results;
     auto &[first, second] = results;
     first.reserve(GetFollowColumnSize()), second.reserve(GetFollowColumnSize());
     for (auto stmtlst = ++stmtlst_to_statements_.begin();
@@ -133,14 +135,14 @@ PairVec<int> StmtlstStatementsStore::GetFollowsPairs() const {
     }
     return results;
 }
-PairVec<int> StmtlstStatementsStore::GetFollowsPairsT() const {
+PairVec<StmtNo> StmtlstStatementsStore::GetFollowsPairsT() const noexcept {
     static const std::size_t kColumnLength = std::transform_reduce(
             ++stmtlst_to_statements_.begin(), stmtlst_to_statements_.end(), 0ul,
             std::plus<>(), [](const auto &s) {
                 auto n = s.size();
                 return (n - 1) * (n) / 2;
             });
-    PairVec<int> results;
+    PairVec<StmtNo> results;
     auto &[first, second] = results;
     first.reserve(kColumnLength), second.reserve(kColumnLength);
     for (const auto &stmtlst : stmtlst_to_statements_) {
@@ -153,7 +155,7 @@ PairVec<int> StmtlstStatementsStore::GetFollowsPairsT() const {
     }
     return results;
 }
-std::size_t StmtlstStatementsStore::GetFollowColumnSize() const {
+std::size_t StmtlstStatementsStore::GetFollowColumnSize() const noexcept {
     static const std::size_t kColumnSize = std::transform_reduce(
             ++stmtlst_to_statements_.begin(), stmtlst_to_statements_.end(), 0ul,
             std::plus<>(), [](const auto &s) { return s.size() - 1; });

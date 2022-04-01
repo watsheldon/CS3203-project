@@ -20,34 +20,25 @@ class ParentRelationshipStore : public FollowsParentRelationshipBase {
   public:
     explicit ParentRelationshipStore(std::size_t stmt_count,
                                      StoreRefs refs) noexcept;
-
-    [[nodiscard]] bool IsNonTransitive(
-            Index<ArgPos::kFirst> parent_stmt,
-            Index<ArgPos::kSecond> child_stmt) const noexcept final;
-    [[nodiscard]] bool IsTransitive(
-            Index<ArgPos::kFirst> parent_stmt,
-            Index<ArgPos::kSecond> child_stmt) const noexcept final;
-    [[nodiscard]] bool HasSecondValues(
-            Index<ArgPos::kFirst> parent_stmt) const noexcept final;
-    [[nodiscard]] bool HasFirstValues(
-            Index<ArgPos::kSecond> child_stmt) const noexcept final;
+    [[nodiscard]] bool IsNonTransitive(StmtNo parent_stmt,
+                                       StmtNo child_stmt) const noexcept final;
+    [[nodiscard]] bool IsTransitive(StmtNo parent,
+                                    StmtNo child) const noexcept final;
+    [[nodiscard]] bool HasSecondValues(StmtNo parent_stmt) const noexcept final;
+    [[nodiscard]] bool HasFirstValues(StmtNo child_stmt) const noexcept final;
     [[nodiscard]] bool ExistRelationship() const noexcept final;
     [[nodiscard]] std::set<StmtNo> GetFirstArg(
-            StmtType return_type) const noexcept override;
-    [[nodiscard]] std::set<StmtNo> GetSecondArg(
-            StmtType return_type) const noexcept override;
-    [[nodiscard]] std::set<StmtNo> GetSecondArg(
-            Index<ArgPos::kFirst> stmt_no,
             StmtType return_type) const noexcept final;
+    [[nodiscard]] std::set<StmtNo> GetSecondArg(
+            StmtType return_type) const noexcept final;
+    [[nodiscard]] std::set<StmtNo> GetSecondArg(
+            StmtNo parent, StmtType return_type) const noexcept final;
     [[nodiscard]] std::set<StmtNo> GetSecondArgT(
-            Index<ArgPos::kFirst> stmt_no,
-            StmtType return_type) const noexcept final;
+            StmtNo parent, StmtType return_type) const noexcept final;
     [[nodiscard]] std::set<StmtNo> GetFirstArg(
-            Index<ArgPos::kSecond> stmt_no,
-            StmtType return_type) const noexcept final;
+            StmtNo child, StmtType return_type) const noexcept final;
     [[nodiscard]] std::set<StmtNo> GetFirstArgT(
-            Index<ArgPos::kSecond> stmt_no,
-            StmtType return_type) const noexcept final;
+            StmtNo child, StmtType return_type) const noexcept final;
     [[nodiscard]] PairVec<StmtNo> GetBothArgs(
             StmtType parent_type, StmtType child_type) const noexcept final;
     [[nodiscard]] PairVec<StmtNo> GetBothArgsT(
