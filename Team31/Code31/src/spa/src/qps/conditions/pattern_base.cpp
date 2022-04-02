@@ -33,29 +33,14 @@ PatternBase::PatternBase(Synonym *assign) noexcept
         : type_(Type::kWildWild), zeroth_param_(assign) {}
 ResultTable PatternBase::Execute(KnowledgeBase *pkb) const noexcept {
     switch (type_) {
-        case kVarExpr: {
-            auto first_var_name = std::get<VarName>(first_param_);
-            auto second_expr = std::get<Expression>(second_param_);
-            return VarExpr(pkb, first_var_name, second_expr);
-        }
         case kVarWild: {
             auto first_var_name = std::get<VarName>(first_param_);
             return VarWild(pkb, first_var_name);
-        }
-        case kSynExpr: {
-            auto first_syn = std::get<Synonym *>(first_param_);
-            auto second_expr = std::get<Expression>(second_param_);
-            first_syn->IncResolved();
-            return SynExpr(pkb, first_syn, second_expr);
         }
         case kSynWild: {
             auto first_syn = std::get<Synonym *>(first_param_);
             first_syn->IncResolved();
             return SynWild(pkb, first_syn);
-        }
-        case kWildExpr: {
-            auto second_expr = std::get<Expression>(second_param_);
-            return WildExpr(pkb, second_expr);
         }
         case kWildWild: {
             return WildWild(pkb);

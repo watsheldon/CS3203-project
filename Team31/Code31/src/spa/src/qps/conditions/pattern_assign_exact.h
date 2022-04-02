@@ -1,14 +1,14 @@
 #ifndef SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_EXACT_CLAUSE_H_
 #define SRC_SPA_SRC_QPS_CONDITIONS_PATTERN_EXACT_CLAUSE_H_
 
-#include "pattern_base.h"
+#include "pattern_expr_base.h"
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/result_table.h"
 
 namespace spa {
-class PatternExactClause : public PatternBase {
+class PatternExactClause : public PatternExprBase {
   public:
-    using PatternBase::PatternBase;
+    using PatternExprBase::PatternExprBase;
 
   protected:
     ResultTable VarExpr(KnowledgeBase *pkb, VarName first,
