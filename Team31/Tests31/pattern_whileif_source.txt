@@ -1,0 +1,25 @@
+procedure PatternWhileIf {
+	read read;
+	if (a == if) then {
+		read x;
+		while (b == while) {
+			assign = assign; }
+		if (c == 0) then {
+			print print; } else {
+			read x; }				} else {
+		read read; }
+	while (d == 0) {
+		read y;
+		if (e == 0) then {
+			read y; } else {
+			assign1 = assign1 + assign1; }
+		while (f == 0) {
+			print print; } }
+	read read; 
+	while (1 == 1) {
+		if (0 == 0) then {
+			print then; } else {
+			print else; } } }
+procedure PatternWhileIf1 {
+	call PatternWhileIf;
+}

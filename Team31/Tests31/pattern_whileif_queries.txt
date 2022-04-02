@@ -1,0 +1,200 @@
+1 - while: (v, _)
+variable v; while w;
+Select v pattern w (v, _)
+b, while, d, f
+5000
+2 - while: (v, _) - select w
+variable v; while w;
+Select w pattern w (v, _)
+4, 10, 15
+5000
+3 - while: (_, _)
+variable v; while w;
+Select w pattern w (_, _)
+4, 10, 15
+5000
+4 - while: (IDENT, _)
+variable v; while w;
+Select w pattern w ("f", _)
+15
+5000
+5 - while-invalid: (_"f"_, _)
+variable v; while w;
+Select w pattern w (_"f"_, _)
+
+5000
+6 - while-invalid: wrong format with 1 arg
+while w;
+Select w pattern w (_)
+
+5000
+7 - while-invalid: wrong format with 3 args
+while w;
+Select w pattern w (v, _, _)
+
+5000
+8 - while-invalid: wrong pos of v
+while w;
+Select w pattern w (_, v)
+
+5000
+9 - while-invalid: digit
+while w;
+Select w pattern w (1, _)
+
+5000
+10 - while-invalid: synonym type
+stmt s; while w;
+Select s pattern w (s, _)
+
+5000
+11 - while-invalid: synonym type
+read r; while w;
+Select r pattern w (r, _)
+
+5000
+12 - while-invalid: synonym type
+print pn; while w;
+Select pn pattern w (pn, _)
+
+5000
+13 - while-invalid: synonym type
+call c; while w;
+Select c pattern w (c, _)
+
+5000
+14 - while-invalid: synonym type
+while w, w1;
+Select w1 pattern w (w1, _)
+
+5000
+15 - while-invalid: synonym type
+while w; if ifs;
+Select ifs pattern w (ifs, _)
+
+5000
+16 - while-invalid: synonym type
+assign a; while w;
+Select a pattern w (a, _)
+
+5000
+17 - while-invalid: synonym type
+procedure p; while w;
+Select p pattern w (p, _)
+
+5000
+18 - if: (v, _, _)
+variable v; if ifs;
+Select v pattern ifs (v, _, _)
+a, if, c, e
+5000
+19 - if: (v, _, _) - select ifs
+variable v; if ifs;
+Select ifs pattern ifs (v, _, _)
+2, 6, 12
+5000
+20 - if: (_, _, _)
+variable v; if ifs;
+Select ifs pattern ifs (_, _, _)
+2, 6, 12
+5000
+21 - if: (IDENT, _, _)
+variable v; if ifs;
+Select ifs pattern ifs ("c", _, _)
+6
+5000
+22 - if-invalid: (_"c"_, _)
+variable v; if ifs;
+Select ifs pattern ifs (_"c"_, _, _)
+
+5000
+23 - if-invalid: wrong format with 2 args
+variable v; if ifs;
+Select v pattern ifs (v, _)
+
+5000
+24 - if-invalid: wrong format with 4 args
+variable v; if ifs;
+Select v pattern ifs (v, _, _, _)
+
+5000
+25 - if-invalid: wrong pos of v
+variable v; if ifs;
+Select v pattern ifs (_, _, v)
+
+5000
+26 - if-invalid: wrong pos of v
+variable v; if ifs;
+Select v pattern ifs (_, v, _)
+
+5000
+27 - if-invalid: digit
+if ifs;
+Select ifs pattern ifs (1, _, _)
+
+5000
+28 - if-invalid: synonym type
+stmt s; if ifs;
+Select s pattern ifs (s, _, _)
+
+5000
+29 - if-invalid: synonym type
+read r; if ifs;
+Select r pattern ifs (r, _, _)
+
+5000
+30 - if-invalid: synonym type
+print pn; if ifs;
+Select pn pattern ifs (pn, _, _)
+
+5000
+31 - if-invalid: synonym type
+call c; if ifs;
+Select c pattern ifs (c, _, _)
+
+5000
+32 - if-invalid: synonym type
+while w; if ifs;
+Select w pattern ifs (w, _, _)
+
+5000
+33 - if-invalid: synonym type
+if ifs, ifs1;
+Select ifs1 pattern ifs (ifs1, _, _)
+
+5000
+34 - if-invalid: synonym type
+assign a; if ifs;
+Select a pattern ifs (a, _, _)
+
+5000
+35 - if-invalid: synonym type
+procedure p; if ifs;
+Select p pattern ifs (p, _, _)
+
+5000
+36 - if-invalid: 2nd or 3rd arg not wildcard
+procedure p; if ifs;
+Select p pattern ifs (p, _"v"_, _)
+
+5000
+37 - if-invalid: 2nd or 3rd arg not wildcard
+variable v; if ifs;
+Select v pattern ifs (v, _, "v")
+
+5000
+38 - pattern-invalid: synonym type
+variable v; procedure p;
+Select v pattern p (v, _, _)
+
+5000
+39 - pattern-invalid: synonym type
+variable v; assign p;
+Select v pattern a (v, _, _)
+
+5000
+40 - pattern-invalid: synonym type
+variable v; stmt s;
+Select v pattern s (v, _)
+
+5000
