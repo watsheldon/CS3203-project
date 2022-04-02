@@ -8,20 +8,20 @@ TRUE
 Select BOOLEAN with "same" = "diff"
 FALSE
 5000
-3 - IDENT = IDENT: invalid - start with INTEGER 
+3 - IDENT = IDENT: invalid-IDENT cannot start with int
 
 Select BOOLEAN with "2" = "2"
-FALSE
+
 5000
 4 - IDENT = INTEGER
 
 Select BOOLEAN with "ident" = 2
 FALSE
 5000
-5 - IDENT = INTEGER: Same value
+5 - IDENT = INTEGER: invalid-IDENT cannot start with int
 
 Select BOOLEAN with "2" = 2
-FALSE
+
 5000
 6 - IDENT = attrRef
 procedure p;
@@ -33,10 +33,10 @@ TRUE
 Select BOOLEAN with 2 = "ident"
 FALSE
 5000
-8 - INTEGER = IDENT: Same value
+8 - INTEGER = IDENT: invalid-IDENT cannot start with int
 
 Select BOOLEAN with 2 = "2"
-FALSE
+
 5000
 9 - INTEGER = INTEGER: Same
 
@@ -58,10 +58,10 @@ procedure p;
 Select BOOLEAN with p.procName = "With"
 TRUE
 5000
-13 - attrRef = IDENT: Invalid attrRef
+13 - attrRef = IDENT: invalid-IDENT cannot start with int
 stmt s;
 Select BOOLEAN with s.stmt# = "1"
-FALSE
+
 5000
 14 - attrRef = INTEGER: Valid attrRef
 while while;
