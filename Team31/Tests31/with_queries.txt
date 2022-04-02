@@ -1,0 +1,320 @@
+1 - IDENT = IDENT: Same
+
+Select BOOLEAN with "same" = "same"
+TRUE
+5000
+2 - IDENT = IDENT: Different
+
+Select BOOLEAN with "same" = "diff"
+FALSE
+5000
+3 - IDENT = IDENT: invalid-IDENT cannot start with int
+
+Select BOOLEAN with "2" = "2"
+
+5000
+4 - IDENT = INTEGER
+
+Select BOOLEAN with "ident" = 2
+FALSE
+5000
+5 - IDENT = INTEGER: invalid-IDENT cannot start with int
+
+Select BOOLEAN with "2" = 2
+
+5000
+6 - IDENT = attrRef
+procedure p;
+Select BOOLEAN with "With" = p.procName
+TRUE
+5000
+7 - INTEGER = IDENT
+
+Select BOOLEAN with 2 = "ident"
+FALSE
+5000
+8 - INTEGER = IDENT: invalid-IDENT cannot start with int
+
+Select BOOLEAN with 2 = "2"
+
+5000
+9 - INTEGER = INTEGER: Same
+
+Select BOOLEAN with 2 = 2
+TRUE
+5000
+10 - INTEGER = INTEGER: Different
+
+Select BOOLEAN with 2 = 3
+FALSE
+5000
+11 - INTEGER =  attrRef
+stmt s;
+Select BOOLEAN with 1 = s.stmt#
+TRUE
+5000
+12 - attrRef = IDENT: Valid attrRef
+procedure p;
+Select BOOLEAN with p.procName = "With"
+TRUE
+5000
+13 - attrRef = IDENT: invalid-IDENT cannot start with int
+stmt s;
+Select BOOLEAN with s.stmt# = "1"
+
+5000
+14 - attrRef = INTEGER: Valid attrRef
+while while;
+Select BOOLEAN with while.stmt# = 2
+TRUE
+5000
+15 - attrRef = INTEGER: Valid attrRef
+assign assign;
+Select BOOLEAN with assign.stmt# = 3
+TRUE
+5000
+16 - attrRef = INTEGER: Valid attrRef
+if if;
+Select BOOLEAN with if.stmt# = 4
+TRUE
+5000
+17 - attrRef = INTEGER: Valid attrRef
+read read;
+Select BOOLEAN with read.stmt# = 5
+TRUE
+5000
+18 - attrRef = INTEGER: Valid attrRef
+call call;
+Select BOOLEAN with call.stmt# = 6
+TRUE
+5000
+19 - attrRef = INTEGER: Valid attrRef
+print print;
+Select BOOLEAN with print.stmt# = 7
+TRUE
+5000
+20 - attrRef = INTEGER: Valid attrRef
+stmt s;
+Select BOOLEAN with s.stmt# = 7
+TRUE
+5000
+21 - attrRef = INTEGER: Invalid attrRef
+print pn;
+Select BOOLEAN with pn.varName = 1
+FALSE
+5000
+22 - p1.procName = p2.procName
+procedure p1, p2;
+Select BOOLEAN with p1.procName = p2.procName
+TRUE
+5000
+23 - p.procName = c.procName: valid matching
+procedure p; call c;
+Select p.procName with p.procName = c.procName
+With1
+5000
+24 - p.procName = cn.value: invalid matching
+procedure p; constant cn;
+Select BOOLEAN with p.procName = cn.value
+FALSE
+5000
+25 - call.procName = call.procName 
+call c1, c2;
+Select BOOLEAN with c1.procName = c2.procName
+TRUE
+5000
+26 - call.procName = variable.varName
+call c; variable v;
+Select c.procName with c.procName = v.varName
+With1
+5000
+27 - invalid: c.procName = s.stmt#
+call c; stmt s;
+Select BOOLEAN with p.procName = s.stmt#
+FALSE
+5000
+28 - v1.varName = v2.varName
+variable v1, v2;
+Select BOOLEAN with v1.varName = v2.varName
+TRUE
+5000
+29 - v.varName = pn.varName : valid matching
+variable v; print pn;
+Select v.varName with v.varName = pn.varName
+With1
+5000
+30 - v.varName = r.stmt#: invalid matching
+variable v; read r;
+Select BOOLEAN with v.varName = r.stmt#
+FALSE
+5000
+31 - r1.varName = r2.varName
+read r1, r2;
+Select BOOLEAN with r1.varName = r2.varName
+TRUE
+5000
+32 - r.varName = p.procName : valid matching
+read r; variable v; procedure p;
+Select r.varName with r.varName = p.procName
+With
+5000
+33 - r.varName = pn.stmt#: invalid matching
+read r; print pn;
+Select BOOLEAN with r.varName = pn.stmt#
+FALSE
+5000
+34 - pn1.varName = pn2.varName
+print pn1, pn2;
+Select BOOLEAN with pn1.varName = pn2.varName
+TRUE
+5000
+35 - pn.varName = p.procName : valid matching
+print pn; procedure p;
+Select pn.varName with pn.varName = p.procName
+With1
+5000
+36 - pn.varName = c.stmt#: invalid matching
+print pn; call c;
+Select BOOLEAN with pn.varName = c.stmt#
+FALSE
+5000
+37 - cn1.value = cn2.value
+constant cn1, cn2;
+Select BOOLEAN with cn1.value = cn2.value
+TRUE
+5000
+38 - cn.value = s.stmt#: valid matching
+constant cn; stmt s;
+Select cn.value with cn.value = s.stmt#
+5
+5000
+39 - cn.value = r.varName: invalid matching
+constant cn; read r;
+Select BOOLEAN with cn.value = r.varName
+FALSE
+5000
+40 - s1.stmt# = s2.stmt#
+stmt s1, s2;
+Select BOOLEAN with s1.stmt# = s2.stmt#
+TRUE
+5000
+41 - s.stmt# = w.stmt#: valid matching
+stmt s; while w;
+Select s.stmt# with s.stmt# = w.stmt#
+1, 2
+5000
+42 - s.stmt# = c.procName: invalid matching
+stmt s; call c;
+Select BOOLEAN with s.stmt# = c.procName
+FALSE
+5000
+43 - r1.stmt# = r2.stmt#
+read r1, r2;
+Select BOOLEAN with r1.stmt# = r2.stmt#
+TRUE
+5000
+44 - r.stmt# = s.stmt#: valid matching
+read r; stmt s;
+Select r.stmt# with r.stmt# = s.stmt#
+5
+5000
+45 - r.stmt# = p.procName: invalid matching
+read r; procedure p;
+Select BOOLEAN with r.stmt# = p.procName
+FALSE
+5000
+46 - pn1.stmt# = pn2.stmt#
+print pn1, pn2;
+Select BOOLEAN with pn1.stmt# = pn2.stmt#
+TRUE
+5000
+47 - pn.stmt# = s.stmt#: valid matching
+print pn; stmt s;
+Select pn.stmt# with pn.stmt# = s.stmt#
+7
+5000
+48 - pn.stmt# = v.varName: invalid matching
+print pn; variable v;
+Select BOOLEAN with pn.stmt# = v.varName
+FALSE
+5000
+49 - c1.stmt# = c2.stmt#
+call c1, c2;
+Select BOOLEAN with c1.stmt# = c2.stmt#
+TRUE
+5000
+50 - c.stmt# = s.stmt#: valid matching
+call c; stmt s;
+Select c.stmt# with c.stmt# = s.stmt#
+6
+5000
+51 - c.stmt# = r.varName: invalid matching
+call c; read r;
+Select BOOLEAN with c.stmt# = r.varName
+FALSE
+5000
+52 - w1.stmt# = w2.stmt#
+while w1, w2;
+Select BOOLEAN with w1.stmt# = w2.stmt#
+TRUE
+5000
+53 - w.stmt# = s.stmt#: valid matching
+while w; stmt s;
+Select w.stmt# with w.stmt# = s.stmt#
+1, 2
+5000
+54 - w.stmt# = pn.varName: invalid matching
+while w; print pn;
+Select BOOLEAN with w.stmt# = pn.varName
+FALSE
+5000
+55 - ifs1.stmt# = ifs2.stmt#
+if ifs1, ifs2;
+Select BOOLEAN with ifs1.stmt# = ifs2.stmt#
+TRUE
+5000
+56 - ifs.stmt# = s.stmt#: valid matching
+if ifs; stmt s;
+Select ifs.stmt# with ifs.stmt# = s.stmt#
+4
+5000
+57 - ifs.stmt# = v.varName: invalid matching
+if ifs; variable v;
+Select BOOLEAN with ifs.stmt# = v.varName
+FALSE
+5000
+58 - a1.stmt# = a2.stmt#
+assign a1, a2;
+Select BOOLEAN with a1.stmt# = a2.stmt#
+TRUE
+5000
+59 - a.stmt# = s.stmt#: valid matching
+assign a; stmt s;
+Select a.stmt# with a.stmt# = s.stmt#
+3
+5000
+60 - a.stmt# = c.procName: invalid matching
+assign a; call c;
+Select BOOLEAN with a.stmt# = c.procName
+FALSE
+5000
+61 - multiple with: refs all equal
+stmt s;
+Select BOOLEAN with "a1" = "a1" and 2 = 2 and s.stmt# = 1
+TRUE
+5000
+62 - multiple with: stmt#
+stmt s1, s2; read s3; constant cn;
+Select <s1.stmt#, s2.stmt#, s3.stmt#> with 0 = 0 and s1.stmt# = s2.stmt# and s2.stmt# = s3.stmt# and cn.value = s3.stmt#
+5 5 5
+5000
+63 - multiple with: Name
+variable v1, v2; procedure p; call c; print pn; read r;
+Select <v1.varName, v2.varName> with pn.varName = "With1" with c.procName = v1.varName with p.procName = v2.varName with v2.varName = r.varName
+With1 With
+5000
+64 - multiple with: integer ref not equal
+stmt s1, s2, s3;
+Select BOOLEAN with 2 = 2 and s1.stmt# = s2.stmt# and s2.stmt# = s3.stmt# with 2 = 2000
+FALSE
+5000
