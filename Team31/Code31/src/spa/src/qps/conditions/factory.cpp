@@ -81,14 +81,31 @@ void Factory::SetTransPartial() noexcept {
             rel_ = Relationship::kAffectsT;
             return;
         case Relationship::kPatternExact:
-        case Relationship::kPatternPartial:
             rel_ = Relationship::kPatternPartial;
+            return;
+        case Relationship::kPatternPartial:
+        case Relationship::kPatternIf:
+        case Relationship::kPatternWhile:
             return;
         default:
             assert(false);
     }
 }
-void Factory::SetAssign(Synonym* syn) noexcept { assign_ = syn; }
+void Factory::SetPatternSynonym(Synonym* syn) noexcept {
+    syn_ = syn;
+    switch (syn->type) {
+        case Synonym::kStmtIf:
+            rel_ = Relationship::kPatternIf;
+            return;
+        case Synonym::kStmtWhile:
+            rel_ = Relationship::kPatternWhile;
+            return;
+        case Synonym::kStmtAssign:
+            return;
+        default:
+            assert(false);
+    }
+}
 std::unique_ptr<ConditionClause> Factory::Build() noexcept {
     switch (rel_) {
         case Relationship::kParent:
@@ -107,6 +124,10 @@ std::unique_ptr<ConditionClause> Factory::Build() noexcept {
             return BuildPatternClause<PatternExactClause>();
         case Relationship::kPatternPartial:
             return BuildPatternClause<PatternPartialClause>();
+        case Relationship::kPatternWhile:
+            return BuildPatternClause<PatternWhileClause>();
+        case Relationship::kPatternIf:
+            return BuildPatternClause<PatternIfClause>();
         case Relationship::kCalls:
             return BuildCallsClause<CallsClause>();
         case Relationship::kCallsT:

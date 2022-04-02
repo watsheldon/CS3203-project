@@ -17,9 +17,12 @@
 #include "next_trans_clause.h"
 #include "parent_clause.h"
 #include "parent_trans_clause.h"
+#include "pattern_assign_exact.h"
+#include "pattern_assign_partial.h"
 #include "pattern_base.h"
-#include "pattern_exact_clause.h"
-#include "pattern_partial_clause.h"
+#include "pattern_expr_base.h"
+#include "pattern_if_clause.h"
+#include "pattern_while_clause.h"
 #include "qps/query_token.h"
 #include "qps/synonym.h"
 #include "stmt_stmt_base.h"
@@ -39,7 +42,7 @@ class Factory {
     void SetSecond(const std::string& value) noexcept;
     void SetSecond(std::vector<QueryToken>&& expr) noexcept;
     void SetTransPartial() noexcept;
-    void SetAssign(Synonym* syn) noexcept;
+    void SetPatternSynonym(Synonym* syn) noexcept;
     std::unique_ptr<ConditionClause> Build() noexcept;
 
   private:
@@ -52,6 +55,8 @@ class Factory {
         kModifies,
         kPatternPartial,
         kPatternExact,
+        kPatternWhile,
+        kPatternIf,
         kCalls,
         kCallsT,
         kNext,
@@ -66,7 +71,7 @@ class Factory {
     int second_int_;
     std::string_view first_ident_;
     std::string_view second_ident_;
-    Synonym* assign_;
+    Synonym* syn_;
     Synonym* first_syn_;
     Synonym* second_syn_;
     std::vector<QueryToken> second_exprs_;
@@ -136,22 +141,22 @@ class Factory {
     template <typename T>
     std::unique_ptr<ConditionClause> BuildPatternClause() noexcept {
         static_assert(std::is_base_of_v<PatternBase, T>);
-        PatternBase::Type type =
-                PatternBase::GetType(first_param_type_, second_param_type_);
+        PatternExprBase::Type type =
+                PatternExprBase::GetType(first_param_type_, second_param_type_);
         switch (type) {
-            case PatternBase::Type::kWildWild:
-                return std::make_unique<T>(assign_);
-            case PatternBase::Type::kWildExpr:
-                return std::make_unique<T>(assign_, std::move(second_exprs_));
-            case PatternBase::Type::kVarWild:
-                return std::make_unique<T>(assign_, first_ident_);
-            case PatternBase::Type::kVarExpr:
-                return std::make_unique<T>(assign_, first_ident_,
+            case PatternExprBase::Type::kWildWild:
+                return std::make_unique<T>(syn_);
+            case PatternExprBase::Type::kWildExpr:
+                return std::make_unique<T>(syn_, std::move(second_exprs_));
+            case PatternExprBase::Type::kVarWild:
+                return std::make_unique<T>(syn_, first_ident_);
+            case PatternExprBase::Type::kVarExpr:
+                return std::make_unique<T>(syn_, first_ident_,
                                            std::move(second_exprs_));
-            case PatternBase::Type::kSynWild:
-                return std::make_unique<T>(assign_, first_syn_);
-            case PatternBase::Type::kSynExpr:
-                return std::make_unique<T>(assign_, first_syn_,
+            case PatternExprBase::Type::kSynWild:
+                return std::make_unique<T>(syn_, first_syn_);
+            case PatternExprBase::Type::kSynExpr:
+                return std::make_unique<T>(syn_, first_syn_,
                                            std::move(second_exprs_));
         }
         assert(false);
