@@ -7,6 +7,7 @@
 #include <set>
 #include <vector>
 
+#include "common/algorithm.h"
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -201,7 +202,7 @@ inline bool ParentRelationshipStore::IsParent(StmtNo stmt) const noexcept {
     return IsParentType(type);
 }
 constexpr bool ParentRelationshipStore::IsParentType(StmtType type) noexcept {
-    return std::find(kParentTypes.begin(), kParentTypes.end(), type) !=
+    return spa::find(kParentTypes.begin(), kParentTypes.end(), type) !=
            kParentTypes.end();
 }
 inline bool ParentRelationshipStore::HasParent(StmtNo stmt) const noexcept {
