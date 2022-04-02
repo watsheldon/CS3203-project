@@ -12,6 +12,7 @@ QueryObject Generator::Generate(const VecTokens &tokens) noexcept {
         ParseToken(token);
         if (semantic_error_) return QueryObject(std::move(selected_));
     }
+    assert(mode_.empty());
     return {std::move(selected_), std::move(synonyms_), std::move(conditions_)};
 }
 
@@ -196,14 +197,14 @@ void Generator::Select(std::string_view name) noexcept {
         return;
     }
     selected_.emplace_back(itr->second);
+    mode_.pop_back();
 }
 void Generator::Attr(QueryTokenType token_type) noexcept {
-    if (mode_.back() == Mode::kSelect) {
-        assert(!selected_.empty());
-        auto syn = selected_.back().synonym;
-        selected_.pop_back();
-        selected_.emplace_back(syn, TokenToAttrType(token_type));
-    }
+    assert(!selected_.empty() &&
+           selected_.back().attribute == SynonymWithAttr::Attribute::kNone);
+    auto syn = selected_.back().synonym;
+    selected_.pop_back();
+    selected_.emplace_back(syn, TokenToAttrType(token_type));
 }
 void Generator::SetZeroth(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
@@ -283,13 +284,24 @@ void Generator::Quote() noexcept {
     }
 }
 void Generator::Comma() noexcept {
-    if (mode_.back() == Mode::kDeclaration) {
+    if (mode_.back() == Mode::kDeclaration) return;
+    if (mode_.back() == Mode::kMultiSelect) {
+        mode_.emplace_back(Mode::kSelect);
         return;
     }
     assert(mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression);
     mode_.emplace_back(Mode::kSecond);
 }
 void Generator::Semicolon() noexcept { mode_.pop_back(); }
+void Generator::AngleBracketL() noexcept {
+    assert(mode_.back() == Mode::kSelect);
+    mode_.back() = Mode::kMultiSelect;
+    mode_.emplace_back(Mode::kSelect);
+}
+void Generator::AngleBracketR() noexcept {
+    assert(mode_.back() == Mode::kMultiSelect);
+    mode_.pop_back();
+}
 void Generator::ParseToken(const QueryToken &token) noexcept {
     const auto &[token_type, name] = token;
     switch (token_type) {
@@ -300,9 +312,9 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kDeclWhile:
         case QueryTokenType::kDeclIf:
         case QueryTokenType::kDeclAssign:
+        case QueryTokenType::kDeclProcedure:
         case QueryTokenType::kDeclVariable:
         case QueryTokenType::kDeclConstant:
-        case QueryTokenType::kDeclProcedure:
             return BeginDecl(token_type);
         case QueryTokenType::kKeywordSelect:
             mode_.emplace_back(Mode::kSelect);
@@ -316,6 +328,11 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kKeywordNext:
         case QueryTokenType::kKeywordAffects:
             return BeginClause(token_type);
+        case QueryTokenType::kAttrProc:
+        case QueryTokenType::kAttrVar:
+        case QueryTokenType::kAttrValue:
+        case QueryTokenType::kAttrStmtNum:
+            return Attr(token_type);
         case QueryTokenType::kOperatorPlus:
         case QueryTokenType::kOperatorMinus:
         case QueryTokenType::kOperatorDivide:
@@ -328,6 +345,10 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
             return BracketL();
         case QueryTokenType::kBracketR:
             return BracketR();
+        case QueryTokenType::kAngleBracketL:
+            return AngleBracketL();
+        case QueryTokenType::kAngleBracketR:
+            return AngleBracketR();
         case QueryTokenType::kWord:
             return Name(token);
         case QueryTokenType::kInteger:
@@ -340,20 +361,14 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
             return Comma();
         case QueryTokenType::kSemicolon:
             return Semicolon();
-        case QueryTokenType::kAttrStmtNum:
-        case QueryTokenType::kAttrVar:
-        case QueryTokenType::kAttrValue:
-        case QueryTokenType::kAttrProc:
-            return Attr(token_type);
-        case QueryTokenType::kAngleBracketL:
-            break;
-        case QueryTokenType::kAngleBracketR:
-            assert(mode_.back() == Mode::kSelect);
-            mode_.pop_back();
-            return;
         case QueryTokenType::kKeywordSuch:
         case QueryTokenType::kKeywordThat:
-            break;
+        case QueryTokenType::kKeywordAnd:
+        case QueryTokenType::kKeywordWith:
+        case QueryTokenType::kDot:
+        case QueryTokenType::kHashtag:
+        case QueryTokenType::kEqual:
+            return;
         default:
             assert(false);
     }

@@ -27,6 +27,7 @@ class Generator {
   private:
     enum class Mode {
         kDeclaration = 0,
+        kMultiSelect,
         kSelect,
         kWith,
         kPattern,
@@ -73,6 +74,8 @@ class Generator {
     void Comma() noexcept;
     void Semicolon() noexcept;
     void Attr(QueryTokenType token_type) noexcept;
+    void AngleBracketL() noexcept;
+    void AngleBracketR() noexcept;
 
     static constexpr Synonym::Type TokenToSynType(QueryTokenType type) noexcept;
     static constexpr Mode TokenToClauseMode(QueryTokenType type) noexcept;
