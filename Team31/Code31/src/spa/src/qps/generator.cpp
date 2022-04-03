@@ -57,7 +57,7 @@ constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
         case Mode::kNext:
             return type > Synonym::kStmtAssign;
         case Mode::kAffects:
-            return type != Synonym::kStmtAssign;
+            return type != Synonym::kStmtAssign && type != Synonym::kStmtAny;
         default:
             assert(false);
             return false;
@@ -78,7 +78,7 @@ constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
         case Mode::kNext:
             return type > Synonym::kStmtAssign;
         case Mode::kAffects:
-            return type != Synonym::kStmtAssign;
+            return type != Synonym::kStmtAssign && type != Synonym::kStmtAny;
         default:
             assert(false);
             return false;
