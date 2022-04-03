@@ -75,6 +75,7 @@ class Generator {
     void SetSecond(std::string_view name) noexcept;
     void ParseToken(const QueryToken& token) noexcept;
     void Underscore() noexcept;
+    void QuoteAsSecondArg() noexcept;
     void Quote() noexcept;
     void Comma() noexcept;
     void Semicolon() noexcept;

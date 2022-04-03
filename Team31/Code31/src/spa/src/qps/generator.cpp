@@ -16,7 +16,6 @@ QueryObject Generator::Generate(const VecTokens &tokens) noexcept {
     assert(mode_.empty());
     return {std::move(selected_), std::move(synonyms_), std::move(conditions_)};
 }
-
 constexpr Synonym::Type Generator::TokenToSynType(
         QueryTokenType type) noexcept {
     assert(type < QueryTokenType::kKeywordSelect);
@@ -234,14 +233,17 @@ void Generator::SetFirst(std::string_view name) noexcept {
 }
 void Generator::SetSecond(std::string_view name) noexcept {
     mode_.pop_back();
+    if (mode_.back() == Mode::kPattern) {
+        semantic_error_ = true;
+        return;
+    }
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end()) {
         semantic_error_ = true;
         return;
     }
     auto syn = itr->second;
-    if (mode_.back() == Mode::kPattern ||
-        UnsuitableSecondSynType(mode_.back(), syn->type)) {
+    if (UnsuitableSecondSynType(mode_.back(), syn->type)) {
         semantic_error_ = true;
         return;
     }
@@ -255,12 +257,29 @@ void Generator::Underscore() noexcept {
             semantic_error_ = true;
         return;
     }
+    if (mode_.back() == Mode::kThird) {
+        mode_.pop_back();
+        return;
+    }
     assert(mode_.back() == Mode::kSecond);
     mode_.pop_back();
     if (mode_.back() == Mode::kPattern) {
         mode_.emplace_back(Mode::kSecond);
         factory_.SetTransPartial();
     }
+}
+void Generator::QuoteAsSecondArg() noexcept {
+    if (*++mode_.rbegin() != Mode::kPattern) {
+        mode_.emplace_back(Mode::kIdentifier);
+        return;
+    }
+    if (pattern_syn_->type == Synonym::kStmtWhile ||
+        pattern_syn_->type == Synonym::kStmtIf) {
+        semantic_error_ = true;
+        return;
+    }
+    mode_.emplace_back(Mode::kExpression);
+    expression_.clear();
 }
 void Generator::Quote() noexcept {
     switch (mode_.back()) {
@@ -275,10 +294,7 @@ void Generator::Quote() noexcept {
             mode_.emplace_back(Mode::kIdentifier);
             return;
         case Mode::kSecond:
-            mode_.emplace_back(*(mode_.rbegin() + 1) == Mode::kPattern
-                                       ? Mode::kExpression
-                                       : Mode::kIdentifier);
-            return expression_.clear();
+            return QuoteAsSecondArg();
         default:
             assert(false);
     }
@@ -289,8 +305,16 @@ void Generator::Comma() noexcept {
         mode_.emplace_back(Mode::kSelect);
         return;
     }
-    assert(mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression);
-    mode_.emplace_back(Mode::kSecond);
+    if (mode_.back() == Mode::kSecond &&
+        pattern_syn_->type == Synonym::kStmtIf) {
+        mode_.back() = Mode::kThird;
+        return;
+    }
+    if (mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression) {
+        mode_.emplace_back(Mode::kSecond);
+        return;
+    }
+    assert(false);
 }
 void Generator::Semicolon() noexcept { mode_.pop_back(); }
 constexpr bool Generator::InvalidPatternSyn(Synonym::Type syn_type) noexcept {
