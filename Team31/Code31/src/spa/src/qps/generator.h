@@ -43,9 +43,13 @@ class Generator {
         kZeroth,
         kFirst,
         kSecond,
+        kThird,
         kNone
     };
     static constexpr std::string_view kBoolean = "BOOLEAN"sv;
+    static constexpr std::array<Synonym::Type, 3> kPatternSynonymType{
+            Synonym::Type::kStmtIf, Synonym::Type::kStmtWhile,
+            Synonym::Type::kStmtAssign};
     bool semantic_error_;
     SynonymMap synonym_map_;
     VecUniquePtr<Synonym> synonyms_;
@@ -54,6 +58,7 @@ class Generator {
     Synonym::Type curr_syn_type_;
     VecUniquePtr<ConditionClause> conditions_;
     std::vector<QueryToken> expression_;
+    Synonym* pattern_syn_;
     Factory factory_;
 
     void BeginDecl(QueryTokenType token_type) noexcept;
@@ -81,6 +86,7 @@ class Generator {
     static constexpr Mode TokenToClauseMode(QueryTokenType type) noexcept;
     static constexpr SynonymWithAttr::Attribute TokenToAttrType(
             QueryTokenType type) noexcept;
+    static constexpr bool InvalidPatternSyn(Synonym::Type syn_type) noexcept;
     static constexpr bool UnsuitableFirstSynType(Mode mode,
                                                  Synonym::Type type) noexcept;
     static constexpr bool UnsuitableSecondSynType(Mode mode,

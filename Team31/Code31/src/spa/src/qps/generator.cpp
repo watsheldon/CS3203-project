@@ -3,6 +3,7 @@
 #include <cassert>
 #include <memory>
 
+#include "common/algorithm.h"
 #include "conditions/condition_clause.h"
 
 namespace spa {
@@ -208,14 +209,13 @@ void Generator::Attr(QueryTokenType token_type) noexcept {
 }
 void Generator::SetZeroth(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
-    if (itr == synonym_map_.end() ||
-        itr->second->type != Synonym::kStmtAssign) {
+    if (itr == synonym_map_.end() || InvalidPatternSyn(itr->second->type)) {
         semantic_error_ = true;
         return;
     }
-    auto syn = itr->second;
-    syn->IncRef();
-    factory_.SetAssign(syn);
+    pattern_syn_ = itr->second;
+    pattern_syn_->IncRef();
+    factory_.SetPatternSynonym(pattern_syn_);
 }
 void Generator::SetFirst(std::string_view name) noexcept {
     mode_.pop_back();
@@ -293,6 +293,10 @@ void Generator::Comma() noexcept {
     mode_.emplace_back(Mode::kSecond);
 }
 void Generator::Semicolon() noexcept { mode_.pop_back(); }
+constexpr bool Generator::InvalidPatternSyn(Synonym::Type syn_type) noexcept {
+    return spa::find(kPatternSynonymType.begin(), kPatternSynonymType.end(),
+                     syn_type) == kPatternSynonymType.end();
+}
 void Generator::AngleBracketL() noexcept {
     assert(mode_.back() == Mode::kSelect);
     mode_.back() = Mode::kMultiSelect;
