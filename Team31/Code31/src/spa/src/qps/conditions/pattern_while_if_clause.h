@@ -10,6 +10,9 @@ namespace spa {
 class PatternWhileIfClause : public PatternBase {
   protected:
     using PatternBase::PatternBase;
+    PatternWhileIfClause()
+            : PatternBase(spa::PatternBase::kVarWild, nullptr,
+                          spa::PatternBase::FirstParam()) {}
     ResultTable VarWild(KnowledgeBase *pkb, VarName first) const noexcept final;
     ResultTable SynWild(KnowledgeBase *pkb,
                         Synonym *first) const noexcept final;

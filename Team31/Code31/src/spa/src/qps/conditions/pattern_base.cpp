@@ -8,29 +8,15 @@
 #include "qps/synonym.h"
 
 namespace spa {
-PatternBase::PatternBase(Synonym *assign, VarName first,
-                         std::vector<QueryToken> &&second) noexcept
-        : type_(Type::kVarExpr),
-          zeroth_param_(assign),
-          first_param_(first),
-          second_param_(std::move(second)) {}
 PatternBase::PatternBase(Synonym *assign, VarName first) noexcept
         : type_(Type::kVarWild), zeroth_param_(assign), first_param_(first) {}
-PatternBase::PatternBase(Synonym *assign, Synonym *first,
-                         std::vector<QueryToken> &&second) noexcept
-        : type_(Type::kSynExpr),
-          zeroth_param_(assign),
-          first_param_(first),
-          second_param_(std::move(second)) {}
 PatternBase::PatternBase(Synonym *assign, Synonym *first) noexcept
         : type_(Type::kSynWild), zeroth_param_(assign), first_param_(first) {}
-PatternBase::PatternBase(Synonym *assign,
-                         std::vector<QueryToken> &&second) noexcept
-        : type_(Type::kWildExpr),
-          zeroth_param_(assign),
-          second_param_(std::move(second)) {}
 PatternBase::PatternBase(Synonym *assign) noexcept
         : type_(Type::kWildWild), zeroth_param_(assign) {}
+PatternBase::PatternBase(Type type, Synonym *zeroth,
+                         FirstParam first_param) noexcept
+        : type_(type), zeroth_param_(zeroth), first_param_(first_param) {}
 ResultTable PatternBase::Execute(KnowledgeBase *pkb) const noexcept {
     switch (type_) {
         case kVarWild: {
@@ -45,8 +31,9 @@ ResultTable PatternBase::Execute(KnowledgeBase *pkb) const noexcept {
         case kWildWild: {
             return WildWild(pkb);
         }
+        default:
+            assert(false);
     }
-    assert(false);
     return ResultTable{false};
 }
 ResultTable PatternBase::VarWild(KnowledgeBase *pkb,
