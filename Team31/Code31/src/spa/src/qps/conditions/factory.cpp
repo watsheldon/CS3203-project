@@ -121,12 +121,12 @@ std::unique_ptr<ConditionClause> Factory::Build() noexcept {
         case Relationship::kModifies:
             return BuildUsesModifiesClause<ModifiesClause>();
         case Relationship::kPatternExact:
-            return BuildPatternClause<PatternExactClause>();
+            return BuildPatternExprClause<PatternExactClause>();
         case Relationship::kPatternPartial:
-            return BuildPatternClause<PatternPartialClause>();
+            return BuildPatternExprClause<PatternPartialClause>();
         case Relationship::kPatternWhile:
         case Relationship::kPatternIf:
-            return BuildPatternClause<PatternWhileIfClause>();
+            return BuildPatternWhileIfClause<PatternWhileIfClause>();
         case Relationship::kCalls:
             return BuildCallsClause<CallsClause>();
         case Relationship::kCallsT:

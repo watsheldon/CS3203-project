@@ -138,8 +138,8 @@ class Factory {
         return {};
     }
     template <typename T>
-    std::unique_ptr<ConditionClause> BuildPatternClause() noexcept {
-        static_assert(std::is_base_of_v<PatternBase, T>);
+    std::unique_ptr<ConditionClause> BuildPatternExprClause() noexcept {
+        static_assert(std::is_base_of_v<PatternExprBase, T>);
         PatternExprBase::Type type =
                 PatternExprBase::GetType(first_param_type_, second_param_type_);
         switch (type) {
@@ -159,6 +159,23 @@ class Factory {
                                            std::move(second_exprs_));
         }
         assert(false);
+        return {};
+    }
+    template <typename T>
+    std::unique_ptr<ConditionClause> BuildPatternWhileIfClause() noexcept {
+        static_assert(std::is_base_of_v<PatternBase, T>);
+        PatternWhileIfClause::Type type = PatternWhileIfClause::GetType(
+                first_param_type_, second_param_type_);
+        switch (type) {
+            case PatternBase::kVarWild:
+                return std::make_unique<T>(syn_, first_ident_);
+            case PatternBase::kSynWild:
+                return std::make_unique<T>(syn_, first_syn_);
+            case PatternBase::kWildWild:
+                return std::make_unique<T>(syn_);
+            default:
+                assert(false);
+        }
         return {};
     }
     template <typename T>
