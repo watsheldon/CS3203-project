@@ -4,7 +4,9 @@
 #include <cassert>
 #include <cstddef>
 #include <numeric>
+#include <queue>
 #include <set>
+#include <utility>
 
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
@@ -169,6 +171,34 @@ bool ControlFlowGraph::IsNext(StmtNo prev, StmtNo next) const noexcept {
     const auto& prev_node = GetNode(prev);
     return prev_node.next.first == next || prev_node.next.second == next;
 }
+bool ControlFlowGraph::IsNextT(StmtNo prev, StmtNo next) const noexcept {
+    if (prev >= stmt_node_index_.size() || next >= stmt_node_index_.size())
+        return false;
+    StmtLstIndex prev_lst_index = stmtlst_stmt_.GetStmtlst(prev);
+    StmtLstIndex next_lst_index = stmtlst_stmt_.GetStmtlst(next);
+    if (!forest_.SameProcedure(prev_lst_index, next_lst_index)) return false;
+    std::vector<StmtNo> stack = {prev};
+    BitArray visited(stmt_node_index_.size());
+    while (!stack.empty()) {
+        StmtNo curr = stack.back();
+        stack.pop_back();
+        if (visited.Get(curr)) continue;
+        visited.Set(curr);
+        const auto& node = GetNode(curr);
+        if (curr != node.stop && next > curr && next <= node.stop) return true;
+        if (node.next.first == next) {
+            return true;
+        } else if (node.next.first != 0) {
+            stack.emplace_back(node.next.first);
+        }
+        if (node.next.second == next) {
+            return true;
+        } else if (node.next.second != 0) {
+            stack.emplace_back(node.next.second);
+        }
+    }
+    return false;
+}
 ControlFlowGraph::Node& ControlFlowGraph::GetNode(StmtNo stmt_no) noexcept {
     assert(stmt_no < stmt_node_index_.size());
     NodeIndex& index = stmt_node_index_[stmt_no];
@@ -192,10 +222,75 @@ std::set<StmtNo> ControlFlowGraph::GetPrev(StmtNo next,
     return next == node.start ? FilterVecResult(node.prev, stmt_type)
                               : std::set<StmtNo>{next - 1};
 }
+std::set<StmtNo> ControlFlowGraph::GetPrevT(StmtNo next,
+                                            StmtType stmt_type) const noexcept {
+    std::vector<StmtNo> stack = {next};
+    std::set<StmtNo> results;
+    BitArray visited(stmt_node_index_.size());
+    while (!stack.empty()) {
+        StmtNo curr = stack.back();
+        stack.pop_back();
+        if (visited.Get(curr)) continue;
+        visited.Set(curr);
+        const auto& node = GetNode(curr);
+        for (StmtNo i = curr - 1; i >= node.start; --i) {
+            if (stmt_type == StmtType::kAll ||
+                type_store_.GetType(i) == stmt_type)
+                results.emplace_hint(results.begin(), i);
+        }
+        for (StmtNo s : node.prev) {
+            if (stmt_type == StmtType::kAll ||
+                type_store_.GetType(s) == stmt_type) {
+                results.emplace_hint(results.begin(), s);
+            }
+            if (!visited.Get(s)) stack.emplace_back(s);
+        }
+    }
+    return results;
+}
 std::set<StmtNo> ControlFlowGraph::GetNext(StmtNo prev,
                                            StmtType stmt_type) const noexcept {
     if (prev >= stmt_node_index_.size()) return {};
     return FilterPairResult(GetNextPair(prev), stmt_type);
+}
+std::set<StmtNo> ControlFlowGraph::GetNextT(StmtNo prev,
+                                            StmtType stmt_type) const noexcept {
+    std::vector<StmtNo> stack = {prev};
+    auto results = GetNextTVec(prev, stmt_type);
+    return {results.begin(), results.end()};
+}
+std::vector<StmtNo> ControlFlowGraph::GetNextTVec(
+        StmtNo prev, StmtType stmt_type) const noexcept {
+    std::vector<StmtNo> stack = {prev};
+    std::vector<StmtNo> results;
+    BitArray visited(stmt_node_index_.size());
+    while (!stack.empty()) {
+        StmtNo curr = stack.back();
+        stack.pop_back();
+        if (visited.Get(curr)) continue;
+        visited.Set(curr);
+        const auto& node = GetNode(curr);
+        for (StmtNo i = curr + 1; i <= node.stop; ++i) {
+            if (stmt_type == StmtType::kAll ||
+                type_store_.GetType(i) == stmt_type)
+                results.emplace_back(i);
+        }
+        const auto [first, second] = node.next;
+        if (first != 0) {
+            if (type_store_.GetType(first) == stmt_type ||
+                stmt_type == StmtType::kAll)
+                results.emplace_back(first);
+            stack.emplace_back(first);
+        }
+        if (second != 0) {
+            if (type_store_.GetType(second) == stmt_type ||
+                stmt_type == StmtType::kAll)
+                results.emplace_back(second);
+            stack.back() = second;
+            stack.emplace_back(first);
+        }
+    }
+    return results;
 }
 std::set<StmtNo> ControlFlowGraph::FilterPairResult(
         const PairOf<StmtNo>& pair, StmtType stmt_type) const noexcept {
@@ -313,6 +408,193 @@ PairVec<StmtNo> ControlFlowGraph::GetNextPairsFilterBoth(
         if (second != 0 && type_store_.GetType(second) == next_type)
             next.emplace_back(second);
         prev.resize(next.size(), p);
+    }
+    return results;
+}
+std::size_t ControlFlowGraph::ToBit(std::size_t row,
+                                    std::size_t col) const noexcept {
+    return col * stmt_node_index_.size() + row;
+}
+PairVec<StmtNo> ControlFlowGraph::GetNextTPairs(StmtType prev_type,
+                                                StmtType next_type) noexcept {
+    if (prev_type == StmtType::kAll) {
+        return next_type == StmtType::kAll
+                       ? GetNextTPairsNoFilter()
+                       : GetNextTPairsFilterByNext(next_type);
+    }
+    if (next_type == StmtType::kAll)
+        return GetNextTPairsFilterByPrev(prev_type);
+    return GetNextTPairsFilterBoth(prev_type, next_type);
+}
+PairVec<StmtNo> ControlFlowGraph::GetNextTPairsNoFilter() noexcept {
+    PairVec<StmtNo> results;
+    std::for_each(roots_.begin(), roots_.end(),
+                  [this, &results](StmtNo stmt_no) {
+                      AddTPairsInProc(stmt_no, results);
+                  });
+    return results;
+}
+void ControlFlowGraph::AddPairsWithPrevInQueue(PairVec<StmtNo>& results,
+                                               BitArray& added,
+                                               StmtNo next_stmt,
+                                               StmtType filter_type) noexcept {
+    auto& [prev, next] = results;
+    for (StmtNo s : queue_.front()) {
+        auto pos = ToBit(s, next_stmt);
+        if (!added.Get(pos) && (filter_type == StmtType::kAll ||
+                                type_store_.GetType(s) == filter_type)) {
+            prev.emplace_back(s);
+            added.Set(pos);
+        }
+    }
+    next.resize(prev.size(), next_stmt);
+}
+void ControlFlowGraph::AppendAndQueue(PairVec<StmtNo>& results, BitArray& added,
+                                      StmtNo next_stmt,
+                                      StmtType type) noexcept {
+    if (GetNode(next_stmt).next.first == 0) return;
+    if (type_store_.GetType(next_stmt) == StmtType::kWhile) {
+        const auto pos = ToBit(next_stmt, next_stmt);
+        if (added.Get(pos)) return;
+        added.Set(pos);
+        if (type == StmtType::kAll || type == StmtType::kWhile) {
+            results.first.emplace_back(next_stmt);
+            results.second.emplace_back(next_stmt);
+        }
+    }
+    queue_.emplace(queue_.front()).emplace_back(next_stmt);
+}
+void ControlFlowGraph::AddTPairsInProc(StmtNo root,
+                                       PairVec<StmtNo>& results) noexcept {
+    queue_.emplace().emplace_back(root);
+    auto& [prev, next] = results;
+    BitArray added(stmt_node_index_.size() * stmt_node_index_.size());
+    while (!queue_.empty()) {
+        const auto& node = GetNode(queue_.front().back());
+        for (StmtNo i = node.start; i < node.stop; ++i) {
+            queue_.front().emplace_back(i + 1);
+            auto num_next = node.stop - i;
+            next.resize(next.size() + num_next);
+            std::iota(next.end() - num_next, next.end(), i + 1);
+            std::for_each(next.end() - num_next, next.end(),
+                          [this, &added, i](const auto s) {
+                              added.Set(ToBit(i, s));
+                          });
+            prev.resize(next.size(), i);
+        }
+        for (StmtNo n : {node.next.first, node.next.second}) {
+            if (n == 0) break;
+            AppendAndQueue(results, added, n);
+            AddPairsWithPrevInQueue(results, added, n);
+        }
+        queue_.pop();
+    }
+}
+PairVec<StmtNo> ControlFlowGraph::GetNextTPairsFilterByNext(
+        StmtType type) noexcept {
+    PairVec<StmtNo> results;
+    std::for_each(roots_.begin(), roots_.end(),
+                  [this, &results, type](StmtNo stmt_no) {
+                      AddTPairsInProcFilterNext(stmt_no, results, type);
+                  });
+    return results;
+}
+void ControlFlowGraph::AddTPairsInProcFilterNext(StmtNo root,
+                                                 PairVec<StmtNo>& results,
+                                                 StmtType next_type) noexcept {
+    queue_.emplace().emplace_back(root);
+    auto& [prev, next] = results;
+    BitArray added(stmt_node_index_.size() * stmt_node_index_.size());
+    while (!queue_.empty()) {
+        const auto& node = GetNode(queue_.front().back());
+        for (StmtNo i = node.start; i < node.stop; ++i) {
+            queue_.front().emplace_back(i + 1);
+            AddConsecutiveTPairsFilterNext(results, added, i, node.stop,
+                                           next_type);
+        }
+        for (StmtNo n : {node.next.first, node.next.second}) {
+            if (n == 0) break;
+            AppendAndQueue(results, added, n, next_type);
+            if (type_store_.GetType(n) != next_type) continue;
+            AddPairsWithPrevInQueue(results, added, n);
+        }
+        queue_.pop();
+    }
+}
+void ControlFlowGraph::AddConsecutiveTPairsFilterNext(
+        PairVec<StmtNo>& results, BitArray& added, StmtNo start, StmtNo stop,
+        StmtType next_type) noexcept {
+    auto& [prev, next] = results;
+    for (StmtNo i = start + 1; i <= stop; ++i) {
+        if (type_store_.GetType(i) == next_type) {
+            next.emplace_back(i);
+            added.Set(ToBit(start, i));
+        }
+    }
+    prev.resize(next.size(), start);
+}
+PairVec<StmtNo> ControlFlowGraph::GetNextTPairsFilterByPrev(
+        StmtType type) noexcept {
+    PairVec<StmtNo> results;
+    std::for_each(roots_.begin(), roots_.end(),
+                  [this, &results, type](StmtNo stmt_no) {
+                      AddTPairsInProcFilterPrev(stmt_no, results, type);
+                  });
+    return results;
+}
+void ControlFlowGraph::AddTPairsInProcFilterPrev(StmtNo root,
+                                                 PairVec<StmtNo>& results,
+                                                 StmtType prev_type) noexcept {
+    queue_.emplace().emplace_back(root);
+    auto& [prev, next] = results;
+    BitArray added(stmt_node_index_.size() * stmt_node_index_.size());
+    while (!queue_.empty()) {
+        const auto& node = GetNode(queue_.front().back());
+        for (StmtNo i = node.start; i < node.stop; ++i) {
+            queue_.front().emplace_back(i + 1);
+            if (type_store_.GetType(i) != prev_type) continue;
+            auto num_next = node.stop - i;
+            next.resize(next.size() + num_next);
+            std::iota(next.end() - num_next, next.end(), i + 1);
+            std::for_each(next.end() - num_next, next.end(),
+                          [this, &added, i](const auto s) {
+                              added.Set(ToBit(i, s));
+                          });
+            prev.resize(next.size(), i);
+        }
+        for (StmtNo n : {node.next.first, node.next.second}) {
+            if (n == 0) break;
+            AppendAndQueue(results, added, n, prev_type);
+            AddPairsWithPrevInQueue(results, added, n, prev_type);
+        }
+        queue_.pop();
+    }
+}
+PairVec<StmtNo> ControlFlowGraph::GetNextTPairsFilterBoth(
+        StmtType prev_type, StmtType next_type) noexcept {
+    PairVec<StmtNo> results;
+    auto& [prev, next] = results;
+    for (StmtNo stmt_no : type_store_.GetStatements(prev_type)) {
+        auto all_next = GetNextT(stmt_no, next_type);
+        next.insert(next.end(), all_next.begin(), all_next.end());
+        prev.resize(next.size(), stmt_no);
+    }
+    return results;
+}
+std::set<StmtNo> ControlFlowGraph::GetNextTSelf(
+        StmtType stmt_type) const noexcept {
+    std::set<StmtNo> results;
+    BitArray added(stmt_node_index_.size());
+    for (const auto while_stmt : type_store_.GetStatements(StmtType::kWhile)) {
+        if (added.Get(while_stmt)) continue;
+        StmtNo last_stmt = parent_store_.GetContainerLastStmt(StmtType::kWhile,
+                                                              while_stmt);
+        for (StmtNo i = while_stmt; i <= last_stmt; ++i) {
+            StmtType i_type = type_store_.GetType(i);
+            if (i_type == StmtType::kWhile) added.Set(i);
+            if (stmt_type != StmtType::kAll && stmt_type != i_type) continue;
+            results.emplace_hint(results.end(), i);
+        }
     }
     return results;
 }

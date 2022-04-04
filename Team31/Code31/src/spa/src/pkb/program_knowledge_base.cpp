@@ -584,7 +584,7 @@ bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kFirst> first_stmt,
 }
 bool ProgramKnowledgeBase::ExistNextT(Index<ArgPos::kFirst> first_stmt,
                                       Index<ArgPos::kSecond> second_stmt) {
-    return false;
+    return cfg_->IsNextT(first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kFirst> first_stmt) {
     return cfg_->HasNext(first_stmt);
@@ -603,7 +603,7 @@ std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kFirst> stmt,
 }
 std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kFirst> stmt,
                                              StmtType return_type) {
-    return {};
+    return cfg_->GetNextT(stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kSecond> stmt,
                                             StmtType return_type) {
@@ -611,7 +611,7 @@ std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kSecond> stmt,
 }
 std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kSecond> stmt,
                                              StmtType return_type) {
-    return {};
+    return cfg_->GetPrevT(stmt, return_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetNextPairs(StmtType first_type,
                                                 StmtType second_type) {
@@ -619,7 +619,7 @@ PairVec<int> ProgramKnowledgeBase::GetNextPairs(StmtType first_type,
 }
 PairVec<int> ProgramKnowledgeBase::GetNextTPairs(StmtType first_type,
                                                  StmtType second_type) {
-    return {};
+    return cfg_->GetNextTPairs(first_type, second_type);
 }
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign,
                                         Index<ArgPos::kSecond> second_assign) {
