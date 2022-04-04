@@ -1,0 +1,42 @@
+procedure Next1 {x = 5;
+    y = 6;
+    print print;
+    if (x < y) then {
+        if (y > 0) then {
+            if (x == x) then {
+                print print;  } else {
+                print y;  }
+            x = x; } else {
+            while (x == y) {
+                x = y;  }
+            x = x;  }
+        call Next2; } else {
+        while (x > 0) {
+            if (y == y) then {
+                y = y;  } else {
+                read read;  }
+            while (x == 0) {
+                print print;  }
+            x = x;  }
+        print y;  }  
+    x = x;  }
+procedure Next2 {read read;
+    while (x < y) {
+        while (x > y) {
+            while (x == x) {
+                print y;  }
+            if (y == y) then {
+                read read;  } else {
+                print y;  }
+            print print;  }
+        if (x == y) then {
+            while (y > y) {
+                y = y;  }
+            if (y > x) then {
+                y = y;  } else {
+                x = x;  }
+            print print;  } else {
+            call Next3;  }
+        print y;  }
+    read read; }
+procedure Next3 { print y;  }
