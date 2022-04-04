@@ -90,7 +90,8 @@ class Factory {
             case StmtStmtBase::Type::kSynNum:
                 return std::make_unique<T>(first_syn_, second_int_);
             case StmtStmtBase::Type::kSynSyn:
-                if constexpr (std::is_base_of_v<OrderedStmtStmtBase, T>) {
+                if constexpr (std::is_base_of_v<OrderedStmtStmtBase, T> ||
+                              std::is_same_v<NextClause, T>) {
                     if (first_syn_ == second_syn_) return nullptr;
                 }
                 return std::make_unique<T>(first_syn_, second_syn_);
