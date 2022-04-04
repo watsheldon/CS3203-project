@@ -1,0 +1,240 @@
+1
+assign a1, a2;
+Select a1 such that Affects (a1, a2)
+1, 9, 14, 17, 19, 20
+5000
+2
+assign a1, a2;
+Select a2 such that Affects (a1, a2)
+2, 12, 15, 18, 20, 21
+5000
+3
+assign a1;
+Select a1 such that Affects (a1, _)
+1, 9, 14, 17, 19, 20
+5000
+4
+assign a2;
+Select a2 such that Affects (_, a2)
+2, 12, 15, 18, 20, 21
+5000
+5
+procedure p;
+Select p such that Affects (_, _)
+Affects1, Affects2, Affects3, Affects4, Affects5, Affects6, Affects7
+5000
+6
+assign a1;
+Select a1 such that Affects (1, _)
+1, 2, 3, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 27, 29
+5000
+7
+
+Select BOOLEAN such that Affects (_, 12)
+TRUE
+5000
+8 - nothing affects first stmt
+
+Select BOOLEAN such that Affects (_, 1)
+FALSE
+5000
+9 
+
+Select BOOLEAN such that Affects (1, 12)
+TRUE
+5000
+10
+
+Select BOOLEAN such that Affects (22, 24)
+FALSE
+5000
+11
+assign a1;
+Select a1 such that Affects (a1, 12)
+1, 9
+5000
+12
+assign a1;
+Select a1 such that Affects (a1, 17)
+
+5000
+13
+assign a2;
+Select a2 such that Affects (9, a2)
+12
+5000
+14
+assign a2;
+Select a2 such that Affects (4, a2)
+
+5000
+15 - tuple
+assign a1, a2;
+Select <a1, a2> such that Affects (a1, a2)
+1 2, 1 12, 9 12, 14 15, 17 18, 19 20, 20 21
+5000
+16
+assign a1, a2;
+Select a1 such that Affects* (a1, a2)
+1, 9, 14, 17, 19, 20
+5000
+17
+assign a1, a2;
+Select a2 such that Affects* (a1, a2)
+2, 12, 15, 18, 20, 21
+5000
+18
+assign a1;
+Select a1 such that Affects* (a1, _)
+1, 9, 14, 17, 19, 20
+5000
+19
+assign a2;
+Select a2 such that Affects* (_, a2)
+2, 12, 15, 18, 20, 21
+5000
+20
+procedure p;
+Select p such that Affects* (_, _)
+Affects1, Affects2, Affects3, Affects4, Affects5, Affects6, Affects7
+5000
+21
+assign a1;
+Select a1 such that Affects* (1, _)
+1, 2, 3, 9, 12, 13, 14, 15, 16, 17, 18, 19 ,20, 21, 22, 24, 25, 27, 29
+5000
+22 
+
+Select BOOLEAN such that Affects* (_, 12)
+TRUE
+5000
+23 - nothing affects first stmt
+
+Select BOOLEAN such that Affects* (_, 1)
+FALSE
+5000
+24
+
+Select BOOLEAN such that Affects* (1, 12)
+TRUE
+5000
+25
+
+Select BOOLEAN such that Affects* (22, 24)
+FALSE
+5000
+26
+assign a1;
+Select a1 such that Affects* (a1, 12)
+1, 9
+5000
+27
+assign a1;
+Select a1 such that Affects* (a1, 17)
+
+5000
+28
+assign a2;
+Select a2 such that Affects* (1, a2)
+2, 12
+5000
+29
+assign a2;
+Select a2 such that Affects* (4, a2)
+
+5000
+30 - tuple
+assign a1, a2;
+Select <a1, a2> such that Affects* (a1, a2)
+1 2, 1 12, 9 12, 14 15, 17 18, 19 20, 19 21, 20 21
+5000
+31 - stmt is also valid synonym type for Affects/Affects*
+stmt s1, s2;
+Select s1 such that Affects (s1, s2)
+1, 9, 14, 17, 19, 20
+5000
+32
+stmt s1, s2;
+Select s2 such that Affects (s1, s2)
+2, 12, 15, 18, 20, 21
+5000
+33
+stmt s1;
+Select s1 such that Affects (s1, _)
+1, 9, 14, 17, 19, 20
+5000
+34
+stmt s2;
+Select s2 such that Affects (_, s2)
+2, 12, 15, 18, 20, 21
+5000
+35
+stmt s1;
+Select s1 such that Affects (s1, 12)
+1, 9
+5000
+36
+stmt s1;
+Select s1 such that Affects (s1, 17)
+
+5000
+37
+stmt s2;
+Select s2 such that Affects (9, s2)
+12
+5000
+38
+stmt s2;
+Select s2 such that Affects (4, s2)
+
+5000
+39 - tuple
+stmt s1, s2;
+Select <s1, s2> such that Affects (s1, s2)
+1 2, 1 12, 9 12, 14 15, 17 18, 19 20, 20 21
+5000
+40
+stmt s1, s2;
+Select s1 such that Affects* (s1, s2)
+1, 9, 14, 17, 19, 20
+5000
+41
+stmt s1, s2;
+Select s2 such that Affects* (s1, s2)
+2, 12, 15, 18, 20, 21
+5000
+42
+stmt s1;
+Select s1 such that Affects* (s1, _)
+1, 9, 14, 17, 19, 20
+5000
+43
+stmt s2;
+Select s2 such that Affects* (_, s2)
+2, 12, 15, 18, 20, 21
+5000
+44
+stmt s1;
+Select s1 such that Affects* (s1, 12)
+1, 9
+5000
+45
+stmt s1;
+Select s1 such that Affects* (s1, 17)
+
+5000
+46
+stmt s2;
+Select s2 such that Affects* (1, s2)
+2, 12
+5000
+47
+stmt s2;
+Select s2 such that Affects* (4, s2)
+
+5000
+48 - tuple
+stmt s1, s2;
+Select <s1, s2> such that Affects* (s1, s2)
+1 2, 1 12, 9 12, 14 15, 17 18, 19 20, 19 21, 20 21
+5000
