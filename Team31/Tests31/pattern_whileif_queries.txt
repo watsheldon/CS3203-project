@@ -18,7 +18,7 @@ variable v; while w;
 Select w pattern w ("f", _)
 15
 5000
-5 - while-invalid: (_"f"_, _)
+5 - while-invalid
 variable v; while w;
 Select w pattern w (_"f"_, _)
 
@@ -103,7 +103,7 @@ variable v; if ifs;
 Select ifs pattern ifs ("c", _, _)
 6
 5000
-22 - if-invalid: (_"c"_, _)
+22 - if-invalid
 variable v; if ifs;
 Select ifs pattern ifs (_"c"_, _, _)
 
