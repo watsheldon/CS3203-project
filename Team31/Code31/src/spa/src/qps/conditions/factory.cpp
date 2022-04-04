@@ -133,10 +133,17 @@ std::unique_ptr<ConditionClause> Factory::Build() noexcept {
             return BuildCallsClause<CallsClause>();
         case Relationship::kCallsT:
             return BuildCallsClause<CallsTransClause>();
-        default:
-            assert(false);
-            return {};
+        case Relationship::kNext:
+            return BuildStmtStmtClause<NextClause>();
+        case Relationship::kNextT:
+            return BuildStmtStmtClause<NextTransClause>();
+        case Relationship::kAffects:
+            return BuildStmtStmtClause<AffectsClause>();
+        case Relationship::kAffectsT:
+            return BuildStmtStmtClause<AffectsTransClause>();
     }
+    assert(false);
+    return {};
 }
 
 void Factory::Reset() noexcept {
