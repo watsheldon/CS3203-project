@@ -64,7 +64,8 @@ class Factory {
         kNext,
         kNextT,
         kAffects,
-        kAffectsT
+        kAffectsT,
+        kWith
     };
     Relationship rel_;
     ConditionClause::FirstParamType first_param_type_;

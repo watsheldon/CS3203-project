@@ -33,6 +33,9 @@ void Factory::SetRelationship(QueryTokenType type) noexcept {
         case QueryTokenType::kKeywordAffects:
             rel_ = Relationship::kAffects;
             return;
+        case QueryTokenType::kKeywordWith:
+            rel_ = Relationship::kWith;
+            return;
         default:
             assert(false);
     }
