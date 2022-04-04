@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <vector>
 
+#include "common/aliases.h"
 #include "container_node.h"
 #include "pkb/store/stmtlst_parent_store.h"
 #include "pkb/store/stmtlst_statements_store.h"
@@ -15,6 +16,8 @@ class ContainerForest {
                     const StmtlstStatementsStore &stmtlst_stmts_store,
                     std::size_t stmtlst_count) noexcept;
     [[nodiscard]] bool IsParentT(int parent, int child) const noexcept;
+    [[nodiscard]] bool SameProcedure(StmtLstIndex a,
+                                     StmtLstIndex b) const noexcept;
     [[nodiscard]] std::vector<int> GetAncestryTrace(int child) const noexcept;
     [[nodiscard]] std::vector<int> GetChildren(int parent) const noexcept;
     /**
@@ -26,6 +29,7 @@ class ContainerForest {
 
   private:
     std::vector<ContainerNode> stmtlsts_;
+    [[nodiscard]] StmtLstIndex GetRoot(StmtLstIndex child) const noexcept;
 };
 }  // namespace spa
 

@@ -3,6 +3,7 @@
 #include <cassert>
 #include <stack>
 
+#include "common/aliases.h"
 #include "pkb/store/stmtlst_parent_store.h"
 #include "pkb/store/stmtlst_statements_store.h"
 
@@ -56,6 +57,19 @@ std::vector<int> ContainerForest::GetAncestryTrace(
         parent = stmtlsts_[parent].GetParent();
     }
     return ancestry;
+}
+StmtLstIndex ContainerForest::GetRoot(StmtLstIndex child) const noexcept {
+    StmtLstIndex father = stmtlsts_[child].GetParent();
+    while (father != 0) {
+        child = father;
+        father = stmtlsts_[child].GetParent();
+    }
+    return child;
+}
+bool ContainerForest::SameProcedure(StmtLstIndex a,
+                                    StmtLstIndex b) const noexcept {
+    assert(a != 0 && b != 0);
+    return GetRoot(a) == GetRoot(b);
 }
 std::vector<int> ContainerForest::GetChildren(const int parent) const noexcept {
     assert(parent != 0);
