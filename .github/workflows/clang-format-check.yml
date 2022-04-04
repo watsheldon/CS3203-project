@@ -19,7 +19,7 @@ jobs:
         uses: fkirc/skip-duplicate-actions@v3.4.1
         with:
           paths: '["Team31/Code31/src/spa/src/**"]'
-          concurrent_skipping: 'same_content'
+          concurrent_skipping: 'same_content_newer'
 
   formatting-check:
     name: Formatting Check
