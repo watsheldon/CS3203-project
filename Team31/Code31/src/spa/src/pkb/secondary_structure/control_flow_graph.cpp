@@ -16,7 +16,9 @@ ControlFlowGraph::ControlFlowGraph(std::size_t stmt_count,
         : stmt_node_index_(stmt_count + 1, 0),
           stmtlst_stmt_(stores.stmtlst_statements),
           type_store_(stores.type_statements),
-          stmtlst_parent_(stores.stmtlst_parent) {
+          stmtlst_parent_(stores.stmtlst_parent),
+          forest_(stores.forest),
+          parent_store_(stores.parent_store) {
     nodes_.reserve(stmtlst_count);
     nodes_.emplace_back(0);  // dummy node
     prev_.reserve(stmt_count);

@@ -8,6 +8,8 @@
 
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
+#include "container_forest.h"
+#include "pkb/store/parent_relationship_store.h"
 #include "pkb/store/stmtlst_parent_store.h"
 #include "pkb/store/stmtlst_statements_store.h"
 #include "pkb/store/type_statements_store.h"
@@ -19,6 +21,8 @@ class ControlFlowGraph {
         const StmtlstStatementsStore& stmtlst_statements;
         const TypeStatementsStore& type_statements;
         const StmtlstParentStore& stmtlst_parent;
+        const ContainerForest& forest;
+        const ParentRelationshipStore& parent_store;
     };
     ControlFlowGraph(std::size_t stmt_count, std::size_t stmtlst_count,
                      Stores stores) noexcept;
@@ -52,6 +56,8 @@ class ControlFlowGraph {
     const StmtlstStatementsStore& stmtlst_stmt_;
     const TypeStatementsStore& type_store_;
     const StmtlstParentStore& stmtlst_parent_;
+    const ContainerForest& forest_;
+    const ParentRelationshipStore& parent_store_;
 
     void AddIfNode(StmtNo if_stmt, StmtNo prev_stmt = 0) noexcept;
     void AddWhileNode(StmtNo while_stmt, StmtNo prev_stmt = 0) noexcept;

@@ -665,8 +665,8 @@ void ProgramKnowledgeBase::Compile() {
                           call_proc_);
     cfg_ = std::make_unique<ControlFlowGraph>(
             stmt_count_, stmtlst_count_,
-            ControlFlowGraph::Stores{stmtlst_stmt_, type_stmt_,
-                                     stmtlst_parent_});
+            ControlFlowGraph::Stores{stmtlst_stmt_, type_stmt_, stmtlst_parent_,
+                                     *container_forest_, parent_store_});
     compiled = true;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {
