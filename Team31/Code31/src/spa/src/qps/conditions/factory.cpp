@@ -29,8 +29,10 @@ void Factory::SetRelationship(QueryTokenType type) noexcept {
             return;
         case QueryTokenType::kKeywordNext:
             rel_ = Relationship::kNext;
+            return;
         case QueryTokenType::kKeywordAffects:
             rel_ = Relationship::kAffects;
+            return;
         default:
             assert(false);
     }
