@@ -182,14 +182,13 @@ void Generator::AddDecl(std::string_view name) noexcept {
 }
 void Generator::Select(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
+    Synonym *selected = nullptr;
     if (itr == synonym_map_.end()) {
-        if (name == kBoolean && selected_.empty()) {
-            selected_.emplace_back(nullptr);
-            return;
-        }
-        return SemanticError();
+        if (!selected_.empty() || name != kBoolean) return SemanticError();
+    } else {
+        selected = itr->second;
     }
-    selected_.emplace_back(itr->second);
+    selected_.emplace_back(selected);
     mode_.pop_back();
 }
 void Generator::Attr(QueryTokenType token_type) noexcept {
