@@ -20,7 +20,6 @@ class ConditionClause {
         kWild,
         kIdent,
     };
-
     enum class SecondParamType {
         kInt,
         kSyn,

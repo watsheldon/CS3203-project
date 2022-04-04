@@ -143,20 +143,20 @@ class Factory {
         PatternExprBase::Type type =
                 PatternExprBase::GetType(first_param_type_, second_param_type_);
         switch (type) {
-            case PatternExprBase::Type::kWildWild:
-                return std::make_unique<T>(syn_);
-            case PatternExprBase::Type::kWildExpr:
-                return std::make_unique<T>(syn_, std::move(second_exprs_));
-            case PatternExprBase::Type::kVarWild:
-                return std::make_unique<T>(syn_, first_ident_);
-            case PatternExprBase::Type::kVarExpr:
+            case PatternBase::Type::kVarExpr:
                 return std::make_unique<T>(syn_, first_ident_,
                                            std::move(second_exprs_));
-            case PatternExprBase::Type::kSynWild:
-                return std::make_unique<T>(syn_, first_syn_);
-            case PatternExprBase::Type::kSynExpr:
+            case PatternBase::Type::kVarWild:
+                return std::make_unique<T>(syn_, first_ident_);
+            case PatternBase::Type::kSynExpr:
                 return std::make_unique<T>(syn_, first_syn_,
                                            std::move(second_exprs_));
+            case PatternBase::Type::kSynWild:
+                return std::make_unique<T>(syn_, first_syn_);
+            case PatternBase::Type::kWildExpr:
+                return std::make_unique<T>(syn_, std::move(second_exprs_));
+            case PatternExprBase::Type::kWildWild:
+                return std::make_unique<T>(syn_);
         }
         assert(false);
         return {};
@@ -164,14 +164,13 @@ class Factory {
     template <typename T>
     std::unique_ptr<ConditionClause> BuildPatternWhileIfClause() noexcept {
         static_assert(std::is_base_of_v<PatternBase, T>);
-        PatternWhileIfClause::Type type = PatternWhileIfClause::GetType(
-                first_param_type_, second_param_type_);
+        PatternBase::Type type = PatternBase::GetType(first_param_type_);
         switch (type) {
-            case PatternBase::kVarWild:
+            case PatternBase::Type::kVarWild:
                 return std::make_unique<T>(syn_, first_ident_);
-            case PatternBase::kSynWild:
+            case PatternBase::Type::kSynWild:
                 return std::make_unique<T>(syn_, first_syn_);
-            case PatternBase::kWildWild:
+            case PatternBase::Type::kWildWild:
                 return std::make_unique<T>(syn_);
             default:
                 assert(false);

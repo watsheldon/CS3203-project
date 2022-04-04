@@ -19,16 +19,16 @@ PatternBase::PatternBase(Type type, Synonym *zeroth,
         : type_(type), zeroth_param_(zeroth), first_param_(first_param) {}
 ResultTable PatternBase::Execute(KnowledgeBase *pkb) const noexcept {
     switch (type_) {
-        case kVarWild: {
+        case Type::kVarWild: {
             auto first_var_name = std::get<VarName>(first_param_);
             return VarWild(pkb, first_var_name);
         }
-        case kSynWild: {
+        case Type::kSynWild: {
             auto first_syn = std::get<Synonym *>(first_param_);
             first_syn->IncResolved();
             return SynWild(pkb, first_syn);
         }
-        case kWildWild: {
+        case Type::kWildWild: {
             return WildWild(pkb);
         }
         default:

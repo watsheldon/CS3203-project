@@ -15,11 +15,9 @@ class PatternBase : public ConditionClause {
                 VarName first) noexcept;                 // IdentWild
     PatternBase(Synonym *syn, Synonym *first) noexcept;  // SynWild
     explicit PatternBase(Synonym *syn) noexcept;         // WildWild
-    static constexpr Type GetType(FirstParamType first,
-                                  SecondParamType second) noexcept {
+    static constexpr Type GetType(FirstParamType first) noexcept {
         int first_index = static_cast<int>(first) - 1;
-        int second_index = static_cast<int>(second) - 2;
-        return kTypeMatrix[first_index][second_index];
+        return kTypeMatrix[first_index];
     }
     ~PatternBase() override = default;
     ResultTable Execute(KnowledgeBase *pkb) const noexcept override;
@@ -28,10 +26,8 @@ class PatternBase : public ConditionClause {
     Type type_;
     FirstParam first_param_;
     Synonym *zeroth_param_;
-    static constexpr Array2D<Type, 3, 2> kTypeMatrix = {
-            {{Type::kSynWild, Type::kSynExpr},
-             {Type::kWildWild, Type::kWildExpr},
-             {Type::kVarWild, Type::kVarExpr}}};
+    static constexpr std::array<Type, 3> kTypeMatrix = {
+            Type::kSynWild, Type::kWildWild, Type::kVarWild};
     PatternBase(Type type, Synonym *zeroth,
                 FirstParam first_param = Wildcard()) noexcept;
     virtual ResultTable VarWild(KnowledgeBase *pkb,

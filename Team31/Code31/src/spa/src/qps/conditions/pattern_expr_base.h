@@ -20,11 +20,21 @@ class PatternExprBase : public PatternBase {
                     std::vector<QueryToken> &&second) noexcept;  // SynExpr
     PatternExprBase(Synonym *syn,
                     std::vector<QueryToken> &&second) noexcept;  // WildExpr
+    static constexpr Type GetType(FirstParamType first,
+                                  SecondParamType second) noexcept {
+        int first_index = static_cast<int>(first) - 1;
+        int second_index = static_cast<int>(second) - 2;
+        return kTypeMatrix[first_index][second_index];
+    }
     ResultTable Execute(KnowledgeBase *pkb) const noexcept final;
 
   protected:
     using PatternBase::PatternBase;
     SecondParam second_param_;
+    static constexpr Array2D<Type, 3, 2> kTypeMatrix = {
+            {{Type::kSynWild, Type::kSynExpr},
+             {Type::kWildWild, Type::kWildExpr},
+             {Type::kVarWild, Type::kVarExpr}}};
     virtual ResultTable VarExpr(KnowledgeBase *pkb, VarName first,
                                 Expression second) const noexcept = 0;
     virtual ResultTable SynExpr(KnowledgeBase *pkb, Synonym *first,
