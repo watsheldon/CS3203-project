@@ -84,6 +84,7 @@ constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
             return false;
     }
 }
+void Generator::SemanticError() noexcept { semantic_error_ = true; }
 void Generator::Reset() noexcept {
     semantic_error_ = false;
     synonym_map_.clear();
@@ -129,10 +130,7 @@ void Generator::BracketR() noexcept {
     assert(mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression);
     mode_.pop_back();
     auto clause = factory_.Build();
-    if (clause == nullptr) {
-        semantic_error_ = true;
-        return;
-    }
+    if (clause == nullptr) return SemanticError();
     conditions_.emplace_back(std::move(clause));
 }
 void Generator::Name(const QueryToken &token) noexcept {
@@ -169,10 +167,7 @@ void Generator::Constant(const QueryToken &token) noexcept {
     }
     // stmt#
     auto value = std::stoi(val);
-    if (value == 0) {
-        semantic_error_ = true;
-        return;
-    }
+    if (value == 0) return SemanticError();
     mode_.back() == Mode::kFirst ? factory_.SetFirst(value)
                                  : factory_.SetSecond(value);
     mode_.pop_back();
@@ -181,10 +176,7 @@ void Generator::AddDecl(std::string_view name) noexcept {
     auto &ptr =
             synonyms_.emplace_back(std::make_unique<Synonym>(curr_syn_type_));
     auto [itr, inserted] = synonym_map_.try_emplace(name, ptr.get());
-    if (!inserted) {
-        semantic_error_ = true;
-        return;
-    }
+    if (!inserted) return SemanticError();
 }
 void Generator::Select(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
@@ -193,8 +185,7 @@ void Generator::Select(std::string_view name) noexcept {
             selected_.emplace_back(nullptr);
             return;
         }
-        semantic_error_ = true;
-        return;
+        return SemanticError();
     }
     selected_.emplace_back(itr->second);
     mode_.pop_back();
@@ -209,8 +200,7 @@ void Generator::Attr(QueryTokenType token_type) noexcept {
 void Generator::SetZeroth(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
     if (itr == synonym_map_.end() || InvalidPatternSyn(itr->second->type)) {
-        semantic_error_ = true;
-        return;
+        return SemanticError();
     }
     pattern_syn_ = itr->second;
     pattern_syn_->IncRef();
@@ -219,34 +209,20 @@ void Generator::SetZeroth(std::string_view name) noexcept {
 void Generator::SetFirst(std::string_view name) noexcept {
     mode_.pop_back();
     auto itr = synonym_map_.find(name);
-    if (itr == synonym_map_.end()) {
-        semantic_error_ = true;
-        return;
-    }
+    if (itr == synonym_map_.end()) return SemanticError();
     auto syn = itr->second;
-    if (UnsuitableFirstSynType(mode_.back(), syn->type)) {
-        semantic_error_ = true;
-        return;
-    }
+    if (UnsuitableFirstSynType(mode_.back(), syn->type)) return SemanticError();
     syn->IncRef();
     factory_.SetFirst(syn);
 }
 void Generator::SetSecond(std::string_view name) noexcept {
     mode_.pop_back();
-    if (mode_.back() == Mode::kPattern) {
-        semantic_error_ = true;
-        return;
-    }
+    if (mode_.back() == Mode::kPattern) return SemanticError();
     auto itr = synonym_map_.find(name);
-    if (itr == synonym_map_.end()) {
-        semantic_error_ = true;
-        return;
-    }
+    if (itr == synonym_map_.end()) return SemanticError();
     auto syn = itr->second;
-    if (UnsuitableSecondSynType(mode_.back(), syn->type)) {
-        semantic_error_ = true;
-        return;
-    }
+    if (UnsuitableSecondSynType(mode_.back(), syn->type))
+        return SemanticError();
     syn->IncRef();
     factory_.SetSecond(syn);
 }
@@ -254,7 +230,7 @@ void Generator::Underscore() noexcept {
     if (mode_.back() == Mode::kFirst) {
         mode_.pop_back();
         if (mode_.back() == Mode::kUses || mode_.back() == Mode::kModifies)
-            semantic_error_ = true;
+            SemanticError();
         return;
     }
     if (mode_.back() == Mode::kThird) {
@@ -274,10 +250,8 @@ void Generator::QuoteAsSecondArg() noexcept {
         return;
     }
     if (pattern_syn_->type == Synonym::kStmtWhile ||
-        pattern_syn_->type == Synonym::kStmtIf) {
-        semantic_error_ = true;
-        return;
-    }
+        pattern_syn_->type == Synonym::kStmtIf)
+        return SemanticError();
     mode_.emplace_back(Mode::kExpression);
     expression_.clear();
 }

@@ -61,6 +61,7 @@ class Generator {
     Synonym* pattern_syn_;
     Factory factory_;
 
+    inline void SemanticError() noexcept;
     void BeginDecl(QueryTokenType token_type) noexcept;
     void BeginClause(QueryTokenType token_type) noexcept;
     void Asterisk() noexcept;
