@@ -24,6 +24,7 @@
 #include "pattern_while_if_clause.h"
 #include "qps/query_token.h"
 #include "qps/synonym.h"
+#include "qps/synonym_with_attr.h"
 #include "stmt_stmt_base.h"
 #include "uses_clause.h"
 #include "uses_modifies_base.h"
@@ -36,10 +37,12 @@ class Factory {
     void SetFirst(int first) noexcept;
     void SetFirst(Synonym* syn) noexcept;
     void SetFirst(const std::string& value) noexcept;
+    void SetFirst(SynonymWithAttr* syn_with_attr) noexcept;
     void SetSecond(int second) noexcept;
     void SetSecond(Synonym* syn) noexcept;
     void SetSecond(const std::string& value) noexcept;
     void SetSecond(std::vector<QueryToken>&& expr) noexcept;
+    void SetSecond(SynonymWithAttr* syn_with_attr) noexcept;
     void SetTransPartial() noexcept;
     void SetPatternSynonym(Synonym* syn) noexcept;
     std::unique_ptr<ConditionClause> Build() noexcept;
@@ -73,6 +76,8 @@ class Factory {
     Synonym* syn_;
     Synonym* first_syn_;
     Synonym* second_syn_;
+    SynonymWithAttr* first_syn_attr_;
+    SynonymWithAttr* second_syn_attr_;
     std::vector<QueryToken> second_exprs_;
     template <typename T>
     std::unique_ptr<ConditionClause> BuildStmtStmtClause() noexcept {
