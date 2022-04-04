@@ -11,6 +11,9 @@ constexpr StmtType SynToPkbType(const Synonym* synonym) noexcept {
     assert(synonym->type < Synonym::kProc);
     return static_cast<StmtType>(synonym->type);
 }
+constexpr QueryEntityType AttrToPkbType(const Attribute attribute) noexcept {
+    return static_cast<QueryEntityType>(attribute);
+}
 }  // namespace spa
 
 #endif  // SRC_SPA_SRC_COMMON_TYPE_CONVERT_HELPERS_H_
