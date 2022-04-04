@@ -580,26 +580,26 @@ PairVec<int> ProgramKnowledgeBase::GetCallsTPairs() {
 }
 bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kFirst> first_stmt,
                                      Index<ArgPos::kSecond> second_stmt) {
-    return false;
+    return cfg_->IsNext(first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistNextT(Index<ArgPos::kFirst> first_stmt,
                                       Index<ArgPos::kSecond> second_stmt) {
     return false;
 }
 bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kFirst> first_stmt) {
-    return false;
+    return cfg_->HasNext(first_stmt);
 }
 bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kSecond> second_stmt) {
-    return false;
+    return cfg_->HasPrev(second_stmt);
 }
-bool ProgramKnowledgeBase::ExistNext() { return false; }
+bool ProgramKnowledgeBase::ExistNext() { return cfg_->HasNext(); }
 std::set<int> ProgramKnowledgeBase::GetNext(ArgPos return_pos,
                                             StmtType return_type) {
-    return {};
+    return cfg_->GetNextSingleArg(return_pos, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kFirst> stmt,
                                             StmtType return_type) {
-    return {};
+    return cfg_->GetNext(stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kFirst> stmt,
                                              StmtType return_type) {
@@ -607,7 +607,7 @@ std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kFirst> stmt,
 }
 std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kSecond> stmt,
                                             StmtType return_type) {
-    return {};
+    return cfg_->GetPrev(stmt, return_type);
 }
 std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kSecond> stmt,
                                              StmtType return_type) {
@@ -615,7 +615,7 @@ std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kSecond> stmt,
 }
 PairVec<int> ProgramKnowledgeBase::GetNextPairs(StmtType first_type,
                                                 StmtType second_type) {
-    return {};
+    return cfg_->GetNextPairs(first_type, second_type);
 }
 PairVec<int> ProgramKnowledgeBase::GetNextTPairs(StmtType first_type,
                                                  StmtType second_type) {
@@ -663,6 +663,10 @@ void ProgramKnowledgeBase::Compile() {
     modifies_rel_.Compile(type_stmt_,
                           {*container_forest_, stmtlst_parent_, stmtlst_stmt_},
                           call_proc_);
+    cfg_ = std::make_unique<ControlFlowGraph>(
+            stmt_count_, stmtlst_count_,
+            ControlFlowGraph::Stores{stmtlst_stmt_, type_stmt_,
+                                     stmtlst_parent_});
     compiled = true;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {

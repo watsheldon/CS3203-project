@@ -22,6 +22,7 @@
 #include "pkb/store/type_statements_store.h"
 #include "pkb/store/uses_relationship_store.h"
 #include "secondary_structure/container_forest.h"
+#include "secondary_structure/control_flow_graph.h"
 
 namespace spa {
 
@@ -252,6 +253,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     TypeStatementsStore type_stmt_;
 
     std::unique_ptr<ContainerForest> container_forest_;
+    std::unique_ptr<ControlFlowGraph> cfg_;
     FollowsRelationshipStore follows_store_;
     ParentRelationshipStore parent_store_;
 
