@@ -125,7 +125,9 @@ void Generator::BracketR() noexcept {
         return;
     } else if (mode_.back() == Mode::kSecond) {
         mode_.pop_back();
-        return BracketR();
+        bool is_pattern_if = mode_.back() == Mode::kPattern &&
+                             pattern_syn_->type == Synonym::kStmtIf;
+        return is_pattern_if ? SemanticError() : BracketR();
     }
     assert(mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression);
     mode_.pop_back();
