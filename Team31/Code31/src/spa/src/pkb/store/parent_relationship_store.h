@@ -43,6 +43,8 @@ class ParentRelationshipStore : public FollowsParentRelationshipBase {
             StmtType parent_type, StmtType child_type) const noexcept final;
     [[nodiscard]] PairVec<StmtNo> GetBothArgsT(
             StmtType parent_type, StmtType child_type) const noexcept final;
+    [[nodiscard]] StmtNo GetContainerLastStmt(StmtType type,
+                                              StmtNo stmt_no) const noexcept;
 
   private:
     friend class ProgramKnowledgeBase;
@@ -53,8 +55,6 @@ class ParentRelationshipStore : public FollowsParentRelationshipBase {
     std::size_t stmt_count_;
     const ContainerForest *container_forest_{};
 
-    [[nodiscard]] StmtNo GetContainerLastStmt(StmtType type,
-                                              StmtNo stmt_no) const noexcept;
     [[nodiscard]] static constexpr bool IsParentType(StmtType type) noexcept;
     [[nodiscard]] inline bool IsParent(StmtNo stmt) const noexcept;
     [[nodiscard]] inline bool HasParent(StmtNo stmt) const noexcept;
