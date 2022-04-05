@@ -19,7 +19,7 @@ ControlFlowGraph::ControlFlowGraph(std::size_t stmt_count,
           stmtlst_parent_(stores.stmtlst_parent),
           forest_(stores.forest),
           parent_store_(stores.parent_store) {
-    nodes_.reserve(stmtlst_count);
+    nodes_.reserve(stmtlst_count * 3 / 2);
     nodes_.emplace_back(0);  // dummy node
     prev_.reserve(stmt_count);
     next_.reserve(stmt_count);
@@ -66,25 +66,24 @@ void ControlFlowGraph::AddIfNode(StmtNo if_stmt, StmtNo prev_stmt) noexcept {
 }
 void ControlFlowGraph::AddWhileNode(StmtNo while_stmt,
                                     StmtNo prev_stmt) noexcept {
-    auto& while_node = GetNode(while_stmt);
-    if (prev_stmt != 0) while_node.prev.emplace_back(prev_stmt);
+    if (prev_stmt != 0) GetNode(while_stmt).prev.emplace_back(prev_stmt);
     StmtLstIndex while_stmtlst_idx =
             stmtlst_parent_.GetWhileStmtLst(while_stmt);
     const auto& while_stmtlst = stmtlst_stmt_.GetStatements(while_stmtlst_idx);
     StmtNo last_stmt = while_stmtlst.back();
     if (type_store_.GetType(last_stmt) == StmtType::kIf) {
-        ProcessWhileExitPoints(while_node, last_stmt, while_stmt);
+        ProcessWhileExitPoints(GetNode(while_stmt), last_stmt, while_stmt);
     } else {
-        while_node.prev.emplace_back(last_stmt);
-        auto& node = GetNode(last_stmt);
-        (node.next.first ? node.next.second : node.next.first) = while_stmt;
+        GetNode(while_stmt).prev.emplace_back(last_stmt);
+        auto& after_node = GetNode(last_stmt);
+        (after_node.next.first ? after_node.next.second
+                               : after_node.next.first) = while_stmt;
     }
     StmtNo first_stmt = while_stmtlst.front();
     StmtNo after_stmt = stmtlst_stmt_.GetFollowsSecondArg(while_stmt);
-    while_node.next = {first_stmt, after_stmt};
-    auto &first_node = GetNode(first_stmt), &after_node = GetNode(after_stmt);
-    first_node.prev.emplace_back(while_stmt);
-    after_node.prev.emplace_back(while_stmt);
+    GetNode(while_stmt).next = {first_stmt, after_stmt};
+    GetNode(first_stmt).prev.emplace_back(while_stmt);
+    GetNode(after_stmt).prev.emplace_back(while_stmt);
 }
 void ControlFlowGraph::ProcessWhileExitPoints(Node& while_node,
                                               StmtNo last_stmt,
