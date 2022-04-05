@@ -18,7 +18,6 @@
 namespace spa {
 
 using PN = spa::PolishNotation;
-using PType = spa::StmtlstParentStore::ParentType;
 
 struct BasicEntities {
     std::vector<std::string> procedures;
@@ -83,7 +82,7 @@ class KnowledgeBase {
                         std::vector<int> stmtlst) = 0;
 
     /**
-     * Sets direct Modifes relationships between stmt# and its variable's
+     * Sets direct Modifies relationships between stmt# and its variable's
      * index
      */
     virtual void SetRel(Index<SetEntityType::kStmt> stmt_no,
@@ -136,16 +135,10 @@ class KnowledgeBase {
      */
     virtual std::set<int> GetFollows(ArgPos return_pos,
                                      StmtType return_type) = 0;
-    std::set<int> GetFollows(ArgPos return_pos) {
-        return GetFollows(return_pos, StmtType::kAll);
-    }
     virtual std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no,
                                      StmtType return_type) = 0;
     virtual std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
                                       StmtType return_type) = 0;
-    std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no) {
-        return GetFollows(stmt_no, StmtType::kAll);
-    }
 
     virtual std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no,
                                      StmtType return_type) = 0;
@@ -376,33 +369,18 @@ class KnowledgeBase {
     virtual bool ExistNext() = 0;
     // Next/Next*(s, _) or (_, s)
     virtual std::set<int> GetNext(ArgPos return_pos, StmtType return_type) = 0;
-    std::set<int> GetNext(ArgPos return_pos) {
-        return GetNext(return_pos, StmtType::kAll);
-    }
     // Next("", s)
     virtual std::set<int> GetNext(Index<ArgPos::kFirst> stmt,
                                   StmtType return_type) = 0;
-    std::set<int> GetNext(Index<ArgPos::kFirst> stmt) {
-        return GetNext(stmt, StmtType::kAll);
-    }
     // Next*("", s)
     virtual std::set<int> GetNextT(Index<ArgPos::kFirst> stmt,
                                    StmtType return_type) = 0;
-    std::set<int> GetNextT(Index<ArgPos::kFirst> stmt) {
-        return GetNextT(stmt, StmtType::kAll);
-    }
     // Next(s,"")
     virtual std::set<int> GetNext(Index<ArgPos::kSecond> stmt,
                                   StmtType return_type) = 0;
-    std::set<int> GetNext(Index<ArgPos::kSecond> stmt) {
-        return GetNext(stmt, StmtType::kAll);
-    }
     // Next*(s,"")
     virtual std::set<int> GetNextT(Index<ArgPos::kSecond> stmt,
                                    StmtType return_type) = 0;
-    std::set<int> GetNextT(Index<ArgPos::kSecond> stmt) {
-        return GetNextT(stmt, StmtType::kAll);
-    }
     // Next(s,s)
     virtual PairVec<int> GetNextPairs(StmtType first_type,
                                       StmtType second_type) = 0;
