@@ -53,6 +53,7 @@ class ControlFlowGraph {
     std::vector<NodeIndex> stmt_node_index_;
     std::vector<StmtNo> prev_;
     std::vector<StmtNo> next_;
+    std::vector<StmtNo> roots_;
     const StmtlstStatementsStore& stmtlst_stmt_;
     const TypeStatementsStore& type_store_;
     const StmtlstParentStore& stmtlst_parent_;

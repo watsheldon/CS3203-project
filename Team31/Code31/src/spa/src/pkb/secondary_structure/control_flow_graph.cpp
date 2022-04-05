@@ -125,10 +125,18 @@ StmtNo ControlFlowGraph::AddCombinedNode(StmtNo first_stmt) noexcept {
     return last;
 }
 void ControlFlowGraph::Precompute() noexcept {
-    for (StmtNo i = 1; i < stmt_node_index_.size(); ++i) {
-        const auto& node = GetNode(i);
-        if (i != node.stop || node.next.first != 0) prev_.emplace_back(i);
-        if (i != node.start || !node.prev.empty()) next_.emplace_back(i);
+    for (auto n = ++nodes_.begin(); n != nodes_.end(); ++n) {
+        if (!n->prev.empty()) {
+            next_.emplace_back(n->start);
+        } else {
+            roots_.emplace_back(n->start);
+        }
+        if (n->next.first != 0) {
+            prev_.emplace_back(n->stop);
+        }
+        for (int i = n->start + 1; i <= n->stop; ++i) {
+            prev_.emplace_back(i - 1), next_.emplace_back(i);
+        }
     }
 }
 bool ControlFlowGraph::HasNext() const noexcept {
