@@ -46,6 +46,11 @@ class Generator {
         kThird,
         kNone
     };
+    enum class ClauseMode {
+        kSuchThat,
+        kPattern,
+        kWith,
+    };
     static constexpr std::string_view kBoolean = "BOOLEAN"sv;
     static constexpr std::array<Synonym::Type, 3> kPatternSynonymType{
             Synonym::Type::kStmtIf, Synonym::Type::kStmtWhile,
@@ -55,6 +60,7 @@ class Generator {
     VecUniquePtr<Synonym> synonyms_;
     std::vector<SynonymWithAttr> selected_;
     std::vector<Mode> mode_;
+    ClauseMode curr_clause_mode_;
     Synonym::Type curr_syn_type_;
     VecUniquePtr<ConditionClause> conditions_;
     std::vector<QueryToken> expression_;
@@ -83,6 +89,8 @@ class Generator {
     void Attr(QueryTokenType token_type) noexcept;
     void AngleBracketL() noexcept;
     void AngleBracketR() noexcept;
+    void SetClauseMode(QueryTokenType token_type) noexcept;
+    void And() noexcept;
 
     static constexpr Synonym::Type TokenToSynType(QueryTokenType type) noexcept;
     static constexpr Mode TokenToClauseMode(QueryTokenType type) noexcept;

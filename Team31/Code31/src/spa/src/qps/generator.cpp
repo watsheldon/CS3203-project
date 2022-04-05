@@ -305,6 +305,37 @@ void Generator::AngleBracketR() noexcept {
     assert(mode_.back() == Mode::kMultiSelect);
     mode_.pop_back();
 }
+void Generator::SetClauseMode(QueryTokenType token_type) noexcept {
+    switch (token_type) {
+        case QueryTokenType::kKeywordSuch:
+            curr_clause_mode_ = ClauseMode::kSuchThat;
+            return;
+        case QueryTokenType::kKeywordWith:
+            curr_clause_mode_ = ClauseMode::kWith;
+            return;
+        case QueryTokenType::kKeywordPattern:
+            curr_clause_mode_ = ClauseMode::kPattern;
+            return;
+        default:
+            assert(false);
+            return;
+    }
+}
+void Generator::And() noexcept {
+    switch (curr_clause_mode_) {
+        case ClauseMode::kSuchThat:
+            break;
+        case ClauseMode::kPattern:
+            mode_.emplace_back(Mode::kPattern);
+            return;
+        case ClauseMode::kWith:
+            mode_.emplace_back(Mode::kWith);
+            return;
+        default:
+            assert(false);
+            return;
+    }
+}
 void Generator::ParseToken(const QueryToken &token) noexcept {
     const auto &[token_type, name] = token;
     switch (token_type) {
@@ -322,7 +353,6 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kKeywordSelect:
             mode_.emplace_back(Mode::kSelect);
             return;
-        case QueryTokenType::kKeywordPattern:
         case QueryTokenType::kKeywordFollows:
         case QueryTokenType::kKeywordParent:
         case QueryTokenType::kKeywordUses:
@@ -330,6 +360,9 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kKeywordCalls:
         case QueryTokenType::kKeywordNext:
         case QueryTokenType::kKeywordAffects:
+            return BeginClause(token_type);
+        case QueryTokenType::kKeywordPattern:
+            SetClauseMode(token_type);
             return BeginClause(token_type);
         case QueryTokenType::kAttrProc:
         case QueryTokenType::kAttrVar:
@@ -364,10 +397,12 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
             return Comma();
         case QueryTokenType::kSemicolon:
             return Semicolon();
-        case QueryTokenType::kKeywordSuch:
-        case QueryTokenType::kKeywordThat:
         case QueryTokenType::kKeywordAnd:
+            return And();
+        case QueryTokenType::kKeywordSuch:
         case QueryTokenType::kKeywordWith:
+            return SetClauseMode(token_type);
+        case QueryTokenType::kKeywordThat:
         case QueryTokenType::kDot:
         case QueryTokenType::kHashtag:
         case QueryTokenType::kEqual:
