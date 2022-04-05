@@ -1,6 +1,7 @@
 #include "source_processor.h"
 
 #include <memory>
+#include <utility>
 
 #include "ast/abstract_syntax_tree.h"
 #include "validator.h"
@@ -12,6 +13,8 @@ std::unique_ptr<AbstractSyntaxTree> SourceProcessor::Parse() noexcept {
     Validator validator(source_path_);
     auto tokens = validator.Validate();
     if (tokens.empty()) return {};
-    return std::make_unique<AbstractSyntaxTree>(std::move(tokens));
+    auto ast = std::make_unique<AbstractSyntaxTree>(std::move(tokens));
+    if (ast->GetRoot() == nullptr) return nullptr;
+    return std::move(ast);
 }
 }  // namespace spa
