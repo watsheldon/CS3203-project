@@ -211,6 +211,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                               StmtType second_type) override;
     PairVec<int> GetNextTPairs(StmtType first_type,
                                StmtType second_type) override;
+    std::set<StmtNo> GetNextTSelf(StmtType type) override;
 
     bool ExistAffects(Index<ArgPos::kFirst> first_assign,
                       Index<ArgPos::kSecond> second_assign) override;

@@ -381,12 +381,13 @@ class KnowledgeBase {
     // Next*(s,"")
     virtual std::set<int> GetNextT(Index<ArgPos::kSecond> stmt,
                                    StmtType return_type) = 0;
-    // Next(s,s)
+    // Next(s1,s2)
     virtual PairVec<int> GetNextPairs(StmtType first_type,
                                       StmtType second_type) = 0;
-    // Next*(s,s)
+    // Next*(s1,s2)
     virtual PairVec<int> GetNextTPairs(StmtType first_type,
                                        StmtType second_type) = 0;
+    virtual std::set<StmtNo> GetNextTSelf(StmtType type) = 0;
 
     // Affects("", "")
     virtual bool ExistAffects(Index<ArgPos::kFirst> first_assign,

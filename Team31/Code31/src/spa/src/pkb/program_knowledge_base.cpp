@@ -621,6 +621,9 @@ PairVec<int> ProgramKnowledgeBase::GetNextTPairs(StmtType first_type,
                                                  StmtType second_type) {
     return cfg_->GetNextTPairs(first_type, second_type);
 }
+std::set<StmtNo> ProgramKnowledgeBase::GetNextTSelf(StmtType type) {
+    return cfg_->GetNextTSelf(type);
+}
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign,
                                         Index<ArgPos::kSecond> second_assign) {
     return false;
@@ -650,8 +653,8 @@ std::set<int> ProgramKnowledgeBase::GetAffectsT(Index<ArgPos::kSecond> assign) {
     return {};
 }
 PairVec<int> ProgramKnowledgeBase::GetAffectsPairs() { return {}; }
-PairVec<int> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
 
+PairVec<int> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(

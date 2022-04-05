@@ -29,6 +29,10 @@ ResultTable NextTransClause::SynNum(KnowledgeBase *pkb, Synonym *first,
 }
 ResultTable NextTransClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
                                     Synonym *second) const noexcept {
+    if (first == second) {
+        auto result = pkb->GetNextTSelf(SynToPkbType(first));
+        return {first, std::move(result)};
+    }
     auto [col_1, col_2] =
             pkb->GetNextTPairs(SynToPkbType(first), SynToPkbType(second));
     return {first, std::move(col_1), second, std::move(col_2)};
