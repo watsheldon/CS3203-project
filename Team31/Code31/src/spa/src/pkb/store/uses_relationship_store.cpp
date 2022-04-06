@@ -110,7 +110,8 @@ void UsesRelationshipStore::AddConditionIndirectUses(
         stmts.resize(vars.size(), index);
     }
 }
-bool UsesRelationshipStore::ExistUses(StmtNo stmt_no, VarIndex var_index) {
+bool UsesRelationshipStore::ExistUses(StmtNo stmt_no,
+                                      VarIndex var_index) const noexcept {
     return ExistRel(stmt_no, var_index);
 }
 std::set<VarIndex> UsesRelationshipStore::GetUses(
