@@ -24,12 +24,6 @@ int PolishNotationStore::GetPolishIndex(int stmt_no) const {
     return stmt_to_index_[stmt_no];
 }
 std::set<int> PolishNotationStore::CheckPattern(
-        const PN& converted_pn, bool partial_match,
-        const std::vector<int>& assign_stmt) {
-    return partial_match ? CheckPatternP(converted_pn, assign_stmt)
-                         : CheckPattern(converted_pn, assign_stmt);
-}
-std::set<int> PolishNotationStore::CheckPattern(
         const PN& converted_pn, const std::vector<int>& assign_stmt) {
     std::set<int> full_match_stmt;
     for (const auto i : assign_stmt) {

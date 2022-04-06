@@ -336,7 +336,7 @@ std::set<int> ProgramKnowledgeBase::GetPattern(std::vector<QueryToken> tokens) {
 
     PN *converted_pn = converted_token.get();
     return polish_notation_.CheckPattern(
-            *converted_pn, false, type_stmt_.GetStatements(StmtType::kAssign));
+            *converted_pn, type_stmt_.GetStatements(StmtType::kAssign));
 }
 std::set<int> ProgramKnowledgeBase::GetPatternP(
         std::vector<QueryToken> tokens) {
@@ -347,8 +347,8 @@ std::set<int> ProgramKnowledgeBase::GetPatternP(
     }
 
     PN *converted_pn = converted_token.get();
-    return polish_notation_.CheckPattern(
-            *converted_pn, true, type_stmt_.GetStatements(StmtType::kAssign));
+    return polish_notation_.CheckPatternP(
+            *converted_pn, type_stmt_.GetStatements(StmtType::kAssign));
 }
 // (" ", _)
 std::set<int> ProgramKnowledgeBase::GetPattern(int var_index) {
