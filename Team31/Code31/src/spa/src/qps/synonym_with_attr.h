@@ -6,10 +6,10 @@
 
 namespace spa {
 struct SynonymWithAttr {
-    explicit SynonymWithAttr(const Synonym* synonym,
+    explicit SynonymWithAttr(Synonym* synonym,
                              Attribute attribute = Attribute::kNone)
             : synonym(synonym), attribute(attribute){};
-    const Synonym* const synonym;
+    Synonym* const synonym;
     const Attribute attribute;
 };
 }  // namespace spa
