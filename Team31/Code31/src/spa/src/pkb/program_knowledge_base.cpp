@@ -9,6 +9,8 @@
 #include "common/index.h"
 #include "knowledge_base.h"
 #include "secondary_structure/container_forest.h"
+#include "secondary_structure/control_flow_graph.h"
+#include "secondary_structure/next_calculator.h"
 
 namespace spa {
 ProgramKnowledgeBase::ProgramKnowledgeBase(BasicEntities init)
@@ -587,49 +589,49 @@ PairVec<ProcIndex> ProgramKnowledgeBase::GetCallsTPairs() {
 }
 bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kFirst> first_stmt,
                                      Index<ArgPos::kSecond> second_stmt) {
-    return cfg_->IsNext(first_stmt, second_stmt);
+    return next_->IsNext(first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistNextT(Index<ArgPos::kFirst> first_stmt,
                                       Index<ArgPos::kSecond> second_stmt) {
-    return cfg_->IsNextT(first_stmt, second_stmt);
+    return next_->IsNextT(first_stmt, second_stmt);
 }
 bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kFirst> first_stmt) {
-    return cfg_->HasNext(first_stmt);
+    return next_->HasNext(first_stmt);
 }
 bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kSecond> second_stmt) {
-    return cfg_->HasPrev(second_stmt);
+    return next_->HasPrev(second_stmt);
 }
-bool ProgramKnowledgeBase::ExistNext() { return cfg_->HasNext(); }
+bool ProgramKnowledgeBase::ExistNext() { return next_->HasNext(); }
 std::set<StmtNo> ProgramKnowledgeBase::GetNext(ArgPos return_pos,
                                                StmtType return_type) {
-    return cfg_->GetNextSingleArg(return_pos, return_type);
+    return next_->GetNextSingleArg(return_pos, return_type);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetNext(Index<ArgPos::kFirst> stmt,
                                                StmtType return_type) {
-    return cfg_->GetNext(stmt, return_type);
+    return next_->GetNext(stmt, return_type);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kFirst> stmt,
                                                 StmtType return_type) {
-    return cfg_->GetNextT(stmt, return_type);
+    return next_->GetNextT(stmt, return_type);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetNext(Index<ArgPos::kSecond> stmt,
                                                StmtType return_type) {
-    return cfg_->GetPrev(stmt, return_type);
+    return next_->GetPrev(stmt, return_type);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kSecond> stmt,
                                                 StmtType return_type) {
-    return cfg_->GetPrevT(stmt, return_type);
+    return next_->GetPrevT(stmt, return_type);
 }
 PairVec<StmtNo> ProgramKnowledgeBase::GetNextPairs(StmtType first_type,
                                                    StmtType second_type) {
-    return cfg_->GetNextPairs(first_type, second_type);
+    return next_->GetNextPairs(first_type, second_type);
 }
 PairVec<StmtNo> ProgramKnowledgeBase::GetNextTPairs(StmtType first_type,
                                                     StmtType second_type) {
-    return cfg_->GetNextTPairs(first_type, second_type);
+    return next_->GetNextTPairs(first_type, second_type);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetNextTSelf(StmtType type) {
-    return cfg_->GetNextTSelf(type);
+    return next_->GetNextTSelf(type);
 }
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign,
                                         Index<ArgPos::kSecond> second_assign) {
@@ -681,8 +683,11 @@ void ProgramKnowledgeBase::Compile() {
                           call_proc_);
     cfg_ = std::make_unique<ControlFlowGraph>(
             stmt_count_, stmtlst_count_,
-            ControlFlowGraph::Stores{stmtlst_stmt_, type_stmt_, stmtlst_parent_,
-                                     *container_forest_, parent_store_});
+            ControlFlowGraph::Stores{stmtlst_stmt_, type_stmt_,
+                                     stmtlst_parent_});
+    next_ = std::make_unique<NextCalculator>(
+            NextCalculator::Stores{stmtlst_stmt_, type_stmt_,
+                                   *container_forest_, parent_store_, *cfg_});
     compiled = true;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {
