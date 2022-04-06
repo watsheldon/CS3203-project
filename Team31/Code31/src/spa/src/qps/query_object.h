@@ -10,7 +10,7 @@
 
 namespace spa {
 struct QueryObject {
-    std::vector<SynonymWithAttr> selected;
+    const std::vector<SynonymWithAttr> selected;
     const VecUniquePtr<Synonym> synonyms;
     const VecUniquePtr<ConditionClause> clauses;
     bool valid;

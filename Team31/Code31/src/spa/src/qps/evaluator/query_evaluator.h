@@ -21,6 +21,7 @@ class QueryEvaluator {
     struct ResultsView {
         const bool &has_valid_result;
         const SynonymDomains &synonym_domain;
+        const ResultTables &result_tables;
         const VarTableMap &vartable_map;
     };
     QueryEvaluator() noexcept = default;
@@ -30,7 +31,7 @@ class QueryEvaluator {
     ResultsView GetResultsView() noexcept;
 
   private:
-    bool has_result_;
+    bool has_result_ = false;
     KnowledgeBase *pkb_{};
     SynonymDomains domains_;
     ResultTables vartables_;

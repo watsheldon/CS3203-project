@@ -13,7 +13,7 @@
 namespace spa {
 void QueryEvaluator::Use(KnowledgeBase* pkb) noexcept { pkb_ = pkb; }
 QueryEvaluator::ResultsView QueryEvaluator::GetResultsView() noexcept {
-    return {has_result_, domains_, vartable_map_};
+    return {has_result_, domains_, vartables_, vartable_map_};
 }
 void QueryEvaluator::Evaluate(const QueryObject& query,
                               std::list<std::string>& list) noexcept {
