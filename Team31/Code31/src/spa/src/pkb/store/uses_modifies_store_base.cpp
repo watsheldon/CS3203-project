@@ -168,7 +168,7 @@ void UsesModifiesStoreBase::AddIndirectRel(
         ancestors.pop_back();
         for (auto j : ancestors) {
             auto& [type, index] = stmtlst_parent.GetParent(j);
-            auto added =
+            auto& added =
                     type == StmtlstParentStore::kIf ? if_added : while_added;
             auto& if_var_pairs_ =
                     stmt_var_pairs_[StmtTypeToIndex(StmtType::kIf)];

@@ -3,20 +3,23 @@
 
 #include <cstddef>
 
-#include "common/aliases.h"
+#include "common/bit_array.h"
 
 namespace spa {
 class BitVec2D {
   public:
     BitVec2D(std::size_t n_rows, std::size_t n_cols) noexcept;
+    BitVec2D(const BitVec2D &other) = delete;
+    BitVec2D(BitVec2D &&other) = delete;
     [[nodiscard]] bool At(std::size_t row, std::size_t col) const noexcept;
     void Set(std::size_t row, std::size_t col) noexcept;
     void Unset(std::size_t row, std::size_t col) noexcept;
-    void Flip(std::size_t row, std::size_t col) noexcept;
-    void Reset() noexcept;
 
   private:
-    Vec2D<bool> map_;
+    BitArray bit_array_;
+    const std::size_t kCols;
+    [[nodiscard]] std::size_t CalcPos(std::size_t row,
+                                      std::size_t col) const noexcept;
 };
 }  // namespace spa
 

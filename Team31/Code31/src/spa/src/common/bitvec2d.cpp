@@ -1,27 +1,21 @@
 #include "bitvec2d.h"
 
-#include <algorithm>
-#include <vector>
+#include <cstddef>
 
 namespace spa {
 BitVec2D::BitVec2D(std::size_t n_rows, std::size_t n_cols) noexcept
-        : map_(n_rows, std::vector<bool>(n_cols, false)) {}
+        : bit_array_(n_rows * n_cols), kCols(n_cols) {}
 bool BitVec2D::At(std::size_t row, std::size_t col) const noexcept {
-    return map_[row][col];
+    return bit_array_.Get(CalcPos(row, col));
 }
 void BitVec2D::Set(std::size_t row, std::size_t col) noexcept {
-    map_[row][col] = true;
+    bit_array_.Set(CalcPos(row, col));
 }
 void BitVec2D::Unset(std::size_t row, std::size_t col) noexcept {
-    map_[row][col] = false;
+    bit_array_.Unset(CalcPos(row, col));
 }
-void BitVec2D::Flip(std::size_t row, std::size_t col) noexcept {
-    map_[row][col].flip();
-}
-void BitVec2D::Reset() noexcept {
-    std::for_each(map_.begin(), map_.end(), [](std::vector<bool> &row) {
-        std::fill(row.begin(), row.end(), false);
-    });
+std::size_t BitVec2D::CalcPos(std::size_t row, std::size_t col) const noexcept {
+    return row * kCols + col;
 }
 
 }  // namespace spa
