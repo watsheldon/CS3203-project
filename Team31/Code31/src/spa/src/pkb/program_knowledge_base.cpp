@@ -787,9 +787,7 @@ void ProgramKnowledgeBase::ToName(Synonym::Type syn_type,
 int ProgramKnowledgeBase::IdentToIndexValue(std::string_view name,
                                             QueryEntityType et) {
     assert(compiled);
-    assert(et == QueryEntityType::kVar || et == QueryEntityType::kProc);
-    return (et == QueryEntityType::kVar)
-                   ? name_value_.GetIndex(name.data(), QueryEntityType::kVar)
-                   : name_value_.GetIndex(name.data(), QueryEntityType::kProc);
+    assert(et != QueryEntityType::kStmt);
+    return name_value_.GetIndex(name.data(), et);
 }
 }  // namespace spa

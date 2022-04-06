@@ -445,6 +445,8 @@ class KnowledgeBase {
     virtual void ToName(Synonym::Type syn_type,
                         const std::vector<int> &index_list,
                         std::list<std::string> &names) = 0;
+    virtual int IdentToIndexValue(std::string_view name,
+                                  QueryEntityType et) = 0;
 
     /**
      * Prevents any further updates to the KnowledgeBase and compile all

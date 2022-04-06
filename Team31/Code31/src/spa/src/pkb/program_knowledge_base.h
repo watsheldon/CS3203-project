@@ -237,7 +237,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     void ToName(Synonym::Type syn_type, const std::vector<int> &index_list,
                 std::list<std::string> &names) override;
-
+    int IdentToIndexValue(std::string_view name, QueryEntityType et) override;
     // mark the end of source processor
     void Compile() override;
 
@@ -262,7 +262,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     FollowsRelationshipStore follows_store_;
     ParentRelationshipStore parent_store_;
 
-    int IdentToIndexValue(std::string_view name, QueryEntityType et);
     template <QueryEntityType et>
     Index<et> IdentToIndex(std::string_view name) {
         return Index<et>(IdentToIndexValue(name, et));
