@@ -5,7 +5,6 @@
 #include <set>
 #include <vector>
 
-#include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "knowledge_base.h"
@@ -67,7 +66,7 @@ void ProgramKnowledgeBase::SetIndex(
     polish_notation_.Set(assign_stmt.value, notation_index.value);
 }
 void ProgramKnowledgeBase::SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
-                                  std::vector<int> stmtlst) {
+                                  std::vector<StmtNo> stmtlst) {
     assert(!compiled);
     stmtlst_stmt_.Set(stmtlst_index.value, std::move(stmtlst));
 }
@@ -77,7 +76,7 @@ void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
     modifies_rel_.Set(stmt_no.value, var_index.value);
 }
 void ProgramKnowledgeBase::SetRel(Index<SetEntityType::kStmt> stmt_no,
-                                  std::vector<int> var_indices) {
+                                  std::vector<VarIndex> var_indices) {
     assert(!compiled);
     uses_rel_.Set(stmt_no.value, std::move(var_indices));
 }
@@ -103,40 +102,40 @@ bool ProgramKnowledgeBase::ExistFollows() {
     assert(compiled);
     return follows_store_.ExistRelationship();
 }
-std::set<int> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
-                                               StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetFollows(ArgPos return_pos,
+                                                  StmtType return_type) {
     assert(compiled);
     return return_pos == ArgPos::kFirst
                    ? follows_store_.GetFirstArg(return_type)
                    : follows_store_.GetSecondArg(return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kFirst> stmt_no,
-                                               StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kFirst> stmt_no,
+                                                  StmtType return_type) {
     assert(compiled);
     return follows_store_.GetSecondArg(stmt_no, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kFirst> stmt_no,
-                                                StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetFollowsT(
+        Index<ArgPos::kFirst> stmt_no, StmtType return_type) {
     assert(compiled);
     return follows_store_.GetSecondArgT(stmt_no, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetFollows(Index<ArgPos::kSecond> stmt_no,
-                                               StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetFollows(
+        Index<ArgPos::kSecond> stmt_no, StmtType return_type) {
     assert(compiled);
     return follows_store_.GetFirstArg(stmt_no, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetFollowsT(Index<ArgPos::kSecond> stmt_no,
-                                                StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetFollowsT(
+        Index<ArgPos::kSecond> stmt_no, StmtType return_type) {
     assert(compiled);
     return follows_store_.GetFirstArgT(stmt_no, return_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetFollowsPairs(StmtType first_type,
-                                                   StmtType second_type) {
+PairVec<StmtNo> ProgramKnowledgeBase::GetFollowsPairs(StmtType first_type,
+                                                      StmtType second_type) {
     assert(compiled);
     return follows_store_.GetBothArgs(first_type, second_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetFollowsTPairs(StmtType first_type,
-                                                    StmtType second_type) {
+PairVec<StmtNo> ProgramKnowledgeBase::GetFollowsTPairs(StmtType first_type,
+                                                       StmtType second_type) {
     assert(compiled);
     return follows_store_.GetBothArgsT(first_type, second_type);
 }
@@ -162,168 +161,172 @@ bool ProgramKnowledgeBase::ExistParent() {
     assert(compiled);
     return parent_store_.ExistRelationship();
 }
-std::set<int> ProgramKnowledgeBase::GetParent(ArgPos return_pos,
-                                              StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetParent(ArgPos return_pos,
+                                                 StmtType return_type) {
     assert(compiled);
     return return_pos == ArgPos::kFirst
                    ? parent_store_.GetFirstArg(return_type)
                    : parent_store_.GetSecondArg(return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kFirst> parent_stmt,
-                                              StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetParent(
+        Index<ArgPos::kFirst> parent_stmt, StmtType return_type) {
     assert(compiled);
     return parent_store_.GetSecondArg(parent_stmt, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetParentT(
+std::set<StmtNo> ProgramKnowledgeBase::GetParentT(
         Index<ArgPos::kFirst> parent_stmt, StmtType return_type) {
     assert(compiled);
     return parent_store_.GetSecondArgT(parent_stmt, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetParent(Index<ArgPos::kSecond> child_stmt,
-                                              StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetParent(
+        Index<ArgPos::kSecond> child_stmt, StmtType return_type) {
     assert(compiled);
     return parent_store_.GetFirstArg(child_stmt, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetParentT(
+std::set<StmtNo> ProgramKnowledgeBase::GetParentT(
         Index<ArgPos::kSecond> child_stmt, StmtType return_type) {
     assert(compiled);
     return parent_store_.GetFirstArgT(child_stmt, return_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetParentPairs(StmtType parent_type,
-                                                  StmtType child_type) {
+PairVec<StmtNo> ProgramKnowledgeBase::GetParentPairs(StmtType parent_type,
+                                                     StmtType child_type) {
     assert(compiled);
     return parent_store_.GetBothArgs(parent_type, child_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetParentTPairs(StmtType parent_type,
-                                                   StmtType child_type) {
+PairVec<StmtNo> ProgramKnowledgeBase::GetParentTPairs(StmtType parent_type,
+                                                      StmtType child_type) {
     assert(compiled);
     return parent_store_.GetBothArgsT(parent_type, child_type);
 }
-bool ProgramKnowledgeBase::ExistModifies(int stmt_no, int var_index) {
+bool ProgramKnowledgeBase::ExistModifies(StmtNo stmt_no, VarIndex var_index) {
     assert(compiled);
     return modifies_rel_.ExistModifies(stmt_no, var_index);
 }
-bool ProgramKnowledgeBase::ExistModifies(int stmt_no,
+bool ProgramKnowledgeBase::ExistModifies(StmtNo stmt_no,
                                          std::string_view var_name) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return false;
     return ExistModifies(stmt_no, var_index);
 }
-bool ProgramKnowledgeBase::ExistUses(int stmt_no, int var_index) {
+bool ProgramKnowledgeBase::ExistUses(StmtNo stmt_no, VarIndex var_index) {
     assert(compiled);
     return uses_rel_.ExistUses(stmt_no, var_index);
 }
-bool ProgramKnowledgeBase::ExistUses(int stmt_no, std::string_view var_name) {
+bool ProgramKnowledgeBase::ExistUses(StmtNo stmt_no,
+                                     std::string_view var_name) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return false;
     return ExistUses(stmt_no, var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetModifies(
+std::set<VarIndex> ProgramKnowledgeBase::GetModifies(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
     return modifies_rel_.GetModifies(stmt_no);
 }
-std::set<int> ProgramKnowledgeBase::GetModifies(std::string_view var_name,
-                                                StmtType type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetModifies(std::string_view var_name,
+                                                   StmtType type) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
     return GetModifies(var_index, type);
 }
-std::set<int> ProgramKnowledgeBase::GetModifies(
+std::set<StmtNo> ProgramKnowledgeBase::GetModifies(
         Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
     return modifies_rel_.GetModifies(var_index, type, type_stmt_);
 }
-std::set<int> ProgramKnowledgeBase::GetModifies(StmtType type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetModifies(StmtType type) {
     assert(compiled);
     return modifies_rel_.GetStmt(type);
 }
-PairVec<int> ProgramKnowledgeBase::GetModifiesStmtVar(StmtType type) {
+PairVec<StmtNo, VarIndex> ProgramKnowledgeBase::GetModifiesStmtVar(
+        StmtType type) {
     assert(compiled);
     return modifies_rel_.GetStmtVar(type);
 }
-std::set<int> ProgramKnowledgeBase::GetUses(
+std::set<VarIndex> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kStmt> stmt_no) {
     assert(compiled);
     return uses_rel_.GetUses(stmt_no);
 }
-std::set<int> ProgramKnowledgeBase::GetUses(
+std::set<StmtNo> ProgramKnowledgeBase::GetUses(
         Index<QueryEntityType::kVar> var_index, StmtType type) {
     assert(compiled);
     return uses_rel_.GetUses(var_index, type, type_stmt_);
 }
-std::set<int> ProgramKnowledgeBase::GetUses(std::string_view var_name,
-                                            StmtType type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetUses(std::string_view var_name,
+                                               StmtType type) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
     return GetUses(var_index, type);
 }
-std::set<int> ProgramKnowledgeBase::GetUses(StmtType type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetUses(StmtType type) {
     return uses_rel_.GetStmt(type);
 }
-PairVec<int> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
+PairVec<StmtNo, VarIndex> ProgramKnowledgeBase::GetUsesStmtVar(StmtType type) {
     assert(compiled);
     return uses_rel_.GetStmtVar(type);
 }
 bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name,
                                          std::string_view var_name) {
     assert(compiled);
-    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
-    int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
+    ProcIndex proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    VarIndex var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     if (proc_index == 0 || var_index == 0) return false;
     return modifies_rel_.ExistModifiesP(proc_index, var_index);
 }
 bool ProgramKnowledgeBase::ExistModifies(std::string_view proc_name) {
     assert(compiled);
-    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    ProcIndex proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
     return modifies_rel_.ExistModifiesP(proc_index);
 }
-std::set<int> ProgramKnowledgeBase::GetModifies(
+std::set<VarIndex> ProgramKnowledgeBase::GetModifies(
         Name<ArgPos::kFirst> proc_name) {
     assert(compiled);
-    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    ProcIndex proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
     return modifies_rel_.GetVarAccessByProc(proc_index);
 }
-std::set<int> ProgramKnowledgeBase::GetModifies(
+std::set<ProcIndex> ProgramKnowledgeBase::GetModifies(
         Name<ArgPos::kSecond> var_name) {
     assert(compiled);
-    int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
+    VarIndex var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     return modifies_rel_.GetAllProc(var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetModifiesProc() {
+std::set<ProcIndex> ProgramKnowledgeBase::GetModifiesProc() {
     return modifies_rel_.GetAllProc();
 }
-PairVec<int> ProgramKnowledgeBase::GetModifiesProcVar() {
+PairVec<ProcIndex, VarIndex> ProgramKnowledgeBase::GetModifiesProcVar() {
     return modifies_rel_.GetProcVar();
 }
 bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name,
                                      std::string_view var_name) {
     assert(compiled);
-    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
-    int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
+    ProcIndex proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    VarIndex var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     if (proc_index == 0 || var_index == 0) return false;
     return uses_rel_.ExistUsesP(proc_index, var_index);
 }
 bool ProgramKnowledgeBase::ExistUses(std::string_view proc_name) {
     assert(compiled);
-    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    ProcIndex proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
     return uses_rel_.ExistUsesP(proc_index);
 }
-std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kFirst> proc_name) {
+std::set<VarIndex> ProgramKnowledgeBase::GetUses(
+        Name<ArgPos::kFirst> proc_name) {
     assert(compiled);
-    int proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
+    ProcIndex proc_index = IdentToIndexValue(proc_name, QueryEntityType::kProc);
     return uses_rel_.GetVarAccessByProc(proc_index);
 }
-std::set<int> ProgramKnowledgeBase::GetUses(Name<ArgPos::kSecond> var_name) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetUses(
+        Name<ArgPos::kSecond> var_name) {
     assert(compiled);
-    int var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
+    VarIndex var_index = IdentToIndexValue(var_name, QueryEntityType::kVar);
     return uses_rel_.GetAllProc(var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetUsesProc() {
+std::set<ProcIndex> ProgramKnowledgeBase::GetUsesProc() {
     assert(compiled);
     return uses_rel_.GetAllProc();
 }
-PairVec<int> ProgramKnowledgeBase::GetUsesProcVar() {
+PairVec<ProcIndex, VarIndex> ProgramKnowledgeBase::GetUsesProcVar() {
     assert(compiled);
     return uses_rel_.GetProcVar();
 }
@@ -350,35 +353,34 @@ std::set<int> ProgramKnowledgeBase::GetPatternP(
     return polish_notation_.CheckPatternP(
             *converted_pn, type_stmt_.GetStatements(StmtType::kAssign));
 }
-// (" ", _)
-std::set<int> ProgramKnowledgeBase::GetPattern(int var_index) {
+std::set<StmtNo> ProgramKnowledgeBase::GetPattern(VarIndex var_index) {
     assert(compiled);
     return GetModifies(Index<QueryEntityType::kVar>(var_index),
                        StmtType::kAssign);
 }
-std::set<int> ProgramKnowledgeBase::GetPattern(std::string_view var_name) {
+std::set<StmtNo> ProgramKnowledgeBase::GetPattern(std::string_view var_name) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
     return GetPattern(var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetPattern(
+std::set<StmtNo> ProgramKnowledgeBase::GetPattern(
         std::string_view var_name, std::vector<QueryToken> second_tokens) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
     return GetPattern(var_index, second_tokens);
 }
-std::set<int> ProgramKnowledgeBase::GetPatternP(
+std::set<StmtNo> ProgramKnowledgeBase::GetPatternP(
         std::string_view var_name, std::vector<QueryToken> second_tokens) {
     auto var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
     return GetPatternP(var_index, second_tokens);
 }
-std::set<int> ProgramKnowledgeBase::GetPattern(
-        int var_index, std::vector<QueryToken> second_tokens) {
+std::set<StmtNo> ProgramKnowledgeBase::GetPattern(
+        VarIndex var_index, std::vector<QueryToken> second_tokens) {
     assert(compiled);
 
-    std::set<int> assign_stmt;
-    std::set<int> filtered_assign_stmt;
+    std::set<StmtNo> assign_stmt;
+    std::set<StmtNo> filtered_assign_stmt;
     assign_stmt = GetPattern(second_tokens);
 
     for (auto &i : assign_stmt) {
@@ -388,12 +390,12 @@ std::set<int> ProgramKnowledgeBase::GetPattern(
     }
     return filtered_assign_stmt;
 }
-std::set<int> ProgramKnowledgeBase::GetPatternP(
-        int var_index, std::vector<QueryToken> second_tokens) {
+std::set<StmtNo> ProgramKnowledgeBase::GetPatternP(
+        VarIndex var_index, std::vector<QueryToken> second_tokens) {
     assert(compiled);
 
-    std::set<int> assign_stmt;
-    std::set<int> filtered_assign_stmt;
+    std::set<StmtNo> assign_stmt;
+    std::set<StmtNo> filtered_assign_stmt;
     assign_stmt = GetPatternP(second_tokens);
 
     for (auto &i : assign_stmt) {
@@ -403,13 +405,13 @@ std::set<int> ProgramKnowledgeBase::GetPatternP(
     }
     return filtered_assign_stmt;
 }
-PairVec<int> ProgramKnowledgeBase::GetPatternPair(
+PairVec<StmtNo, VarIndex> ProgramKnowledgeBase::GetPatternPair(
         std::vector<QueryToken> tokens) {
     assert(compiled);
 
-    std::set<int> assign_stmt_set;
-    std::vector<int> assign_var;
-    std::vector<int> assign_stmt;
+    std::set<StmtNo> assign_stmt_set;
+    std::vector<VarIndex> assign_var;
+    std::vector<StmtNo> assign_stmt;
     assign_stmt_set = GetPattern(tokens);
 
     for (auto &i : assign_stmt_set) {
@@ -421,13 +423,13 @@ PairVec<int> ProgramKnowledgeBase::GetPatternPair(
 
     return {assign_stmt, assign_var};
 }
-PairVec<int> ProgramKnowledgeBase::GetPatternPairP(
+PairVec<StmtNo, VarIndex> ProgramKnowledgeBase::GetPatternPairP(
         std::vector<QueryToken> tokens) {
     assert(compiled);
 
-    std::set<int> assign_stmt_set;
-    std::vector<int> assign_var;
-    std::vector<int> assign_stmt;
+    std::set<StmtNo> assign_stmt_set;
+    std::vector<VarIndex> assign_var;
+    std::vector<StmtNo> assign_stmt;
     assign_stmt_set = GetPatternP(tokens);
 
     for (auto &i : assign_stmt_set) {
@@ -439,35 +441,34 @@ PairVec<int> ProgramKnowledgeBase::GetPatternPairP(
 
     return {assign_stmt, assign_var};
 }
-
-// (v, _)
-PairVec<int> ProgramKnowledgeBase::GetPatternPair() {
+PairVec<StmtNo, VarIndex> ProgramKnowledgeBase::GetPatternPair() {
     assert(compiled);
     return GetModifiesStmtVar(StmtType::kAssign);
 }
-std::set<int> ProgramKnowledgeBase::GetPattern(StmtType container_type,
-                                               std::string_view var_name) {
+std::set<StmtNo> ProgramKnowledgeBase::GetPattern(StmtType container_type,
+                                                  std::string_view var_name) {
     assert(compiled);
     assert(container_type == StmtType::kWhile ||
            container_type == StmtType::kIf);
-    int var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
+    VarIndex var_index = IdentToIndex<QueryEntityType::kVar>(var_name);
     if (var_index == 0) return {};
     return GetPattern(container_type, var_index);
 }
-std::set<int> ProgramKnowledgeBase::GetPattern(StmtType container_type,
-                                               int var_index) {
+std::set<StmtNo> ProgramKnowledgeBase::GetPattern(StmtType container_type,
+                                                  VarIndex var_index) {
     assert(compiled);
     assert(container_type == StmtType::kWhile ||
            container_type == StmtType::kIf);
     return uses_rel_.GetContainers(container_type, var_index);
 }
-PairVec<int> ProgramKnowledgeBase::GetPatternPairs(StmtType container_type) {
+PairVec<StmtNo, VarIndex> ProgramKnowledgeBase::GetPatternPairs(
+        StmtType container_type) {
     assert(compiled);
     assert(container_type == StmtType::kWhile ||
            container_type == StmtType::kIf);
     return uses_rel_.GetContainerVarPairs(container_type);
 }
-std::set<int> ProgramKnowledgeBase::GetPattern(StmtType container_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetPattern(StmtType container_type) {
     assert(compiled);
     assert(container_type == StmtType::kWhile ||
            container_type == StmtType::kIf);
@@ -525,56 +526,62 @@ bool ProgramKnowledgeBase::ExistCalls() {
     assert(compiled);
     return !type_stmt_.GetStatements(StmtType::kCall).empty();
 }
-std::set<int> ProgramKnowledgeBase::GetCalls(ArgPos return_pos) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetCalls(ArgPos return_pos) {
     assert(compiled);
     return call_proc_.GetCalls(return_pos);
 }
-std::set<int> ProgramKnowledgeBase::GetCalls(Index<ArgPos::kFirst> proc) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetCalls(Index<ArgPos::kFirst> proc) {
     assert(compiled);
     return call_proc_.GetCalleeProcs(proc);
 }
-std::set<int> ProgramKnowledgeBase::GetCalls(Name<ArgPos::kFirst> proc_name) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetCalls(
+        Name<ArgPos::kFirst> proc_name) {
     auto first_proc =
             IdentToIndex<ArgPos::kFirst>(proc_name, QueryEntityType::kProc);
     if (first_proc == 0) return {};
     return GetCalls(first_proc);
 }
-std::set<int> ProgramKnowledgeBase::GetCallsT(
+std::set<ProcIndex> ProgramKnowledgeBase::GetCallsT(
         Index<ArgPos::kFirst> first_proc) {
     assert(compiled);
     return call_proc_.GetCalleeProcsT(first_proc.value);
 }
-std::set<int> ProgramKnowledgeBase::GetCallsT(Name<ArgPos::kFirst> proc_name) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetCallsT(
+        Name<ArgPos::kFirst> proc_name) {
     auto first_proc =
             IdentToIndex<ArgPos::kFirst>(proc_name, QueryEntityType::kProc);
     if (first_proc == 0) return {};
     return GetCallsT(first_proc);
 }
-std::set<int> ProgramKnowledgeBase::GetCalls(Index<ArgPos::kSecond> proc) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetCalls(
+        Index<ArgPos::kSecond> proc) {
     assert(compiled);
     return call_proc_.GetCallerProcs(proc);
 }
-std::set<int> ProgramKnowledgeBase::GetCalls(Name<ArgPos::kSecond> proc_name) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetCalls(
+        Name<ArgPos::kSecond> proc_name) {
     auto second_proc =
             IdentToIndex<ArgPos::kSecond>(proc_name, QueryEntityType::kProc);
     if (second_proc == 0) return {};
     return GetCalls(second_proc);
 }
-std::set<int> ProgramKnowledgeBase::GetCallsT(Index<ArgPos::kSecond> proc) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetCallsT(
+        Index<ArgPos::kSecond> proc) {
     assert(compiled);
     return call_proc_.GetCallerProcsT(proc);
 }
-std::set<int> ProgramKnowledgeBase::GetCallsT(Name<ArgPos::kSecond> proc_name) {
+std::set<ProcIndex> ProgramKnowledgeBase::GetCallsT(
+        Name<ArgPos::kSecond> proc_name) {
     auto second_proc =
             IdentToIndex<ArgPos::kSecond>(proc_name, QueryEntityType::kProc);
     if (second_proc == 0) return {};
     return GetCallsT(second_proc);
 }
-PairVec<int> ProgramKnowledgeBase::GetCallsPairs() {
+PairVec<ProcIndex> ProgramKnowledgeBase::GetCallsPairs() {
     assert(compiled);
     return call_proc_.GetCallsPairs();
 }
-PairVec<int> ProgramKnowledgeBase::GetCallsTPairs() {
+PairVec<ProcIndex> ProgramKnowledgeBase::GetCallsTPairs() {
     assert(compiled);
     return call_proc_.GetCallsTPairs();
 }
@@ -593,32 +600,32 @@ bool ProgramKnowledgeBase::ExistNext(Index<ArgPos::kSecond> second_stmt) {
     return cfg_->HasPrev(second_stmt);
 }
 bool ProgramKnowledgeBase::ExistNext() { return cfg_->HasNext(); }
-std::set<int> ProgramKnowledgeBase::GetNext(ArgPos return_pos,
-                                            StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetNext(ArgPos return_pos,
+                                               StmtType return_type) {
     return cfg_->GetNextSingleArg(return_pos, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kFirst> stmt,
-                                            StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetNext(Index<ArgPos::kFirst> stmt,
+                                               StmtType return_type) {
     return cfg_->GetNext(stmt, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kFirst> stmt,
-                                             StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kFirst> stmt,
+                                                StmtType return_type) {
     return cfg_->GetNextT(stmt, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetNext(Index<ArgPos::kSecond> stmt,
-                                            StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetNext(Index<ArgPos::kSecond> stmt,
+                                               StmtType return_type) {
     return cfg_->GetPrev(stmt, return_type);
 }
-std::set<int> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kSecond> stmt,
-                                             StmtType return_type) {
+std::set<StmtNo> ProgramKnowledgeBase::GetNextT(Index<ArgPos::kSecond> stmt,
+                                                StmtType return_type) {
     return cfg_->GetPrevT(stmt, return_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetNextPairs(StmtType first_type,
-                                                StmtType second_type) {
+PairVec<StmtNo> ProgramKnowledgeBase::GetNextPairs(StmtType first_type,
+                                                   StmtType second_type) {
     return cfg_->GetNextPairs(first_type, second_type);
 }
-PairVec<int> ProgramKnowledgeBase::GetNextTPairs(StmtType first_type,
-                                                 StmtType second_type) {
+PairVec<StmtNo> ProgramKnowledgeBase::GetNextTPairs(StmtType first_type,
+                                                    StmtType second_type) {
     return cfg_->GetNextTPairs(first_type, second_type);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetNextTSelf(StmtType type) {
@@ -639,22 +646,28 @@ bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kSecond> second_assign) {
     return false;
 }
 bool ProgramKnowledgeBase::ExistAffects() { return false; }
-std::set<int> ProgramKnowledgeBase::GetAffects(ArgPos return_pos) { return {}; }
-std::set<int> ProgramKnowledgeBase::GetAffects(Index<ArgPos::kFirst> assign) {
+std::set<StmtNo> ProgramKnowledgeBase::GetAffects(ArgPos return_pos) {
     return {};
 }
-std::set<int> ProgramKnowledgeBase::GetAffectsT(Index<ArgPos::kFirst> assign) {
+std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
+        Index<ArgPos::kFirst> assign) {
     return {};
 }
-std::set<int> ProgramKnowledgeBase::GetAffects(Index<ArgPos::kSecond> assign) {
+std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
+        Index<ArgPos::kFirst> assign) {
     return {};
 }
-std::set<int> ProgramKnowledgeBase::GetAffectsT(Index<ArgPos::kSecond> assign) {
+std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
+        Index<ArgPos::kSecond> assign) {
     return {};
 }
-PairVec<int> ProgramKnowledgeBase::GetAffectsPairs() { return {}; }
+std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
+        Index<ArgPos::kSecond> assign) {
+    return {};
+}
+PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() { return {}; }
 
-PairVec<int> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
+PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(

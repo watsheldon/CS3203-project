@@ -23,16 +23,16 @@ struct BasicEntities {
     std::vector<std::string> procedures;
     std::vector<std::string> variables;
     std::vector<std::string> constants;
-    std::vector<int> reads;
-    std::vector<int> prints;
-    std::vector<int> calls;
-    std::vector<int> whiles;
-    std::vector<int> ifs;
-    std::vector<int> assigns;
+    std::vector<StmtNo> reads;
+    std::vector<StmtNo> prints;
+    std::vector<StmtNo> calls;
+    std::vector<StmtNo> whiles;
+    std::vector<StmtNo> ifs;
+    std::vector<StmtNo> assigns;
     // each notation is unique
     // notations may not have the same size as assigns
     std::vector<PN> notations;
-    std::vector<std::set<int>> proc_call_graph;
+    std::vector<std::set<ProcIndex>> proc_call_graph;
 };
 
 class KnowledgeBase {
@@ -79,7 +79,7 @@ class KnowledgeBase {
      * Stores each statement list to its respective index.
      */
     virtual void SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
-                        std::vector<int> stmtlst) = 0;
+                        std::vector<StmtNo> stmtlst) = 0;
 
     /**
      * Sets direct Modifies relationships between stmt# and its variable's
@@ -93,7 +93,7 @@ class KnowledgeBase {
      * indices
      */
     virtual void SetRel(Index<SetEntityType::kStmt> stmt_no,
-                        std::vector<int> var_indices) = 0;
+                        std::vector<VarIndex> var_indices) = 0;
 
     virtual bool ExistFollows(Index<ArgPos::kFirst> first_stmt,
                               Index<ArgPos::kSecond> second_stmt) = 0;
@@ -133,109 +133,111 @@ class KnowledgeBase {
      * Gets a list of stmt# that satisfy Follows/Follows*(stmt#, _) or
      * Follows/Follows*(_, stmt#)
      */
-    virtual std::set<int> GetFollows(ArgPos return_pos,
-                                     StmtType return_type) = 0;
-    virtual std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no,
-                                     StmtType return_type) = 0;
-    virtual std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
-                                      StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetFollows(ArgPos return_pos,
+                                        StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetFollows(Index<ArgPos::kFirst> stmt_no,
+                                        StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
+                                         StmtType return_type) = 0;
 
-    virtual std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no,
-                                     StmtType return_type) = 0;
-    virtual std::set<int> GetFollowsT(Index<ArgPos::kSecond> stmt_no,
-                                      StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetFollows(Index<ArgPos::kSecond> stmt_no,
+                                        StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetFollowsT(Index<ArgPos::kSecond> stmt_no,
+                                         StmtType return_type) = 0;
 
-    virtual PairVec<int> GetFollowsPairs(StmtType first_type,
-                                         StmtType second_type) = 0;
-    virtual PairVec<int> GetFollowsTPairs(StmtType first_type,
-                                          StmtType second_type) = 0;
+    virtual PairVec<StmtNo> GetFollowsPairs(StmtType first_type,
+                                            StmtType second_type) = 0;
+    virtual PairVec<StmtNo> GetFollowsTPairs(StmtType first_type,
+                                             StmtType second_type) = 0;
 
     /**
      * Gets a list of stmt# that satisfy Parent/Parent*(stmt#, _) or
      * Parent/Parent*(_, stmt#)
      */
-    virtual std::set<int> GetParent(ArgPos return_pos,
-                                    StmtType return_type) = 0;
-    std::set<int> GetParent(ArgPos return_pos) {
+    virtual std::set<StmtNo> GetParent(ArgPos return_pos,
+                                       StmtType return_type) = 0;
+    std::set<StmtNo> GetParent(ArgPos return_pos) {
         return GetParent(return_pos, StmtType::kAll);
     }
-    virtual std::set<int> GetParent(Index<ArgPos::kFirst> parent_stmt,
-                                    StmtType return_type) = 0;
-    virtual std::set<int> GetParentT(Index<ArgPos::kFirst> parent_stmt,
-                                     StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetParent(Index<ArgPos::kFirst> parent_stmt,
+                                       StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetParentT(Index<ArgPos::kFirst> parent_stmt,
+                                        StmtType return_type) = 0;
 
-    virtual std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt,
-                                    StmtType return_type) = 0;
-    virtual std::set<int> GetParentT(Index<ArgPos::kSecond> child_stmt,
-                                     StmtType return_type) = 0;
-    std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt) {
+    virtual std::set<StmtNo> GetParent(Index<ArgPos::kSecond> child_stmt,
+                                       StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetParentT(Index<ArgPos::kSecond> child_stmt,
+                                        StmtType return_type) = 0;
+    std::set<StmtNo> GetParent(Index<ArgPos::kSecond> child_stmt) {
         return GetParent(child_stmt, StmtType::kAll);
     }
 
-    virtual PairVec<int> GetParentPairs(StmtType parent_type,
-                                        StmtType child_type) = 0;
-    virtual PairVec<int> GetParentTPairs(StmtType parent_type,
-                                         StmtType child_type) = 0;
+    virtual PairVec<StmtNo> GetParentPairs(StmtType parent_type,
+                                           StmtType child_type) = 0;
+    virtual PairVec<StmtNo> GetParentTPairs(StmtType parent_type,
+                                            StmtType child_type) = 0;
 
     /**
      * Check if modifies relationships between stmt# and its variable
      * exist
      */
-    virtual bool ExistModifies(int stmt_no, std::string_view var_name) = 0;
-    virtual bool ExistModifies(int stmt_no, int var_index) = 0;
+    virtual bool ExistModifies(StmtNo stmt_no, std::string_view var_name) = 0;
+    virtual bool ExistModifies(StmtNo stmt_no, VarIndex var_index) = 0;
 
     /**
      * Check if uses relationships between stmt# and its variable
      * exist
      */
-    virtual bool ExistUses(int stmt_no, std::string_view var_name) = 0;
-    virtual bool ExistUses(int stmt_no, int var_index) = 0;
+    virtual bool ExistUses(StmtNo stmt_no, std::string_view var_name) = 0;
+    virtual bool ExistUses(StmtNo stmt_no, VarIndex var_index) = 0;
 
     /**
      * Gets a var_index that is modified in stmt#
      */
-    virtual std::set<int> GetModifies(
+    virtual std::set<VarIndex> GetModifies(
             Index<QueryEntityType::kStmt> stmt_no) = 0;
 
     /**
      * Gets a list of stmt# that modifies var_index
      */
-    virtual std::set<int> GetModifies(std::string_view var_name,
-                                      StmtType type) = 0;
-    virtual std::set<int> GetModifies(Index<QueryEntityType::kVar> var_index,
-                                      StmtType type) = 0;
+    virtual std::set<StmtNo> GetModifies(std::string_view var_name,
+                                         StmtType type) = 0;
+    virtual std::set<StmtNo> GetModifies(Index<QueryEntityType::kVar> var_index,
+                                         StmtType type) = 0;
 
     /**
      * Gets a list of stmt# that modifies any var_index (wildcard)
      */
-    virtual std::set<int> GetModifies(StmtType type) = 0;
+    virtual std::set<StmtNo> GetModifies(StmtType type) = 0;
 
     /**
      * For Modifies (s,v)
      */
-    virtual PairVec<int> GetModifiesStmtVar(StmtType type) = 0;
+    virtual PairVec<StmtNo, VarIndex> GetModifiesStmtVar(StmtType type) = 0;
 
     /**
      * Gets a list of var_index that are used in stmt#
      */
-    virtual std::set<int> GetUses(Index<QueryEntityType::kStmt> stmt_no) = 0;
+    virtual std::set<VarIndex> GetUses(
+            Index<QueryEntityType::kStmt> stmt_no) = 0;
 
     /**
      * Gets a list of stmt# that uses var_index
      */
-    virtual std::set<int> GetUses(std::string_view var_name, StmtType type) = 0;
-    virtual std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
-                                  StmtType type) = 0;
+    virtual std::set<StmtNo> GetUses(std::string_view var_name,
+                                     StmtType type) = 0;
+    virtual std::set<StmtNo> GetUses(Index<QueryEntityType::kVar> var_index,
+                                     StmtType type) = 0;
 
     /**
      * Gets a list of stmt# that uses var_index
      */
-    virtual std::set<int> GetUses(StmtType type) = 0;
+    virtual std::set<StmtNo> GetUses(StmtType type) = 0;
 
     /**
      * For Uses (s,v)
      */
-    virtual PairVec<int> GetUsesStmtVar(StmtType type) = 0;
+    virtual PairVec<StmtNo, VarIndex> GetUsesStmtVar(StmtType type) = 0;
 
     // Modifies and Uses for Procedure
     // Modifies ("", "")
@@ -244,62 +246,66 @@ class KnowledgeBase {
     // Modifies ("", _)
     virtual bool ExistModifies(std::string_view proc_name) = 0;
     // Modifies ("", v)
-    virtual std::set<int> GetModifies(Name<ArgPos::kFirst> proc_name) = 0;
+    virtual std::set<VarIndex> GetModifies(Name<ArgPos::kFirst> proc_name) = 0;
     // Modifies (p, "")
-    virtual std::set<int> GetModifies(Name<ArgPos::kSecond> var_name) = 0;
+    virtual std::set<ProcIndex> GetModifies(Name<ArgPos::kSecond> var_name) = 0;
     //  Modifies (p, _)
-    virtual std::set<int> GetModifiesProc() = 0;
+    virtual std::set<ProcIndex> GetModifiesProc() = 0;
     //  Modifies (p, v)
-    virtual PairVec<int> GetModifiesProcVar() = 0;
+    virtual PairVec<ProcIndex, VarIndex> GetModifiesProcVar() = 0;
     // Uses ("", "")
     virtual bool ExistUses(std::string_view proc_name,
                            std::string_view var_name) = 0;
     // Uses ("", _)
     virtual bool ExistUses(std::string_view proc_name) = 0;
     // Uses ("", v)
-    virtual std::set<int> GetUses(Name<ArgPos::kFirst> proc_name) = 0;
+    virtual std::set<VarIndex> GetUses(Name<ArgPos::kFirst> proc_name) = 0;
     // Uses (p, "")
-    virtual std::set<int> GetUses(Name<ArgPos::kSecond> var_name) = 0;
+    virtual std::set<ProcIndex> GetUses(Name<ArgPos::kSecond> var_name) = 0;
     //  Uses (p, _)
-    virtual std::set<int> GetUsesProc() = 0;
+    virtual std::set<ProcIndex> GetUsesProc() = 0;
     //  Uses (p, v)
-    virtual PairVec<int> GetUsesProcVar() = 0;
+    virtual PairVec<ProcIndex, VarIndex> GetUsesProcVar() = 0;
 
     /**
      * For pattern related methods, a "P" at the end of the method name
      * indicates partial matching.
      */
-    virtual std::set<int> GetPattern(std::vector<QueryToken> tokens) = 0;
-    virtual std::set<int> GetPatternP(std::vector<QueryToken> tokens) = 0;
-
-    //(" ", _)
-    virtual std::set<int> GetPattern(std::string_view var_name) = 0;
-    virtual std::set<int> GetPattern(int var_index) = 0;
-
-    virtual std::set<int> GetPattern(std::string_view var_name,
-                                     std::vector<QueryToken> second_tokens) = 0;
-    virtual std::set<int> GetPatternP(
+    // a(_, expr)
+    virtual std::set<StmtNo> GetPattern(std::vector<QueryToken> tokens) = 0;
+    virtual std::set<StmtNo> GetPatternP(std::vector<QueryToken> tokens) = 0;
+    // a("v", _)
+    virtual std::set<StmtNo> GetPattern(std::string_view var_name) = 0;
+    virtual std::set<StmtNo> GetPattern(VarIndex var_index) = 0;
+    // a("v", expr)
+    virtual std::set<StmtNo> GetPattern(
             std::string_view var_name,
             std::vector<QueryToken> second_tokens) = 0;
-    virtual std::set<int> GetPattern(int var_index,
-                                     std::vector<QueryToken> second_tokens) = 0;
-    virtual std::set<int> GetPatternP(
-            int var_index, std::vector<QueryToken> second_tokens) = 0;
-    virtual PairVec<int> GetPatternPair(std::vector<QueryToken> tokens) = 0;
-    virtual PairVec<int> GetPatternPairP(std::vector<QueryToken> tokens) = 0;
-
-    // (v, _)
-    virtual PairVec<int> GetPatternPair() = 0;
+    virtual std::set<StmtNo> GetPatternP(
+            std::string_view var_name,
+            std::vector<QueryToken> second_tokens) = 0;
+    virtual std::set<StmtNo> GetPattern(
+            VarIndex var_index, std::vector<QueryToken> second_tokens) = 0;
+    virtual std::set<StmtNo> GetPatternP(
+            VarIndex var_index, std::vector<QueryToken> second_tokens) = 0;
+    // a(v, expr)
+    virtual PairVec<StmtNo, VarIndex> GetPatternPair(
+            std::vector<QueryToken> tokens) = 0;
+    virtual PairVec<StmtNo, VarIndex> GetPatternPairP(
+            std::vector<QueryToken> tokens) = 0;
+    // a(v, _)
+    virtual PairVec<StmtNo, VarIndex> GetPatternPair() = 0;
 
     // while("v",_) or if("v",_,_)
-    virtual std::set<int> GetPattern(StmtType container_type,
-                                     std::string_view var_name) = 0;
-    virtual std::set<int> GetPattern(StmtType container_type,
-                                     int var_index) = 0;
+    virtual std::set<StmtNo> GetPattern(StmtType container_type,
+                                        std::string_view var_name) = 0;
+    virtual std::set<StmtNo> GetPattern(StmtType container_type,
+                                        VarIndex var_index) = 0;
     // while(v,_) or if(v,_,_)
-    virtual PairVec<int> GetPatternPairs(StmtType container_type) = 0;
+    virtual PairVec<StmtNo, VarIndex> GetPatternPairs(
+            StmtType container_type) = 0;
     // while(_,_) or if(_,_,_)
-    virtual std::set<int> GetPattern(StmtType container_type) = 0;
+    virtual std::set<StmtNo> GetPattern(StmtType container_type) = 0;
 
     /**
      * Check if Calls (first_proc, second_proc) exist
@@ -338,22 +344,28 @@ class KnowledgeBase {
     /**
      * Gets a list of procedures that is called by the given procedure
      */
-    virtual std::set<int> GetCalls(Index<ArgPos::kFirst> first_proc) = 0;
-    virtual std::set<int> GetCalls(Name<ArgPos::kFirst> first_proc_name) = 0;
-    virtual std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) = 0;
-    virtual std::set<int> GetCallsT(Name<ArgPos::kFirst> first_proc_name) = 0;
+    virtual std::set<ProcIndex> GetCalls(Index<ArgPos::kFirst> first_proc) = 0;
+    virtual std::set<ProcIndex> GetCalls(
+            Name<ArgPos::kFirst> first_proc_name) = 0;
+    virtual std::set<ProcIndex> GetCallsT(Index<ArgPos::kFirst> first_proc) = 0;
+    virtual std::set<ProcIndex> GetCallsT(
+            Name<ArgPos::kFirst> first_proc_name) = 0;
     /**
      * Gets a list of procedures that call the given procedure
      */
-    virtual std::set<int> GetCalls(Index<ArgPos::kSecond> second_proc) = 0;
-    virtual std::set<int> GetCalls(Name<ArgPos::kSecond> second_proc_name) = 0;
-    virtual std::set<int> GetCallsT(Index<ArgPos::kSecond> second_proc) = 0;
-    virtual std::set<int> GetCallsT(Name<ArgPos::kSecond> second_proc_name) = 0;
+    virtual std::set<ProcIndex> GetCalls(
+            Index<ArgPos::kSecond> second_proc) = 0;
+    virtual std::set<ProcIndex> GetCalls(
+            Name<ArgPos::kSecond> second_proc_name) = 0;
+    virtual std::set<ProcIndex> GetCallsT(
+            Index<ArgPos::kSecond> second_proc) = 0;
+    virtual std::set<ProcIndex> GetCallsT(
+            Name<ArgPos::kSecond> second_proc_name) = 0;
     /**
      * Gets a list of procedure pairs that exist in Calls/Calls*
      */
-    virtual PairVec<int> GetCallsPairs() = 0;
-    virtual PairVec<int> GetCallsTPairs() = 0;
+    virtual PairVec<ProcIndex> GetCallsPairs() = 0;
+    virtual PairVec<ProcIndex> GetCallsTPairs() = 0;
 
     // Next("", "")
     virtual bool ExistNext(Index<ArgPos::kFirst> first_stmt,
@@ -368,25 +380,26 @@ class KnowledgeBase {
     // Next/Next*(_, _)
     virtual bool ExistNext() = 0;
     // Next/Next*(s, _) or (_, s)
-    virtual std::set<int> GetNext(ArgPos return_pos, StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetNext(ArgPos return_pos,
+                                     StmtType return_type) = 0;
     // Next("", s)
-    virtual std::set<int> GetNext(Index<ArgPos::kFirst> stmt,
-                                  StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetNext(Index<ArgPos::kFirst> stmt,
+                                     StmtType return_type) = 0;
     // Next*("", s)
-    virtual std::set<int> GetNextT(Index<ArgPos::kFirst> stmt,
-                                   StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetNextT(Index<ArgPos::kFirst> stmt,
+                                      StmtType return_type) = 0;
     // Next(s,"")
-    virtual std::set<int> GetNext(Index<ArgPos::kSecond> stmt,
-                                  StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetNext(Index<ArgPos::kSecond> stmt,
+                                     StmtType return_type) = 0;
     // Next*(s,"")
-    virtual std::set<int> GetNextT(Index<ArgPos::kSecond> stmt,
-                                   StmtType return_type) = 0;
+    virtual std::set<StmtNo> GetNextT(Index<ArgPos::kSecond> stmt,
+                                      StmtType return_type) = 0;
     // Next(s1,s2)
-    virtual PairVec<int> GetNextPairs(StmtType first_type,
-                                      StmtType second_type) = 0;
+    virtual PairVec<StmtNo> GetNextPairs(StmtType first_type,
+                                         StmtType second_type) = 0;
     // Next*(s1,s2)
-    virtual PairVec<int> GetNextTPairs(StmtType first_type,
-                                       StmtType second_type) = 0;
+    virtual PairVec<StmtNo> GetNextTPairs(StmtType first_type,
+                                          StmtType second_type) = 0;
     virtual std::set<StmtNo> GetNextTSelf(StmtType type) = 0;
 
     // Affects("", "")
@@ -402,19 +415,19 @@ class KnowledgeBase {
     // Affects(_, _)
     virtual bool ExistAffects() = 0;
     // Affects/Affects*(a, _) or (_, a)
-    virtual std::set<int> GetAffects(ArgPos return_pos) = 0;
+    virtual std::set<StmtNo> GetAffects(ArgPos return_pos) = 0;
     // Affects("", a)
-    virtual std::set<int> GetAffects(Index<ArgPos::kFirst> assign) = 0;
+    virtual std::set<StmtNo> GetAffects(Index<ArgPos::kFirst> assign) = 0;
     // Affects*("", a)
-    virtual std::set<int> GetAffectsT(Index<ArgPos::kFirst> assign) = 0;
+    virtual std::set<StmtNo> GetAffectsT(Index<ArgPos::kFirst> assign) = 0;
     // Affects(a,"")
-    virtual std::set<int> GetAffects(Index<ArgPos::kSecond> assign) = 0;
+    virtual std::set<StmtNo> GetAffects(Index<ArgPos::kSecond> assign) = 0;
     // Affects*(a,"")
-    virtual std::set<int> GetAffectsT(Index<ArgPos::kSecond> assign) = 0;
+    virtual std::set<StmtNo> GetAffectsT(Index<ArgPos::kSecond> assign) = 0;
     // Affects(a,a)
-    virtual PairVec<int> GetAffectsPairs() = 0;
+    virtual PairVec<StmtNo> GetAffectsPairs() = 0;
     // Affects*(a,a)
-    virtual PairVec<int> GetAffectsTPairs() = 0;
+    virtual PairVec<StmtNo> GetAffectsTPairs() = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type

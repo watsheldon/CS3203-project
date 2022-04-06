@@ -49,13 +49,13 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void SetIndex(Index<SetEntityType::kStmt> assign_stmt,
                   Index<SetEntityType::kNotation> notation_index) override;
     void SetLst(Index<SetEntityType::kStmtLst> stmtlst_index,
-                std::vector<int> stmtlst) override;
+                std::vector<StmtNo> stmtlst) override;
 
     // set direct Uses and Modifies relationships
     void SetRel(Index<SetEntityType::kStmt> stmt_no,
                 Index<SetEntityType::kVar> var_index) override;
     void SetRel(Index<SetEntityType::kStmt> stmt_no,
-                std::vector<int> var_index) override;
+                std::vector<VarIndex> var_index) override;
 
     bool ExistFollows(Index<ArgPos::kFirst> first_stmt,
                       Index<ArgPos::kSecond> second_stmt) override;
@@ -73,98 +73,100 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistParent(Index<ArgPos::kSecond> child_stmt) override;
     bool ExistParent() override;
 
-    std::set<int> GetFollows(ArgPos return_pos, StmtType return_type) override;
+    std::set<StmtNo> GetFollows(ArgPos return_pos,
+                                StmtType return_type) override;
 
-    std::set<int> GetFollows(Index<ArgPos::kFirst> stmt_no,
-                             StmtType return_type) override;
-    std::set<int> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
-                              StmtType return_type) override;
+    std::set<StmtNo> GetFollows(Index<ArgPos::kFirst> stmt_no,
+                                StmtType return_type) override;
+    std::set<StmtNo> GetFollowsT(Index<ArgPos::kFirst> stmt_no,
+                                 StmtType return_type) override;
 
-    std::set<int> GetFollows(Index<ArgPos::kSecond> stmt_no,
-                             StmtType return_type) override;
-    std::set<int> GetFollowsT(Index<ArgPos::kSecond> stmt_no,
-                              StmtType return_type) override;
-    PairVec<int> GetFollowsPairs(StmtType first_type,
-                                 StmtType second_type) override;
-    PairVec<int> GetFollowsTPairs(StmtType first_type,
-                                  StmtType second_type) override;
+    std::set<StmtNo> GetFollows(Index<ArgPos::kSecond> stmt_no,
+                                StmtType return_type) override;
+    std::set<StmtNo> GetFollowsT(Index<ArgPos::kSecond> stmt_no,
+                                 StmtType return_type) override;
+    PairVec<StmtNo> GetFollowsPairs(StmtType first_type,
+                                    StmtType second_type) override;
+    PairVec<StmtNo> GetFollowsTPairs(StmtType first_type,
+                                     StmtType second_type) override;
 
-    std::set<int> GetParent(ArgPos return_pos, StmtType return_type) override;
-    std::set<int> GetParent(Index<ArgPos::kFirst> parent_stmt,
-                            StmtType return_type) override;
-    std::set<int> GetParentT(Index<ArgPos::kFirst> parent_stmt,
-                             StmtType return_type) override;
+    std::set<StmtNo> GetParent(ArgPos return_pos,
+                               StmtType return_type) override;
+    std::set<StmtNo> GetParent(Index<ArgPos::kFirst> parent_stmt,
+                               StmtType return_type) override;
+    std::set<StmtNo> GetParentT(Index<ArgPos::kFirst> parent_stmt,
+                                StmtType return_type) override;
 
-    std::set<int> GetParent(Index<ArgPos::kSecond> child_stmt,
-                            StmtType return_type) override;
-    std::set<int> GetParentT(Index<ArgPos::kSecond> child_stmt,
-                             StmtType return_type) override;
-    PairVec<int> GetParentPairs(StmtType parent_type,
-                                StmtType child_type) override;
-    PairVec<int> GetParentTPairs(StmtType parent_type,
-                                 StmtType child_type) override;
+    std::set<StmtNo> GetParent(Index<ArgPos::kSecond> child_stmt,
+                               StmtType return_type) override;
+    std::set<StmtNo> GetParentT(Index<ArgPos::kSecond> child_stmt,
+                                StmtType return_type) override;
+    PairVec<StmtNo> GetParentPairs(StmtType parent_type,
+                                   StmtType child_type) override;
+    PairVec<StmtNo> GetParentTPairs(StmtType parent_type,
+                                    StmtType child_type) override;
 
-    bool ExistModifies(int stmt_no, std::string_view var_name) override;
-    bool ExistModifies(int stmt_no, int var_index) override;
-    bool ExistUses(int stmt_no, std::string_view var_name) override;
-    bool ExistUses(int stmt_no, int var_index) override;
+    bool ExistModifies(StmtNo stmt_no, std::string_view var_name) override;
+    bool ExistModifies(StmtNo stmt_no, VarIndex var_index) override;
+    bool ExistUses(StmtNo stmt_no, std::string_view var_name) override;
+    bool ExistUses(StmtNo stmt_no, VarIndex var_index) override;
 
-    std::set<int> GetModifies(Index<QueryEntityType::kStmt> stmt_no) override;
-    std::set<int> GetModifies(std::string_view var_name,
-                              StmtType type) override;
-    std::set<int> GetModifies(Index<QueryEntityType::kVar> var_index,
-                              StmtType type) override;
-    std::set<int> GetModifies(StmtType type) override;
-    PairVec<int> GetModifiesStmtVar(StmtType type) override;
-    std::set<int> GetUses(Index<QueryEntityType::kStmt> stmt_no) override;
-    std::set<int> GetUses(std::string_view var_name, StmtType type) override;
-    std::set<int> GetUses(Index<QueryEntityType::kVar> var_index,
-                          StmtType type) override;
-    std::set<int> GetUses(StmtType type) override;
-    PairVec<int> GetUsesStmtVar(StmtType type) override;
+    std::set<VarIndex> GetModifies(
+            Index<QueryEntityType::kStmt> stmt_no) override;
+    std::set<StmtNo> GetModifies(std::string_view var_name,
+                                 StmtType type) override;
+    std::set<StmtNo> GetModifies(Index<QueryEntityType::kVar> var_index,
+                                 StmtType type) override;
+    std::set<StmtNo> GetModifies(StmtType type) override;
+    PairVec<StmtNo, VarIndex> GetModifiesStmtVar(StmtType type) override;
+    std::set<VarIndex> GetUses(Index<QueryEntityType::kStmt> stmt_no) override;
+    std::set<StmtNo> GetUses(std::string_view var_name, StmtType type) override;
+    std::set<StmtNo> GetUses(Index<QueryEntityType::kVar> var_index,
+                             StmtType type) override;
+    std::set<StmtNo> GetUses(StmtType type) override;
+    PairVec<StmtNo, VarIndex> GetUsesStmtVar(StmtType type) override;
 
     // Modifies and Uses for Procedure
     bool ExistModifies(std::string_view proc_name,
                        std::string_view var_name) override;
     bool ExistModifies(std::string_view proc_name) override;
-    std::set<int> GetModifies(Name<ArgPos::kFirst> proc_name) override;
-    std::set<int> GetModifies(Name<ArgPos::kSecond> var_name) override;
-    std::set<int> GetModifiesProc() override;
-    PairVec<int> GetModifiesProcVar() override;
+    std::set<VarIndex> GetModifies(Name<ArgPos::kFirst> proc_name) override;
+    std::set<ProcIndex> GetModifies(Name<ArgPos::kSecond> var_name) override;
+    std::set<ProcIndex> GetModifiesProc() override;
+    PairVec<ProcIndex, VarIndex> GetModifiesProcVar() override;
     bool ExistUses(std::string_view proc_name,
                    std::string_view var_name) override;
     bool ExistUses(std::string_view proc_name) override;
-    std::set<int> GetUses(Name<ArgPos::kFirst> proc_name) override;
-    std::set<int> GetUses(Name<ArgPos::kSecond> var_name) override;
-    std::set<int> GetUsesProc() override;
-    PairVec<int> GetUsesProcVar() override;
+    std::set<VarIndex> GetUses(Name<ArgPos::kFirst> proc_name) override;
+    std::set<ProcIndex> GetUses(Name<ArgPos::kSecond> var_name) override;
+    std::set<ProcIndex> GetUsesProc() override;
+    PairVec<ProcIndex, VarIndex> GetUsesProcVar() override;
 
-    std::set<int> GetPattern(std::vector<QueryToken> tokens) override;
-    std::set<int> GetPatternP(std::vector<QueryToken> tokens) override;
+    std::set<StmtNo> GetPattern(std::vector<QueryToken> tokens) override;
+    std::set<StmtNo> GetPatternP(std::vector<QueryToken> tokens) override;
+    std::set<StmtNo> GetPattern(std::string_view var_name) override;
+    std::set<StmtNo> GetPattern(VarIndex var_index) override;
+    std::set<StmtNo> GetPattern(std::string_view var_name,
+                                std::vector<QueryToken> second_tokens) override;
+    std::set<StmtNo> GetPatternP(
+            std::string_view var_name,
+            std::vector<QueryToken> second_tokens) override;
+    std::set<StmtNo> GetPattern(VarIndex var_index,
+                                std::vector<QueryToken> second_tokens) override;
+    std::set<StmtNo> GetPatternP(
+            VarIndex var_index, std::vector<QueryToken> second_tokens) override;
+    PairVec<StmtNo, VarIndex> GetPatternPair(
+            std::vector<QueryToken> tokens) override;
+    PairVec<StmtNo, VarIndex> GetPatternPairP(
+            std::vector<QueryToken> tokens) override;
+    PairVec<StmtNo, VarIndex> GetPatternPair() override;
 
-    //(" ", _)
-    std::set<int> GetPattern(std::string_view var_name) override;
-    std::set<int> GetPattern(int var_index) override;
-
-    std::set<int> GetPattern(std::string_view var_name,
-                             std::vector<QueryToken> second_tokens) override;
-    std::set<int> GetPatternP(std::string_view var_name,
-                              std::vector<QueryToken> second_tokens) override;
-    std::set<int> GetPattern(int var_index,
-                             std::vector<QueryToken> second_tokens) override;
-    std::set<int> GetPatternP(int var_index,
-                              std::vector<QueryToken> second_tokens) override;
-    PairVec<int> GetPatternPair(std::vector<QueryToken> tokens) override;
-    PairVec<int> GetPatternPairP(std::vector<QueryToken> tokens) override;
-
-    // (v, _)
-    PairVec<int> GetPatternPair() override;
-
-    std::set<int> GetPattern(StmtType container_type,
-                             std::string_view var_name) override;
-    std::set<int> GetPattern(StmtType container_type, int var_index) override;
-    PairVec<int> GetPatternPairs(StmtType container_type) override;
-    std::set<int> GetPattern(StmtType container_type) override;
+    std::set<StmtNo> GetPattern(StmtType container_type,
+                                std::string_view var_name) override;
+    std::set<StmtNo> GetPattern(StmtType container_type,
+                                VarIndex var_index) override;
+    PairVec<StmtNo, VarIndex> GetPatternPairs(StmtType container_type) override;
+    std::set<StmtNo> GetPattern(StmtType container_type) override;
 
     bool ExistCalls(Index<ArgPos::kFirst> first_proc,
                     Index<ArgPos::kSecond> second_proc) override;
@@ -179,17 +181,17 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistCalls(Index<ArgPos::kSecond> proc) override;
     bool ExistCalls(Name<ArgPos::kSecond> proc_name) override;
     bool ExistCalls() override;
-    std::set<int> GetCalls(ArgPos return_pos) override;
-    std::set<int> GetCalls(Index<ArgPos::kFirst> proc) override;
-    std::set<int> GetCalls(Name<ArgPos::kFirst> proc_name) override;
-    std::set<int> GetCallsT(Index<ArgPos::kFirst> first_proc) override;
-    std::set<int> GetCallsT(Name<ArgPos::kFirst> proc_name) override;
-    std::set<int> GetCalls(Index<ArgPos::kSecond> proc) override;
-    std::set<int> GetCalls(Name<ArgPos::kSecond> proc_name) override;
-    std::set<int> GetCallsT(Index<ArgPos::kSecond> proc) override;
-    std::set<int> GetCallsT(Name<ArgPos::kSecond> proc_name) override;
-    PairVec<int> GetCallsPairs() override;
-    PairVec<int> GetCallsTPairs() override;
+    std::set<ProcIndex> GetCalls(ArgPos return_pos) override;
+    std::set<ProcIndex> GetCalls(Index<ArgPos::kFirst> proc) override;
+    std::set<ProcIndex> GetCalls(Name<ArgPos::kFirst> proc_name) override;
+    std::set<ProcIndex> GetCallsT(Index<ArgPos::kFirst> first_proc) override;
+    std::set<ProcIndex> GetCallsT(Name<ArgPos::kFirst> proc_name) override;
+    std::set<ProcIndex> GetCalls(Index<ArgPos::kSecond> proc) override;
+    std::set<ProcIndex> GetCalls(Name<ArgPos::kSecond> proc_name) override;
+    std::set<ProcIndex> GetCallsT(Index<ArgPos::kSecond> proc) override;
+    std::set<ProcIndex> GetCallsT(Name<ArgPos::kSecond> proc_name) override;
+    PairVec<ProcIndex> GetCallsPairs() override;
+    PairVec<ProcIndex> GetCallsTPairs() override;
 
     bool ExistNext(Index<ArgPos::kFirst> first_stmt,
                    Index<ArgPos::kSecond> second_stmt) override;
@@ -198,19 +200,19 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistNext(Index<ArgPos::kFirst> first_stmt) override;
     bool ExistNext(Index<ArgPos::kSecond> second_stmt) override;
     bool ExistNext() override;
-    std::set<int> GetNext(ArgPos return_pos, StmtType return_type) override;
-    std::set<int> GetNext(Index<ArgPos::kFirst> stmt,
-                          StmtType return_type) override;
-    std::set<int> GetNextT(Index<ArgPos::kFirst> stmt,
-                           StmtType return_type) override;
-    std::set<int> GetNext(Index<ArgPos::kSecond> stmt,
-                          StmtType return_type) override;
-    std::set<int> GetNextT(Index<ArgPos::kSecond> stmt,
-                           StmtType return_type) override;
-    PairVec<int> GetNextPairs(StmtType first_type,
-                              StmtType second_type) override;
-    PairVec<int> GetNextTPairs(StmtType first_type,
-                               StmtType second_type) override;
+    std::set<StmtNo> GetNext(ArgPos return_pos, StmtType return_type) override;
+    std::set<StmtNo> GetNext(Index<ArgPos::kFirst> stmt,
+                             StmtType return_type) override;
+    std::set<StmtNo> GetNextT(Index<ArgPos::kFirst> stmt,
+                              StmtType return_type) override;
+    std::set<StmtNo> GetNext(Index<ArgPos::kSecond> stmt,
+                             StmtType return_type) override;
+    std::set<StmtNo> GetNextT(Index<ArgPos::kSecond> stmt,
+                              StmtType return_type) override;
+    PairVec<StmtNo> GetNextPairs(StmtType first_type,
+                                 StmtType second_type) override;
+    PairVec<StmtNo> GetNextTPairs(StmtType first_type,
+                                  StmtType second_type) override;
     std::set<StmtNo> GetNextTSelf(StmtType type) override;
 
     bool ExistAffects(Index<ArgPos::kFirst> first_assign,
@@ -220,13 +222,13 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     bool ExistAffects(Index<ArgPos::kFirst> first_assign) override;
     bool ExistAffects(Index<ArgPos::kSecond> second_assign) override;
     bool ExistAffects() override;
-    std::set<int> GetAffects(ArgPos return_pos) override;
-    std::set<int> GetAffects(Index<ArgPos::kFirst> assign) override;
-    std::set<int> GetAffectsT(Index<ArgPos::kFirst> assign) override;
-    std::set<int> GetAffects(Index<ArgPos::kSecond> assign) override;
-    std::set<int> GetAffectsT(Index<ArgPos::kSecond> assign) override;
-    PairVec<int> GetAffectsPairs() override;
-    PairVec<int> GetAffectsTPairs() override;
+    std::set<StmtNo> GetAffects(ArgPos return_pos) override;
+    std::set<StmtNo> GetAffects(Index<ArgPos::kFirst> assign) override;
+    std::set<StmtNo> GetAffectsT(Index<ArgPos::kFirst> assign) override;
+    std::set<StmtNo> GetAffects(Index<ArgPos::kSecond> assign) override;
+    std::set<StmtNo> GetAffectsT(Index<ArgPos::kSecond> assign) override;
+    PairVec<StmtNo> GetAffectsPairs() override;
+    PairVec<StmtNo> GetAffectsTPairs() override;
 
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
