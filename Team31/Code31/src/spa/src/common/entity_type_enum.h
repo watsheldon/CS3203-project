@@ -9,4 +9,6 @@ enum class StmtType { kAll = 0, kRead, kPrint, kCall, kWhile, kIf, kAssign };
 
 enum class ArgPos { kFirst, kSecond };
 
+enum class Attribute { kProcName, kVarName, kValue, kStmtNum, kNone };
+
 #endif  // SRC_SPA_SRC_COMMON_ENTITY_TYPE_ENUM_H_

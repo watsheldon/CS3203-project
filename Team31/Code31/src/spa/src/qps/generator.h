@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 
+#include "common/entity_type_enum.h"
 #include "conditions/factory.h"
 #include "query_object.h"
 #include "query_token.h"
@@ -95,8 +96,7 @@ class Generator {
 
     static constexpr Synonym::Type TokenToSynType(QueryTokenType type) noexcept;
     static constexpr Mode TokenToClauseMode(QueryTokenType type) noexcept;
-    static constexpr SynonymWithAttr::Attribute TokenToAttrType(
-            QueryTokenType type) noexcept;
+    static constexpr Attribute TokenToAttrType(QueryTokenType type) noexcept;
     static constexpr bool InvalidPatternSyn(Synonym::Type syn_type) noexcept;
     static constexpr bool UnsuitableFirstSynType(Mode mode,
                                                  Synonym::Type type) noexcept;

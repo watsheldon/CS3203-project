@@ -1,17 +1,11 @@
 #ifndef SRC_SPA_SRC_QPS_SYNONYM_WITH_ATTR_H_
 #define SRC_SPA_SRC_QPS_SYNONYM_WITH_ATTR_H_
 
+#include "common/entity_type_enum.h"
 #include "synonym.h"
 
 namespace spa {
 struct SynonymWithAttr {
-    enum class Attribute {
-        kProcName,
-        kVarName,
-        kValue,
-        kStmtNum,
-        kNone,
-    };
     explicit SynonymWithAttr(const Synonym* synonym,
                              Attribute attribute = Attribute::kNone)
             : synonym(synonym), attribute(attribute){};

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "common/algorithm.h"
+#include "common/entity_type_enum.h"
 #include "conditions/condition_clause.h"
 
 namespace spa {
@@ -30,13 +31,11 @@ constexpr Generator::Mode Generator::TokenToClauseMode(
                 static_cast<int>(QueryTokenType::kKeywordWith) +
                 static_cast<int>(Mode::kWith)};
 }
-constexpr SynonymWithAttr::Attribute Generator::TokenToAttrType(
-        QueryTokenType type) noexcept {
+constexpr Attribute Generator::TokenToAttrType(QueryTokenType type) noexcept {
     assert(type >= QueryTokenType::kAttrProc &&
            type <= QueryTokenType::kAttrStmtNum);
-    return SynonymWithAttr::Attribute{
-            static_cast<int>(type) -
-            static_cast<int>(QueryTokenType::kAttrProc)};
+    return Attribute{static_cast<int>(type) -
+                     static_cast<int>(QueryTokenType::kAttrProc)};
 }
 constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
                                                  Synonym::Type type) noexcept {
@@ -198,7 +197,7 @@ void Generator::Select(std::string_view name) noexcept {
 }
 void Generator::Attr(QueryTokenType token_type) noexcept {
     assert(!selected_.empty() &&
-           selected_.back().attribute == SynonymWithAttr::Attribute::kNone);
+           selected_.back().attribute == Attribute::kNone);
     auto syn = selected_.back().synonym;
     selected_.pop_back();
     selected_.emplace_back(syn, TokenToAttrType(token_type));
