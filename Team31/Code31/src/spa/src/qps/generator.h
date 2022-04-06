@@ -56,6 +56,7 @@ class Generator {
             Synonym::Type::kStmtIf, Synonym::Type::kStmtWhile,
             Synonym::Type::kStmtAssign};
     bool semantic_error_;
+    bool can_terminate_;
     SynonymMap synonym_map_;
     VecUniquePtr<Synonym> synonyms_;
     std::vector<SynonymWithAttr> selected_;

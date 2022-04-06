@@ -11,7 +11,8 @@ QueryObject Generator::Generate(const VecTokens &tokens) noexcept {
     Reset();
     for (const auto &token : tokens) {
         ParseToken(token);
-        if (semantic_error_) return QueryObject(std::move(selected_));
+        if (semantic_error_ && can_terminate_)
+            return QueryObject(std::move(selected_));
     }
     assert(mode_.empty());
     return {std::move(selected_), std::move(synonyms_), std::move(conditions_)};
@@ -87,6 +88,7 @@ constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
 void Generator::SemanticError() noexcept { semantic_error_ = true; }
 void Generator::Reset() noexcept {
     semantic_error_ = false;
+    can_terminate_ = false;
     synonym_map_.clear();
     synonyms_.clear();
     selected_.clear();
@@ -181,10 +183,13 @@ void Generator::AddDecl(std::string_view name) noexcept {
     if (!inserted) return SemanticError();
 }
 void Generator::Select(std::string_view name) noexcept {
+    can_terminate_ = true;
     auto itr = synonym_map_.find(name);
     Synonym *selected = nullptr;
     if (itr == synonym_map_.end()) {
-        if (!selected_.empty() || name != kBoolean) return SemanticError();
+        if (!selected_.empty() || name != kBoolean ||
+            *--mode_.end() == Mode::kMultiSelect)
+            return SemanticError();
     } else {
         selected = itr->second;
     }
