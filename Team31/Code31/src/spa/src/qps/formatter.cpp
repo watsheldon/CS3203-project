@@ -23,12 +23,20 @@ void Formatter::OutputResults(
     if (!results_valid_) return;
     auto sel = selected.front().synonym;
     auto domain = synonym_domains_.find(sel);
+    Synonym::Type syn_type = sel->type;
     auto indices = domain == synonym_domains_.end()
-                           ? GetAllIndices(sel->type)
+                           ? GetAllIndices(syn_type)
                            : std::vector<int>(domain->second.begin(),
                                               domain->second.end());
-    QueryEntityType element_type = ToNamedElementType(sel->type);
-    pkb_->ToName(element_type, indices, results);
+    QueryEntityType element_type = ToNamedElementType(syn_type);
+    if (selected.front().attribute == Attribute::kNone ||
+        element_type != QueryEntityType::kStmt ||
+        syn_type == Synonym::kStmtAny ||
+        selected.front().attribute == Attribute::kStmtNum) {
+        pkb_->ToName(element_type, indices, results);
+    } else {
+        pkb_->ToAttr(static_cast<StmtType>(syn_type), indices, results);
+    }
 }
 std::vector<int> Formatter::GetAllIndices(Synonym::Type type) const noexcept {
     QueryEntityType element_type = ToNamedElementType(type);

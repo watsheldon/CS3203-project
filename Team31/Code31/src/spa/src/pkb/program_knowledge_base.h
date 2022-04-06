@@ -236,7 +236,10 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     void ToName(QueryEntityType et, const std::vector<int> &index_list,
                 std::list<std::string> &names) override;
+    void ToAttr(StmtType et, const std::vector<StmtNo> &index_list,
+                std::list<std::string> &names) override;
     int IdentToIndexValue(std::string_view name, QueryEntityType et) override;
+
     // mark the end of source processor
     void Compile() override;
 
@@ -274,6 +277,12 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     Index<pos> IdentToIndex(Name<pos> identifier, QueryEntityType et) noexcept {
         return IdentToIndex<pos>(identifier.value, et);
     }
+    void ExtractReadModifies(const std::vector<StmtNo> &read_stmts,
+                             std::list<std::string> &output) const noexcept;
+    void ExtractPrintUses(const std::vector<StmtNo> &print_stmts,
+                          std::list<std::string> &output) const noexcept;
+    void ExtractCallProcNames(const std::vector<StmtNo> &call_stmts,
+                              std::list<std::string> &output) const noexcept;
 };
 
 }  // namespace spa

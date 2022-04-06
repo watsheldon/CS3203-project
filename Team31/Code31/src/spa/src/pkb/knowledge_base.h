@@ -443,6 +443,8 @@ class KnowledgeBase {
      */
     virtual void ToName(QueryEntityType et, const std::vector<int> &index_list,
                         std::list<std::string> &names) = 0;
+    virtual void ToAttr(StmtType et, const std::vector<int> &index_list,
+                        std::list<std::string> &names) = 0;
     virtual int IdentToIndexValue(std::string_view name,
                                   QueryEntityType et) = 0;
 

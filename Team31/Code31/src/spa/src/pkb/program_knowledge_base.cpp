@@ -725,35 +725,35 @@ void ProgramKnowledgeBase::ToName(QueryEntityType et,
                                   const std::vector<int> &index_list,
                                   std::list<std::string> &names) {
     assert(compiled);
-    switch (syn_type) {
-        case Synonym::kProc:
+    switch (et) {
+        case QueryEntityType::kProc:
+        case QueryEntityType::kVar:
+        case QueryEntityType::kConst:
             std::transform(index_list.begin(), index_list.end(),
-                           std::back_inserter(names), [this](int i) {
-                               return name_value_.GetNameValue(
-                                       i, QueryEntityType::kProc);
+                           std::back_inserter(names), [this, et](int i) {
+                               return name_value_.GetNameValue(i, et);
                            });
-            break;
-        case Synonym::kVar:
-            std::transform(index_list.begin(), index_list.end(),
-                           std::back_inserter(names), [this](int i) {
-                               return name_value_.GetNameValue(
-                                       i, QueryEntityType::kVar);
-                           });
-            break;
-        case Synonym::kConst:
-            std::transform(index_list.begin(), index_list.end(),
-                           std::back_inserter(names), [this](int i) {
-                               return name_value_.GetNameValue(
-                                       i, QueryEntityType::kConst);
-                           });
-            break;
-        case Synonym::kNone:
-            break;
-        default:
+            return;
+        case QueryEntityType::kStmt:
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names),
                            [](int i) { return std::to_string(i); });
             return;
+    }
+    assert(false);
+}
+void ProgramKnowledgeBase::ToAttr(StmtType et,
+                                  const std::vector<StmtNo> &index_list,
+                                  std::list<std::string> &names) {
+    switch (et) {
+        case StmtType::kRead:
+            return ExtractReadModifies(index_list, names);
+        case StmtType::kPrint:
+            return ExtractPrintUses(index_list, names);
+        case StmtType::kCall:
+            return ExtractCallProcNames(index_list, names);
+        default:
+            assert(false);
     }
     assert(false);
 }
@@ -762,5 +762,32 @@ int ProgramKnowledgeBase::IdentToIndexValue(std::string_view name,
     assert(compiled);
     assert(et != QueryEntityType::kStmt);
     return name_value_.GetIndex(name.data(), et);
+}
+void ProgramKnowledgeBase::ExtractReadModifies(
+        const std::vector<int> &read_stmts,
+        std::list<std::string> &output) const noexcept {
+    for (StmtNo read : read_stmts) {
+        auto modify = *modifies_rel_.GetModifies(read).begin();
+        auto var_name = name_value_.GetNameValue(modify, QueryEntityType::kVar);
+        output.emplace_back(var_name);
+    }
+}
+void ProgramKnowledgeBase::ExtractPrintUses(
+        const std::vector<int> &print_stmts,
+        std::list<std::string> &output) const noexcept {
+    for (StmtNo print : print_stmts) {
+        auto use = *uses_rel_.GetUses(print).begin();
+        auto var_name = name_value_.GetNameValue(use, QueryEntityType::kVar);
+        output.emplace_back(var_name);
+    }
+}
+void ProgramKnowledgeBase::ExtractCallProcNames(
+        const std::vector<StmtNo> &call_stmts,
+        std::list<std::string> &output) const noexcept {
+    for (StmtNo call : call_stmts) {
+        auto proc = call_proc_.GetProc(call);
+        auto proc_name = name_value_.GetNameValue(proc, QueryEntityType::kProc);
+        output.emplace_back(proc_name);
+    }
 }
 }  // namespace spa
