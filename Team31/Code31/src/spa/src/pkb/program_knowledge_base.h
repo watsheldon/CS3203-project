@@ -233,9 +233,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
-    std::vector<int> GetAllEntityIndices(Synonym::Type synType) override;
 
-    void ToName(Synonym::Type syn_type, const std::vector<int> &index_list,
+    void ToName(QueryEntityType et, const std::vector<int> &index_list,
                 std::list<std::string> &names) override;
     int IdentToIndexValue(std::string_view name, QueryEntityType et) override;
     // mark the end of source processor

@@ -721,36 +721,7 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(StmtType st) {
     }
     return type_stmt_.GetStatements(st);
 }
-std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(
-        Synonym::Type synType) {
-    assert(compiled);
-    switch (synType) {
-        case Synonym::kProc:
-            return GetAllEntityIndices(QueryEntityType::kProc);
-        case Synonym::kVar:
-            return GetAllEntityIndices(QueryEntityType::kVar);
-        case Synonym::kConst:
-            return GetAllEntityIndices(QueryEntityType::kConst);
-        case Synonym::kStmtAny:
-            return GetAllEntityIndices(StmtType::kAll);
-        case Synonym::kStmtAssign:
-            return GetAllEntityIndices(StmtType::kAssign);
-        case Synonym::kStmtCall:
-            return GetAllEntityIndices(StmtType::kCall);
-        case Synonym::kStmtIf:
-            return GetAllEntityIndices(StmtType::kIf);
-        case Synonym::kStmtPrint:
-            return GetAllEntityIndices(StmtType::kPrint);
-        case Synonym::kStmtRead:
-            return GetAllEntityIndices(StmtType::kRead);
-        case Synonym::kStmtWhile:
-            return GetAllEntityIndices(StmtType::kWhile);
-        default:
-            assert(false);
-            return {};
-    }
-}
-void ProgramKnowledgeBase::ToName(Synonym::Type syn_type,
+void ProgramKnowledgeBase::ToName(QueryEntityType et,
                                   const std::vector<int> &index_list,
                                   std::list<std::string> &names) {
     assert(compiled);
@@ -782,7 +753,9 @@ void ProgramKnowledgeBase::ToName(Synonym::Type syn_type,
             std::transform(index_list.begin(), index_list.end(),
                            std::back_inserter(names),
                            [](int i) { return std::to_string(i); });
+            return;
     }
+    assert(false);
 }
 int ProgramKnowledgeBase::IdentToIndexValue(std::string_view name,
                                             QueryEntityType et) {

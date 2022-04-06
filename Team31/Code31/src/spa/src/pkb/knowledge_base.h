@@ -434,7 +434,6 @@ class KnowledgeBase {
      */
     virtual std::vector<int> GetAllEntityIndices(QueryEntityType et) = 0;
     virtual std::vector<int> GetAllEntityIndices(StmtType st) = 0;
-    virtual std::vector<int> GetAllEntityIndices(Synonym::Type synType) = 0;
 
     /**
      * Converts the entities to string according to their respective indices.
@@ -442,8 +441,7 @@ class KnowledgeBase {
      * internal data structure. The statement types are using stmt# directly as
      * their indices.
      */
-    virtual void ToName(Synonym::Type syn_type,
-                        const std::vector<int> &index_list,
+    virtual void ToName(QueryEntityType et, const std::vector<int> &index_list,
                         std::list<std::string> &names) = 0;
     virtual int IdentToIndexValue(std::string_view name,
                                   QueryEntityType et) = 0;

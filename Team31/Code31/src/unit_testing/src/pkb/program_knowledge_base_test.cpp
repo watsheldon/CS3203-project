@@ -338,10 +338,10 @@ TEST_CASE("pkb/ProgramKnowledgeBase") {
     SECTION("ToName") {
         std::vector<int> list1 = {1, 2};
         std::list<std::string> names;
-        pkb.ToName(Synonym::kVar, list1, names);
+        pkb.ToName(QueryEntityType::kVar, list1, names);
         REQUIRE(names == std::list<std::string>{"v1", "v2"});
         std::list<std::string> stmts;
-        pkb.ToName(Synonym::kStmtAny, list1, stmts);
+        pkb.ToName(QueryEntityType::kStmt, list1, stmts);
         REQUIRE(stmts == std::list<std::string>{"1", "2"});
     }
     SECTION("GetEntity") {
