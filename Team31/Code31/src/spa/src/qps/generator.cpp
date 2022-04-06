@@ -408,7 +408,6 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
             return SetClauseMode(token_type);
         case QueryTokenType::kKeywordThat:
         case QueryTokenType::kDot:
-        case QueryTokenType::kHashtag:
         case QueryTokenType::kEqual:
             return;
         default:

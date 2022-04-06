@@ -95,9 +95,8 @@ bool PQLValidator::Elem() {
     return !Accept(QueryTokenType::kDot) || AttrName();
 }
 bool PQLValidator::AttrName() {
-    if (Accept(QueryTokenType::kDeclStmt))
-        return Accept(QueryTokenType::kHashtag);
-    return Accept(QueryTokenType::kAttrProc) ||
+    return Accept(QueryTokenType::kAttrStmtNum) ||
+           Accept(QueryTokenType::kAttrProc) ||
            Accept(QueryTokenType::kAttrValue) ||
            Accept(QueryTokenType::kAttrVar);
 }
