@@ -366,6 +366,7 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kKeywordAffects:
             return BeginClause(token_type);
         case QueryTokenType::kKeywordPattern:
+        case QueryTokenType::kKeywordWith:
             SetClauseMode(token_type);
             return BeginClause(token_type);
         case QueryTokenType::kAttrProc:
@@ -404,7 +405,6 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kKeywordAnd:
             return And();
         case QueryTokenType::kKeywordSuch:
-        case QueryTokenType::kKeywordWith:
             return SetClauseMode(token_type);
         case QueryTokenType::kKeywordThat:
         case QueryTokenType::kDot:
