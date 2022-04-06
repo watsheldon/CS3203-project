@@ -11,6 +11,9 @@ struct SynonymWithAttr {
             : synonym(synonym), attribute(attribute){};
     Synonym* const synonym;
     const Attribute attribute;
+    bool operator<(const SynonymWithAttr& other) const noexcept {
+        return synonym < other.synonym;
+    }
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_SYNONYM_WITH_ATTR_H_
