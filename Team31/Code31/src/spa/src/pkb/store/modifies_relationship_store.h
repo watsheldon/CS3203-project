@@ -17,17 +17,19 @@ namespace spa {
 class ModifiesRelationshipStore : public UsesModifiesStoreBase {
   public:
     using UsesModifiesStoreBase::UsesModifiesStoreBase;
-    void Set(int stmt_no, int var_index);
-    [[nodiscard]] bool ExistModifies(int stmt_no, int var_index);
-    [[nodiscard]] std::set<int> GetModifies(int stmt_no);
-    [[nodiscard]] std::set<int> GetModifies(int var_index, StmtType type,
-                                            const TypeStatementsStore &store);
-    [[nodiscard]] bool ExistModifiesP(int proc_index, int var_index);
-    [[nodiscard]] bool ExistModifiesP(int proc_index);
+    void Set(int stmt_no, int var_index) noexcept;
+    [[nodiscard]] bool ExistModifies(int stmt_no, int var_index) const noexcept;
+    [[nodiscard]] std::set<int> GetModifies(int stmt_no) const noexcept;
+    [[nodiscard]] std::set<int> GetModifies(
+            int var_index, StmtType type,
+            const TypeStatementsStore &store) const noexcept;
+    [[nodiscard]] bool ExistModifiesP(int proc_index,
+                                      int var_index) const noexcept;
+    [[nodiscard]] bool ExistModifiesP(int proc_index) const noexcept;
 
   private:
-    void AddAllDirectRel(const TypeStatementsStore &store) override;
-    void AddAllIndirectRel(const AuxiliaryData &data_store) override;
+    void AddAllDirectRel(const TypeStatementsStore &store) noexcept override;
+    void AddAllIndirectRel(const AuxiliaryData &data_store) noexcept override;
     static constexpr std::array<StmtType, 2> direct_stmt_types_{
             {StmtType::kAssign, StmtType::kRead}};
     static constexpr std::array<StmtType, 4> indirect_stmt_types_{

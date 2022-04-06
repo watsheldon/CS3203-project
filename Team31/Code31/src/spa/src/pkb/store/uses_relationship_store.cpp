@@ -22,7 +22,8 @@ void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
 const std::vector<int>& UsesRelationshipStore::GetVarIndex(int stmt_no) const {
     return stmt_var_.GetVals(stmt_no);
 }
-void UsesRelationshipStore::AddConditionRel(const AuxiliaryData& data_store) {
+void UsesRelationshipStore::AddConditionRel(
+        const AuxiliaryData& data_store) noexcept {
     auto& [type_stmt, cont_info, bitmaps] = data_store;
     for (auto stmt_type : kContainerStmtTypes) {
         const auto& stmts = type_stmt.GetStatements(stmt_type);
@@ -35,14 +36,16 @@ void UsesRelationshipStore::AddConditionRel(const AuxiliaryData& data_store) {
         }
     }
 }
-void UsesRelationshipStore::AddAllIndirectRel(const AuxiliaryData& data_store) {
+void UsesRelationshipStore::AddAllIndirectRel(
+        const AuxiliaryData& data_store) noexcept {
     FillIndirectRels(relevant_stmt_types_, data_store);
 }
-void UsesRelationshipStore::AddAllDirectRel(const TypeStatementsStore& store) {
+void UsesRelationshipStore::AddAllDirectRel(
+        const TypeStatementsStore& store) noexcept {
     FillDirectRels(relevant_stmt_types_, store);
 }
 void UsesRelationshipStore::PrecompileStep(
-        const TypeStatementsStore& type_store) {
+        const TypeStatementsStore& type_store) noexcept {
     // make a copy of the stmt_var relationships before indirect uses are added
     for (auto stmt_type : kContainerStmtTypes) {
         auto& stmt_var_map =
@@ -108,7 +111,7 @@ void UsesRelationshipStore::AddConditionIndirectUses(
 bool UsesRelationshipStore::ExistUses(int stmt_no, int var_index) {
     return ExistRel(stmt_no, var_index);
 }
-std::set<int> UsesRelationshipStore::GetUses(int stmt_no) {
+std::set<int> UsesRelationshipStore::GetUses(int stmt_no) const noexcept {
     return GetRelRelatedVars(stmt_no);
 }
 std::set<int> UsesRelationshipStore::GetUses(int var_index, StmtType type,

@@ -24,23 +24,25 @@ class UsesModifiesStoreBase {
         const StmtlstStatementsStore &stmtlst_stmt;
     };
     UsesModifiesStoreBase(std::size_t stmt_size, std::size_t var_size,
-                          std::size_t proc_size);
-    [[nodiscard]] bool ExistRel(int stmt_no, int var_index) const;
-    [[nodiscard]] bool ExistRelP(int proc_index) const;
-    [[nodiscard]] bool ExistRelP(int proc_index, int var_index) const;
-    [[nodiscard]] std::set<int> GetRelRelatedVars(int stmt_no) const;
+                          std::size_t proc_size) noexcept;
+    [[nodiscard]] bool ExistRel(int stmt_no, int var_index) const noexcept;
+    [[nodiscard]] bool ExistRelP(int proc_index) const noexcept;
+    [[nodiscard]] bool ExistRelP(int proc_index, int var_index) const noexcept;
+    [[nodiscard]] std::set<int> GetRelRelatedVars(int stmt_no) const noexcept;
     [[nodiscard]] std::set<int> GetRelRelatedVars(
             int var_index, StmtType type,
-            const TypeStatementsStore &store) const;
-    [[nodiscard]] const std::vector<int> &GetStmtNo(int var_index) const;
-    [[nodiscard]] const std::set<int> &GetAllVar(int stmt_no) const;
-    [[nodiscard]] const std::set<int> &GetVarAccessByProc(int proc_index) const;
-    [[nodiscard]] const std::set<int> &GetAllStmt(int var_index) const;
-    [[nodiscard]] const std::set<int> &GetAllProc(int var_index) const;
-    [[nodiscard]] const std::set<int> &GetAllProc() const;
-    [[nodiscard]] PairVec<int> GetStmtVar(StmtType stmt_type) const;
-    [[nodiscard]] PairVec<int> GetProcVar() const;
-    [[nodiscard]] std::set<int> GetStmt(StmtType stmt_type) const;
+            const TypeStatementsStore &store) const noexcept;
+    [[nodiscard]] const std::vector<int> &GetStmtNo(
+            int var_index) const noexcept;
+    [[nodiscard]] const std::set<int> &GetAllVar(int stmt_no) const noexcept;
+    [[nodiscard]] const std::set<int> &GetVarAccessByProc(
+            int proc_index) const noexcept;
+    [[nodiscard]] const std::set<int> &GetAllStmt(int var_index) const noexcept;
+    [[nodiscard]] const std::set<int> &GetAllProc(int var_index) const noexcept;
+    [[nodiscard]] const std::set<int> &GetAllProc() const noexcept;
+    [[nodiscard]] PairVec<int> GetStmtVar(StmtType stmt_type) const noexcept;
+    [[nodiscard]] PairVec<int> GetProcVar() const noexcept;
+    [[nodiscard]] std::set<int> GetStmt(StmtType stmt_type) const noexcept;
     void Compile(const TypeStatementsStore &type_statement_store,
                  const ContainerInfo &info,
                  const CallsRelationshipStore &calls_rel_store);
@@ -57,30 +59,32 @@ class UsesModifiesStoreBase {
         ContainerAddedTrackers &bitmaps;
     };
 
-    [[nodiscard]] PairVec<int> GetAllRel() const;
+    [[nodiscard]] PairVec<int> GetAllRel() const noexcept;
     void AddDirectRel(PairVec<int> &stmt_var_pair,
-                      const std::vector<int> &stmt_no) const;
+                      const std::vector<int> &stmt_no) const noexcept;
     void AddIndirectRel(const PairVec<int> &basic_pairs,
                         const ContainerInfo &info,
-                        ContainerAddedTrackers &bitmaps);
-    void AddAllContainerRel(const TypeStatementsStore &type_statement_store,
-                            const ContainerInfo &info,
-                            const CallsRelationshipStore &calls_rel_store);
-    void AddCallStmtVar(PairVec<int> &stmt_var_pair,
-                        const std::vector<int> &stmt_no,
-                        const CallsRelationshipStore &calls_rel_store) const;
+                        ContainerAddedTrackers &bitmaps) noexcept;
+    void AddAllContainerRel(
+            const TypeStatementsStore &type_statement_store,
+            const ContainerInfo &info,
+            const CallsRelationshipStore &calls_rel_store) noexcept;
+    void AddCallStmtVar(
+            PairVec<int> &stmt_var_pair, const std::vector<int> &stmt_no,
+            const CallsRelationshipStore &calls_rel_store) const noexcept;
     void ProcessProcedureAncestor(int proc_index, int var_index,
-                                  BitVec2D &proc_added);
-    void FillStmts();
-    void FillVars();
-    void FillRels();
-    void FillProcs();
-    void CalculateNumRels();
+                                  BitVec2D &proc_added) noexcept;
+    void FillStmts() noexcept;
+    void FillVars() noexcept;
+    void FillRels() noexcept;
+    void FillProcs() noexcept;
+    void CalculateNumRels() noexcept;
 
-    virtual void PrecompileStep(const TypeStatementsStore &type_store);
-    virtual void AddAllDirectRel(const TypeStatementsStore &store) = 0;
-    virtual void AddAllIndirectRel(const AuxiliaryData &data_store) = 0;
-    virtual void AddConditionRel(const AuxiliaryData &data_store);
+    virtual void PrecompileStep(const TypeStatementsStore &type_store) noexcept;
+    virtual void AddAllDirectRel(const TypeStatementsStore &store) noexcept = 0;
+    virtual void AddAllIndirectRel(
+            const AuxiliaryData &data_store) noexcept = 0;
+    virtual void AddConditionRel(const AuxiliaryData &data_store) noexcept;
 
     template <std::size_t n>
     void FillDirectRels(std::array<StmtType, n> direct_stmt_types,
