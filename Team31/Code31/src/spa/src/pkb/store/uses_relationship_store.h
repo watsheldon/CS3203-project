@@ -20,18 +20,20 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
   public:
     UsesRelationshipStore(std::size_t stmt_size, std::size_t var_size,
                           std::size_t proc_size);
-    void Set(int stmt_no, std::vector<int>&& var_indices);
-    [[nodiscard]] const std::vector<int>& GetVarIndex(int stmt_no) const;
-    [[nodiscard]] bool ExistUses(int stmt_no, int var_index);
-    [[nodiscard]] std::set<int> GetUses(int stmt_no) const noexcept;
-    [[nodiscard]] std::set<int> GetUses(int var_index, StmtType type,
-                                        const TypeStatementsStore& store);
-    [[nodiscard]] bool ExistUsesP(int proc_index, int var_index);
-    [[nodiscard]] bool ExistUsesP(int proc_index);
-    [[nodiscard]] const std::set<int>& GetContainers(StmtType type,
-                                                     int var_index) const;
-    [[nodiscard]] std::set<int> GetContainers(StmtType type) const;
-    [[nodiscard]] const PairVec<int>& GetContainerVarPairs(StmtType type) const;
+    void Set(StmtNo stmt_no, std::vector<VarIndex>&& var_indices);
+    [[nodiscard]] const std::vector<VarIndex>& GetVarIndex(
+            StmtNo stmt_no) const;
+    [[nodiscard]] bool ExistUses(StmtNo stmt_no, VarIndex var_index);
+    [[nodiscard]] std::set<VarIndex> GetUses(StmtNo stmt_no) const noexcept;
+    [[nodiscard]] std::set<StmtNo> GetUses(VarIndex var_index, StmtType type,
+                                           const TypeStatementsStore& store);
+    [[nodiscard]] bool ExistUsesP(ProcIndex proc_index, VarIndex var_index);
+    [[nodiscard]] bool ExistUsesP(ProcIndex proc_index);
+    [[nodiscard]] const std::set<StmtNo>& GetContainers(
+            StmtType type, VarIndex var_index) const;
+    [[nodiscard]] std::set<StmtNo> GetContainers(StmtType type) const;
+    [[nodiscard]] const PairVec<StmtNo, VarIndex>& GetContainerVarPairs(
+            StmtType type) const;
 
   private:
     void PrecompileStep(
@@ -39,9 +41,10 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
     void AddConditionRel(const AuxiliaryData& data_store) noexcept override;
     void AddAllDirectRel(const TypeStatementsStore& store) noexcept override;
     void AddAllIndirectRel(const AuxiliaryData& data_store) noexcept override;
-    void AddConditionDirectUses(int stmt_no, PairVec<int>& stmt_var_pairs,
+    void AddConditionDirectUses(StmtNo stmt_no,
+                                PairVec<StmtNo, VarIndex>& stmt_var_pairs,
                                 BitVec2D& bitmap) const;
-    void AddConditionIndirectUses(int stmt_no, const ContainerInfo& info,
+    void AddConditionIndirectUses(StmtNo stmt_no, const ContainerInfo& info,
                                   ContainerAddedTrackers& bitmaps);
     static constexpr int GetCondTypeIndex(StmtType stmt_type) {
         return static_cast<int>(stmt_type) - static_cast<int>(StmtType::kWhile);

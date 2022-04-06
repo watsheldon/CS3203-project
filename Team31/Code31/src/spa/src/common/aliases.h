@@ -20,6 +20,7 @@ using StmtNo = int;
 using StmtLstIndex = int;
 using VarIndex = int;
 using ProcIndex = int;
+using PNIndex = int;
 using Ident = std::string;
 using IdentView = std::string_view;
 }  // namespace spa

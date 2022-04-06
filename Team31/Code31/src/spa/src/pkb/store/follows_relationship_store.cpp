@@ -34,13 +34,13 @@ std::set<StmtNo> FollowsRelationshipStore::GetSecondArg(
         StmtType return_type) const noexcept {
     return Filter(stmtlst_stmt_.GetFollowsWildcard(), return_type);
 }
-std::set<int> FollowsRelationshipStore::GetSecondArg(
+std::set<StmtNo> FollowsRelationshipStore::GetSecondArg(
         StmtNo parent, StmtType return_type) const noexcept {
     StmtNo second_arg = stmtlst_stmt_.GetFollowsSecondArg(parent);
     return second_arg == 0 ? std::set<StmtNo>{}
                            : Filter(second_arg, return_type);
 }
-std::set<int> FollowsRelationshipStore::GetSecondArgT(
+std::set<StmtNo> FollowsRelationshipStore::GetSecondArgT(
         StmtNo stmt_no, StmtType return_type) const noexcept {
     auto results = stmtlst_stmt_.GetFollowsTSecondArg(stmt_no);
     return Filter(results, return_type);
@@ -50,19 +50,19 @@ std::set<StmtNo> FollowsRelationshipStore::GetFirstArg(
     auto first_arg = stmtlst_stmt_.GetFollowsFirstArg(stmt_no);
     return first_arg == 0 ? std::set<StmtNo>{} : Filter(first_arg, return_type);
 }
-std::set<int> FollowsRelationshipStore::GetFirstArgT(
+std::set<StmtNo> FollowsRelationshipStore::GetFirstArgT(
         StmtNo stmt_no, StmtType return_type) const noexcept {
     auto results = stmtlst_stmt_.GetFollowsTFirstArg(stmt_no);
     return Filter(results, return_type);
 }
-PairVec<int> FollowsRelationshipStore::GetBothArgs(
+PairVec<StmtNo> FollowsRelationshipStore::GetBothArgs(
         StmtType first_type, StmtType second_type) const noexcept {
-    PairVec<int> results = stmtlst_stmt_.GetFollowsPairs();
+    PairVec<StmtNo> results = stmtlst_stmt_.GetFollowsPairs();
     return ExtractPairs(std::move(results), first_type, second_type);
 }
-PairVec<int> FollowsRelationshipStore::GetBothArgsT(
+PairVec<StmtNo> FollowsRelationshipStore::GetBothArgsT(
         StmtType first_type, StmtType second_type) const noexcept {
-    PairVec<int> results = stmtlst_stmt_.GetFollowsPairsT();
+    PairVec<StmtNo> results = stmtlst_stmt_.GetFollowsPairsT();
     return ExtractPairs(std::move(results), first_type, second_type);
 }
 PairVec<StmtNo> FollowsRelationshipStore::ExtractPairs(
@@ -70,7 +70,7 @@ PairVec<StmtNo> FollowsRelationshipStore::ExtractPairs(
         StmtType second_type) const noexcept {
     if (first_type == StmtType::kAll && second_type == StmtType::kAll)
         return results;
-    PairVec<int> extracted_results;
+    PairVec<StmtNo> extracted_results;
     auto &[first, second] = results;
     for (int i = 0; i < results.first.size(); ++i) {
         bool has_first = first_type == StmtType::kAll ||

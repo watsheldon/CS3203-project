@@ -10,20 +10,20 @@
 
 namespace spa {
 struct StmtProperties {
-    int stmtlst_index = 0;
+    StmtLstIndex stmtlst_index = 0;
     int pos_in_stmtlst = 0;
 };
 class StmtlstStatementsStore {
   public:
     StmtlstStatementsStore(std::size_t stmtlst_count,
                            std::size_t stmt_count) noexcept;
-    void Set(int stmtlst_index, std::vector<int> stmtlst);
-    [[nodiscard]] int GetStmtlst(StmtNo stmt_no) const noexcept;
+    void Set(StmtLstIndex stmtlst_index, std::vector<StmtNo> stmtlst);
+    [[nodiscard]] StmtLstIndex GetStmtlst(StmtNo stmt_no) const noexcept;
     [[nodiscard]] int GetStmtRelativePos(StmtNo stmt_no) const noexcept;
     [[nodiscard]] StmtProperties GetStmtProperties(
             StmtNo stmt_no) const noexcept;
     [[nodiscard]] const std::vector<int> &GetStatements(
-            int stmtlst_index) const noexcept;
+            StmtLstIndex stmtlst_index) const noexcept;
     [[nodiscard]] bool ExistFollows(StmtNo first, StmtNo second) const noexcept;
     [[nodiscard]] bool ExistFollowsT(StmtNo first,
                                      StmtNo second) const noexcept;

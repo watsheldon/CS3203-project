@@ -17,15 +17,16 @@ namespace spa {
 class ModifiesRelationshipStore : public UsesModifiesStoreBase {
   public:
     using UsesModifiesStoreBase::UsesModifiesStoreBase;
-    void Set(int stmt_no, int var_index) noexcept;
-    [[nodiscard]] bool ExistModifies(int stmt_no, int var_index) const noexcept;
-    [[nodiscard]] std::set<int> GetModifies(int stmt_no) const noexcept;
-    [[nodiscard]] std::set<int> GetModifies(
-            int var_index, StmtType type,
+    void Set(StmtNo stmt_no, VarIndex var_index) noexcept;
+    [[nodiscard]] bool ExistModifies(StmtNo stmt_no,
+                                     VarIndex var_index) const noexcept;
+    [[nodiscard]] std::set<VarIndex> GetModifies(StmtNo stmt_no) const noexcept;
+    [[nodiscard]] std::set<StmtNo> GetModifies(
+            VarIndex var_index, StmtType type,
             const TypeStatementsStore &store) const noexcept;
-    [[nodiscard]] bool ExistModifiesP(int proc_index,
-                                      int var_index) const noexcept;
-    [[nodiscard]] bool ExistModifiesP(int proc_index) const noexcept;
+    [[nodiscard]] bool ExistModifiesP(ProcIndex proc_index,
+                                      VarIndex var_index) const noexcept;
+    [[nodiscard]] bool ExistModifiesP(ProcIndex proc_index) const noexcept;
 
   private:
     void AddAllDirectRel(const TypeStatementsStore &store) noexcept override;

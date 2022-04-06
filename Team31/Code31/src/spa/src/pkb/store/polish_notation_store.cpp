@@ -10,22 +10,22 @@ PolishNotationStore::PolishNotationStore(size_t stmt_count, std::vector<PN> pns,
           index_to_stmt_(pns.size()),
           index_to_pn_(std::move(pns)),
           name_value_(name_value) {}
-void PolishNotationStore::Set(int stmt_no, int polish_index) {
+void PolishNotationStore::Set(StmtNo stmt_no, PNIndex polish_index) {
     stmt_to_index_[stmt_no] = polish_index;
     index_to_stmt_[polish_index] = stmt_no;
 }
-const PN& PolishNotationStore::GetNotation(int polish_index) const {
+const PN& PolishNotationStore::GetNotation(PNIndex polish_index) const {
     return index_to_pn_[polish_index];
 }
-int PolishNotationStore::GetPolishStmt(int polish_index) const {
+StmtNo PolishNotationStore::GetPolishStmt(PNIndex polish_index) const {
     return index_to_stmt_[polish_index];
 }
-int PolishNotationStore::GetPolishIndex(int stmt_no) const {
+PNIndex PolishNotationStore::GetPolishIndex(StmtNo stmt_no) const {
     return stmt_to_index_[stmt_no];
 }
-std::set<int> PolishNotationStore::CheckPattern(
-        const PN& converted_pn, const std::vector<int>& assign_stmt) {
-    std::set<int> full_match_stmt;
+std::set<StmtNo> PolishNotationStore::CheckPattern(
+        const PN& converted_pn, const std::vector<StmtNo>& assign_stmt) {
+    std::set<StmtNo> full_match_stmt;
     for (const auto i : assign_stmt) {
         const PN& pn = index_to_pn_[stmt_to_index_[i]];
         if (pn == converted_pn) {
@@ -34,10 +34,10 @@ std::set<int> PolishNotationStore::CheckPattern(
     }
     return full_match_stmt;
 }
-std::set<int> PolishNotationStore::CheckPatternP(
-        const PN& converted_pn, const std::vector<int>& assign_stmt) {
-    std::set<int> partial_match_stmt;
-    for (int i : assign_stmt) {
+std::set<StmtNo> PolishNotationStore::CheckPatternP(
+        const PN& converted_pn, const std::vector<StmtNo>& assign_stmt) {
+    std::set<StmtNo> partial_match_stmt;
+    for (const auto i : assign_stmt) {
         const PN& pn = index_to_pn_[stmt_to_index_[i]];
         if (pn.Contains(converted_pn)) {
             partial_match_stmt.emplace(i);

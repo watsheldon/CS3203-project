@@ -26,17 +26,17 @@ void StmtlstParentStore::Set(Index<SetEntityType::kStmt> if_no,
             stmtlst_parent_[else_index.value] = {kIf, if_no.value};
 }
 const StmtlstParentStore::StmtLstParent& StmtlstParentStore::GetParent(
-        int stmtlst_index) const {
+        StmtLstIndex stmtlst_index) const {
     return stmtlst_parent_[stmtlst_index];
 }
-int StmtlstParentStore::GetProcStmtLst(int proc_index) const {
+StmtLstIndex StmtlstParentStore::GetProcStmtLst(ProcIndex proc_index) const {
     return proc_stmtlsts_[proc_index];
 }
-int StmtlstParentStore::GetWhileStmtLst(int stmt_no) const {
+StmtLstIndex StmtlstParentStore::GetWhileStmtLst(StmtNo stmt_no) const {
     return stmt_stmtlsts_[stmt_no];
 }
 StmtlstParentStore::IfPairs StmtlstParentStore::GetIfStmtLst(
-        int stmt_no) const {
+        StmtNo stmt_no) const {
     return {stmt_stmtlsts_[stmt_no], else_stmtlsts_[stmt_no]};
 }
 }  // namespace spa

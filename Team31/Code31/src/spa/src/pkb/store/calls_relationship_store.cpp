@@ -3,9 +3,9 @@
 #include <deque>
 
 namespace spa {
-CallsRelationshipStore::CallsRelationshipStore(size_t stmt_count,
-                                               size_t proc_count,
-                                               std::vector<std::set<int>> procs)
+CallsRelationshipStore::CallsRelationshipStore(
+        size_t stmt_count, size_t proc_count,
+        std::vector<std::set<ProcIndex>> procs)
         : stmt_proc_(stmt_count, proc_count),
           proc_proc_(proc_count, std::move(procs)),
           proc_proc_t_(proc_count, proc_count) {
@@ -36,52 +36,58 @@ CallsRelationshipStore::CallsRelationshipStore(size_t stmt_count,
         }
     }
 }
-void CallsRelationshipStore::Set(int call_stmt, int proc_index) {
-    stmt_proc_.Set(call_stmt, std::move(std::vector<int>{proc_index}));
+void CallsRelationshipStore::Set(StmtNo call_stmt, ProcIndex proc_index) {
+    stmt_proc_.Set(call_stmt, std::move(std::vector<ProcIndex>{proc_index}));
 }
-bool CallsRelationshipStore::ExistCalls(int first_proc, int second_proc) const {
+bool CallsRelationshipStore::ExistCalls(ProcIndex first_proc,
+                                        ProcIndex second_proc) const {
     const auto& callees = GetCalleeProcs(first_proc);
     return callees.find(second_proc) != callees.end();
 }
-bool CallsRelationshipStore::ExistCallsT(int first_proc,
-                                         int second_proc) const {
+bool CallsRelationshipStore::ExistCallsT(ProcIndex first_proc,
+                                         ProcIndex second_proc) const {
     const auto& callees = GetCalleeProcsT(first_proc);
     return callees.find(second_proc) != callees.end();
 }
-bool CallsRelationshipStore::ExistCalls(int first_proc) const {
+bool CallsRelationshipStore::ExistCalls(ProcIndex first_proc) const {
     return !GetCalleeProcs(first_proc).empty();
 }
-std::set<int> CallsRelationshipStore::GetCalls(ArgPos return_pos) const {
+std::set<ProcIndex> CallsRelationshipStore::GetCalls(ArgPos return_pos) const {
     return return_pos == ArgPos::kFirst ? GetAllCallers() : GetAllCallees();
 }
-const std::set<int>& CallsRelationshipStore::GetCallerProcs(int callee) const {
+const std::set<ProcIndex>& CallsRelationshipStore::GetCallerProcs(
+        ProcIndex callee) const {
     return proc_proc_.GetKeys(callee);
 }
-const std::set<int>& CallsRelationshipStore::GetCalleeProcs(int caller) const {
+const std::set<ProcIndex>& CallsRelationshipStore::GetCalleeProcs(
+        ProcIndex caller) const {
     return proc_proc_.GetVals(caller);
 }
-const std::set<int>& CallsRelationshipStore::GetCallerProcsT(int callee) const {
+const std::set<ProcIndex>& CallsRelationshipStore::GetCallerProcsT(
+        ProcIndex callee) const {
     return proc_proc_t_.GetKeys(callee);
 }
-const std::set<int>& CallsRelationshipStore::GetCalleeProcsT(int caller) const {
+const std::set<ProcIndex>& CallsRelationshipStore::GetCalleeProcsT(
+        ProcIndex caller) const {
     return proc_proc_t_.GetVals(caller);
 }
-const std::set<int>& CallsRelationshipStore::GetAllCallers() const {
+const std::set<ProcIndex>& CallsRelationshipStore::GetAllCallers() const {
     return all_callers_;
 }
-const std::set<int>& CallsRelationshipStore::GetAllCallees() const {
+const std::set<ProcIndex>& CallsRelationshipStore::GetAllCallees() const {
     return all_callees_;
 }
-const PairVec<int>& CallsRelationshipStore::GetCallsPairs() const {
+const PairVec<ProcIndex>& CallsRelationshipStore::GetCallsPairs() const {
     return pairs_;
 }
-const PairVec<int>& CallsRelationshipStore::GetCallsTPairs() const {
+const PairVec<ProcIndex>& CallsRelationshipStore::GetCallsTPairs() const {
     return pairs_t_;
 }
-const std::vector<int>& CallsRelationshipStore::GetStmts(int proc_index) const {
+const std::vector<StmtNo>& CallsRelationshipStore::GetStmts(
+        ProcIndex proc_index) const {
     return stmt_proc_.GetKeys(proc_index);
 }
-int CallsRelationshipStore::GetProc(int call_stmt) const {
+ProcIndex CallsRelationshipStore::GetProc(StmtNo call_stmt) const {
     return stmt_proc_.GetVals(call_stmt)[0];
 }
 

@@ -206,13 +206,13 @@ constexpr bool ParentRelationshipStore::IsParentType(StmtType type) noexcept {
            kParentTypes.end();
 }
 inline bool ParentRelationshipStore::HasParent(StmtNo stmt) const noexcept {
-    int stmtlst = stmtlst_stmt_.GetStmtlst(stmt);
+    StmtLstIndex stmtlst = stmtlst_stmt_.GetStmtlst(stmt);
     auto type = stmtlst_parent_.GetParent(stmtlst).type;
     return type == StmtlstParentStore::ParentType::kWhile ||
            type == StmtlstParentStore::ParentType::kIf;
 }
 void ParentRelationshipStore::AddAllChildren(
-        int stmtlst_index, std::vector<StmtNo> &children,
+        StmtLstIndex stmtlst_index, std::vector<StmtNo> &children,
         StmtType child_type) const noexcept {
     const auto &stmtlst = stmtlst_stmt_.GetStatements(stmtlst_index);
     children.reserve(children.size() + stmtlst.size());

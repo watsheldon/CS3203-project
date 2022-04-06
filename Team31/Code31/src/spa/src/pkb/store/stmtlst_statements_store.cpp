@@ -10,13 +10,14 @@ StmtlstStatementsStore::StmtlstStatementsStore(std::size_t stmtlst_count,
                                                std::size_t stmt_count) noexcept
         : stmtlst_to_statements_(stmtlst_count + 1),
           statement_to_stmtlst_(stmt_count + 1) {}
-void StmtlstStatementsStore::Set(int stmtlst_index, std::vector<int> stmtlst) {
+void StmtlstStatementsStore::Set(StmtLstIndex stmtlst_index,
+                                 std::vector<StmtNo> stmtlst) {
     for (int i = 0; i < stmtlst.size(); ++i) {
         statement_to_stmtlst_[stmtlst[i]] = {stmtlst_index, i};
     }
     stmtlst_to_statements_[stmtlst_index] = std::move(stmtlst);
 }
-int StmtlstStatementsStore::GetStmtlst(StmtNo stmt_no) const noexcept {
+StmtLstIndex StmtlstStatementsStore::GetStmtlst(StmtNo stmt_no) const noexcept {
     return statement_to_stmtlst_[stmt_no].stmtlst_index;
 }
 int StmtlstStatementsStore::GetStmtRelativePos(StmtNo stmt_no) const noexcept {
@@ -31,8 +32,8 @@ StmtProperties StmtlstStatementsStore::GetStmtProperties(
         StmtNo stmt_no) const noexcept {
     return statement_to_stmtlst_[stmt_no];
 }
-const std::vector<int> &StmtlstStatementsStore::GetStatements(
-        int stmtlst_index) const noexcept {
+const std::vector<StmtNo> &StmtlstStatementsStore::GetStatements(
+        StmtLstIndex stmtlst_index) const noexcept {
     return stmtlst_to_statements_[stmtlst_index];
 }
 bool StmtlstStatementsStore::ExistFollows(StmtNo first,
@@ -83,7 +84,7 @@ StmtNo StmtlstStatementsStore::GetFollowsSecondArg(
     if (first_stmt + 2 > statement_to_stmtlst_.size()) return 0;
     int second_pos = GetStmtRelativePos(first_stmt) + 1;
     if (second_pos == GetStmtlstSize(first_stmt)) return 0;
-    int index = GetStmtlst(first_stmt);
+    StmtLstIndex index = GetStmtlst(first_stmt);
     const std::vector<StmtNo> &stmts = GetStatements(index);
     return stmts[second_pos];
 }
@@ -92,7 +93,7 @@ std::vector<StmtNo> StmtlstStatementsStore::GetFollowsTSecondArg(
     if (first_stmt + 2 > statement_to_stmtlst_.size()) return {};
     int start_index = GetStmtRelativePos(first_stmt) + 1;
     if (start_index == GetStmtlstSize(first_stmt)) return {};
-    int index = GetStmtlst(first_stmt);
+    StmtLstIndex index = GetStmtlst(first_stmt);
     const auto &stmts = GetStatements(index);
     return {stmts.begin() + start_index, stmts.end()};
 }
@@ -111,7 +112,7 @@ StmtNo StmtlstStatementsStore::GetFollowsFirstArg(
     if (second_stmt + 1 > statement_to_stmtlst_.size()) return 0;
     int relative_pos = GetStmtRelativePos(second_stmt);
     if (relative_pos == 0) return 0;
-    int index = GetStmtlst(second_stmt);
+    StmtLstIndex index = GetStmtlst(second_stmt);
     const auto &stmts = GetStatements(index);
     return stmts[relative_pos - 1];
 }
@@ -120,7 +121,7 @@ std::vector<StmtNo> StmtlstStatementsStore::GetFollowsTFirstArg(
     if (second_stmt + 1 > statement_to_stmtlst_.size()) return {};
     int pos = GetStmtRelativePos(second_stmt);
     if (pos == 0) return {};
-    int index = GetStmtlst(second_stmt);
+    StmtLstIndex index = GetStmtlst(second_stmt);
     const std::vector<StmtNo> &stmts = GetStatements(index);
     return {stmts.begin(), stmts.begin() + pos};
 }

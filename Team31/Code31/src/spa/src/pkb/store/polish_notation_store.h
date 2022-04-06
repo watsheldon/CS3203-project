@@ -18,16 +18,13 @@ class PolishNotationStore {
   public:
     PolishNotationStore(size_t stmt_count, std::vector<PN> pns,
                         const NameValueStore& name_value);
-    void Set(int stmt_no, int polish_index);
-    [[nodiscard]] const PN& GetNotation(int polish_index) const;
-    [[nodiscard]] int GetPolishStmt(int polish_index) const;
-    [[nodiscard]] int GetPolishIndex(int stmt_no) const;
-    [[nodiscard]] std::set<int> CheckPattern(
-            const PN& converted_pn, bool partial_match,
-            const std::vector<int>& assign_stmt);
-    [[nodiscard]] std::set<int> CheckPattern(
+    void Set(StmtNo stmt_no, PNIndex polish_index);
+    [[nodiscard]] const PN& GetNotation(PNIndex polish_index) const;
+    [[nodiscard]] StmtNo GetPolishStmt(PNIndex polish_index) const;
+    [[nodiscard]] PNIndex GetPolishIndex(StmtNo stmt_no) const;
+    [[nodiscard]] std::set<StmtNo> CheckPattern(
             const PN& converted_pn, const std::vector<int>& assign_stmt);
-    [[nodiscard]] std::set<int> CheckPatternP(
+    [[nodiscard]] std::set<StmtNo> CheckPatternP(
             const PN& converted_pn, const std::vector<int>& assign_stmt);
     [[nodiscard]] std::unique_ptr<PolishNotation> ConvertFromQueryTokens(
             const std::vector<QueryToken>& tokens);
@@ -38,8 +35,8 @@ class PolishNotationStore {
     static PolishNotationNode TokenTypeToPNNode(
             QueryTokenType token_type) noexcept;
 
-    std::vector<int> stmt_to_index_;
-    std::vector<int> index_to_stmt_;
+    std::vector<PNIndex> stmt_to_index_;
+    std::vector<StmtNo> index_to_stmt_;
     std::vector<PN> index_to_pn_;
     const NameValueStore& name_value_;
     std::vector<PolishNotationNode> expr_;

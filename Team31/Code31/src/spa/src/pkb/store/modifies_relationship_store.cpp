@@ -5,8 +5,9 @@
 #include "type_statements_store.h"
 
 namespace spa {
-void ModifiesRelationshipStore::Set(int stmt_no, int var_index) noexcept {
-    stmt_var_.Set(stmt_no, std::vector<int>{var_index});
+void ModifiesRelationshipStore::Set(StmtNo stmt_no,
+                                    VarIndex var_index) noexcept {
+    stmt_var_.Set(stmt_no, std::vector<VarIndex>{var_index});
 }
 void ModifiesRelationshipStore::AddAllIndirectRel(
         const AuxiliaryData& data_store) noexcept {
@@ -16,24 +17,25 @@ void ModifiesRelationshipStore::AddAllDirectRel(
         const TypeStatementsStore& store) noexcept {
     FillDirectRels(direct_stmt_types_, store);
 }
-bool ModifiesRelationshipStore::ExistModifies(int stmt_no,
-                                              int var_index) const noexcept {
+bool ModifiesRelationshipStore::ExistModifies(
+        StmtNo stmt_no, VarIndex var_index) const noexcept {
     return ExistRel(stmt_no, var_index);
 }
-std::set<int> ModifiesRelationshipStore::GetModifies(
-        int stmt_no) const noexcept {
+std::set<VarIndex> ModifiesRelationshipStore::GetModifies(
+        StmtNo stmt_no) const noexcept {
     return GetRelRelatedVars(stmt_no);
 }
-std::set<int> ModifiesRelationshipStore::GetModifies(
-        int var_index, StmtType type,
+std::set<StmtNo> ModifiesRelationshipStore::GetModifies(
+        VarIndex var_index, StmtType type,
         const TypeStatementsStore& store) const noexcept {
     return GetRelRelatedVars(var_index, type, store);
 }
-bool ModifiesRelationshipStore::ExistModifiesP(int proc_index,
-                                               int var_index) const noexcept {
+bool ModifiesRelationshipStore::ExistModifiesP(
+        ProcIndex proc_index, VarIndex var_index) const noexcept {
     return ExistRelP(proc_index, var_index);
 }
-bool ModifiesRelationshipStore::ExistModifiesP(int proc_index) const noexcept {
+bool ModifiesRelationshipStore::ExistModifiesP(
+        ProcIndex proc_index) const noexcept {
     return ExistRelP(proc_index);
 }
 }  // namespace spa

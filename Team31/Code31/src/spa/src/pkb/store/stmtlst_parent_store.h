@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 
@@ -28,15 +29,16 @@ class StmtlstParentStore {
     void Set(Index<SetEntityType::kStmt> if_no,
              Index<SetEntityType::kStmtLst> then_index,
              Index<SetEntityType::kStmtLst> else_index);
-    [[nodiscard]] const StmtLstParent &GetParent(int stmtlst_index) const;
-    [[nodiscard]] int GetProcStmtLst(int proc_index) const;
-    [[nodiscard]] int GetWhileStmtLst(int stmt_no) const;
-    [[nodiscard]] IfPairs GetIfStmtLst(int stmt_no) const;
+    [[nodiscard]] const StmtLstParent &GetParent(
+            StmtLstIndex stmtlst_index) const;
+    [[nodiscard]] StmtLstIndex GetProcStmtLst(ProcIndex proc_index) const;
+    [[nodiscard]] StmtLstIndex GetWhileStmtLst(StmtNo stmt_no) const;
+    [[nodiscard]] IfPairs GetIfStmtLst(StmtNo stmt_no) const;
 
   private:
-    std::vector<int> proc_stmtlsts_;
-    std::vector<int> stmt_stmtlsts_;
-    std::vector<int> else_stmtlsts_;
+    std::vector<StmtLstIndex> proc_stmtlsts_;
+    std::vector<StmtLstIndex> stmt_stmtlsts_;
+    std::vector<StmtLstIndex> else_stmtlsts_;
     std::vector<StmtLstParent> stmtlst_parent_;
 };
 }  // namespace spa

@@ -22,8 +22,8 @@ UsesModifiesStoreBase::UsesModifiesStoreBase(std::size_t stmt_size,
           complete_stmt_var_(num_stmts_, num_vars_),
           proc_vars_(num_procs_, num_vars_) {}
 
-bool UsesModifiesStoreBase::ExistRel(int stmt_no,
-                                     int var_index) const noexcept {
+bool UsesModifiesStoreBase::ExistRel(StmtNo stmt_no,
+                                     VarIndex var_index) const noexcept {
     assert(stmt_no != 0);
     if (stmt_no > num_stmts_) {
         return false;
@@ -31,20 +31,20 @@ bool UsesModifiesStoreBase::ExistRel(int stmt_no,
     auto vars = GetAllVar(stmt_no);
     return var_index == 0 ? !vars.empty() : vars.find(var_index) != vars.end();
 }
-bool UsesModifiesStoreBase::ExistRelP(int proc_index) const noexcept {
+bool UsesModifiesStoreBase::ExistRelP(ProcIndex proc_index) const noexcept {
     return !GetVarAccessByProc(proc_index).empty();
 }
-bool UsesModifiesStoreBase::ExistRelP(int proc_index,
-                                      int var_index) const noexcept {
+bool UsesModifiesStoreBase::ExistRelP(ProcIndex proc_index,
+                                      VarIndex var_index) const noexcept {
     auto vars = GetVarAccessByProc(proc_index);
     return vars.find(var_index) != vars.end();
 }
-std::set<int> UsesModifiesStoreBase::GetRelRelatedVars(
-        int stmt_no) const noexcept {
-    return stmt_no > num_stmts_ ? std::set<int>() : GetAllVar(stmt_no);
+std::set<VarIndex> UsesModifiesStoreBase::GetRelRelatedVars(
+        StmtNo stmt_no) const noexcept {
+    return stmt_no > num_stmts_ ? std::set<VarIndex>() : GetAllVar(stmt_no);
 }
-std::set<int> UsesModifiesStoreBase::GetRelRelatedVars(
-        int var_index, StmtType type,
+std::set<StmtNo> UsesModifiesStoreBase::GetRelRelatedVars(
+        VarIndex var_index, StmtType type,
         const TypeStatementsStore& store) const noexcept {
     assert(var_index != 0);
     auto stmts = GetAllStmt(var_index);
@@ -60,41 +60,42 @@ std::set<int> UsesModifiesStoreBase::GetRelRelatedVars(
     }
     return stmts;
 }
-const std::vector<int>& UsesModifiesStoreBase::GetStmtNo(
-        int var_index) const noexcept {
+const std::vector<StmtNo>& UsesModifiesStoreBase::GetStmtNo(
+        VarIndex var_index) const noexcept {
     return stmt_var_.GetKeys(var_index);
 }
-const std::set<int>& UsesModifiesStoreBase::GetAllVar(
-        int stmt_no) const noexcept {
+const std::set<VarIndex>& UsesModifiesStoreBase::GetAllVar(
+        StmtNo stmt_no) const noexcept {
     return stmt_no == 0 ? all_vars_ : complete_stmt_var_.GetVals(stmt_no);
 }
-const std::set<int>& UsesModifiesStoreBase::GetVarAccessByProc(
-        int proc_index) const noexcept {
+const std::set<VarIndex>& UsesModifiesStoreBase::GetVarAccessByProc(
+        ProcIndex proc_index) const noexcept {
     return proc_vars_.GetVals(proc_index);
 }
-const std::set<int>& UsesModifiesStoreBase::GetAllStmt(
-        int var_index) const noexcept {
+const std::set<StmtNo>& UsesModifiesStoreBase::GetAllStmt(
+        VarIndex var_index) const noexcept {
     return complete_stmt_var_.GetKeys(var_index);
 }
-const std::set<int>& UsesModifiesStoreBase::GetAllProc(
-        int var_index) const noexcept {
+const std::set<ProcIndex>& UsesModifiesStoreBase::GetAllProc(
+        VarIndex var_index) const noexcept {
     return proc_vars_.GetKeys(var_index);
 }
-const std::set<int>& UsesModifiesStoreBase::GetAllProc() const noexcept {
+const std::set<ProcIndex>& UsesModifiesStoreBase::GetAllProc() const noexcept {
     return all_procs_;
 }
-PairVec<int> UsesModifiesStoreBase::GetStmtVar(
+PairVec<StmtNo, VarIndex> UsesModifiesStoreBase::GetStmtVar(
         StmtType stmt_type) const noexcept {
     if (stmt_type == StmtType::kAll) {
         return GetAllRel();
     }
     return stmt_var_pairs_[StmtTypeToIndex(stmt_type)];
 }
-PairVec<int> UsesModifiesStoreBase::GetProcVar() const noexcept {
+PairVec<ProcIndex, VarIndex> UsesModifiesStoreBase::GetProcVar()
+        const noexcept {
     return proc_var_pair_;
 }
-PairVec<int> UsesModifiesStoreBase::GetAllRel() const noexcept {
-    auto [stmts, vars] = PairVec<int>();
+PairVec<StmtNo, VarIndex> UsesModifiesStoreBase::GetAllRel() const noexcept {
+    auto [stmts, vars] = PairVec<StmtNo, VarIndex>();
     stmts.reserve(num_rels_), vars.reserve(num_rels_);
 
     for (const auto& stmt_var_pair : stmt_var_pairs_) {
@@ -105,7 +106,7 @@ PairVec<int> UsesModifiesStoreBase::GetAllRel() const noexcept {
     }
     return {stmts, vars};
 }
-std::set<int> UsesModifiesStoreBase::GetStmt(
+std::set<StmtNo> UsesModifiesStoreBase::GetStmt(
         StmtType stmt_type) const noexcept {
     return stmts_arr_[static_cast<int>(stmt_type)];
 }
@@ -124,11 +125,12 @@ void UsesModifiesStoreBase::Compile(
     CalculateNumRels();
 }
 void UsesModifiesStoreBase::AddCallStmtVar(
-        PairVec<int>& stmt_var_pair, const std::vector<int>& stmt_list,
+        PairVec<StmtNo, VarIndex>& stmt_var_pair,
+        const std::vector<StmtNo>& stmt_list,
         const CallsRelationshipStore& calls_rel_store) const noexcept {
     auto& [stmts, vars] = stmt_var_pair;
     for (const auto stmt_no : stmt_list) {
-        int proc_index = calls_rel_store.GetProc(stmt_no);
+        ProcIndex proc_index = calls_rel_store.GetProc(stmt_no);
         auto& var_indices = proc_vars_.GetVals(proc_index);
         auto proc_indices = calls_rel_store.GetCalleeProcsT(proc_index);
         for (auto index : proc_indices) {
@@ -142,8 +144,8 @@ void UsesModifiesStoreBase::AddCallStmtVar(
     }
 }
 void UsesModifiesStoreBase::AddDirectRel(
-        PairVec<int>& stmt_var_pair,
-        const std::vector<int>& stmt_list) const noexcept {
+        PairVec<StmtNo, VarIndex>& stmt_var_pair,
+        const std::vector<StmtNo>& stmt_list) const noexcept {
     auto& [stmts, vars] = stmt_var_pair;
     for (const auto stmt_no : stmt_list) {
         auto& var_indices = stmt_var_.GetVals(stmt_no);
@@ -152,16 +154,16 @@ void UsesModifiesStoreBase::AddDirectRel(
     }
 }
 void UsesModifiesStoreBase::AddIndirectRel(
-        const PairVec<int>& basic_pairs, const ContainerInfo& info,
+        const PairVec<StmtNo, VarIndex>& basic_pairs, const ContainerInfo& info,
         ContainerAddedTrackers& bitmaps) noexcept {
     const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
     auto& [if_added, while_added, proc_added] = bitmaps;
     auto& [basic_stmts, basic_vars] = basic_pairs;
     for (int i = 0; i < basic_stmts.size(); ++i) {
         auto s = basic_stmts[i], v = basic_vars[i];
-        int stmtlst = stmtlst_stmt.GetStmtlst(s);
+        StmtLstIndex stmtlst = stmtlst_stmt.GetStmtlst(s);
         auto ancestors = forest.GetAncestryTrace(stmtlst);
-        int proc_index = stmtlst_parent.GetParent(ancestors.back()).index;
+        ProcIndex proc_index = stmtlst_parent.GetParent(ancestors.back()).index;
         ProcessProcedureAncestor(proc_index, v, proc_added);
         ancestors.pop_back();
         for (auto j : ancestors) {
@@ -240,7 +242,8 @@ void UsesModifiesStoreBase::CalculateNumRels() noexcept {
             [](PairVec<int>& pair) { return pair.first.size(); });
 }
 void UsesModifiesStoreBase::ProcessProcedureAncestor(
-        int proc_index, int var_index, BitVec2D& proc_added) noexcept {
+        ProcIndex proc_index, VarIndex var_index,
+        BitVec2D& proc_added) noexcept {
     if (proc_added.At(proc_index, var_index)) return;
     proc_added.Set(proc_index, var_index);
     proc_vars_.Set(proc_index, var_index);

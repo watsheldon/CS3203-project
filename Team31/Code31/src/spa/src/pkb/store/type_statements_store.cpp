@@ -3,12 +3,12 @@
 #include <cassert>
 
 namespace spa {
-TypeStatementsStore::TypeStatementsStore(std::vector<int>&& reads,
-                                         std::vector<int>&& prints,
-                                         std::vector<int>&& calls,
-                                         std::vector<int>&& whiles,
-                                         std::vector<int>&& ifs,
-                                         std::vector<int>&& assigns)
+TypeStatementsStore::TypeStatementsStore(std::vector<StmtNo>&& reads,
+                                         std::vector<StmtNo>&& prints,
+                                         std::vector<StmtNo>&& calls,
+                                         std::vector<StmtNo>&& whiles,
+                                         std::vector<StmtNo>&& ifs,
+                                         std::vector<StmtNo>&& assigns)
         : statement_to_type_(reads.size() + prints.size() + calls.size() +
                              whiles.size() + ifs.size() + assigns.size() + 1),
           type_to_statements_{{std::move(reads), std::move(prints),
@@ -22,12 +22,13 @@ TypeStatementsStore::TypeStatementsStore(std::vector<int>&& reads,
     }
 }
 
-const std::vector<int>& TypeStatementsStore::GetStatements(StmtType st) const {
+const std::vector<StmtNo>& TypeStatementsStore::GetStatements(
+        StmtType st) const {
     assert(st != StmtType::kAll);
     return type_to_statements_[static_cast<int>(st) - 1];
 }
 
-StmtType TypeStatementsStore::GetType(int stmt_no) const {
+StmtType TypeStatementsStore::GetType(StmtNo stmt_no) const {
     return statement_to_type_[stmt_no];
 }
 }  // namespace spa

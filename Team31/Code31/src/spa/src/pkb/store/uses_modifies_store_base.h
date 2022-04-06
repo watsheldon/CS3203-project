@@ -25,24 +25,31 @@ class UsesModifiesStoreBase {
     };
     UsesModifiesStoreBase(std::size_t stmt_size, std::size_t var_size,
                           std::size_t proc_size) noexcept;
-    [[nodiscard]] bool ExistRel(int stmt_no, int var_index) const noexcept;
-    [[nodiscard]] bool ExistRelP(int proc_index) const noexcept;
-    [[nodiscard]] bool ExistRelP(int proc_index, int var_index) const noexcept;
-    [[nodiscard]] std::set<int> GetRelRelatedVars(int stmt_no) const noexcept;
-    [[nodiscard]] std::set<int> GetRelRelatedVars(
-            int var_index, StmtType type,
+    [[nodiscard]] bool ExistRel(StmtNo stmt_no,
+                                VarIndex var_index) const noexcept;
+    [[nodiscard]] bool ExistRelP(ProcIndex proc_index) const noexcept;
+    [[nodiscard]] bool ExistRelP(ProcIndex proc_index,
+                                 VarIndex var_index) const noexcept;
+    [[nodiscard]] std::set<VarIndex> GetRelRelatedVars(
+            StmtNo stmt_no) const noexcept;
+    [[nodiscard]] std::set<StmtNo> GetRelRelatedVars(
+            VarIndex var_index, StmtType type,
             const TypeStatementsStore &store) const noexcept;
-    [[nodiscard]] const std::vector<int> &GetStmtNo(
-            int var_index) const noexcept;
-    [[nodiscard]] const std::set<int> &GetAllVar(int stmt_no) const noexcept;
-    [[nodiscard]] const std::set<int> &GetVarAccessByProc(
-            int proc_index) const noexcept;
-    [[nodiscard]] const std::set<int> &GetAllStmt(int var_index) const noexcept;
-    [[nodiscard]] const std::set<int> &GetAllProc(int var_index) const noexcept;
-    [[nodiscard]] const std::set<int> &GetAllProc() const noexcept;
-    [[nodiscard]] PairVec<int> GetStmtVar(StmtType stmt_type) const noexcept;
-    [[nodiscard]] PairVec<int> GetProcVar() const noexcept;
-    [[nodiscard]] std::set<int> GetStmt(StmtType stmt_type) const noexcept;
+    [[nodiscard]] const std::vector<StmtNo> &GetStmtNo(
+            VarIndex var_index) const noexcept;
+    [[nodiscard]] const std::set<VarIndex> &GetAllVar(
+            StmtNo stmt_no) const noexcept;
+    [[nodiscard]] const std::set<VarIndex> &GetVarAccessByProc(
+            ProcIndex proc_index) const noexcept;
+    [[nodiscard]] const std::set<StmtNo> &GetAllStmt(
+            VarIndex var_index) const noexcept;
+    [[nodiscard]] const std::set<ProcIndex> &GetAllProc(
+            VarIndex var_index) const noexcept;
+    [[nodiscard]] const std::set<ProcIndex> &GetAllProc() const noexcept;
+    [[nodiscard]] PairVec<StmtNo, VarIndex> GetStmtVar(
+            StmtType stmt_type) const noexcept;
+    [[nodiscard]] PairVec<ProcIndex, VarIndex> GetProcVar() const noexcept;
+    [[nodiscard]] std::set<StmtNo> GetStmt(StmtType stmt_type) const noexcept;
     void Compile(const TypeStatementsStore &type_statement_store,
                  const ContainerInfo &info,
                  const CallsRelationshipStore &calls_rel_store);
@@ -59,10 +66,10 @@ class UsesModifiesStoreBase {
         ContainerAddedTrackers &bitmaps;
     };
 
-    [[nodiscard]] PairVec<int> GetAllRel() const noexcept;
-    void AddDirectRel(PairVec<int> &stmt_var_pair,
-                      const std::vector<int> &stmt_no) const noexcept;
-    void AddIndirectRel(const PairVec<int> &basic_pairs,
+    [[nodiscard]] PairVec<StmtNo, VarIndex> GetAllRel() const noexcept;
+    void AddDirectRel(PairVec<StmtNo, VarIndex> &stmt_var_pair,
+                      const std::vector<StmtNo> &stmt_no) const noexcept;
+    void AddIndirectRel(const PairVec<StmtNo, VarIndex> &basic_pairs,
                         const ContainerInfo &info,
                         ContainerAddedTrackers &bitmaps) noexcept;
     void AddAllContainerRel(
@@ -70,9 +77,10 @@ class UsesModifiesStoreBase {
             const ContainerInfo &info,
             const CallsRelationshipStore &calls_rel_store) noexcept;
     void AddCallStmtVar(
-            PairVec<int> &stmt_var_pair, const std::vector<int> &stmt_no,
+            PairVec<StmtNo, VarIndex> &stmt_var_pair,
+            const std::vector<StmtNo> &stmt_no,
             const CallsRelationshipStore &calls_rel_store) const noexcept;
-    void ProcessProcedureAncestor(int proc_index, int var_index,
+    void ProcessProcedureAncestor(ProcIndex proc_index, VarIndex var_index,
                                   BitVec2D &proc_added) noexcept;
     void FillStmts() noexcept;
     void FillVars() noexcept;
@@ -120,9 +128,9 @@ class UsesModifiesStoreBase {
     IndexBimap<std::vector<int>> stmt_var_;
     IndexBimap<std::set<int>> complete_stmt_var_;
     IndexBimap<std::set<int>> proc_vars_;
-    PairVec<int> proc_var_pair_;
-    std::set<int> all_procs_;
-    std::set<int> all_vars_;
+    PairVec<ProcIndex, VarIndex> proc_var_pair_;
+    std::set<ProcIndex> all_procs_;
+    std::set<VarIndex> all_vars_;
     // Read, Print, Call, While, If, Assign
     std::array<PairVec<int>, 6> stmt_var_pairs_;
     // All, Read, Print, Call, While, If, Assign

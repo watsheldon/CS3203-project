@@ -8,31 +8,38 @@ namespace spa {
 class CallsRelationshipStore {
   public:
     CallsRelationshipStore(size_t stmt_count, size_t proc_count,
-                           std::vector<std::set<int>> procs);
-    void Set(int call_stmt, int proc_index);
-    [[nodiscard]] bool ExistCalls(int first_proc, int second_proc) const;
-    [[nodiscard]] bool ExistCallsT(int first_proc, int second_proc) const;
-    [[nodiscard]] bool ExistCalls(int first_proc) const;
-    [[nodiscard]] std::set<int> GetCalls(ArgPos return_pos) const;
-    [[nodiscard]] const std::set<int> &GetCallerProcs(int callee) const;
-    [[nodiscard]] const std::set<int> &GetCalleeProcs(int caller) const;
-    [[nodiscard]] const std::set<int> &GetCallerProcsT(int callee) const;
-    [[nodiscard]] const std::set<int> &GetCalleeProcsT(int caller) const;
-    [[nodiscard]] const std::set<int> &GetAllCallers() const;
-    [[nodiscard]] const std::set<int> &GetAllCallees() const;
-    [[nodiscard]] const PairVec<int> &GetCallsPairs() const;
-    [[nodiscard]] const PairVec<int> &GetCallsTPairs() const;
-    [[nodiscard]] const std::vector<int> &GetStmts(int proc_index) const;
-    [[nodiscard]] int GetProc(int call_stmt) const;
+                           std::vector<std::set<ProcIndex>> procs);
+    void Set(StmtNo call_stmt, ProcIndex proc_index);
+    [[nodiscard]] bool ExistCalls(ProcIndex first_proc,
+                                  ProcIndex second_proc) const;
+    [[nodiscard]] bool ExistCallsT(ProcIndex first_proc,
+                                   ProcIndex second_proc) const;
+    [[nodiscard]] bool ExistCalls(ProcIndex first_proc) const;
+    [[nodiscard]] std::set<ProcIndex> GetCalls(ArgPos return_pos) const;
+    [[nodiscard]] const std::set<ProcIndex> &GetCallerProcs(
+            ProcIndex callee) const;
+    [[nodiscard]] const std::set<ProcIndex> &GetCalleeProcs(
+            ProcIndex caller) const;
+    [[nodiscard]] const std::set<ProcIndex> &GetCallerProcsT(
+            ProcIndex callee) const;
+    [[nodiscard]] const std::set<ProcIndex> &GetCalleeProcsT(
+            ProcIndex caller) const;
+    [[nodiscard]] const std::set<ProcIndex> &GetAllCallers() const;
+    [[nodiscard]] const std::set<ProcIndex> &GetAllCallees() const;
+    [[nodiscard]] const PairVec<ProcIndex> &GetCallsPairs() const;
+    [[nodiscard]] const PairVec<ProcIndex> &GetCallsTPairs() const;
+    [[nodiscard]] const std::vector<StmtNo> &GetStmts(
+            ProcIndex proc_index) const;
+    [[nodiscard]] ProcIndex GetProc(StmtNo call_stmt) const;
 
   private:
     IndexBimap<std::vector<int>> stmt_proc_;
     IndexBimap<std::set<int>> proc_proc_;
     IndexBimap<std::set<int>> proc_proc_t_;
-    std::set<int> all_callees_;
-    std::set<int> all_callers_;
-    PairVec<int> pairs_;
-    PairVec<int> pairs_t_;
+    std::set<ProcIndex> all_callees_;
+    std::set<ProcIndex> all_callers_;
+    PairVec<ProcIndex> pairs_;
+    PairVec<ProcIndex> pairs_t_;
 };
 }  // namespace spa
 

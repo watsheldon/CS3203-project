@@ -16,10 +16,12 @@ UsesRelationshipStore::UsesRelationshipStore(std::size_t stmt_size,
           condition_direct_uses_(
                   {IndexBimap<std::set<int>>(stmt_size, var_size),
                    IndexBimap<std::set<int>>(stmt_size, var_size)}) {}
-void UsesRelationshipStore::Set(int stmt_no, std::vector<int>&& var_indices) {
+void UsesRelationshipStore::Set(StmtNo stmt_no,
+                                std::vector<VarIndex>&& var_indices) {
     stmt_var_.Set(stmt_no, std::move(var_indices));
 }
-const std::vector<int>& UsesRelationshipStore::GetVarIndex(int stmt_no) const {
+const std::vector<VarIndex>& UsesRelationshipStore::GetVarIndex(
+        StmtNo stmt_no) const {
     return stmt_var_.GetVals(stmt_no);
 }
 void UsesRelationshipStore::AddConditionRel(
@@ -53,7 +55,7 @@ void UsesRelationshipStore::PrecompileStep(
         auto& [direct_stmts, direct_vars] =
                 condition_direct_pairs_[GetCondTypeIndex(stmt_type)];
         auto& stmt_set = condition_direct_stmts_[GetCondTypeIndex(stmt_type)];
-        const std::vector<int>& statements =
+        const std::vector<StmtNo>& statements =
                 type_store.GetStatements(stmt_type);
         for (StmtNo stmt_no : statements) {
             const auto& vars = GetVarIndex(stmt_no);
@@ -67,9 +69,9 @@ void UsesRelationshipStore::PrecompileStep(
 }
 // Add direct Uses of condition variables by container stmt with the given
 // index.
-void UsesRelationshipStore::AddConditionDirectUses(int stmt_no,
-                                                   PairVec<int>& stmt_var_pairs,
-                                                   BitVec2D& bitmap) const {
+void UsesRelationshipStore::AddConditionDirectUses(
+        StmtNo stmt_no, PairVec<StmtNo, VarIndex>& stmt_var_pairs,
+        BitVec2D& bitmap) const {
     auto& [container_stmts, container_vars] = stmt_var_pairs;
     for (auto v : GetVarIndex(stmt_no)) {
         if (bitmap.At(stmt_no, v)) continue;
@@ -80,7 +82,7 @@ void UsesRelationshipStore::AddConditionDirectUses(int stmt_no,
 }
 // Add indirect Uses of condition variables by ancestors of stmt_no.
 void UsesRelationshipStore::AddConditionIndirectUses(
-        int stmt_no, const ContainerInfo& info,
+        StmtNo stmt_no, const ContainerInfo& info,
         ContainerAddedTrackers& bitmaps) {
     const auto& [forest, stmtlst_parent, stmtlst_stmt] = info;
     auto& [if_added, while_added, proc_added] = bitmaps;
@@ -108,30 +110,32 @@ void UsesRelationshipStore::AddConditionIndirectUses(
         stmts.resize(vars.size(), index);
     }
 }
-bool UsesRelationshipStore::ExistUses(int stmt_no, int var_index) {
+bool UsesRelationshipStore::ExistUses(StmtNo stmt_no, VarIndex var_index) {
     return ExistRel(stmt_no, var_index);
 }
-std::set<int> UsesRelationshipStore::GetUses(int stmt_no) const noexcept {
+std::set<VarIndex> UsesRelationshipStore::GetUses(
+        StmtNo stmt_no) const noexcept {
     return GetRelRelatedVars(stmt_no);
 }
-std::set<int> UsesRelationshipStore::GetUses(int var_index, StmtType type,
-                                             const TypeStatementsStore& store) {
+std::set<StmtNo> UsesRelationshipStore::GetUses(
+        VarIndex var_index, StmtType type, const TypeStatementsStore& store) {
     return GetRelRelatedVars(var_index, type, store);
 }
-bool UsesRelationshipStore::ExistUsesP(int proc_index, int var_index) {
+bool UsesRelationshipStore::ExistUsesP(ProcIndex proc_index,
+                                       VarIndex var_index) {
     return ExistRelP(proc_index, var_index);
 }
-bool UsesRelationshipStore::ExistUsesP(int proc_index) {
+bool UsesRelationshipStore::ExistUsesP(ProcIndex proc_index) {
     return ExistRelP(proc_index);
 }
-const std::set<int>& UsesRelationshipStore::GetContainers(StmtType type,
-                                                          int var_index) const {
+const std::set<StmtNo>& UsesRelationshipStore::GetContainers(
+        StmtType type, VarIndex var_index) const {
     return condition_direct_uses_[GetCondTypeIndex(type)].GetKeys(var_index);
 }
-std::set<int> UsesRelationshipStore::GetContainers(StmtType type) const {
+std::set<StmtNo> UsesRelationshipStore::GetContainers(StmtType type) const {
     return condition_direct_stmts_[GetCondTypeIndex(type)];
 }
-const PairVec<int>& UsesRelationshipStore::GetContainerVarPairs(
+const PairVec<StmtNo, VarIndex>& UsesRelationshipStore::GetContainerVarPairs(
         StmtType type) const {
     return condition_direct_pairs_[GetCondTypeIndex(type)];
 }
