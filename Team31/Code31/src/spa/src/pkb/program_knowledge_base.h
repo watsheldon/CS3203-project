@@ -6,6 +6,7 @@
 #include <iterator>
 #include <numeric>
 #include <utility>
+#include <vector>
 
 #include "common/entity_type_enum.h"
 #include "common/index.h"
@@ -234,6 +235,11 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;
 
+    std::vector<std::string_view> GetNames(
+            const std::vector<int> &indices,
+            QueryEntityType entity_type) override;
+    std::vector<std::string_view> GetAttr(const std::vector<int> &indices,
+                                          StmtType stmt_type) override;
     void ToName(QueryEntityType et, const std::vector<int> &index_list,
                 std::list<std::string> &names) override;
     void ToAttr(StmtType et, const std::vector<StmtNo> &index_list,
@@ -283,6 +289,12 @@ class ProgramKnowledgeBase : public KnowledgeBase {
                           std::list<std::string> &output) const noexcept;
     void ExtractCallProcNames(const std::vector<StmtNo> &call_stmts,
                               std::list<std::string> &output) const noexcept;
+    [[nodiscard]] std::vector<IdentView> ExtractReadModifies(
+            const std::vector<int> &read_stmts) const noexcept;
+    [[nodiscard]] std::vector<IdentView> ExtractPrintUses(
+            const std::vector<int> &print_stmts) const noexcept;
+    [[nodiscard]] std::vector<IdentView> ExtractCallProcNames(
+            const std::vector<StmtNo> &call_stmts) const noexcept;
 };
 
 }  // namespace spa

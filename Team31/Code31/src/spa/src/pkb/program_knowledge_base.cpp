@@ -756,7 +756,6 @@ void ProgramKnowledgeBase::ToAttr(StmtType et,
         default:
             assert(false);
     }
-    assert(false);
 }
 int ProgramKnowledgeBase::IdentToIndexValue(std::string_view name,
                                             QueryEntityType et) {
@@ -790,5 +789,58 @@ void ProgramKnowledgeBase::ExtractCallProcNames(
         auto proc_name = name_value_.GetNameValue(proc, QueryEntityType::kProc);
         output.emplace_back(proc_name);
     }
+}
+std::vector<IdentView> ProgramKnowledgeBase::ExtractReadModifies(
+        const std::vector<int> &read_stmts) const noexcept {
+    std::vector<IdentView> output;
+    for (StmtNo read : read_stmts) {
+        auto modify = *modifies_rel_.GetModifies(read).begin();
+        auto var_name = name_value_.GetNameValue(modify, QueryEntityType::kVar);
+        output.emplace_back(var_name);
+    }
+    return output;
+}
+std::vector<IdentView> ProgramKnowledgeBase::ExtractPrintUses(
+        const std::vector<int> &print_stmts) const noexcept {
+    std::vector<IdentView> output;
+    for (StmtNo print : print_stmts) {
+        auto use = *uses_rel_.GetUses(print).begin();
+        auto var_name = name_value_.GetNameValue(use, QueryEntityType::kVar);
+        output.emplace_back(var_name);
+    }
+    return output;
+}
+std::vector<IdentView> ProgramKnowledgeBase::ExtractCallProcNames(
+        const std::vector<StmtNo> &call_stmts) const noexcept {
+    std::vector<IdentView> output;
+    for (StmtNo call : call_stmts) {
+        auto proc = call_proc_.GetProc(call);
+        auto proc_name = name_value_.GetNameValue(proc, QueryEntityType::kProc);
+        output.emplace_back(proc_name);
+    }
+    return output;
+}
+std::vector<std::string_view> ProgramKnowledgeBase::GetNames(
+        const std::vector<int> &indices, QueryEntityType entity_type) {
+    std::vector<std::string_view> names;
+    names.reserve(indices.size());
+    for (int idx : indices) {
+        names.emplace_back(name_value_.GetNameValue(idx, entity_type));
+    }
+    return names;
+}
+std::vector<std::string_view> ProgramKnowledgeBase::GetAttr(
+        const std::vector<int> &indices, StmtType stmt_type) {
+    switch (stmt_type) {
+        case StmtType::kRead:
+            return ExtractReadModifies(indices);
+        case StmtType::kPrint:
+            return ExtractPrintUses(indices);
+        case StmtType::kCall:
+            return ExtractCallProcNames(indices);
+        default:
+            assert(false);
+    }
+    return {};
 }
 }  // namespace spa
