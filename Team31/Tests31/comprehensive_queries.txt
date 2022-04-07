@@ -153,3 +153,13 @@ assign               and;
 Select and such that Follows*(and, _) and Next*(and, _) and Affects*(and, _) and Parent*(_, _) and Calls*(_, _) and Uses(and, _) and Modifies(and, _) pattern and(_,_) with "and"="and"
 5, 32, 38, 44, 45, 65, 75, 91, 92, 99
 5000
+32 - 7 such that (Follows*, Parent*, Calls*, Next*, Affects*, Uses, Modifies) + 1 pattern(assign) + 1 with (meaningless) - integer/ident for 2nd arg
+assign                and; procedure with;
+Select <and.stmt#,            with.procName> such that Follows*(and, 39) and Next*(and, 48) and Affects*(and, _) and Parent*(33, 37) and Calls*("One1", with) and Uses(and, "read") and Modifies(and, "x") pattern and("x",_"read"_) with "with"="with"
+38 Three3,38 Four4, 38 Five5, 38 Six6
+5000
+33 - 7 such that (Follows*, Parent*, Calls*, Next*, Affects*, Uses, Modifies) + 1 pattern(assign) - integer/ident for 1st arg
+assign and; procedure Calls;
+Select <                 and.stmt#,Calls.procName> such that Follows*(4, and) and Next*(10, and) and Affects*(5, and) and Parent*(2, and) and Calls*(Calls, "Five5") and Uses(Calls, "One1Two2Three3") and Modifies(Calls, "read") pattern and("read", "(read) -(procedure+while)")
+5 One1, 5 Two2, 5 Four4
+5000
