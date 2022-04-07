@@ -118,6 +118,7 @@ StmtNo ControlFlowGraph::AddCombinedNode(StmtNo first_stmt) noexcept {
             break;
         }
         stmt_node_index[last] = stmt_node_index[first_stmt];
+        curr_node.stop = last;
     }
     return last;
 }
