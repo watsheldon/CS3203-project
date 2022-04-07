@@ -2,6 +2,7 @@
 #define SRC_SPA_SRC_PKB_SECONDARY_STRUCTURE_AFFECTS_CALCULATOR_H_
 
 #include <set>
+#include <vector>
 
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
@@ -52,6 +53,7 @@ class AffectsCalculator {
     const UsesRelationshipStore& uses_store_;
     const ControlFlowGraph& cfg_;
     const NextCalculator& next_;
+    const std::vector<StmtNo>& assign_stmts_;
 
     [[nodiscard]] bool IsSameProcedure(StmtNo first_assign,
                                        StmtNo second_assign) const noexcept;

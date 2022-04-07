@@ -642,18 +642,18 @@ bool ProgramKnowledgeBase::ExistAffectsT(Index<ArgPos::kFirst> first_assign,
     return false;
 }
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign) {
-    return false;
+    return affects_->HasAffected(first_assign);
 }
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kSecond> second_assign) {
-    return false;
+    return affects_->HasAffecter(second_assign);
 }
-bool ProgramKnowledgeBase::ExistAffects() { return false; }
+bool ProgramKnowledgeBase::ExistAffects() { return affects_->ExistAffects(); }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffects(ArgPos return_pos) {
-    return {};
+    return affects_->GetAffects(return_pos);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
         Index<ArgPos::kFirst> assign) {
-    return {};
+    return affects_->GetAffected(assign);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
         Index<ArgPos::kFirst> assign) {
@@ -661,13 +661,15 @@ std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
         Index<ArgPos::kSecond> assign) {
-    return {};
+    return affects_->GetAffecter(assign);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
         Index<ArgPos::kSecond> assign) {
     return {};
 }
-PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() { return {}; }
+PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() {
+    return affects_->GetAffectsPairs();
+}
 
 PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsSelf() { return {}; }
