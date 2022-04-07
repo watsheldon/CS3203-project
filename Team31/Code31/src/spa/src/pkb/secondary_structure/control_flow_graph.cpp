@@ -76,10 +76,15 @@ void ControlFlowGraph::AddWhileNode(StmtNo while_stmt,
                                : after_node.next.first) = while_stmt;
     }
     StmtNo first_stmt = while_stmtlst.front();
+    auto& while_node = GetNode(while_stmt);
+    (while_node.next.first ? while_node.next.second : while_node.next.first) =
+            first_stmt;
     StmtNo after_stmt = stmtlst_stmt_.GetFollowsSecondArg(while_stmt);
-    GetNode(while_stmt).next = {first_stmt, after_stmt};
+    if (after_stmt) {
+        while_node.next.second = after_stmt;
+        GetNode(after_stmt).prev.emplace_back(while_stmt);
+    }
     GetNode(first_stmt).prev.emplace_back(while_stmt);
-    GetNode(after_stmt).prev.emplace_back(while_stmt);
 }
 void ControlFlowGraph::ProcessWhileExitPoints(Node& while_node,
                                               StmtNo last_stmt,
