@@ -186,8 +186,7 @@ void Generator::Select(std::string_view name) noexcept {
     auto itr = synonym_map_.find(name);
     Synonym *selected = nullptr;
     if (itr == synonym_map_.end()) {
-        if (!selected_.empty() || name != kBoolean ||
-            *--mode_.end() == Mode::kMultiSelect)
+        if (!selected_.empty() || name != kBoolean || mode_.size() > 1)
             return SemanticError();
     } else {
         selected = itr->second;
