@@ -4,6 +4,7 @@
 #include <set>
 
 #include "common/aliases.h"
+#include "common/bitvec2d.h"
 #include "common/entity_type_enum.h"
 #include "container_forest.h"
 #include "control_flow_graph.h"
@@ -51,7 +52,6 @@ class NextCalculator {
     const ContainerForest& forest_;
     const ParentRelationshipStore& parent_store_;
     const ControlFlowGraph& cfg_;
-    std::queue<std::vector<StmtNo>> queue_;
 
     [[nodiscard]] PairOf<StmtNo> GetNextPair(StmtNo prev) const noexcept;
     [[nodiscard]] std::set<StmtNo> FilterPairResult(
@@ -64,6 +64,8 @@ class NextCalculator {
     [[nodiscard]] PairVec<StmtNo> GetNextPairsFilterByPrev(StmtType type) const;
     [[nodiscard]] PairVec<StmtNo> GetNextPairsFilterBoth(
             StmtType prev_type, StmtType next_type) const;
+    [[nodiscard]] std::vector<StmtNo> GetPrevTVec(
+            StmtNo next, StmtType stmt_type) const noexcept;
     [[nodiscard]] std::vector<StmtNo> GetNextTVec(
             StmtNo prev, StmtType stmt_type) const noexcept;
     [[nodiscard]] PairVec<StmtNo> GetNextTPairsNoFilter() noexcept;
@@ -75,23 +77,6 @@ class NextCalculator {
             StmtType type) noexcept;
     [[nodiscard]] PairVec<StmtNo> GetNextTPairsFilterBoth(
             StmtType prev_type, StmtType next_type) noexcept;
-    void AddTPairsInProc(StmtNo root, PairVec<StmtNo>& results) noexcept;
-    [[nodiscard]] std::size_t ToBit(std::size_t row,
-                                    std::size_t col) const noexcept;
-    void AddPairsWithPrevInQueue(
-            PairVec<StmtNo>& results, BitArray& added, StmtNo next_stmt,
-            StmtType filter_type = StmtType::kAll) noexcept;
-    void AppendAndQueue(PairVec<StmtNo>& results, BitArray& added,
-                        StmtNo next_stmt,
-                        StmtType type = StmtType::kAll) noexcept;
-    void AddTPairsInProcFilterNext(StmtNo root, PairVec<StmtNo>& results,
-                                   StmtType next_type) noexcept;
-    void AddConsecutiveTPairsFilterNext(PairVec<StmtNo>& results,
-                                        BitArray& added, StmtNo start,
-                                        StmtNo stop,
-                                        StmtType next_type) noexcept;
-    void AddTPairsInProcFilterPrev(StmtNo root, PairVec<StmtNo>& results,
-                                   StmtType prev_type) noexcept;
 };
 }  // namespace spa
 

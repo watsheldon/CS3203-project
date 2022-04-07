@@ -93,8 +93,13 @@ std::set<StmtNo> NextCalculator::GetPrev(StmtNo next,
 }
 std::set<StmtNo> NextCalculator::GetPrevT(StmtNo next,
                                           StmtType stmt_type) const noexcept {
+    auto results = GetPrevTVec(next, stmt_type);
+    return {results.begin(), results.end()};
+}
+std::vector<StmtNo> NextCalculator::GetPrevTVec(
+        StmtNo next, StmtType stmt_type) const noexcept {
     std::vector<StmtNo> stack = {next};
-    std::set<StmtNo> results;
+    std::vector<StmtNo> results;
     BitArray visited(cfg_.stmt_node_index.size());
     while (!stack.empty()) {
         StmtNo curr = stack.back();
@@ -105,12 +110,12 @@ std::set<StmtNo> NextCalculator::GetPrevT(StmtNo next,
         for (StmtNo i = curr - 1; i >= node.start; --i) {
             if (stmt_type == StmtType::kAll ||
                 type_store_.GetType(i) == stmt_type)
-                results.emplace_hint(results.begin(), i);
+                results.emplace_back(i);
         }
         for (StmtNo s : node.prev) {
             if (stmt_type == StmtType::kAll ||
                 type_store_.GetType(s) == stmt_type) {
-                results.emplace_hint(results.begin(), s);
+                results.emplace_back(s);
             }
             if (!visited.Get(s)) stack.emplace_back(s);
         }
@@ -146,14 +151,14 @@ std::vector<StmtNo> NextCalculator::GetNextTVec(
         }
         const auto [first, second] = node.next;
         if (first != 0) {
-            if (type_store_.GetType(first) == stmt_type ||
-                stmt_type == StmtType::kAll)
+            if (stmt_type == StmtType::kAll ||
+                type_store_.GetType(first) == stmt_type)
                 results.emplace_back(first);
             stack.emplace_back(first);
         }
         if (second != 0) {
-            if (type_store_.GetType(second) == stmt_type ||
-                stmt_type == StmtType::kAll)
+            if (stmt_type == StmtType::kAll ||
+                type_store_.GetType(second) == stmt_type)
                 results.emplace_back(second);
             stack.back() = second;
             stack.emplace_back(first);
@@ -279,10 +284,6 @@ PairVec<StmtNo> NextCalculator::GetNextPairsFilterBoth(
     }
     return results;
 }
-std::size_t NextCalculator::ToBit(std::size_t row,
-                                  std::size_t col) const noexcept {
-    return col * cfg_.stmt_node_index.size() + row;
-}
 PairVec<StmtNo> NextCalculator::GetNextTPairs(StmtType prev_type,
                                               StmtType next_type) noexcept {
     if (prev_type == StmtType::kAll) {
@@ -296,145 +297,35 @@ PairVec<StmtNo> NextCalculator::GetNextTPairs(StmtType prev_type,
 }
 PairVec<StmtNo> NextCalculator::GetNextTPairsNoFilter() noexcept {
     PairVec<StmtNo> results;
-    std::for_each(cfg_.roots.begin(), cfg_.roots.end(),
-                  [this, &results](StmtNo stmt_no) {
-                      AddTPairsInProc(stmt_no, results);
-                  });
+    auto& [prev, next] = results;
+    for (StmtNo i = 1; i < cfg_.stmt_node_index.size(); ++i) {
+        auto next_stmts = GetNextTVec(i, StmtType::kAll);
+        next.insert(next.end(), next_stmts.begin(), next_stmts.end());
+        prev.resize(next.size(), i);
+    }
     return results;
-}
-void NextCalculator::AddPairsWithPrevInQueue(PairVec<StmtNo>& results,
-                                             BitArray& added, StmtNo next_stmt,
-                                             StmtType filter_type) noexcept {
-    auto& [prev, next] = results;
-    for (StmtNo s : queue_.front()) {
-        auto pos = ToBit(s, next_stmt);
-        if (!added.Get(pos) && (filter_type == StmtType::kAll ||
-                                type_store_.GetType(s) == filter_type)) {
-            prev.emplace_back(s);
-            added.Set(pos);
-        }
-    }
-    next.resize(prev.size(), next_stmt);
-}
-void NextCalculator::AppendAndQueue(PairVec<StmtNo>& results, BitArray& added,
-                                    StmtNo next_stmt, StmtType type) noexcept {
-    if (type_store_.GetType(next_stmt) == StmtType::kWhile) {
-        const auto pos = ToBit(next_stmt, next_stmt);
-        if (added.Get(pos)) return;
-        added.Set(pos);
-        if (type == StmtType::kAll || type == StmtType::kWhile) {
-            results.first.emplace_back(next_stmt);
-            results.second.emplace_back(next_stmt);
-        }
-    }
-    queue_.emplace(queue_.front()).emplace_back(next_stmt);
-}
-void NextCalculator::AddTPairsInProc(StmtNo root,
-                                     PairVec<StmtNo>& results) noexcept {
-    queue_.emplace().emplace_back(root);
-    auto& [prev, next] = results;
-    BitArray added(cfg_.stmt_node_index.size() * cfg_.stmt_node_index.size());
-    while (!queue_.empty()) {
-        const auto& node = cfg_.GetNode(queue_.front().back());
-        for (StmtNo i = node.start; i < node.stop; ++i) {
-            queue_.front().emplace_back(i + 1);
-            auto num_next = node.stop - i;
-            next.resize(next.size() + num_next);
-            std::iota(next.end() - num_next, next.end(), i + 1);
-            std::for_each(next.end() - num_next, next.end(),
-                          [this, &added, i](const auto s) {
-                              added.Set(ToBit(i, s));
-                          });
-            prev.resize(next.size(), i);
-        }
-        for (StmtNo n : {node.next.first, node.next.second}) {
-            if (n == 0) break;
-            AppendAndQueue(results, added, n);
-            AddPairsWithPrevInQueue(results, added, n);
-        }
-        queue_.pop();
-    }
 }
 PairVec<StmtNo> NextCalculator::GetNextTPairsFilterByNext(
         StmtType type) noexcept {
-    assert(type != StmtType::kAll);
     PairVec<StmtNo> results;
-    std::for_each(cfg_.roots.begin(), cfg_.roots.end(),
-                  [this, &results, type](StmtNo stmt_no) {
-                      AddTPairsInProcFilterNext(stmt_no, results, type);
-                  });
+    auto& [prev, next] = results;
+    for (const StmtNo i : type_store_.GetStatements(type)) {
+        auto prev_stmts = GetPrevTVec(i, StmtType::kAll);
+        prev.insert(prev.end(), prev_stmts.begin(), prev_stmts.end());
+        next.resize(prev.size(), i);
+    }
     return results;
-}
-void NextCalculator::AddTPairsInProcFilterNext(StmtNo root,
-                                               PairVec<StmtNo>& results,
-                                               StmtType next_type) noexcept {
-    queue_.emplace().emplace_back(root);
-    auto& [prev, next] = results;
-    BitArray added(cfg_.stmt_node_index.size() * cfg_.stmt_node_index.size());
-    while (!queue_.empty()) {
-        const auto& node = cfg_.GetNode(queue_.front().back());
-        for (StmtNo i = node.start; i < node.stop; ++i) {
-            queue_.front().emplace_back(i + 1);
-            AddConsecutiveTPairsFilterNext(results, added, i, node.stop,
-                                           next_type);
-        }
-        for (StmtNo n : {node.next.first, node.next.second}) {
-            if (n == 0) break;
-            AppendAndQueue(results, added, n, next_type);
-            if (type_store_.GetType(n) != next_type) continue;
-            AddPairsWithPrevInQueue(results, added, n);
-        }
-        queue_.pop();
-    }
-}
-void NextCalculator::AddConsecutiveTPairsFilterNext(
-        PairVec<StmtNo>& results, BitArray& added, StmtNo start, StmtNo stop,
-        StmtType next_type) noexcept {
-    auto& [prev, next] = results;
-    for (StmtNo i = start + 1; i <= stop; ++i) {
-        if (type_store_.GetType(i) == next_type) {
-            next.emplace_back(i);
-            added.Set(ToBit(start, i));
-        }
-    }
-    prev.resize(next.size(), start);
 }
 PairVec<StmtNo> NextCalculator::GetNextTPairsFilterByPrev(
         StmtType type) noexcept {
     PairVec<StmtNo> results;
-    std::for_each(cfg_.roots.begin(), cfg_.roots.end(),
-                  [this, &results, type](StmtNo stmt_no) {
-                      AddTPairsInProcFilterPrev(stmt_no, results, type);
-                  });
-    return results;
-}
-void NextCalculator::AddTPairsInProcFilterPrev(StmtNo root,
-                                               PairVec<StmtNo>& results,
-                                               StmtType prev_type) noexcept {
-    queue_.emplace().emplace_back(root);
     auto& [prev, next] = results;
-    BitArray added(cfg_.stmt_node_index.size() * cfg_.stmt_node_index.size());
-    while (!queue_.empty()) {
-        const auto& node = cfg_.GetNode(queue_.front().back());
-        for (StmtNo i = node.start; i < node.stop; ++i) {
-            queue_.front().emplace_back(i + 1);
-            if (type_store_.GetType(i) != prev_type) continue;
-            auto num_next = node.stop - i;
-            next.resize(next.size() + num_next);
-            std::iota(next.end() - num_next, next.end(), i + 1);
-            std::for_each(next.end() - num_next, next.end(),
-                          [this, &added, i](const auto s) {
-                              added.Set(ToBit(i, s));
-                          });
-            prev.resize(next.size(), i);
-        }
-        for (StmtNo n : {node.next.first, node.next.second}) {
-            if (n == 0) break;
-            AppendAndQueue(results, added, n, prev_type);
-            AddPairsWithPrevInQueue(results, added, n, prev_type);
-        }
-        queue_.pop();
+    for (const StmtNo i : type_store_.GetStatements(type)) {
+        auto next_stmts = GetNextTVec(i, StmtType::kAll);
+        next.insert(next.end(), next_stmts.begin(), next_stmts.end());
+        prev.resize(next.size(), i);
     }
+    return results;
 }
 PairVec<StmtNo> NextCalculator::GetNextTPairsFilterBoth(
         StmtType prev_type, StmtType next_type) noexcept {
@@ -451,7 +342,8 @@ std::set<StmtNo> NextCalculator::GetNextTSelf(
         StmtType stmt_type) const noexcept {
     std::set<StmtNo> results;
     BitArray added(cfg_.stmt_node_index.size());
-    for (const auto while_stmt : type_store_.GetStatements(StmtType::kWhile)) {
+    for (const StmtNo while_stmt :
+         type_store_.GetStatements(StmtType::kWhile)) {
         if (added.Get(while_stmt)) continue;
         StmtNo last_stmt = parent_store_.GetContainerLastStmt(StmtType::kWhile,
                                                               while_stmt);
