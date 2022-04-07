@@ -328,13 +328,11 @@ void Generator::SetClauseMode(QueryTokenType token_type) noexcept {
 void Generator::And() noexcept {
     switch (curr_clause_mode_) {
         case ClauseMode::kSuchThat:
-            break;
+            return;
         case ClauseMode::kPattern:
-            mode_.emplace_back(Mode::kPattern);
-            return;
+            return BeginClause(QueryTokenType::kKeywordPattern);
         case ClauseMode::kWith:
-            mode_.emplace_back(Mode::kWith);
-            return;
+            return BeginClause(QueryTokenType::kKeywordWith);
         default:
             assert(false);
             return;
@@ -357,6 +355,9 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kKeywordSelect:
             mode_.emplace_back(Mode::kSelect);
             return;
+        case QueryTokenType::kKeywordPattern:
+        case QueryTokenType::kKeywordWith:
+            SetClauseMode(token_type);
         case QueryTokenType::kKeywordFollows:
         case QueryTokenType::kKeywordParent:
         case QueryTokenType::kKeywordUses:
@@ -364,10 +365,6 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
         case QueryTokenType::kKeywordCalls:
         case QueryTokenType::kKeywordNext:
         case QueryTokenType::kKeywordAffects:
-            return BeginClause(token_type);
-        case QueryTokenType::kKeywordPattern:
-        case QueryTokenType::kKeywordWith:
-            SetClauseMode(token_type);
             return BeginClause(token_type);
         case QueryTokenType::kAttrProc:
         case QueryTokenType::kAttrVar:
