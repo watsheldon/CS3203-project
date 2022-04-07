@@ -2,11 +2,11 @@ name: CMake Builds
 
 on:
   push:
-    branches-ignore:
-      - production
     paths:
       - 'Team31/Code31/src/**'
   pull_request:
+    paths:
+      - 'Team31/Code31/src/**'
 
 env:
   BUILD_TYPE: Release

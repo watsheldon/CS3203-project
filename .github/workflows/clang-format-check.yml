@@ -2,11 +2,11 @@ name: clang-format Check
 
 on:
   push:
-    branches-ignore:
-      - production
     paths:
       - 'Team31/Code31/src/spa/src/**'
   pull_request:
+    paths:
+      - 'Team31/Code31/src/spa/src/**'
 
 jobs:
   dup_check:
