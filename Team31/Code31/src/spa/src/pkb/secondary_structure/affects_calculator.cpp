@@ -55,11 +55,8 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
         if (ExistAffects(curr, second_assign)) {
             return true;
         }
-        for (const StmtNo stmt : GetAffected(curr)) {
-            if (!visited.Get(stmt)) {
-                s.emplace(stmt);
-            }
-        }
+        std::set<StmtNo> children = GetAffected(curr);
+        AddChildrenAffectsT(children, visited, s);
     }
     return false;
 }
@@ -172,14 +169,6 @@ bool AffectsCalculator::IsSameProcedure(StmtNo first_assign,
 bool AffectsCalculator::ExistUnmodifiedPath(StmtNo first_assign,
                                             StmtNo second_assign,
                                             VarIndex var) const noexcept {
-    /*
-     * This might be a borderline pyramid of doom violation. But since BFS is a
-     * standard algorithm, current way of writing makes it easier to observe
-     * what adaptations we made to the standard BFS, while still maintaining
-     * readability. We can avoid this pyramid of doom by extracting out the
-     * for loop into a method, but we decided not to use it as it breaks the
-     * flow of the algorithm and hinders readability.
-     */
     // Basically BFS on CFG.
     // The case Affects(a, a) requires some special handling.
     std::queue<StmtNo> q;
@@ -205,12 +194,7 @@ bool AffectsCalculator::ExistUnmodifiedPath(StmtNo first_assign,
             continue;
         }
         std::set<StmtNo> children = next_.GetNext(curr, StmtType::kAll);
-        for (const StmtNo child : children) {
-            if (child != 0 && !visited.Get(child)) {
-                visited.Set(child);
-                q.push(child);
-            }
-        }
+        AddChildrenAffects(children, visited, q);
     }
     return false;
 }

@@ -1,7 +1,9 @@
 #ifndef SRC_SPA_SRC_PKB_SECONDARY_STRUCTURE_AFFECTS_CALCULATOR_H_
 #define SRC_SPA_SRC_PKB_SECONDARY_STRUCTURE_AFFECTS_CALCULATOR_H_
 
+#include <queue>
 #include <set>
+#include <stack>
 #include <vector>
 
 #include "common/aliases.h"
@@ -60,6 +62,25 @@ class AffectsCalculator {
     [[nodiscard]] bool ExistUnmodifiedPath(StmtNo first_assign,
                                            StmtNo second_assign,
                                            VarIndex var) const noexcept;
+    static void AddChildrenAffects(const std::set<StmtNo>& children,
+                                   BitArray& visited,
+                                   std::queue<StmtNo>& q) noexcept {
+        for (const StmtNo child : children) {
+            if (child != 0 && !visited.Get(child)) {
+                visited.Set(child);
+                q.push(child);
+            }
+        }
+    }
+    static void AddChildrenAffectsT(
+            const std::set<StmtNo>& children, BitArray& visited,
+            std::stack<StmtNo, std::vector<StmtNo>>& s) noexcept {
+        for (const StmtNo stmt : children) {
+            if (!visited.Get(stmt)) {
+                s.emplace(stmt);
+            }
+        }
+    }
 };
 }  // namespace spa
 
