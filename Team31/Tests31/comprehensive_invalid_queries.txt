@@ -1,0 +1,200 @@
+1 - syntax (additional ;)
+
+Select BOOLEAN;
+
+5000
+2 - syntax (special characters)
+read e9%3;
+Select e9%3
+
+5000
+3 - syntax (non-existant design entity)
+state stmt;
+Select stmt
+
+5000
+4 - syntax (synonym starts with digit)
+stmt 4G;
+Select 4G
+
+5000
+5 - syntax (select quoted expression)
+stmt expr;
+Select "expr"
+
+5000
+6 - semantic (duplicated synonym)
+print p; read p;
+Select p
+
+5000
+7 - semantic (duplicated synonym)
+print p; read p;
+Select BOOLEAN
+FALSE
+5000
+8 - semantic (undeclared synonym)
+
+Select BOOLEAN with p.varName = "undeclared"
+FALSE
+5000
+9 - syntax (missing 1st arg)
+stmt s;
+Select BOOLEAN such that Follows(,s)
+
+5000
+10 - syntax (missing 2nd arg)
+stmt s;
+Select BOOLEAN such that Follows*(s,)
+
+5000
+11 - syntax (wrong char at 1st arg)
+stmt s;
+Select BOOLEAN such that Parent((),s)
+
+5000
+12 - syntax (wrong char at 1st arg)
+stmt s;
+Select BOOLEAN such that Parent*(s,*)
+
+5000
+13 - syntax (double clause without and)
+stmt s; variable v;
+Select BOOLEAN such that Uses(s, v) Uses(s, v)
+
+5000
+14 - syntax (double clause with and + such that)
+stmt s; variable v;
+Select BOOLEAN such that Modifies(s, v) and such that Modifies(s, v)
+
+5000
+15 - syntax (no star after Uses)
+stmt s; variable v;
+Select BOOLEAN such that Uses*(s, v)
+
+5000
+16 - syntax (no star after Modifies)
+stmt s; variable v;
+Select BOOLEAN such that Modifies*(s, v)
+
+5000
+17 - syntax (3 args)
+procedure p, q;
+Select BOOLEAN such that Calls(p, q, p)
+
+5000
+18 - syntax (empty quote)
+procedure p, q;
+Select BOOLEAN such that Calls*(p, "")
+
+5000
+19 - syntax (IDENT starts with digit)
+procedure p;
+Select BOOLEAN such that Calls*(p, "1P")
+
+5000
+20 - syntax (wrongly use IDENT)
+stmt s1, s2;
+Select BOOLEAN such that Next("int", 1)
+
+5000
+21 - syntax (wrongly use IDENT)
+stmt s1, s2;
+Select BOOLEAN such that Next*(1, "int")
+
+5000
+22 - semantic (synonym of wrong entity type)
+procedure p, q;
+Select BOOLEAN such that Affects(p, q)
+FALSE
+5000
+23 - semantic (synonym of wrong entity type)
+read r; print p;
+Select BOOLEAN such that Affects*(r, p)
+FALSE
+5000
+24 - syntax (pattern wrong expr)
+assign a; variable v;
+Select BOOLEAN pattern a(_,v)
+
+5000
+25 - semantic (synonym of wrong entity type)
+assign a; stmt s;
+Select BOOLEAN pattern a(s,_)
+FALSE
+5000
+26 - syntax (varName starts with digit)
+assign a; variable v;
+Select BOOLEAN pattern a(v,_"1varName + 2"_)
+
+5000
+27 - syntax (not entRef)
+if ifs;
+Select BOOLEAN pattern ifs(5,_,_)
+
+5000
+28 - syntax (2nd arg should be wildcard)
+if ifs;
+Select BOOLEAN pattern ifs(_,"v",_)
+
+5000
+29 - semantic (2 args for pattern if)
+if ifs;
+Select BOOLEAN pattern ifs(_,_)
+FALSE
+5000
+30 - semantic (3 args for pattern while)
+while while;
+Select BOOLEAN pattern while(_,_,_)
+FALSE
+5000
+31 - semantic (2nd arg should be wildcard)
+while w;
+Select BOOLEAN pattern w(_,_"v"_)
+FALSE
+5000
+32 - syntax (IDENT starts with digit)
+while w;
+Select BOOLEAN pattern w("1W",_)
+
+5000
+33 - syntax (wrong connection - and pattern)
+while w; if ifs; assign a;
+Select BOOLEAN pattern w(_,_) and a(_,_) and pattern if(_,_,_)
+
+5000
+34 - syntax (wrong connection - missing and)
+while w; if ifs; assign a;
+Select BOOLEAN pattern w(_,_) a(_,_) pattern if(_,_,_)
+
+5000
+35 - semantic (Uses 1st arg cannot be wildcard)
+variable v;
+Select BOOLEAN such that Uses(_, v)
+FALSE
+5000
+36 - semantic (Modifies 1st arg cannot be wildcard)
+variable v;
+Select BOOLEAN such that Modifies(_, v)
+FALSE
+5000
+37 - semantic (non-matching synonym.attrName)
+stmt s;
+Select BOOLEAN with "First" = s.procName
+FALSE
+5000
+38 - semantic (non-matching ref type)
+stmt s;
+Select BOOLEAN with "First" = s.stmt#
+FALSE
+5000
+39 - semantic (non-matching ref type)
+
+Select BOOLEAN with "First" = 1
+FALSE
+5000
+40 - semantic (non-matching attrRef)
+stmt s; variable v;
+Select BOOLEAN with s.stmt# = v.varName
+FALSE
+5000
