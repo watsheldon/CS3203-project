@@ -729,10 +729,11 @@ void ProgramKnowledgeBase::ToName(QueryEntityType et,
         case QueryEntityType::kProc:
         case QueryEntityType::kVar:
         case QueryEntityType::kConst:
-            std::transform(index_list.begin(), index_list.end(),
-                           std::back_inserter(names), [this, et](int i) {
-                               return name_value_.GetNameValue(i, et);
-                           });
+            std::for_each(
+                    index_list.begin(), index_list.end(),
+                    [this, et, &names](int i) {
+                        names.emplace_back(name_value_.GetNameValue(i, et));
+                    });
             return;
         case QueryEntityType::kStmt:
             std::transform(index_list.begin(), index_list.end(),

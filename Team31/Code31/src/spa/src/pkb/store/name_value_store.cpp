@@ -15,8 +15,8 @@ NameValueStore::NameValueStore(std::vector<std::string> &&proc_names,
             std::move(IndexBimap<std::string>(std::move(const_values))));
 }
 
-const std::string &NameValueStore::GetNameValue(int index,
-                                                QueryEntityType type) const {
+std::string_view NameValueStore::GetNameValue(int index,
+                                              QueryEntityType type) const {
     assert(type != QueryEntityType::kStmt);
     return name_val_store_[static_cast<int>(type)].GetVal(index);
 }

@@ -13,8 +13,8 @@ class NameValueStore {
     explicit NameValueStore(std::vector<std::string> &&proc_names,
                             std::vector<std::string> &&var_names,
                             std::vector<std::string> &&const_values);
-    [[nodiscard]] const std::string &GetNameValue(int index,
-                                                  QueryEntityType type) const;
+    [[nodiscard]] std::string_view GetNameValue(int index,
+                                                QueryEntityType type) const;
     [[nodiscard]] int GetIndex(const std::string &name,
                                QueryEntityType type) const;
     [[nodiscard]] const std::vector<std::string> &GetAllNamesValues(
