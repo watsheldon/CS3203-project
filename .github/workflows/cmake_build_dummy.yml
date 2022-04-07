@@ -1,0 +1,17 @@
+name: CMake Builds
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'Team31/Code31/src/**'
+
+jobs:
+  build:
+    name: CMake
+    strategy:
+      matrix:
+        os: [ macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: 'echo "No Build required" '
+

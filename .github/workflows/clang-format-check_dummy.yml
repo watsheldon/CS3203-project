@@ -1,0 +1,14 @@
+name: clang-format Check
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'Team31/Code31/src/spa/src/**'
+
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No checks required" '
+
