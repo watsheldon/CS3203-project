@@ -81,8 +81,15 @@ std::set<StmtNo> NextCalculator::GetPrev(StmtNo next,
                                          StmtType stmt_type) const noexcept {
     if (next >= cfg_.stmt_node_index.size()) return {};
     const auto& node = cfg_.GetNode(next);
-    return next == node.start ? FilterVecResult(node.prev, stmt_type)
-                              : std::set<StmtNo>{next - 1};
+    if (next != node.start) {
+        if (stmt_type == StmtType::kAll ||
+            type_store_.GetType(next - 1) == stmt_type) {
+            return {next - 1};
+        } else {
+            return {};
+        }
+    }
+    return FilterVecResult(node.prev, stmt_type);
 }
 std::set<StmtNo> NextCalculator::GetPrevT(StmtNo next,
                                           StmtType stmt_type) const noexcept {
