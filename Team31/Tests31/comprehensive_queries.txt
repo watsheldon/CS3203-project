@@ -1,0 +1,155 @@
+1 - such that (Affects) - TRUE
+
+Select BOOLEAN such that Affects(5, 9) and Affects (32, 35) and Affects(32, 38) and Affects(75,76) and Affects(92,94) and Affects(99,99) and Affects(45,44) and Affects(65,73)
+TRUE
+5000
+2 - such that (Affects) - FALSE : stmt# 53 -> proc Five5 modifies else
+
+Select BOOLEAN such that Affects(56,57) 
+FALSE
+5000
+3 - such that (Affects) - FALSE : stmt# 59 modifies else
+
+Select BOOLEAN such that Affects(56,60) 
+FALSE
+5000
+4 - such that (Affects) - FALSE : stmt# 15 -> proc Five5 -> proc Sixth modifies read
+
+Select BOOLEAN such that Affects(5,19)
+FALSE
+5000
+5 - such that (Affects) - FALSE : not modifies or uses common var directly
+
+Select BOOLEAN such that Affects(91,94)
+FALSE
+5000
+6 - such that (Affects) - FALSE : not modifies or uses common var directly
+
+Select BOOLEAN such that Affects(32,50)
+FALSE
+5000
+7 - such that (Affects*)
+
+Select BOOLEAN such that Affects*(45, 50) and Affects* (44, 50) and Affects*(32, 50) and Affects*(91,94) and Affects(_,_) and Affects*(_,_) 
+TRUE
+5000
+8 - 1 such that (Follows) + 1 pattern (assign) + 2 with (stmt#, varName)
+assign a1, a2; variable varName;
+Select <a1, a2> such that Follows(a1, a2) pattern a1 (varName, _) with a2.stmt# = 45 and varName.varName = "x"
+44 45
+5000
+9 - 1 such that (Parent*) + 1 pattern (while) + 2 with (stmt#)
+while w; call c; stmt stmt;
+Select <w, c> such that Parent*(w, c) with c.stmt# = 20 and w.stmt# = stmt.stmt# pattern w ("procedure", _)
+16 20
+5000
+10 - 1 such that (Uses) + 1 pattern (assign) + 2 with (stmt#,value,procName)
+assign Uses; constant cn; call c; procedure p;
+Select Uses with Uses.stmt# = cn.value and c.procName = p.procName pattern Uses(_,_"x-y   "_) such that Uses(Uses,"Uses")
+84
+5000
+11 - 1 such that (Uses) + 1 pattern (assign) + 2 with (stmt#,value,procName)
+assign a; constant cn; call c; procedure p;
+Select a with a.stmt# = cn.value and c.procName = p.procName pattern a     (_,_"       y + Uses"_) such that Uses(a,"Uses")
+85
+5000
+12 - 1 such that (Modifies) + 2 pattern (while, if) + 1 with (procName)
+if ifs; while w;call procName;
+Select <w,procName.procName> pattern ifs("read",_,_)  such that Modifies(w, "else") pattern w("print",_) with "Three3" = procName.procName
+28 Three3
+5000
+13 - 1 such that (Next) + 2 pattern (assign, while) + 1 with (stmt#)
+assign a; while pattern;
+Select <a, pattern.stmt#> with a.stmt# = 96 such that Next(a, pattern) pattern a (_, _) and w (_, _)
+
+5000
+14 - 1 such that (Next) + 2 pattern (assign, assign) + 1 with (stmt#)
+assign a; while pattern;
+Select <a, pattern.stmt#> such that Next(a, pattern) with 96 = a.stmt# pattern a (_, _) and a (_, _"procedure+call"_)
+96 95
+5000
+15 - 1 such that (Affects) + 2 pattern (assign1, assign2) + 1 with (stmt#)
+assign a1, a2; constant value;
+Select <a1, a2> pattern a1 ("read", _) and a2 (_, _"read"_) such that Affects(a1, a2) with a1.stmt# = value.value
+5 5, 5 9
+5000
+16 - 2 such that (Follows, Parent*) + 1 pattern (assign) + 1 with (varName)
+assign Follows, assign; while Parent; variable v;
+Select <Follows, assign> such that Parent*(Parent, assign) and Follows(Follows, assign)  pattern Follows (v, _) with  "x" =v.varName
+44 45
+5000
+17 - 2 such that (Follows*, Uses) + 1 pattern (while) + 1 with (procName, varName) 
+while Select; call c; variable v;
+Select Select such that Follows*(c, Select) and Uses(c, v) pattern Select (v, _) with c.procName = v.varName
+30, 43  
+5000
+18 - 2 such that (Uses, Calls*) + 1 pattern (assign) + 1 with (varName, procName)
+assign a; variable variable; procedure p, stmt;
+Select <a, p> pattern a (variable, _) such that Uses(p, variable) and Calls*(p, stmt)  with variable.varName = stmt.procName
+35 One1, 35 Two2, 35 Three3, 35 Four4
+5000
+19 - 2 such that (Uses, Modifies) + 1 pattern (assign) + 1 with (varName, procName)
+assign such; variable procedure; 
+Select such such that Uses(such, procedure) and Modifies(such, procedure) pattern such ("while", _"procedure"_) with procedure.varName = "while"
+13
+5000
+20 - 2 such that (Modifies, Next) + 1 pattern (if) + 1 with (varName)
+read Next; if ifs; variable v; print with;
+Select ifs such that Modifies(ifs, v) and Next*(ifs, Next) pattern ifs (v, _, _) with Next.varName = with.varName
+2, 31, 33, 54 
+5000
+21 - 2 such that (Modifies, Calls*) + 1 pattern (while) + 2 with (varName, procName)
+while w; procedure p, q; variable v;
+Select w such that Modifies(w, v) and Calls*(p, q) pattern w (v, _) with v.varName = q.procName and "Five5" = v.varName
+30, 43, 80
+5000
+22 - 2 such that (Uses, Next*) + 1 pattern (if) + 2 with (varName, stmt)
+if ifs; variable v; read r; print pr; stmt s;
+Select r such that Next*(r, ifs) pattern ifs (v, _, _) such that Uses(pr, v) with pr.varName = r.varName and r.stmt# = s.stmt#
+39, 47 
+5000
+23 - 2 such that (Calls, Affects) + 2 pattern (assign, while) + 1 with (varName, procName)
+procedure p, q; assign and, and1; variable v; while pattern;
+Select <and1.stmt#, and, pattern.stmt#> such that Calls(p, q) and Affects(and1, and) pattern and (v, _) and pattern("x",_) with v.varName = p.procName
+5 9 3, 75 76 3, 5 9 16, 75 76 16, 5 9 18, 75 76 18, 5 9 64, 75 76 64
+5000
+24 - 3 such that (Uses, Modifies, Affects) + 1 with (stmt#)
+assign a1, a2; variable v;
+Select v such that Uses(a1, v) and Modifies(a2, v) and Affects(a1, a2) with a1.stmt# = a2.stmt#
+read, then
+5000
+25 - 3 such that (Calls, Calls*, Uses) + 1 pattern (while) + 1 with (procName, varName)
+variable v; if ifs; stmt s; procedure One1;
+Select <v, ifs, One1> such that Calls("One1", One1) and Calls*(One1, "Six6") and Uses(ifs, v) pattern ifs (v, _, _) with One1.procName = v.varName 
+
+5000
+26 - 3 such that (Parent, Modifies, Next*) + 2 pattern (while, if)
+variable v; while w; if ifs; stmt s;
+Select <w, ifs.stmt#> such that Parent(w, s) and Modifies(ifs, v) and Next*(ifs, s) pattern w (v, _) and ifs (v, _, _)
+16 2, 28 31, 37 31, 43 31, 43 33 
+5000
+27 - 3 such that (Modifies,Next,Affects*) + 1 pattern(while) + 2 with(value, stmt#, varName)
+assign a,a1,a2;print pr;variable v;while w;constant c;
+Select a2 such that Modifies(a1,v) and Next(a1,w) and Affects*(a1,a2) with c.value = a.stmt# and pr.varName = v.varName pattern w(v,_)
+94
+5000
+28 - 4 such that (Follows*, Uses, Next*, Affects*) + 1 pattern (assign) + 1 with (stmt#)
+assign a1, a2; read print; stmt s; variable v;
+Select print such that Follows*(a1, a2) and Uses(s, v) and Next*(print, a2) and Affects*(a1, a2) with a2.stmt# = s.stmt# pattern a2(_,_"print"_)
+88, 90
+5000
+29 - 5 such that (Follows*, Parent*, Calls*, Next*, Affects*) - wildcard
+assign and; constant value;
+Select and such that Follows*(_, and) and Next*(_, and) and Affects*(_, and) and Parent*(_, and) and Calls*(_, "Five5") 
+5, 9, 35
+5000
+30 - 4 such that (Parent*, Calls*, Next*, Affects*) + 1 with (meaningless) - wildcard
+assign and; constant value;
+Select and such that      Next*(_, and) and Parent*(_, and) and Affects*(_, and) and Calls*("One1", _) with 1000000=1000000
+5, 9, 35, 38, 44, 94, 99
+5000
+31 - 7 such that (Follows*, Parent*, Calls*, Next*, Affects*, Uses, Modifies) + 1 pattern(assign) + 1 with (meaningless) - wildcard
+assign               and;
+Select and such that Follows*(and, _) and Next*(and, _) and Affects*(and, _) and Parent*(_, _) and Calls*(_, _) and Uses(and, _) and Modifies(and, _) pattern and(_,_) with "and"="and"
+5, 32, 38, 44, 45, 65, 75, 91, 92, 99
+5000

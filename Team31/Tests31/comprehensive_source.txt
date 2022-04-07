@@ -1,0 +1,102 @@
+procedure One1 {read read;
+    if (procedure == procedure) then {
+        while ((1 == x + 1) && ((12) < (11))) {
+            read procedure;
+            read = read - ((procedure+while));
+            print procedure;
+            while (12 == 12) {
+               read One1;
+               One1 = read + Two2 + read + Two2;
+               call = Two2;}}
+        call Three3;} else {
+        call Three3;
+        while = while * (while * read) / procedure;
+        call Four4;}
+    call Four4;
+    while (!(((procedure == 12 + Three3) && (0 == 0)) || (x >= (y - 1)))) {
+        call Three3;
+        while (1 == x) {
+            x = procedure + (procedure + (Two2 + Three3 + read));
+            call Three3;}
+        call Four4;
+        call Four4;
+        call = Four4 * Three3;
+        while (1 == 1) {
+            while = Three3 + 0;
+            call Three3;}}}
+procedure Two2 {read Three3;
+    while (print != read) {
+        call Three3;
+        while (Three3 != Five5) {
+           if (read == (procedure + 1)) then {
+                if = while - else;
+                if (if == while + else * then) then {
+                    call Five5;
+                    Five5 = (if%if + else) * (read + Four4);} else {
+                    call Three3;
+                    while (read != (print + Four4)) {
+                        x = if + (read);
+                        read read; }
+                    read y;
+                    print print; } } else {
+                call Five5;
+                while ((call + read >= Five5)||(!(if != else))) {
+                    x = procedure + y * One1Two2Three3;
+                    y = read + Two2 * Four4 + else;
+                    print read;
+                    read read;
+                    call Three3;   } }}}
+    call Five5;
+    x = x + Uses + procedure;
+    call Three3;}
+procedure Three3 {while (read == (read + 1)) {
+        call Five5;
+        if (else + then > procedure) then {
+            call Five5;
+            else = then * procedure;} else {
+            call = (procedure) / else;}}
+    read procedure;
+    read else;
+    else = else + procedure;
+    print Uses;
+    call Five5;}
+procedure Four4 {call Six6;
+    while (x >1) {
+        x = procedure + One1Two2Three3;
+        while (y < Uses) {
+            while (10 >= 5) {
+                call Six6;}
+            call Five5;}
+        call Five5;
+        print Five5;}
+    read call;
+    call = One1Two2Three3 + ((Five5 + 100)) * (((x + 85)));
+    call Six6;}
+procedure Five5 {procedure = else + if;
+    One1 = procedure + else;
+    else = if + read;
+    read else;
+    read print;
+    while (Five5 <= Six6) {
+        read Five5;
+        if (1 != 0) then {
+            while (!(84 == 1)) {
+                procedure = x - y + Uses;
+                procedure = x - (y + Uses);}} else {
+            read Three3; }}
+    call = read + Three3;}
+procedure Six6 {read procedure;
+    print read;
+    read print;
+    read = print + read;
+    print = read + print;
+    while ((read != print)&&(read != print)) {
+        read = print + (procedure + if) + else;}
+    while ((9 != 1)||(1 != 9)) {
+        print = procedure+call;}
+    while (read > print) {
+        while (!(read != print)) {
+            then = then * (if + else);
+            print then;}}
+    print read;
+    read print;   }
