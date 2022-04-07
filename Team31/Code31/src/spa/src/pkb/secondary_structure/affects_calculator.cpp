@@ -111,7 +111,13 @@ std::set<StmtNo> AffectsCalculator::GetAffected(
 }
 std::set<StmtNo> AffectsCalculator::GetAffectedT(
         StmtNo first_assign) const noexcept {
-    return {};
+    std::vector<StmtNo> results;
+    for (const StmtNo stmt : assign_stmts_) {
+        if (ExistAffectsT(first_assign, stmt)) {
+            results.emplace_back(stmt);
+        }
+    }
+    return {results.begin(), results.end()};
 }
 std::set<StmtNo> AffectsCalculator::GetAffecter(
         StmtNo second_assign) const noexcept {
@@ -125,7 +131,13 @@ std::set<StmtNo> AffectsCalculator::GetAffecter(
 }
 std::set<StmtNo> AffectsCalculator::GetAffecterT(
         StmtNo second_assign) const noexcept {
-    return {};
+    std::vector<StmtNo> results;
+    for (const StmtNo stmt : assign_stmts_) {
+        if (ExistAffectsT(stmt, second_assign)) {
+            results.emplace_back(stmt);
+        }
+    }
+    return {results.begin(), results.end()};
 }
 PairVec<StmtNo> AffectsCalculator::GetAffectsPairs() const noexcept {
     std::vector<StmtNo> affecter;
@@ -140,7 +152,16 @@ PairVec<StmtNo> AffectsCalculator::GetAffectsPairs() const noexcept {
     return {affecter, affected};
 }
 PairVec<StmtNo> AffectsCalculator::GetAffectsTPairs() const noexcept {
-    return {};
+    std::vector<StmtNo> affecter;
+    std::vector<StmtNo> affected;
+    for (const StmtNo stmt : assign_stmts_) {
+        affecter.emplace_back(stmt);
+        std::set<StmtNo> affected_stmts = GetAffectedT(stmt);
+        std::copy(affected_stmts.begin(), affected_stmts.end(),
+                  std::back_inserter(affected));
+        affecter.resize(affected.size(), stmt);
+    }
+    return {affecter, affected};
 }
 bool AffectsCalculator::IsSameProcedure(StmtNo first_assign,
                                         StmtNo second_assign) const noexcept {

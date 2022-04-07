@@ -657,7 +657,7 @@ std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
         Index<ArgPos::kFirst> assign) {
-    return {};
+    return affects_->GetAffectedT(assign);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
         Index<ArgPos::kSecond> assign) {
@@ -665,15 +665,15 @@ std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
         Index<ArgPos::kSecond> assign) {
-    return {};
+    return affects_->GetAffecterT(assign);
 }
 PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() {
     return affects_->GetAffectsPairs();
 }
-
-PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
+PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() {return affects_->GetAffectsTPairs();}
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsSelf() { return {}; }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsTSelf() { return {}; }
+
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(
