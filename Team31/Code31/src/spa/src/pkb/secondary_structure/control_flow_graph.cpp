@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cstddef>
 #include <queue>
-#include <set>
 
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
@@ -41,8 +40,8 @@ void ControlFlowGraph::AddIfNode(StmtNo if_stmt, StmtNo prev_stmt) noexcept {
     auto then_next = stmtlst_stmt_.GetStatements(t).front();
     auto else_next = stmtlst_stmt_.GetStatements(e).front();
     if_node.next = {then_next, else_next};
-    auto &then_node = GetNode(then_next), &else_node = GetNode(else_next);
-    then_node.prev.emplace_back(if_stmt), else_node.prev.emplace_back(if_stmt);
+    GetNode(then_next).prev.emplace_back(if_stmt);
+    GetNode(else_next).prev.emplace_back(if_stmt);
     StmtNo follower = stmtlst_stmt_.GetFollowsSecondArg(if_stmt);
     if (follower == 0) return;
     std::vector<StmtLstIndex> stack = {e, t};
