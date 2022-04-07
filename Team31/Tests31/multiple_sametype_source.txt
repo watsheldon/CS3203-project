@@ -1,0 +1,32 @@
+procedure One1 {read x;
+      read Two2;
+      call Two2; }
+procedure Two2 {x = 0;
+    assign = 5;
+    while (while!=0) {
+        x = x + 2*y;
+        call Three3;
+        while (x>=                         0){
+            y=x+1;
+    print                                                        ALotOfSpacing                  ;        }
+        if (!(2<=1)) then {
+            assign = 1;
+            read x;
+        } else {assign = assign * 2;}
+        assign = assign - 1; }
+    if ((Two2==1) || (x==1)) then {
+        if ((0>x+y)&&(0>x+y)) then {
+            assign = y * x + 2;
+            print x;
+            x = 2 + assign;} else {
+            x = 6%y;}
+        assign = 2 / 3 - x;
+        x = x+1; }else {
+        read y;
+        Two2 = 1; }
+    Two2 = Two2 - x + assign;
+    y = Two2 + 2;
+    x = x * y + Two2; }
+procedure Three3 { Two2 = 5;
+    One1 = Two2;
+    print One1; }

@@ -1,0 +1,405 @@
+1 - SuchThatClause: relationships related to procedure (calls*,modifies,uses)
+procedure p;
+Select p such that Calls*(p, "Three3") and Modifies(p, "assign") and Uses(p,"x")
+One1, Two2
+5000
+2 - SuchThatClause: relationships related to procedure (calls*,modifies,uses)
+procedure p;
+Select p such that Calls*(p, "Three3") such that Modifies(p, "assign") and Uses(p,"x")
+One1, Two2
+5000
+3 - SuchThatClause: relationships related to procedure (calls,modifies,uses)
+procedure p;
+Select p such that Calls(p, "Two2") and Modifies(p, "assign") such that Uses(p,"x")
+One1
+5000
+4 - SuchThatClause: relationships related to procedure (calls,modifies,uses)
+procedure p;
+Select p such that Calls(p, "Two2") such that Modifies(p, "assign") such that Uses(p,"x")
+One1
+5000
+5 - SuchThatClause: relationships related to stmt (parent*,follows,uses)
+stmt s;
+Select s such that Parent*(6,s) and Follows(10,s) and Uses(s,"ALotOfSpacing")
+11
+5000
+6 - SuchThatClause: relationships related to stmt (parent,follows*,uses)
+stmt s;
+Select s such that Parent(6,s) such that Follows(10,s) and Uses(s,"ALotOfSpacing")
+
+5000
+7 - SuchThatClause: relationships related to stmt (parent*,follows*,uses)
+stmt s;
+Select s such that Parent*(6,s) and Follows*(10,s) such that Uses(s,"ALotOfSpacing")
+11
+5000
+8 - SuchThatClause: relationships related to stmt (parent,follows,uses)
+stmt s;
+Select s such that Parent(6,s) such that Follows(10,s) such that Uses(s,"ALotOfSpacing")
+
+5000
+9 - SuchThatClause: relationships related to stmt (modifies, next*, affects*)
+stmt s;
+Select <s, s.stmt#> such that Modifies(s,"assign") and Next*(6,s) and Affects*(10,s)
+19 19, 23 23 
+5000
+10 - SuchThatClause: relationships related to stmt (modifies, next, affects*)
+stmt s;
+Select s.stmt# such that Modifies(s,"assign") such that Next*(21,s) and Affects*(10,s)
+23
+5000
+11 - SuchThatClause: relationships related to stmt (modifies, next*, affects)
+stmt s;
+Select s such that Modifies(s,"assign") such that Next*(6,s) such that Affects(10,s)
+19
+5000
+12 - SuchThatClause: relationships related to stmt-assign (modifies, next*, affects)
+assign a;
+Select a such that Modifies(a,"assign") and Next*(6,a) such that Affects(10,a)
+19
+5000
+13 - SuchThatClause: relationships related to variable (modifies,uses) - all connected by such that
+variable v; while w; if ifs; procedure p;
+Select v such that Uses(ifs,v) such that Uses(w,v) such that Uses(28, v) such that Modifies(8, v) such that Modifies("One1", v)
+Two2
+5000
+14 - SuchThatClause: relationships related to variable (modifies,uses) - all connected by and
+variable v; while w; if ifs; procedure p;
+Select v such that Uses(ifs,v) and Uses(w,v) and Uses(28, v) and Modifies(8, v) and Modifies("One1", v)
+Two2
+5000
+15 - SuchThatClause: (parent/parent*)
+assign a; while w1,w2; if ifs;
+Select a.stmt# such that Parent*(w1,w2) and Parent*(w2,a) and Parent(w1,ifs) and Parent*(ifs, _)
+10
+5000
+16 - SuchThatClause: (parent/parent*)
+assign a; while w1,w2; if ifs;
+Select a such that Parent(w1,w2) such that Parent(w2,a) such that Parent(w1,ifs) such that Parent(ifs, _)
+10
+5000
+17 - SuchThatClause: (parent/parent*) - unrelated synonym
+procedure p;if ifs; while w;
+Select p such that Parent(17,23) and Parent(17,18) such that Parent(6,ifs) and Parent*(w, 14)
+One1,Two2,Three3
+5000
+18 - SuchThatClause: (parent/parent*) - tuple
+assign a; while w1,w2; if ifs;
+Select <a,a.stmt#, w1> such that Parent(w1,w2) and Parent*(w2,a) such that Parent*(w1,ifs) and Parent(ifs, _)
+10 10 6 
+5000
+19 - SuchThatClause: (uses)
+variable v;if ifs;print pn;
+Select v such that Uses("Two2",v) and Uses(ifs,v) and Uses(pn,v)
+x
+5000
+20 - SuchThatClause: (uses)
+variable v;if ifs;print pn;
+Select v such that Uses("Two2",v) such that Uses(ifs,v) and Uses(pn,v)
+x
+5000
+21 - SuchThatClause: (uses) - semantically invalid
+variable v;if ifs;print pn;
+Select BOOLEAN such that Uses("Two2",v) and Uses(ifs,v) and Uses(pn,v) such that Uses(_,v)
+FALSE
+5000
+22 - SuchThatClause: no synonym - (call*,follows,modifies) - semantically invalid
+
+Select BOOLEAN such that Calls*("One1",_) and Follows(32,_) and Modifies(_,"x")
+FALSE
+5000
+23 - SuchThatClause: no synonym - (call,follows,modifies)
+
+Select BOOLEAN such that Calls(_,"Three3") such that Follows(31,_) and Modifies("One1","x")
+TRUE
+5000
+24 - SuchThatClause: no synonym - (call*,follows*,modifies)
+
+Select BOOLEAN such that Calls*("One1", "Three3") such that Follows*(30,32) such that Modifies(17,"y")
+TRUE
+5000
+25 - SuchThatClause: no synonym - (next,affect*,parent*)
+
+Select BOOLEAN such that Next(_,12) such that Affects*(_,5) and Parent*(17,23)
+FALSE
+5000
+26 - SuchThatClause: no synonym - (next,affect*,parent)
+
+Select BOOLEAN such that Next(9,12) and Affects*(_,10) and Parent(17,23)
+TRUE
+5000
+27 - SuchThatClause: no synonym - (next,affect*,parent)
+
+Select BOOLEAN such that Next(17,_) and Affects*(10,_) such that Parent(_,12)
+TRUE
+5000
+28 - SuchThatClause: no synonym - (affects/affects*) - true 
+
+Select BOOLEAN such that Affects(15,16) and Affects(24,29) and Affects*(27,29) such that Affects(27,28)
+TRUE
+5000
+29 - SuchThatClause: no synonym - (affects/affects*) - false last clause 
+
+Select BOOLEAN such that Affects(15,16) such that Affects(24,29) such that Affects*(27,29) such that Affects*(_,13)
+FALSE
+5000
+30 - SuchThatClause: (affect,uses,follows) - tuple
+assign a1; stmt s1;
+Select <s1, a1.stmt#> such that Affects(a1,s1) and Uses(a1,"assign") and Follows*(8,a1)
+15 16,27 16
+5000
+31 - SuchThatClause: (affect,uses,follows) - tuple
+assign a1,a2;
+Select <a1, a2> such that Affects(a1,a2) such that Uses(a1,"assign") and Follows*(8,a1)
+16 15,16 27
+5000
+32 - SuchThatClause: (affect,uses,follows) - tuple
+assign a1,a2;
+Select <a1.stmt#, a2.stmt#> such that Affects(a1,a2) and Uses(a1,"assign") such that Follows*(8,a1)
+16 15,16 27
+5000
+33 - SuchThatClause: (calls,uses,modifies) - tuple
+procedure p;stmt s;
+Select <p,s> such that Calls*(p, "Three3") and Modifies(p, "assign") and Uses(s,"x")
+One1 10,One1 17,One1 18,One1 19,One1 20,One1 23,One1 24,One1 27,One1 29,One1 3,One1 6,One1 7,One1 9,Two2 10,Two2 17,Two2 18,Two2 19,Two2 20,Two2 23,Two2 24,Two2 27,Two2 29,Two2 3,Two2 6,Two2 7,Two2 9
+5000
+34 - SuchThatClause: (calls,uses,modifies) - tuple
+procedure p;stmt s;
+Select <p.procName,s.stmt#> such that Calls*(p, "Three3") such that Modifies(p, "assign") and Uses(s,"x")
+One1 10,One1 17,One1 18,One1 19,One1 20,One1 23,One1 24,One1 27,One1 29,One1 3,One1 6,One1 7,One1 9,Two2 10,Two2 17,Two2 18,Two2 19,Two2 20,Two2 23,Two2 24,Two2 27,Two2 29,Two2 3,Two2 6,Two2 7,Two2 9
+5000
+35 - SuchThatClause: (calls,uses,modifies) - tuple
+procedure p;stmt s;
+Select <s, s, p> such that Calls*(p, "Three3") and Modifies(p, "assign") such that Uses(s,"x")
+3 3 One1, 6 6 One1, 7 7 One1, 9 9 One1, 10 10 One1, 17 17 One1, 18 18 One1, 19 19 One1, 20 20 One1, 23 23 One1, 24 24 One1, 27 27 One1, 29 29 One1, 3 3 Two2, 6 6 Two2, 7 7 Two2, 9 9 Two2, 10 10 Two2, 17 17 Two2, 18 18 Two2, 19 19 Two2, 20 20 Two2, 23 23 Two2, 24 24 Two2, 27 27 Two2, 29 29 Two2
+5000
+36 - SuchThatClause: (next) - tuple
+print pn;assign a1,a2;
+Select <pn.stmt#,a1,a2.stmt#> such that Next*(17,pn) and Next*(pn,a1) and Next*(a1,a2)
+20 21 23, 20 21 24, 20 21 27, 20 21 28, 20 21 29, 20 23 24, 20 23 27, 20 23 28, 20 23 29, 20 24 27, 20 24 28, 20 24 29, 20 27 28, 20 27 29, 20 28 29
+5000
+37 - SuchThatClause: (next) - tuple
+read r;assign a1,a2;
+Select <r,a1,a2> such that Next*(17,r) such that Next*(r,a1) and Next*(a1,a2)
+25 26 27, 25 26 28, 25 26 29, 25 27 28, 25 27 29, 25 28 29 
+5000
+38 - SuchThatClause: (next) - tuple
+stmt s;assign a1,a2;
+Select <s,a1.stmt#,a2> such that Next*(23,s) and Next*(s,a1) such that Next*(a1,a2)
+24 27 28,24 27 29,24 28 29,27 28 29
+5000
+39 - SuchThatClause: (call,follows,parent) - unrelated tuple
+if ifs; while w;
+Select <ifs.stmt#, w> such that Calls*(_, "Two2") and Follows(18,23) and Parent*(6,_)
+12 6,12 9,17 6,17 9,18 6,18 9
+5000
+40 - SuchThatClause: (call,follows,parent) - unrelated tuple
+if ifs; while w;
+Select <ifs, w.stmt#> such that Calls("Two2", "Three3") such that Follows*(_,29) and Parent*(_,18) such that Calls*(_, "Two2") and Follows(18,23) such that Parent*(6,_)
+12 6,12 9,17 6,17 9,18 6,18 9
+5000
+41 - SuchThatClause: (affect*,next,modifies,uses,calls*) - unrelated synonym - mostly wildcard
+variable v; assign a;
+Select v.varName such that Affects*(_,_) such that Next(_,_) and Modifies("Three3", _) and Uses(9,_) such that Calls(_,_)
+y, ALotOfSpacing, One1, x, Two2, assign, while
+5000
+42 - SuchThatClause: (affect*,next,modifies,uses,calls*) - unrelated synonym
+variable v; assign a;
+Select v such that Affects*(4,23) and Next(1,2) and Uses(17, "assign") such that Modifies(9,_) and Calls*("One1","Three3")
+y, ALotOfSpacing, One1, x, Two2, assign, while
+5000
+43 - SuchThatClause: (affect*,next*,modifies,uses,calls) - unrelated synonym
+variable v; assign a;
+Select a such that Affects*(4,23) such that Modifies(9,_) and Calls("One1","Two2") and Next*(1,3) such that Uses(17, "assign")
+4, 5, 7, 10, 13, 15, 16, 19, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31
+5000
+44 - PatternClause: (if) - same if syn - boolean
+variable v; if ifs;
+Select BOOLEAN pattern ifs("y", _, _) and ifs("x", _, _) and ifs(v, _, _)
+TRUE
+5000
+45 - PatternClause: (if) - diff if syn - boolean
+variable v; if ifs, ifs1, ifs2;
+Select BOOLEAN pattern ifs("y", _, _) pattern ifs1(v, _, _) and ifs2("x", _, _)
+TRUE
+5000
+46 - PatternClause: (while) - same while syn - boolean
+variable v; while w;
+Select BOOLEAN pattern w("x", _) pattern w(_, _) pattern w(v, _)
+TRUE
+5000
+47 - PatternClause: (while) - diff while syn - boolean
+variable v; while w1, w2; while w3;
+Select BOOLEAN pattern w1("x", _) and w2(v, _) pattern w3(_, _)
+TRUE
+5000
+48 - PatternClause: (assign) - same assign syn - boolean
+variable v; assign a;
+Select BOOLEAN pattern a(v, _"y"_) and a("x", _) and a(_, _)
+TRUE
+5000
+49 - PatternClause: (assign) - diff assign syn - boolean
+assign a; assign a1; assign a2;
+Select BOOLEAN pattern a("assign", _) and a1(_, _"y * x"_) pattern a2(_, _)
+TRUE
+5000
+50 - PatternClause: (assign) - diff assign syn - false
+assign a; assign a1; assign a2;
+Select BOOLEAN pattern a("assign", _) and a1(_, "y * x") pattern a2(_, _)
+FALSE
+5000
+51 - PatternClause: (assign, while, if) - boolean
+assign a; while w; if ifs;
+Select BOOLEAN pattern a(_, _"1"_) pattern w("while", _) pattern ifs("x", _, _)
+TRUE
+5000
+52 - PatternClause: (assign, while, if) - no expr - boolean
+assign a; while w; if ifs; variable v;
+Select BOOLEAN pattern a(v, _) and w(v, _) and ifs(v, _, _)
+TRUE
+5000
+53 - PatternClause: (if) - same if syn - return if
+variable v; if ifs;
+Select ifs pattern ifs("y", _, _) pattern ifs("x", _, _) pattern ifs(v, _, _)
+18
+5000
+54 - PatternClause: (if) - diff if syn - return single if
+variable v; if ifs; if ifs1, ifs2;
+Select ifs pattern ifs(v, _, _) and ifs1("y", _, _) pattern ifs2(_, _, _)
+17, 18
+5000
+55 - PatternClause: (while) - same while syn - return while
+variable v; while w;
+Select w pattern w("x", _) pattern w(_, _) and w(v, _)
+9
+5000
+56 - PatternClause: (while) - diff while syn - return single while
+variable v; while w1, w2, w3;
+Select w1 pattern w1("while", _) and w2(v, _) and w3("x", _)
+6
+5000
+57 - PatternClause: (assign) - same assign syn - return assign
+variable v; assign a;
+Select a pattern a(v, _"y"_) pattern a("x", _) and a(_, _)
+7, 22, 29
+5000
+58 - PatternClause: (assign) - diff assign syn - return single assign
+assign a; assign a1; assign a2;
+Select a1.stmt# pattern a("assign", _) and a1(_, _"2/3"_) pattern a2(_, _)
+23
+5000
+59 - PatternClause: (assign, while, if) - return common variable
+assign a; while w; if ifs; variable v;
+Select v pattern a(v, _) and w(v, _) and ifs(v, _, _)
+x
+5000
+60 - PatternClause: (assign, while, if) - return while
+assign a; while w; if ifs; variable v, v1;
+Select w.stmt# pattern a(v, _) pattern ifs(v1, _, _) and w("x", _)
+9
+5000
+61 - PatternClause: (if) - same if syn - tuple
+variable v; if ifs, ifs1, ifs2;
+Select <v, ifs> pattern ifs("y", _, _) and ifs("x", _, _) and ifs(v, _, _)
+x 18, y 18
+5000
+62 - PatternClause: (if) - diff if syn  - tuple
+variable v; if ifs, ifs1, ifs2;
+Select <ifs, ifs1, ifs2> pattern ifs(v, _, _) and ifs1("Two2", _, _) and ifs2(_, _, _)
+17 17 17, 17 17 18, 18 17 17, 18 17 18
+5000
+63 - PatternClause: (while) - same while syn - tuple
+while w, w1, w2; variable v;
+Select <w, v> pattern w("x", _) pattern w(v, _) and w(_, _)
+9 x
+5000
+64 - PatternClause: (while) - diff while syn - tuple
+while w, w1, w2; variable v;
+Select <w, w1, w2> pattern w("while", _) pattern w1(v, _) and w2(_, _)
+6 6 6, 6 9 6, 6 6 9, 6 9 9
+5000
+65 - PatternClause: (assign) - same assign syn - tuple
+assign a; variable v;
+Select <a, v.varName, v> pattern a(v, _) pattern a(_, _"x"_) pattern a(_, _"2"_)
+7 x x, 19 assign assign, 23 assign assign
+5000
+66 - PatternClause: (assign) - diff assign syn - tuple
+assign a, b, c; variable v;
+Select <a, b.stmt#, c> pattern a("One1", _) pattern b(v, _"x * y"_) pattern c(v, _)
+31 29 4, 31 29 7, 31 29 21, 31 29 22, 31 29 24, 31 29 29
+5000
+67 - PatternClause: (assign, while, if) - tuple
+assign a, a1; while w; if ifs; variable v;
+Select <v, w, ifs, a1> pattern a(v, _) and w(v, _) and ifs(v, _, _) and a1(_, _"Two2 - x"_)
+x 9 17 27, x 9 18 27
+5000
+68 - PatternClause: (if, assign) - unrelated tuple
+if ifs, ifs1; procedure p; assign a, a1;
+Select <ifs, p> pattern ifs1("x", _, _) and a("x", _) pattern a1(_, _"2 / 3"_)
+12 One1, 12 Two2, 12 Three3, 17 One1, 17 Two2, 17 Three3, 18 One1, 18 Two2, 18 Three3
+5000
+69 - PatternClause: (while, if) - unrelated tuple - false last clause
+while w, w1; if ifs; variable v;
+Select <w, w> pattern w1(v,_) and ifs(v, _,_) and ifs("notFound",_,_)
+
+5000
+70 - WithClause: same INTEGER attrName stmt#
+assign a; call c;
+Select a with a.stmt# = 4 with 8 = c.stmt#
+4
+5000
+71 - WithClause: diff INTEGER attrName stmt#, value
+constant c; stmt s;
+Select s with s.stmt# = c.value and c.value = 0
+
+5000
+72 - WithClause: same NAME attrName procName 
+procedure p; call c;
+Select c with p.procName = "Two2" and p.procName = c.procName
+3
+5000
+73 - WithClause: diff NAME attrName procName, varName 
+procedure p; print pn; call c;
+Select pn with p.procName = "One1" with p.procName = pn.varName
+32
+5000
+74 - WithClause: diff NAME attrName procName, varName - Select attrName tuples
+variable v; print pn; call c;
+Select <v.varName, c.procName> with c.procName = "Three3" and pn.varName = v.varName
+ALotOfSpacing Three3, One1 Three3, x Three3
+5000
+75 - WithClause: INTEGER and VALUE attrName from the same entity
+read r; print pn;
+Select pn with pn.stmt# = 20 with pn.varName = r.varName
+20
+5000
+76 - WithClause: Cover all entities - attrRef = INTEGER/IDENT - Connected by and - BOOLEAN
+print pn; read r; stmt s; call c; while w; if ifs; assign a; variable v; constant cn; procedure p;
+Select BOOLEAN with pn.stmt# = 11 and r.stmt# = 2 and s.stmt# = 30 and c.stmt# = 3 and w.stmt# = 9 and ifs.stmt# = 18 and a.stmt# = 29 and v.varName = "Two2" and cn.value = 6 and p.procName = "Two2" and pn.varName = "ALotOfSpacing" and r.varName = "Two2" and c.procName = "Two2"
+TRUE
+5000
+77 - WithClause: Cover all entities - attrRef = INTEGER/IDENT - Connected by with - tuples
+print pn; read r; stmt s; call c; while w; if ifs; assign a; variable v; constant cn; procedure p;
+Select <pn, r, s, c, w, ifs, a, v, cn, p, pn.varName, r.varName,c.procName> with pn.stmt# = 11 with r.stmt# = 2 with s.stmt# = 30 with c.stmt# = 3 with w.stmt# = 9 with ifs.stmt# = 18 with a.stmt# = 29 with v.varName = "Two2" with cn.value = 6 with p.procName = "Two2" with pn.varName = "ALotOfSpacing" with r.varName = "Two2" with c.procName = "Two2"
+11 2 30 3 9 18 29 Two2 6 Two2 ALotOfSpacing Two2 Two2
+5000
+78 - WithClause: attrRef = attrRef
+call c; procedure p; constant cn; stmt s; variable v; while w;
+Select c with c.procName = p.procName and cn.value = s.stmt# with c.stmt# = cn.value and v.varName = c.procName
+3
+5000
+79 - WithClause: INTEGER/IDENT = attrRef
+procedure p; call c; stmt s; read r; constant cn; variable v;
+Select BOOLEAN with "Two2" = p.procName with 3 = cn.value and "y" = v.varName with "Three3" = c.procName
+TRUE
+5000
+80 - WithClause: INTEGER=INTEGER or IDENT=IDENT - Select attrRef
+call c;
+Select c.procName with "with" = "with" with 0=0 and "and" = "and" and 9=9 with "procName" = "procName"
+Two2, Three3
+5000
+81 - WithClause: mixed - Select tuples
+call c; procedure p; stmt s; variable v; if ifs; while w; print pn; read r; constant cn;
+Select <p,r,ifs,v> with c.procName = "Three3" with s.stmt# = c.stmt# and "One1" = v.varName with ifs.stmt# = 17 and w.stmt# = cn.value and pn.varName = r.varName
+One1 1 17 One1, One1 14 17 One1, Two2 1 17 One1, Two2 14 17 One1, Three3 1 17 One1, Three3 14 17 One1 
+5000
