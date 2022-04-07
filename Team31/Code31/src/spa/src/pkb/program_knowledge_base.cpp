@@ -639,7 +639,7 @@ bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign,
 }
 bool ProgramKnowledgeBase::ExistAffectsT(Index<ArgPos::kFirst> first_assign,
                                          Index<ArgPos::kSecond> second_assign) {
-    return false;
+    return affects_->ExistAffectsT(first_assign, second_assign);
 }
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign) {
     return affects_->HasAffected(first_assign);

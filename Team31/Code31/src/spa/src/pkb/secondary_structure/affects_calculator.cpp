@@ -3,6 +3,7 @@
 #include <iterator>
 #include <queue>
 #include <set>
+#include <stack>
 #include <vector>
 
 #include "common/aliases.h"
@@ -38,6 +39,28 @@ bool AffectsCalculator::ExistAffects(StmtNo first_assign,
 }
 bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
                                       StmtNo second_assign) const noexcept {
+    /*
+     * DFS on the AffectsGraph.
+     * AffectsGraph:
+     *    - Vertices: all assign stmts
+     *    - Edges: (a1, a2) is an edge iff Affects(a1, a2) holds, even if a1=a2
+     */
+    std::stack<StmtNo, std::vector<StmtNo>> s;
+    BitArray visited(assign_stmts_.size());
+    visited.Set(first_assign);
+    s.emplace(first_assign);
+    while (!s.empty()) {
+        StmtNo curr = s.top();
+        s.pop();
+        if (ExistAffects(curr, second_assign)) {
+            return true;
+        }
+        for (const StmtNo stmt : GetAffected(curr)) {
+            if (!visited.Get(stmt)) {
+                s.emplace(stmt);
+            }
+        }
+    }
     return false;
 }
 bool AffectsCalculator::HasAffected(StmtNo first_assign) const noexcept {
@@ -105,13 +128,6 @@ std::set<StmtNo> AffectsCalculator::GetAffecterT(
     return {};
 }
 PairVec<StmtNo> AffectsCalculator::GetAffectsPairs() const noexcept {
-    /*
-     * Return A pair of vectors <[a,b], [c,d]> such that
-     * Affects(a,c)&&Affects(b,d) vector first, second for stmt in assign_stmts:
-     *     first.add(stmt)
-     *     second.append(GetAffected(stmt))
-     *     first.resize(second.size(), stmt)
-     */
     std::vector<StmtNo> affecter;
     std::vector<StmtNo> affected;
     for (const StmtNo stmt : assign_stmts_) {
