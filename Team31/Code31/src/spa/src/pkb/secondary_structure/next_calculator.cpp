@@ -318,7 +318,6 @@ void NextCalculator::AddPairsWithPrevInQueue(PairVec<StmtNo>& results,
 }
 void NextCalculator::AppendAndQueue(PairVec<StmtNo>& results, BitArray& added,
                                     StmtNo next_stmt, StmtType type) noexcept {
-    if (cfg_.GetNode(next_stmt).next.first == 0) return;
     if (type_store_.GetType(next_stmt) == StmtType::kWhile) {
         const auto pos = ToBit(next_stmt, next_stmt);
         if (added.Get(pos)) return;
@@ -358,6 +357,7 @@ void NextCalculator::AddTPairsInProc(StmtNo root,
 }
 PairVec<StmtNo> NextCalculator::GetNextTPairsFilterByNext(
         StmtType type) noexcept {
+    assert(type != StmtType::kAll);
     PairVec<StmtNo> results;
     std::for_each(cfg_.roots.begin(), cfg_.roots.end(),
                   [this, &results, type](StmtNo stmt_no) {
