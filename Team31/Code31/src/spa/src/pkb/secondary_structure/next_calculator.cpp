@@ -44,7 +44,9 @@ bool NextCalculator::IsNext(StmtNo prev, StmtNo next) const noexcept {
         next >= cfg_.stmt_node_index.size())
         return false;
     const auto& prev_node = cfg_.GetNode(prev);
-    return prev_node.next.first == next || prev_node.next.second == next;
+    return prev != prev_node.stop ? prev + 1 == next
+                                  : prev_node.next.first == next ||
+                                            prev_node.next.second == next;
 }
 bool NextCalculator::IsNextT(StmtNo prev, StmtNo next) const noexcept {
     if (prev >= cfg_.stmt_node_index.size() ||
