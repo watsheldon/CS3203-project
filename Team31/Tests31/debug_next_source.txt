@@ -1,4 +1,12 @@
-procedure NextDebug{
-a = b;
-a = a;
-b = a; }
+procedure NextDebug {
+    a = b;
+    a = a;
+    b = a;}
+procedure NextContainerBug {
+    while (4 > b) {
+        if (5 < b) then {
+            a=6;
+            a=7;} else {
+            a=8;
+            a=9;}}
+    a=10;}
