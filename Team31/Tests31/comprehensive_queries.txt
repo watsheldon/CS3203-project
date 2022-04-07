@@ -140,7 +140,7 @@ Select print such that Follows*(a1, a2) and Uses(s, v) and Next*(print, a2) and 
 5000
 29 - 5 such that (Follows*, Parent*, Calls*, Next*, Affects*) - wildcard
 assign BOOLEAN; constant value;
-Select BOOLEAN such that Follows*(_, and) and Next*(_, and) and Affects*(_, and) and Parent*(_, and) and Calls*(_, "Five5")
+Select BOOLEAN such that Follows*(_, BOOLEAN) and Next*(_, BOOLEAN) and Affects*(_, BOOLEAN) and Parent*(_, BOOLEAN) and Calls*(_, "Five5")
 5, 9, 35
 5000
 30 - 4 such that (Parent*, Calls*, Next*, Affects*) + 1 with (meaningless) - wildcard
