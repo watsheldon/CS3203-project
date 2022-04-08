@@ -17,5 +17,5 @@ void BitVec2D::Unset(std::size_t row, std::size_t col) noexcept {
 std::size_t BitVec2D::CalcPos(std::size_t row, std::size_t col) const noexcept {
     return row * kCols + col;
 }
-
+void BitVec2D::Reset() noexcept { bit_array_.Reset(); }
 }  // namespace spa

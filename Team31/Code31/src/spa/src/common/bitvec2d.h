@@ -14,6 +14,7 @@ class BitVec2D {
     [[nodiscard]] bool At(std::size_t row, std::size_t col) const noexcept;
     void Set(std::size_t row, std::size_t col) noexcept;
     void Unset(std::size_t row, std::size_t col) noexcept;
+    void Reset() noexcept;
 
   private:
     BitArray bit_array_;
