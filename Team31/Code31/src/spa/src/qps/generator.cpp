@@ -274,6 +274,7 @@ void Generator::Attr(QueryTokenType token_type) noexcept {
         if (!is_with_num_ && attribute > Attribute::kVarName)
             return SemanticError();
         factory_.SetSecond(attribute);
+        mode_.pop_back();
         auto clause = factory_.Build();
         if (clause == nullptr) return SemanticError();
         conditions_.emplace_back(std::move(clause));
