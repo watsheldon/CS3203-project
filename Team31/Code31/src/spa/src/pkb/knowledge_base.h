@@ -428,6 +428,10 @@ class KnowledgeBase {
     virtual PairVec<StmtNo> GetAffectsPairs() = 0;
     // Affects*(a,a)
     virtual PairVec<StmtNo> GetAffectsTPairs() = 0;
+    // Affects(a, a)
+    virtual std::set<StmtNo> GetAffectsSelf() = 0;
+    // Affects*(a, a)
+    virtual std::set<StmtNo> GetAffectsTSelf() = 0;
 
     /**
      * Gets all indices of the given entity type or stmt type

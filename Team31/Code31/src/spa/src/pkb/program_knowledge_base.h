@@ -231,6 +231,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::set<StmtNo> GetAffectsT(Index<ArgPos::kSecond> assign) override;
     PairVec<StmtNo> GetAffectsPairs() override;
     PairVec<StmtNo> GetAffectsTPairs() override;
+    std::set<StmtNo> GetAffectsSelf() override;
+    std::set<StmtNo> GetAffectsTSelf() override;
 
     std::vector<int> GetAllEntityIndices(QueryEntityType et) override;
     std::vector<int> GetAllEntityIndices(StmtType st) override;

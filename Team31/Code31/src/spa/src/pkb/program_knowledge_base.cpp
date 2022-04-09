@@ -670,6 +670,8 @@ std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
 PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() { return {}; }
 
 PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
+std::set<StmtNo> ProgramKnowledgeBase::GetAffectsSelf() { return {}; }
+std::set<StmtNo> ProgramKnowledgeBase::GetAffectsTSelf() { return {}; }
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(
