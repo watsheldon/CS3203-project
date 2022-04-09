@@ -27,7 +27,7 @@ class AffectsCalculator {
         const UsesRelationshipStore& uses_store;
         const ControlFlowGraph& cfg;
         const NextCalculator& next;
-        const size_t& stmt_count;
+        const size_t stmt_count;
     };
     explicit AffectsCalculator(Stores stores) noexcept;
     [[nodiscard]] bool ExistAffects(StmtNo first_assign,
@@ -54,7 +54,7 @@ class AffectsCalculator {
     const ControlFlowGraph& cfg_;
     const NextCalculator& next_;
     const std::vector<StmtNo>& assign_stmts_;
-    const size_t& stmt_count_;
+    const size_t stmt_count_;
     Cache affects_cache_;
 
     [[nodiscard]] bool IsSameProcedure(StmtNo first_assign,

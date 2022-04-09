@@ -1,19 +1,15 @@
 #include "cache.h"
 
 namespace spa {
-Cache::Cache(size_t max_size)
-        : max_cache_size_(max_size),
-          cache_items_map_(max_size,
+Cache::Cache(size_t max_size) noexcept
+        : cache_items_map_(max_size,
                            std::vector<Cache::Indicator>(
                                    max_size, Cache::Indicator::kUncalculated)) {
 }
-void Cache::Put(const StmtNo& stmt1, const StmtNo& stmt2,
-                const Cache::Indicator& value) {
+void Cache::Set(StmtNo stmt1, StmtNo stmt2, Cache::Indicator value) noexcept {
     cache_items_map_[stmt1][stmt2] = value;
 }
-const Cache::Indicator& Cache::Get(const StmtNo& stmt1,
-                                   const StmtNo& stmt2) const {
+Cache::Indicator Cache::Get(StmtNo stmt1, StmtNo stmt2) const noexcept {
     return cache_items_map_[stmt1][stmt2];
 }
-size_t Cache::Size() const noexcept { return cache_items_map_.size(); }
 }  // namespace spa

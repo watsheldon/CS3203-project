@@ -26,39 +26,34 @@ AffectsCalculator::AffectsCalculator(Stores stores) noexcept
 bool AffectsCalculator::ExistAffects(StmtNo first_assign,
                                      StmtNo second_assign) noexcept {
     auto indicator = affects_cache_.Get(first_assign, second_assign);
-    if (indicator == Cache::Indicator::kCalculatedTrue) {
-        return true;
+    if (indicator != Cache::Indicator::kUncalculated) {
+        return indicator == Cache::Indicator::kTrue;
     }
-    if (indicator == Cache::Indicator::kCalculatedFalse) {
-        return false;
-    }
-
     StmtType first_type = type_store_.GetType(first_assign);
     StmtType second_type = type_store_.GetType(second_assign);
     if (first_type != StmtType::kAssign || second_type != StmtType::kAssign) {
-        affects_cache_.Put(first_assign, second_assign,
-                           Cache::Indicator::kCalculatedFalse);
+        affects_cache_.Set(first_assign, second_assign,
+                           Cache::Indicator::kFalse);
         return false;
     }
     if (!IsSameProcedure(first_assign, second_assign)) {
-        affects_cache_.Put(first_assign, second_assign,
-                           Cache::Indicator::kCalculatedFalse);
+        affects_cache_.Set(first_assign, second_assign,
+                           Cache::Indicator::kFalse);
         return false;
     }
     VarIndex modified_var = *modifies_store_.GetModifies(first_assign).begin();
     if (!uses_store_.ExistUses(second_assign, modified_var)) {
-        affects_cache_.Put(first_assign, second_assign,
-                           Cache::Indicator::kCalculatedFalse);
+        affects_cache_.Set(first_assign, second_assign,
+                           Cache::Indicator::kFalse);
         return false;
     }
 
     if (ExistUnmodifiedPath(first_assign, second_assign, modified_var)) {
-        affects_cache_.Put(first_assign, second_assign,
-                           Cache::Indicator::kCalculatedTrue);
+        affects_cache_.Set(first_assign, second_assign,
+                           Cache::Indicator::kTrue);
         return true;
     }
-    affects_cache_.Put(first_assign, second_assign,
-                       Cache::Indicator::kCalculatedFalse);
+    affects_cache_.Set(first_assign, second_assign, Cache::Indicator::kFalse);
     return false;
 }
 bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,

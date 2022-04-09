@@ -8,20 +8,14 @@
 namespace spa {
 class Cache {
   public:
-    enum class Indicator {
-        kUncalculated = 0,
-        kCalculatedTrue,
-        kCalculatedFalse
-    };
-    Cache(size_t max_size);
-    void Put(const StmtNo& stmt1, const StmtNo& stmt2,
-             const Cache::Indicator& value);
-    const Cache::Indicator& Get(const StmtNo& stmt1, const StmtNo& stmt2) const;
-    size_t Size() const noexcept;
+    enum class Indicator { kUncalculated = 0, kTrue, kFalse };
+    explicit Cache(size_t max_size) noexcept;
+    void Set(StmtNo stmt1, StmtNo stmt2, Cache::Indicator value) noexcept;
+    [[nodiscard]] Cache::Indicator Get(StmtNo stmt1,
+                                       StmtNo stmt2) const noexcept;
 
   private:
-    std::vector<std::vector<Cache::Indicator>> cache_items_map_;
-    size_t max_cache_size_;
+    Vec2D<Cache::Indicator> cache_items_map_;
 };
 }  // namespace spa
 
