@@ -214,4 +214,23 @@ bool AffectsCalculator::ExistUnmodifiedPath(StmtNo first_assign,
     }
     return false;
 }
+void AffectsCalculator::AddChildrenAffects(const std::set<StmtNo>& children,
+                                           BitArray& visited,
+                                           std::queue<StmtNo>& q) noexcept {
+    for (const StmtNo child : children) {
+        if (child != 0 && !visited.Get(child)) {
+            visited.Set(child);
+            q.push(child);
+        }
+    }
+}
+void AffectsCalculator::AddChildrenAffectsT(
+        const std::set<StmtNo>& children, BitArray& visited,
+        std::stack<StmtNo, std::vector<StmtNo>>& s) noexcept {
+    for (const StmtNo stmt : children) {
+        if (!visited.Get(stmt)) {
+            s.emplace(stmt);
+        }
+    }
+}
 }  // namespace spa

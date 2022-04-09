@@ -64,23 +64,10 @@ class AffectsCalculator {
                                            VarIndex var) noexcept;
     static void AddChildrenAffects(const std::set<StmtNo>& children,
                                    BitArray& visited,
-                                   std::queue<StmtNo>& q) noexcept {
-        for (const StmtNo child : children) {
-            if (child != 0 && !visited.Get(child)) {
-                visited.Set(child);
-                q.push(child);
-            }
-        }
-    }
+                                   std::queue<StmtNo>& q) noexcept;
     static void AddChildrenAffectsT(
             const std::set<StmtNo>& children, BitArray& visited,
-            std::stack<StmtNo, std::vector<StmtNo>>& s) noexcept {
-        for (const StmtNo stmt : children) {
-            if (!visited.Get(stmt)) {
-                s.emplace(stmt);
-            }
-        }
-    }
+            std::stack<StmtNo, std::vector<StmtNo>>& s) noexcept;
 };
 }  // namespace spa
 
