@@ -58,6 +58,7 @@ class Generator {
             Synonym::Type::kStmtAssign};
     bool semantic_error_;
     bool can_terminate_;
+    bool is_with_num_;
     SynonymMap synonym_map_;
     VecUniquePtr<Synonym> synonyms_;
     std::vector<SynonymWithAttr> selected_;
@@ -67,6 +68,8 @@ class Generator {
     VecUniquePtr<ConditionClause> conditions_;
     std::vector<QueryToken> expression_;
     Synonym* pattern_syn_;
+    Synonym* first_with_syn_;
+    Synonym* second_with_syn_;
     Factory factory_;
 
     inline void SemanticError() noexcept;
@@ -93,6 +96,10 @@ class Generator {
     void AngleBracketR() noexcept;
     void SetClauseMode(QueryTokenType token_type) noexcept;
     void And() noexcept;
+    void Equal() noexcept;
+    void RightQuote() noexcept;
+    void SetIsWithNum(Attribute attr) noexcept;
+    void Identifier(const std::string& name) noexcept;
 
     static constexpr Synonym::Type TokenToSynType(QueryTokenType type) noexcept;
     static constexpr Mode TokenToClauseMode(QueryTokenType type) noexcept;
@@ -102,6 +109,8 @@ class Generator {
                                                  Synonym::Type type) noexcept;
     static constexpr bool UnsuitableSecondSynType(Mode mode,
                                                   Synonym::Type type) noexcept;
+    static constexpr bool UnsuitableAttributeType(Synonym* syn,
+                                                  Attribute attr) noexcept;
     void Reset() noexcept;
 };
 }  // namespace spa

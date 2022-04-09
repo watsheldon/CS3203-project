@@ -84,6 +84,43 @@ constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
             return false;
     }
 }
+constexpr bool Generator::UnsuitableAttributeType(Synonym *syn,
+                                                  Attribute attr) noexcept {
+    auto type = syn->type;
+    switch (type) {
+        case Synonym::kProc:
+            return attr != Attribute::kProcName;
+        case Synonym::kVar:
+            return attr != Attribute::kVarName;
+        case Synonym::kConst:
+            return attr != Attribute::kValue;
+        case Synonym::kStmtCall:
+            return attr != Attribute::kProcName && attr != Attribute::kStmtNum;
+        case Synonym::kStmtRead:
+        case Synonym::kStmtPrint:
+            return attr != Attribute::kVarName && attr != Attribute::kStmtNum;
+        case Synonym::kStmtAny:
+        case Synonym::kStmtWhile:
+        case Synonym::kStmtIf:
+        case Synonym::kStmtAssign:
+            return attr != Attribute::kStmtNum;
+        default:
+            assert(false);
+            return false;
+    }
+}
+void Generator::SetIsWithNum(Attribute attr) noexcept {
+    switch (attr) {
+        case Attribute::kProcName:
+        case Attribute::kVarName:
+            is_with_num_ = true;
+        case Attribute::kValue:
+        case Attribute::kStmtNum:
+            is_with_num_ = false;
+        default:
+            assert(false);
+    }
+}
 void Generator::SemanticError() noexcept { semantic_error_ = true; }
 void Generator::Reset() noexcept {
     semantic_error_ = false;
@@ -103,7 +140,11 @@ void Generator::BeginDecl(QueryTokenType token_type) noexcept {
 void Generator::BeginClause(QueryTokenType token_type) noexcept {
     factory_.SetRelationship(token_type);
     mode_.emplace_back(TokenToClauseMode(token_type));
-    mode_.emplace_back(Mode::kZeroth);
+    if (mode_.back() == Mode::kWith) {
+        mode_.emplace_back(Mode::kFirst);
+    } else {
+        mode_.emplace_back(Mode::kZeroth);
+    }
 }
 void Generator::Asterisk() noexcept {
     if (mode_.back() == Mode::kZeroth) {
@@ -147,11 +188,7 @@ void Generator::Name(const QueryToken &token) noexcept {
             expression_.emplace_back(token);
             return;
         case Mode::kIdentifier:
-            mode_.pop_back();
-            mode_.back() == Mode::kFirst ? factory_.SetFirst(token.value)
-                                         : factory_.SetSecond(token.value);
-            mode_.emplace_back(Mode::kIdentifier);
-            return;
+            return Identifier(const_cast<std::string &>(token.value));
         case Mode::kZeroth:
             return SetZeroth(name);
         case Mode::kFirst:
@@ -162,11 +199,30 @@ void Generator::Name(const QueryToken &token) noexcept {
             assert(false);
     }
 }
+void Generator::Identifier(const std::string &name) noexcept {
+    mode_.pop_back();
+    if (mode_.back() == Mode::kFirst) {
+        is_with_num_ = false;
+        factory_.SetFirst(name);
+    } else {
+        is_with_num_ ? SemanticError() : factory_.SetSecond(name);
+    }
+    mode_.emplace_back(Mode::kIdentifier);
+}
 void Generator::Constant(const QueryToken &token) noexcept {
     const auto &val = token.value;
     if (mode_.back() == Mode::kExpression) {
         expression_.emplace_back(token);
         return;
+    }
+    // with
+    if (*++mode_.rbegin() == Mode::kWith && mode_.back() == Mode::kFirst) {
+        is_with_num_ = true;
+        factory_.SetFirst(val);
+        return;
+    }
+    if (*++mode_.rbegin() == Mode::kWith && mode_.back() == Mode::kSecond) {
+        return !is_with_num_ ? SemanticError() : factory_.SetSecond(val);
     }
     // stmt#
     auto value = std::stoi(val);
@@ -195,9 +251,33 @@ void Generator::Select(std::string_view name) noexcept {
     mode_.pop_back();
 }
 void Generator::Attr(QueryTokenType token_type) noexcept {
+    Attribute attribute = TokenToAttrType(token_type);
+    if (mode_.back() == Mode::kFirst) {
+        mode_.pop_back();
+        if (UnsuitableAttributeType(first_with_syn_, attribute))
+            return SemanticError();
+        SetIsWithNum(attribute);
+        return factory_.SetFirst(attribute);
+    }
+    if (mode_.back() == Mode::kSecond) {
+        mode_.pop_back();
+        if (UnsuitableAttributeType(second_with_syn_, attribute))
+            return SemanticError();
+        if (is_with_num_ && attribute <= Attribute::kVarName)
+            return SemanticError();
+        if (!is_with_num_ && attribute > Attribute::kVarName)
+            return SemanticError();
+        factory_.SetSecond(attribute);
+        auto clause = factory_.Build();
+        if (clause == nullptr) return SemanticError();
+        conditions_.emplace_back(std::move(clause));
+        return;
+    }
     assert(!selected_.empty() &&
-           selected_.back().attribute == Attribute::kNone);
-    auto syn = selected_.back().synonym;
+           selected_.back().attribute_ == Attribute::kNone);
+    auto syn = selected_.back().synonym_;
+    if (UnsuitableAttributeType(syn, TokenToAttrType(token_type)))
+        return SemanticError();
     selected_.pop_back();
     selected_.emplace_back(syn, TokenToAttrType(token_type));
 }
@@ -218,6 +298,10 @@ void Generator::SetFirst(std::string_view name) noexcept {
     if (UnsuitableFirstSynType(mode_.back(), syn->type)) return SemanticError();
     syn->IncRef();
     factory_.SetFirst(syn);
+    if (mode_.back() == Mode::kWith) {
+        first_with_syn_ = syn;
+        mode_.emplace_back(Mode::kFirst);
+    }
 }
 void Generator::SetSecond(std::string_view name) noexcept {
     mode_.pop_back();
@@ -229,6 +313,10 @@ void Generator::SetSecond(std::string_view name) noexcept {
         return SemanticError();
     syn->IncRef();
     factory_.SetSecond(syn);
+    if (mode_.back() == Mode::kWith) {
+        second_with_syn_ = syn;
+        mode_.emplace_back(Mode::kSecond);
+    }
 }
 void Generator::Underscore() noexcept {
     if (mode_.back() == Mode::kFirst) {
@@ -265,7 +353,7 @@ void Generator::Quote() noexcept {
             mode_.pop_back();
             return factory_.SetSecond(std::move(expression_));
         case Mode::kIdentifier:
-            return mode_.resize(mode_.size() - 2);
+            return RightQuote();
         case Mode::kZeroth:
             break;
         case Mode::kFirst:
@@ -275,6 +363,17 @@ void Generator::Quote() noexcept {
             return QuoteAsSecondArg();
         default:
             assert(false);
+    }
+}
+void Generator::RightQuote() noexcept {
+    bool is_second = mode_.back() == Mode::kSecond;
+    mode_.pop_back();
+    bool is_with = mode_.back() == Mode::kWith;
+    mode_.pop_back();
+    if (is_second && is_with) {
+        auto clause = factory_.Build();
+        if (clause == nullptr) return SemanticError();
+        conditions_.emplace_back(std::move(clause));
     }
 }
 void Generator::Comma() noexcept {
@@ -339,6 +438,13 @@ void Generator::And() noexcept {
             assert(false);
             return;
     }
+}
+void Generator::Equal() noexcept {
+    if (mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression) {
+        mode_.emplace_back(Mode::kSecond);
+        return;
+    }
+    assert(false);
 }
 void Generator::ParseToken(const QueryToken &token) noexcept {
     const auto &[token_type, name] = token;
@@ -405,10 +511,10 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
             return And();
         case QueryTokenType::kKeywordSuch:
             return SetClauseMode(token_type);
+        case QueryTokenType::kEqual:
+            return Equal();
         case QueryTokenType::kKeywordThat:
         case QueryTokenType::kDot:
-        case QueryTokenType::kEqual:
-            return;
         default:
             assert(false);
     }
