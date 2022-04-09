@@ -8,11 +8,11 @@ namespace spa {
 struct SynonymWithAttr {
     explicit SynonymWithAttr(Synonym* synonym,
                              Attribute attribute = Attribute::kNone)
-            : synonym(synonym), attribute(attribute){};
-    Synonym* const synonym;
-    const Attribute attribute;
+            : synonym_(synonym), attribute_(attribute){};
+    Synonym* synonym_;
+    Attribute attribute_;
     bool operator<(const SynonymWithAttr& other) const noexcept {
-        return synonym < other.synonym;
+        return synonym_ < other.synonym_;
     }
 };
 }  // namespace spa

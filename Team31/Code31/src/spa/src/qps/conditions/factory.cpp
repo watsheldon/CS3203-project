@@ -52,8 +52,9 @@ void Factory::SetFirst(const std::string& value) noexcept {
     first_ident_ = value;
     first_param_type_ = ConditionClause::FirstParamType::kIdent;
 }
-void Factory::SetFirst(SynonymWithAttr* syn_with_attr) noexcept {
-    first_syn_attr_ = syn_with_attr;
+void Factory::SetFirst(Attribute attribute) noexcept {
+    assert(first_syn_ != nullptr);
+    first_syn_attr_ = SynonymWithAttr(first_syn_, attribute);
     first_param_type_ = ConditionClause::FirstParamType::kSyn;
 }
 void Factory::SetSecond(int second) noexcept {
@@ -72,8 +73,9 @@ void Factory::SetSecond(std::vector<QueryToken>&& expr) noexcept {
     second_exprs_ = std::move(expr);
     second_param_type_ = ConditionClause::SecondParamType::kExpr;
 }
-void Factory::SetSecond(SynonymWithAttr* syn_with_attr) noexcept {
-    second_syn_attr_ = syn_with_attr;
+void Factory::SetSecond(Attribute attribute) noexcept {
+    assert(second_syn_ != nullptr);
+    second_syn_attr_ = SynonymWithAttr(second_syn_, attribute);
     second_param_type_ = ConditionClause::SecondParamType::kSyn;
 }
 void Factory::SetTransPartial() noexcept {
