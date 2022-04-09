@@ -694,7 +694,7 @@ void ProgramKnowledgeBase::Compile() {
                                    *container_forest_, parent_store_, *cfg_});
     affects_ = std::make_unique<AffectsCalculator>(AffectsCalculator::Stores{
             stmtlst_stmt_, type_stmt_, *container_forest_, modifies_rel_,
-            uses_rel_, *cfg_, *next_});
+            uses_rel_, *cfg_, *next_, stmt_count_});
     compiled = true;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {

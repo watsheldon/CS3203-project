@@ -1,24 +1,19 @@
 #include "cache.h"
 
 namespace spa {
-Cache::Cache(size_t max_size) : max_cache_size{max_size} {}
-void Cache::Put(const int& key, const int& value) {
-    auto it = cache_items_map.find(key);
-    if (it == cache_items_map.end()) {
-        cache_items_map.insert({key, {value}});
-    } else {
-        cache_items_map.at(key).insert(value);
-    }
+Cache::Cache(size_t max_size)
+        : max_cache_size_(max_size),
+          cache_items_map_(max_size,
+                           std::vector<Cache::Indicator>(
+                                   max_size, Cache::Indicator::kUncalculated)) {
 }
-const std::set<int>& Cache::Get(const int& key) const {
-    auto it = cache_items_map.find(key);
-    if (it == cache_items_map.end()) {
-        throw std::range_error("No such key in the cache");
-    }
-    return it->second;
+void Cache::Put(const StmtNo& stmt1, const StmtNo& stmt2,
+                const Cache::Indicator& value) {
+    cache_items_map_[stmt1][stmt2] = value;
 }
-bool Cache::Exists(const int& key) const noexcept {
-    return cache_items_map.find(key) != cache_items_map.end();
+const Cache::Indicator& Cache::Get(const StmtNo& stmt1,
+                                   const StmtNo& stmt2) const {
+    return cache_items_map_[stmt1][stmt2];
 }
-size_t Cache::Size() const noexcept { return cache_items_map.size(); }
+size_t Cache::Size() const noexcept { return cache_items_map_.size(); }
 }  // namespace spa

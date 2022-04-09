@@ -19,55 +19,46 @@ AffectsCalculator::AffectsCalculator(Stores stores) noexcept
           uses_store_(stores.uses_store),
           cfg_(stores.cfg),
           next_(stores.next),
-          affects_cache_(assign_stmts_.size()),
-          affectsT_cache_(assign_stmts_.size()),
-          affected_cache_(assign_stmts_.size()),
-          affectedT_cache_(assign_stmts_.size()),
-          cached_affects_(assign_stmts_.size()),
-          cached_affectsT_(assign_stmts_.size()),
-          cached_affected_(assign_stmts_.size()),
-          cached_affectedT_(assign_stmts_.size()),
+          stmt_count_(stores.stmt_count),
+          affects_cache_(stmt_count_ + 1),
           assign_stmts_(
                   stores.type_statements.GetStatements(StmtType::kAssign)) {}
 bool AffectsCalculator::ExistAffects(StmtNo first_assign,
                                      StmtNo second_assign) noexcept {
-    if (affects_cache_.Exists(first_assign)) {
-        auto results = affects_cache_.Get(first_assign);
-        if (results.find(second_assign) != results.end()) {
-            return true;
-        }
+    auto indicator = affects_cache_.Get(first_assign, second_assign);
+    if (indicator == Cache::Indicator::kCalculatedTrue) {
+        return true;
     }
-    if (affected_cache_.Exists(second_assign)) {
-        auto results = affected_cache_.Get(second_assign);
-        if (results.find(first_assign) != results.end()) {
-            return true;
-        }
-    }
-    if (cached_affects_.Get(first_assign) ||
-        cached_affected_.Get(second_assign)) {
+    if (indicator == Cache::Indicator::kCalculatedFalse) {
         return false;
     }
 
     StmtType first_type = type_store_.GetType(first_assign);
     StmtType second_type = type_store_.GetType(second_assign);
     if (first_type != StmtType::kAssign || second_type != StmtType::kAssign) {
+        affects_cache_.Put(first_assign, second_assign,
+                           Cache::Indicator::kCalculatedFalse);
         return false;
     }
     if (!IsSameProcedure(first_assign, second_assign)) {
+        affects_cache_.Put(first_assign, second_assign,
+                           Cache::Indicator::kCalculatedFalse);
         return false;
     }
     VarIndex modified_var = *modifies_store_.GetModifies(first_assign).begin();
     if (!uses_store_.ExistUses(second_assign, modified_var)) {
+        affects_cache_.Put(first_assign, second_assign,
+                           Cache::Indicator::kCalculatedFalse);
         return false;
     }
 
     if (ExistUnmodifiedPath(first_assign, second_assign, modified_var)) {
-        affects_cache_.Put(first_assign, second_assign);
-        affectsT_cache_.Put(first_assign, second_assign);
-        affected_cache_.Put(second_assign, first_assign);
-        affectedT_cache_.Put(second_assign, first_assign);
+        affects_cache_.Put(first_assign, second_assign,
+                           Cache::Indicator::kCalculatedTrue);
         return true;
     }
+    affects_cache_.Put(first_assign, second_assign,
+                       Cache::Indicator::kCalculatedFalse);
     return false;
 }
 bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
@@ -78,23 +69,6 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
      *    - Vertices: all assign stmts
      *    - Edges: (a1, a2) is an edge iff Affects(a1, a2) holds, even if a1=a2
      */
-    if (affectsT_cache_.Exists(first_assign)) {
-        auto results = affectsT_cache_.Get(first_assign);
-        if (results.find(second_assign) != results.end()) {
-            return true;
-        }
-    }
-    if (affectedT_cache_.Exists(second_assign)) {
-        auto results = affectedT_cache_.Get(second_assign);
-        if (results.find(first_assign) != results.end()) {
-            return true;
-        }
-    }
-    if (cached_affectsT_.Get(first_assign) ||
-        cached_affectedT_.Get(second_assign)) {
-        return false;
-    }
-
     std::stack<StmtNo, std::vector<StmtNo>> s;
     BitArray visited(assign_stmts_.size());
     visited.Set(first_assign);
@@ -103,8 +77,6 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
         StmtNo curr = s.top();
         s.pop();
         if (ExistAffects(curr, second_assign)) {
-            affectsT_cache_.Put(first_assign, second_assign);
-            affectedT_cache_.Put(second_assign, first_assign);
             return true;
         }
         std::set<StmtNo> children = GetAffected(curr);
@@ -148,78 +120,40 @@ std::set<StmtNo> AffectsCalculator::GetAffects(ArgPos return_pos) noexcept {
     return {results.begin(), results.end()};
 }
 std::set<StmtNo> AffectsCalculator::GetAffected(StmtNo first_assign) noexcept {
-    if (affects_cache_.Exists(first_assign)) {
-        return affects_cache_.Get(first_assign);
-    }
-    if (cached_affects_.Get(first_assign)) {
-        return {};
-    }
-
     std::vector<StmtNo> results;
     for (const StmtNo stmt : assign_stmts_) {
         if (ExistAffects(first_assign, stmt)) {
             results.emplace_back(stmt);
-            affects_cache_.Put(first_assign, stmt);
         }
     }
-    cached_affects_.Set(first_assign);
     return {results.begin(), results.end()};
 }
 std::set<StmtNo> AffectsCalculator::GetAffectedT(StmtNo first_assign) noexcept {
-    if (affectsT_cache_.Exists(first_assign)) {
-        return affectsT_cache_.Get(first_assign);
-    }
-    if (cached_affectsT_.Get(first_assign)) {
-        return {};
-    }
-
     std::vector<StmtNo> results;
     for (const StmtNo stmt : assign_stmts_) {
         if (ExistAffectsT(first_assign, stmt)) {
             results.emplace_back(stmt);
-            affectsT_cache_.Put(first_assign, stmt);
         }
     }
-    cached_affectsT_.Set(first_assign);
     return {results.begin(), results.end()};
 }
 std::set<StmtNo> AffectsCalculator::GetAffecter(StmtNo second_assign) noexcept {
-    if (affected_cache_.Exists(second_assign)) {
-        return affected_cache_.Get(second_assign);
-    }
-    if (cached_affected_.Get(second_assign)) {
-        return {};
-    }
-
     std::vector<StmtNo> results;
     for (const StmtNo stmt : assign_stmts_) {
         if (ExistAffects(stmt, second_assign)) {
             results.emplace_back(stmt);
-
-            affected_cache_.Put(second_assign, stmt);
         }
     }
-
-    cached_affected_.Set(second_assign);
     return {results.begin(), results.end()};
 }
 std::set<StmtNo> AffectsCalculator::GetAffecterT(
         StmtNo second_assign) noexcept {
-    if (affectedT_cache_.Exists(second_assign)) {
-        return affectedT_cache_.Get(second_assign);
-    }
-    if (cached_affectedT_.Get(second_assign)) {
-        return {};
-    }
-
     std::vector<StmtNo> results;
     for (const StmtNo stmt : assign_stmts_) {
         if (ExistAffectsT(stmt, second_assign)) {
             results.emplace_back(stmt);
-            affectedT_cache_.Put(second_assign, stmt);
         }
     }
-    cached_affectedT_.Set(second_assign);
     return {results.begin(), results.end()};
 }
 PairVec<StmtNo> AffectsCalculator::GetAffectsPairs() noexcept {
