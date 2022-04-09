@@ -1,5 +1,6 @@
 #include "affects_calculator.h"
 
+#include <algorithm>
 #include <iterator>
 #include <queue>
 #include <set>
@@ -80,28 +81,22 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
     return false;
 }
 bool AffectsCalculator::HasAffected(StmtNo first_assign) noexcept {
-    for (const StmtNo stmt : assign_stmts_) {
-        if (ExistAffects(first_assign, stmt)) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(assign_stmts_.begin(), assign_stmts_.end(),
+                       [&](const StmtNo stmt) {
+                           return ExistAffects(first_assign, stmt);
+                       });
 }
 bool AffectsCalculator::HasAffecter(StmtNo second_assign) noexcept {
-    for (const StmtNo stmt : assign_stmts_) {
-        if (ExistAffects(stmt, second_assign)) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(assign_stmts_.begin(), assign_stmts_.end(),
+                       [&](const StmtNo stmt) {
+                           return ExistAffects(stmt, second_assign);
+                       });
 }
 bool AffectsCalculator::ExistAffects() noexcept {
-    for (const StmtNo stmt : assign_stmts_) {
-        if (HasAffected(stmt) || HasAffecter(stmt)) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(assign_stmts_.begin(), assign_stmts_.end(),
+                       [&](const StmtNo stmt) {
+                           return HasAffected(stmt) || HasAffecter(stmt);
+                       });
 }
 std::set<StmtNo> AffectsCalculator::GetAffects(ArgPos return_pos) noexcept {
     std::vector<StmtNo> results;
