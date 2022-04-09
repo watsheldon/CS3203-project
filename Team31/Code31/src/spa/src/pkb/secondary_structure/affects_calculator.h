@@ -44,6 +44,8 @@ class AffectsCalculator {
     [[nodiscard]] std::set<StmtNo> GetAffecterT(StmtNo second_assign) noexcept;
     [[nodiscard]] PairVec<StmtNo> GetAffectsPairs() noexcept;
     [[nodiscard]] PairVec<StmtNo> GetAffectsTPairs() noexcept;
+    [[nodiscard]] std::set<StmtNo> GetAffectsSelf() noexcept;
+    [[nodiscard]] std::set<StmtNo> GetAffectsTSelf() noexcept;
 
   private:
     const StmtlstStatementsStore& stmtlst_stmt_;

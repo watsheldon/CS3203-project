@@ -4,7 +4,6 @@
 #include <iterator>
 #include <queue>
 #include <set>
-#include <stack>
 #include <vector>
 
 #include "common/aliases.h"
@@ -177,6 +176,20 @@ PairVec<StmtNo> AffectsCalculator::GetAffectsTPairs() noexcept {
         affecter.resize(affected.size(), stmt);
     }
     return {affecter, affected};
+}
+std::set<StmtNo> AffectsCalculator::GetAffectsSelf() noexcept {
+    std::set<StmtNo> results;
+    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
+                 std::inserter(results, results.end()),
+                 [&](const StmtNo stmt) { return ExistAffects(stmt, stmt); });
+    return results;
+}
+std::set<StmtNo> AffectsCalculator::GetAffectsTSelf() noexcept {
+    std::set<StmtNo> results;
+    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
+                 std::inserter(results, results.end()),
+                 [&](const StmtNo stmt) { return ExistAffectsT(stmt, stmt); });
+    return results;
 }
 bool AffectsCalculator::IsSameProcedure(StmtNo first_assign,
                                         StmtNo second_assign) const noexcept {

@@ -673,8 +673,12 @@ PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() {
 PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() {
     return affects_->GetAffectsTPairs();
 }
-std::set<StmtNo> ProgramKnowledgeBase::GetAffectsSelf() { return {}; }
-std::set<StmtNo> ProgramKnowledgeBase::GetAffectsTSelf() { return {}; }
+std::set<StmtNo> ProgramKnowledgeBase::GetAffectsSelf() {
+    return affects_->GetAffectsSelf();
+}
+std::set<StmtNo> ProgramKnowledgeBase::GetAffectsTSelf() {
+    return affects_->GetAffectsTSelf();
+}
 
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
