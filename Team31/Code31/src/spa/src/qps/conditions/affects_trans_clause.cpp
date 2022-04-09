@@ -28,6 +28,10 @@ ResultTable AffectsTransClause::SynNum(KnowledgeBase *pkb, Synonym *first,
 }
 ResultTable AffectsTransClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
                                        Synonym *second) const noexcept {
+    if (first == second) {
+        auto result = pkb->GetAffectsTSelf();
+        return {first, std::move(result)};
+    }
     auto [col_1, col_2] = pkb->GetAffectsTPairs();
     return {first, std::move(col_1), second, std::move(col_2)};
 }

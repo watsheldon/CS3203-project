@@ -28,6 +28,10 @@ ResultTable AffectsClause::SynNum(KnowledgeBase *pkb, Synonym *first,
 }
 ResultTable AffectsClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
                                   Synonym *second) const noexcept {
+    if (first == second) {
+        auto result = pkb->GetAffectsSelf();
+        return {first, std::move(result)};
+    }
     auto [col_1, col_2] = pkb->GetAffectsPairs();
     return {first, std::move(col_1), second, std::move(col_2)};
 }
