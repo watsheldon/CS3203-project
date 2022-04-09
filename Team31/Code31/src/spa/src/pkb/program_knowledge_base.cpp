@@ -670,7 +670,9 @@ std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
 PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() {
     return affects_->GetAffectsPairs();
 }
-PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() {return affects_->GetAffectsTPairs();}
+PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() {
+    return affects_->GetAffectsTPairs();
+}
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsSelf() { return {}; }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsTSelf() { return {}; }
 
