@@ -60,23 +60,28 @@ bool AffectsCalculator::ExistAffects(StmtNo first_assign,
 bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
                                       StmtNo second_assign) noexcept {
     /*
-     * DFS on the AffectsGraph.
+     * BFS on the AffectsGraph.
      * AffectsGraph:
      *    - Vertices: all assign stmts
      *    - Edges: (a1, a2) is an edge iff Affects(a1, a2) holds, even if a1=a2
      */
-    std::stack<StmtNo, std::vector<StmtNo>> s;
+    std::queue<StmtNo> q;
     BitArray visited(assign_stmts_.size());
     visited.Set(first_assign);
-    s.emplace(first_assign);
-    while (!s.empty()) {
-        StmtNo curr = s.top();
-        s.pop();
+    q.push(first_assign);
+    while (!q.empty()) {
+        StmtNo curr = q.front();
+        q.pop();
         if (ExistAffects(curr, second_assign)) {
             return true;
         }
         std::set<StmtNo> children = GetAffected(curr);
-        AddChildrenAffectsT(children, visited, s);
+        for (const StmtNo child : children) {
+            if (!visited.Get(child)) {
+                visited.Set(child);
+                q.push(child);
+            }
+        }
     }
     return false;
 }
@@ -218,15 +223,6 @@ void AffectsCalculator::AddChildrenAffects(const std::set<StmtNo>& children,
         if (child != 0 && !visited.Get(child)) {
             visited.Set(child);
             q.push(child);
-        }
-    }
-}
-void AffectsCalculator::AddChildrenAffectsT(
-        const std::set<StmtNo>& children, BitArray& visited,
-        std::stack<StmtNo, std::vector<StmtNo>>& s) noexcept {
-    for (const StmtNo stmt : children) {
-        if (!visited.Get(stmt)) {
-            s.emplace(stmt);
         }
     }
 }

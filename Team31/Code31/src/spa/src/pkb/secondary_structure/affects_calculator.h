@@ -65,9 +65,6 @@ class AffectsCalculator {
     static void AddChildrenAffects(const std::set<StmtNo>& children,
                                    BitArray& visited,
                                    std::queue<StmtNo>& q) noexcept;
-    static void AddChildrenAffectsT(
-            const std::set<StmtNo>& children, BitArray& visited,
-            std::stack<StmtNo, std::vector<StmtNo>>& s) noexcept;
 };
 }  // namespace spa
 
