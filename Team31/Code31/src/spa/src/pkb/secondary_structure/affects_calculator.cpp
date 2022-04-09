@@ -41,7 +41,7 @@ bool AffectsCalculator::ExistAffects(StmtNo first_assign,
                            Cache::Indicator::kFalse);
         return false;
     }
-    VarIndex modified_var = *modifies_store_.GetModifies(first_assign).begin();
+    VarIndex modified_var = modifies_store_.GetModifiesSingleVar(first_assign);
     if (!uses_store_.ExistUses(second_assign, modified_var)) {
         affects_cache_.Set(first_assign, second_assign,
                            Cache::Indicator::kFalse);

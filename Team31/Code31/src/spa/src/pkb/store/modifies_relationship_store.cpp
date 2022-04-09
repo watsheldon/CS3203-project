@@ -38,4 +38,8 @@ bool ModifiesRelationshipStore::ExistModifiesP(
         ProcIndex proc_index) const noexcept {
     return ExistRelP(proc_index);
 }
+VarIndex ModifiesRelationshipStore::GetModifiesSingleVar(
+        StmtNo stmt_no) const noexcept {
+    return *GetModifies(stmt_no).begin();
+}
 }  // namespace spa
