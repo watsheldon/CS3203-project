@@ -23,10 +23,10 @@ AffectsCalculator::AffectsCalculator(Stores stores) noexcept
           affectsT_cache_(assign_stmts_.size()),
           affected_cache_(assign_stmts_.size()),
           affectedT_cache_(assign_stmts_.size()),
-          cached_affects_(200),
-          cached_affectsT_(200),
-          cached_affected_(200),
-          cached_affectedT_(200),
+          cached_affects_(assign_stmts_.size()),
+          cached_affectsT_(assign_stmts_.size()),
+          cached_affected_(assign_stmts_.size()),
+          cached_affectedT_(assign_stmts_.size()),
           assign_stmts_(
                   stores.type_statements.GetStatements(StmtType::kAssign)) {}
 bool AffectsCalculator::ExistAffects(StmtNo first_assign,
