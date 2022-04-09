@@ -99,52 +99,54 @@ bool AffectsCalculator::ExistAffects() noexcept {
                        });
 }
 std::set<StmtNo> AffectsCalculator::GetAffects(ArgPos return_pos) noexcept {
-    std::vector<StmtNo> results;
-    for (const StmtNo stmt : assign_stmts_) {
-        bool is_satisfied = return_pos == ArgPos::kFirst ? HasAffected(stmt)
-                                                         : HasAffecter(stmt);
-        if (is_satisfied) {
-            results.emplace_back(stmt);
-        }
+    std::set<StmtNo> affected;
+    if (return_pos == ArgPos::kFirst) {
+        std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
+                     std::inserter(affected, affected.end()),
+                     [&](const StmtNo stmt) { return HasAffected(stmt); });
+    } else {
+        std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
+                     std::inserter(affected, affected.end()),
+                     [&](const StmtNo stmt) { return HasAffecter(stmt); });
     }
-    return {results.begin(), results.end()};
+    return affected;
 }
 std::set<StmtNo> AffectsCalculator::GetAffected(StmtNo first_assign) noexcept {
-    std::vector<StmtNo> results;
-    for (const StmtNo stmt : assign_stmts_) {
-        if (ExistAffects(first_assign, stmt)) {
-            results.emplace_back(stmt);
-        }
-    }
-    return {results.begin(), results.end()};
+    std::set<StmtNo> affected;
+    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
+                 std::inserter(affected, affected.end()),
+                 [&](const StmtNo stmt) {
+                     return ExistAffects(first_assign, stmt);
+                 });
+    return affected;
 }
 std::set<StmtNo> AffectsCalculator::GetAffectedT(StmtNo first_assign) noexcept {
-    std::vector<StmtNo> results;
-    for (const StmtNo stmt : assign_stmts_) {
-        if (ExistAffectsT(first_assign, stmt)) {
-            results.emplace_back(stmt);
-        }
-    }
-    return {results.begin(), results.end()};
+    std::set<StmtNo> affected;
+    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
+                 std::inserter(affected, affected.end()),
+                 [&](const StmtNo stmt) {
+                     return ExistAffectsT(first_assign, stmt);
+                 });
+    return affected;
 }
 std::set<StmtNo> AffectsCalculator::GetAffecter(StmtNo second_assign) noexcept {
-    std::vector<StmtNo> results;
-    for (const StmtNo stmt : assign_stmts_) {
-        if (ExistAffects(stmt, second_assign)) {
-            results.emplace_back(stmt);
-        }
-    }
-    return {results.begin(), results.end()};
+    std::set<StmtNo> affecter;
+    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
+                 std::inserter(affecter, affecter.end()),
+                 [&](const StmtNo stmt) {
+                     return ExistAffects(stmt, second_assign);
+                 });
+    return affecter;
 }
 std::set<StmtNo> AffectsCalculator::GetAffecterT(
         StmtNo second_assign) noexcept {
-    std::vector<StmtNo> results;
-    for (const StmtNo stmt : assign_stmts_) {
-        if (ExistAffectsT(stmt, second_assign)) {
-            results.emplace_back(stmt);
-        }
-    }
-    return {results.begin(), results.end()};
+    std::set<StmtNo> affecter;
+    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
+                 std::inserter(affecter, affecter.end()),
+                 [&](const StmtNo stmt) {
+                     return ExistAffectsT(stmt, second_assign);
+                 });
+    return affecter;
 }
 PairVec<StmtNo> AffectsCalculator::GetAffectsPairs() noexcept {
     std::vector<StmtNo> affecter;
