@@ -119,6 +119,18 @@ void Factory::SetPatternSynonym(Synonym* syn) noexcept {
             assert(false);
     }
 }
+std::unique_ptr<ConditionClause> Factory::BuildWithClause() noexcept {
+    if (first_syn_ != nullptr && second_syn_ != nullptr) {
+        return std::make_unique<WithClause>(first_syn_attr_, second_syn_attr_);
+    }
+    if (first_syn_ != nullptr) {
+        return std::make_unique<WithClause>(first_syn_attr_, second_ident_);
+    }
+    if (second_syn_ != nullptr) {
+        return std::make_unique<WithClause>(first_ident_, second_syn_attr_);
+    }
+    return std::make_unique<WithClause>(first_ident_, second_ident_);
+}
 std::unique_ptr<ConditionClause> Factory::Build() noexcept {
     switch (rel_) {
         case Relationship::kParent:
@@ -152,11 +164,12 @@ std::unique_ptr<ConditionClause> Factory::Build() noexcept {
             return BuildStmtStmtClause<AffectsClause>();
         case Relationship::kAffectsT:
             return BuildStmtStmtClause<AffectsTransClause>();
+        case Relationship::kWith:
+            return BuildWithClause();
     }
     assert(false);
     return {};
 }
-
 void Factory::Reset() noexcept {
     first_param_type_ = ConditionClause::FirstParamType::kWild;
     second_param_type_ = ConditionClause::SecondParamType::kWild;

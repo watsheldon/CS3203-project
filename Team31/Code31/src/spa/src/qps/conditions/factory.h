@@ -217,6 +217,7 @@ class Factory {
         assert(false);
         return {};
     }
+    std::unique_ptr<ConditionClause> BuildWithClause() noexcept;
     void Reset() noexcept;
 };
 }  // namespace spa
