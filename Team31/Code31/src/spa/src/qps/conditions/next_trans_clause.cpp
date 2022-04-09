@@ -2,12 +2,15 @@
 
 #include <utility>
 
+#include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "common/type_convert_helpers.h"
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/result_table.h"
+#include "qps/synonym.h"
 
+int spa::NextTransClause::GetPriority() const noexcept { return kPriority; }
 namespace spa {
 ResultTable NextTransClause::NumNum(KnowledgeBase *pkb, StmtNo first,
                                     StmtNo second) const noexcept {

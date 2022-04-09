@@ -73,4 +73,7 @@ ResultTable CallsBase::Execute(KnowledgeBase *pkb) const noexcept {
     assert(false);
     return ResultTable{false};
 }
+int CallsBase::GetSynCount() const noexcept {
+    return kSynCount[static_cast<int>(type_)];
+}
 }  // namespace spa

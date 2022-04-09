@@ -27,4 +27,5 @@ ResultTable CallsTransClause::ProcProc(KnowledgeBase *pkb, ProcName first,
                                        ProcName second) const noexcept {
     return ResultTable(pkb->ExistCallsT(first, second));
 }
+int CallsTransClause::GetPriority() const noexcept { return kPriority; }
 }  // namespace spa

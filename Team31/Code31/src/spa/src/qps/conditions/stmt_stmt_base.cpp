@@ -70,4 +70,7 @@ ResultTable StmtStmtBase::Execute(KnowledgeBase *pkb) const noexcept {
     assert(false);
     return ResultTable{false};
 }
+int StmtStmtBase::GetSynCount() const noexcept {
+    return kSynCount[static_cast<int>(type_)];
+}
 }  // namespace spa

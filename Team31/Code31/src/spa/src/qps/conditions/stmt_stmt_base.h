@@ -87,6 +87,10 @@ class StmtStmtBase : public ConditionClause {
     virtual ResultTable WildSyn(KnowledgeBase *pkb,
                                 Synonym *second) const noexcept = 0;
     virtual ResultTable WildWild(KnowledgeBase *pkb) const noexcept = 0;
+    [[nodiscard]] int GetSynCount() const noexcept final;
+
+  private:
+    static constexpr std::array<int, 9> kSynCount{0, 1, 0, 1, 2, 1, 0, 1, 0};
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_STMTSTMTBASE_H_

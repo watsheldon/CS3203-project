@@ -59,7 +59,6 @@ class UsesModifiesBase : public ConditionClause {
              {Type::kSynSyn, Type::kSynWild, Type::kSynVar},
              {Type::kProcSyn, Type::kProcWild, Type::kProcVar}}};
 
-  public:
     ResultTable Execute(KnowledgeBase *pkb) const noexcept final;
     virtual ResultTable NumVar(KnowledgeBase *pkb, StmtNo first,
                                VarName second) const noexcept = 0;
@@ -79,6 +78,10 @@ class UsesModifiesBase : public ConditionClause {
                                 Synonym *second) const noexcept = 0;
     virtual ResultTable ProcWild(KnowledgeBase *pkb,
                                  ProcName first) const noexcept = 0;
+    [[nodiscard]] int GetSynCount() const noexcept override;
+
+  private:
+    static constexpr std::array<int, 9> kSynCount{0, 1, 0, 1, 2, 1, 0, 1, 0};
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_USESMODIFIESBASE_H_

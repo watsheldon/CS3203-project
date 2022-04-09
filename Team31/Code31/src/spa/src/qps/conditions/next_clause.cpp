@@ -1,5 +1,6 @@
 #include "next_clause.h"
 
+#include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "common/index.h"
 #include "common/type_convert_helpers.h"
@@ -7,6 +8,7 @@
 #include "qps/evaluator/result_table.h"
 #include "qps/synonym.h"
 
+int spa::NextClause::GetPriority() const noexcept { return kPriority; }
 namespace spa {
 ResultTable NextClause::NumNum(KnowledgeBase *pkb, StmtNo first,
                                StmtNo second) const noexcept {

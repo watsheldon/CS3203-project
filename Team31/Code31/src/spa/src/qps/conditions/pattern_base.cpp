@@ -50,4 +50,8 @@ ResultTable PatternBase::WildWild(KnowledgeBase *pkb) const noexcept {
     auto result = pkb->GetAllEntityIndices(StmtType::kAssign);
     return {zeroth_param_, {result.begin(), result.end()}};
 }
+int PatternBase::GetSynCount() const noexcept {
+    return kSynCount[static_cast<int>(type_)];
+}
+int PatternBase::GetPriority() const noexcept { return kPriority; }
 }  // namespace spa

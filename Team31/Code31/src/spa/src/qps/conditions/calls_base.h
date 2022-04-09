@@ -61,6 +61,10 @@ class CallsBase : public ConditionClause {
                                 Synonym *second) const noexcept = 0;
     virtual ResultTable ProcProc(KnowledgeBase *pkb, ProcName first,
                                  ProcName second) const noexcept = 0;
+    [[nodiscard]] int GetSynCount() const noexcept final;
+
+  private:
+    static constexpr std::array<int, 9> kSynCount{2, 1, 1, 1, 0, 0, 1, 0, 0};
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_CALLBASE_H_

@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <list>
-#include <queue>
 #include <string>
 
 #include "pkb/knowledge_base.h"
@@ -18,20 +17,20 @@ QueryEvaluator::ResultsView QueryEvaluator::GetResultsView() noexcept {
 void QueryEvaluator::Evaluate(const QueryObject& query,
                               std::list<std::string>& list) noexcept {
     Clear();
-    std::queue<const ConditionClause*> queue;
+    std::list<const ConditionClause*> queue;
     const auto& clauses = query.clauses;
     std::for_each(clauses.begin(), clauses.end(),
-                  [&queue](const auto& c) { queue.emplace(c.get()); });
-    // todo: make the clauses comparable by using the sum of the ref_count of
-    // each synonym, overload the operator< since that's what stl uses by
-    // default, then change to a priority queue
+                  [&queue](const auto& c) { queue.emplace_back(c.get()); });
     while (!queue.empty()) {
-        auto vartable = queue.front()->Execute(pkb_);
+        auto it = std::min_element(
+                queue.begin(), queue.end(),
+                [](const auto a, const auto b) { return *a < *b; });
+        auto vartable = (*it)->Execute(pkb_);
         if (!vartable.has_result || !UpdateResult(vartable)) {
             has_result_ = false;
             return;
         }
-        queue.pop();
+        queue.erase(it);
     }
 }
 bool QueryEvaluator::UpdateResult(ResultTable& result_table) noexcept {

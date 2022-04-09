@@ -31,4 +31,5 @@ ResultTable AffectsTransClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
     auto [col_1, col_2] = pkb->GetAffectsTPairs();
     return {first, std::move(col_1), second, std::move(col_2)};
 }
+int AffectsTransClause::GetPriority() const noexcept { return kPriority; }
 }  // namespace spa

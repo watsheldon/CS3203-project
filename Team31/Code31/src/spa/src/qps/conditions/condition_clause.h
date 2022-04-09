@@ -14,6 +14,7 @@ class ConditionClause {
     using VarName = IdentView;
     virtual ResultTable Execute(KnowledgeBase *pkb) const noexcept = 0;
     virtual ~ConditionClause() = 0;
+    bool operator<(const ConditionClause &other) const noexcept;
     enum class FirstParamType {
         kInt,
         kSyn,
@@ -27,6 +28,10 @@ class ConditionClause {
         kExpr,
         kIdent,
     };
+
+  protected:
+    [[nodiscard]] virtual int GetSynCount() const noexcept = 0;
+    [[nodiscard]] virtual int GetPriority() const noexcept = 0;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITION_CLAUSE_H_

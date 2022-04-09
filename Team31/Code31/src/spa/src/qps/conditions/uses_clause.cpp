@@ -58,4 +58,5 @@ ResultTable UsesClause::ProcWild(KnowledgeBase *pkb,
                                  ProcName first) const noexcept {
     return ResultTable(pkb->ExistUses(first));
 }
+int UsesClause::GetPriority() const noexcept { return kPriority; }
 }  // namespace spa

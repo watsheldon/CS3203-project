@@ -19,6 +19,10 @@ class FollowsTransClause : public FollowsBase {
                        StmtNo second) const noexcept override;
     ResultTable SynSyn(KnowledgeBase *pkb, Synonym *first,
                        Synonym *second) const noexcept override;
+    [[nodiscard]] int GetPriority() const noexcept final;
+
+  private:
+    static constexpr int kPriority = 6;
 };
 
 }  // namespace spa

@@ -59,4 +59,5 @@ ResultTable ModifiesClause::ProcWild(KnowledgeBase *pkb,
                                      ProcName first) const noexcept {
     return ResultTable(pkb->ExistModifies(first));
 }
+int ModifiesClause::GetPriority() const noexcept { return kPriority; }
 }  // namespace spa

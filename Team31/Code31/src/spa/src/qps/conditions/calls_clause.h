@@ -19,6 +19,10 @@ class CallsClause : public CallsBase {
                         Synonym* second) const noexcept final;
     ResultTable ProcProc(KnowledgeBase* pkb, ProcName first,
                          ProcName second) const noexcept final;
+    [[nodiscard]] int GetPriority() const noexcept override;
+
+  private:
+    static constexpr int kPriority = 5;
 };
 }  // namespace spa
 

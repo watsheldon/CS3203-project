@@ -35,6 +35,12 @@ class PatternBase : public ConditionClause {
     virtual ResultTable SynWild(KnowledgeBase *pkb,
                                 Synonym *first) const noexcept;
     virtual ResultTable WildWild(KnowledgeBase *pkb) const noexcept;
+    [[nodiscard]] int GetSynCount() const noexcept final;
+    [[nodiscard]] int GetPriority() const noexcept override;
+
+  private:
+    static constexpr std::array<int, 6> kSynCount{1, 1, 2, 2, 1, 1};
+    static constexpr int kPriority = 9;
 };
 }  // namespace spa
 

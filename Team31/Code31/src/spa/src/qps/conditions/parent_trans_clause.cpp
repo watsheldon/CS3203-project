@@ -33,4 +33,5 @@ ResultTable ParentTransClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
             pkb->GetParentTPairs(SynToPkbType(first), SynToPkbType(second));
     return {first, std::move(col_1), second, std::move(col_2)};
 }
+int ParentTransClause::GetPriority() const noexcept { return kPriority; }
 }  // namespace spa

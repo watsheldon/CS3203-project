@@ -26,4 +26,5 @@ ResultTable CallsClause::ProcProc(KnowledgeBase *pkb, ProcName first,
                                   ProcName second) const noexcept {
     return ResultTable(pkb->ExistCalls(first, second));
 }
+int CallsClause::GetPriority() const noexcept { return kPriority; }
 }  // namespace spa

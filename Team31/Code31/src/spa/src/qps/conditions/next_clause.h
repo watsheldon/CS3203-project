@@ -4,6 +4,7 @@
 #include "next_base.h"
 #include "pkb/knowledge_base.h"
 #include "qps/evaluator/result_table.h"
+#include "stmt_stmt_base.h"
 
 namespace spa {
 class NextClause : public NextBase {
@@ -19,6 +20,10 @@ class NextClause : public NextBase {
                        StmtNo second) const noexcept final;
     ResultTable SynSyn(KnowledgeBase *pkb, Synonym *first,
                        Synonym *second) const noexcept final;
+    [[nodiscard]] int GetPriority() const noexcept final;
+
+  private:
+    static constexpr int kPriority = 10;
 };
 }  // namespace spa
 

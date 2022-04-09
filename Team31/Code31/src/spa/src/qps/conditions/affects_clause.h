@@ -19,6 +19,10 @@ class AffectsClause : public AffectsBase {
                        StmtNo second) const noexcept final;
     ResultTable SynSyn(KnowledgeBase *pkb, Synonym *first,
                        Synonym *second) const noexcept final;
+    [[nodiscard]] int GetPriority() const noexcept final;
+
+  private:
+    static constexpr int kPriority = 15;
 };
 }  // namespace spa
 

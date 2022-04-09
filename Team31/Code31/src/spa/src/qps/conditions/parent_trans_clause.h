@@ -19,6 +19,10 @@ class ParentTransClause : public ParentBase {
                        StmtNo second) const noexcept final;
     ResultTable SynSyn(KnowledgeBase *pkb, Synonym *first,
                        Synonym *second) const noexcept final;
+    [[nodiscard]] int GetPriority() const noexcept final;
+
+  private:
+    static constexpr int kPriority = 6;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_PARENT_TRANS_CLAUSE_H_

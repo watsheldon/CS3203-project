@@ -34,4 +34,5 @@ ResultTable FollowsClause::SynSyn(KnowledgeBase *pkb, Synonym *first,
             pkb->GetFollowsPairs(SynToPkbType(first), SynToPkbType(second));
     return {first, std::move(col_1), second, std::move(col_2)};
 }
+int FollowsClause::GetPriority() const noexcept { return kPriority; }
 }  // namespace spa

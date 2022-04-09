@@ -27,6 +27,10 @@ class ModifiesClause : public UsesModifiesBase {
                         Synonym *second) const noexcept override;
     ResultTable ProcWild(KnowledgeBase *pkb,
                          ProcName first) const noexcept override;
+    [[nodiscard]] int GetPriority() const noexcept final;
+
+  private:
+    static constexpr int kPriority = 7;
 };
 }  // namespace spa
 #endif  // SRC_SPA_SRC_QPS_CONDITIONS_MODIFIES_CLAUSE_H_
