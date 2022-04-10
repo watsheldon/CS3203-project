@@ -76,18 +76,25 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
     while (!q.empty()) {
         StmtNo curr = q.front();
         q.pop();
+        bool skip_curr = false;
         auto status = affectsT_cache_.Get(curr, second_assign);
         if (status != Cache::Indicator::kUncalculated) {
-            affectsT_cache_.Set(first_assign, second_assign, status);
-            return status == Cache::Indicator::kTrue;
+            if (status == Cache::Indicator::kTrue) {
+                affectsT_cache_.Set(first_assign, second_assign, status);
+                return true;
+            } else {
+                skip_curr = true;
+            }
         }
-        if (ExistAffects(curr, second_assign)) {
+        if (!skip_curr && ExistAffects(curr, second_assign)) {
             affectsT_cache_.Set(first_assign, second_assign,
                                 Cache::Indicator::kTrue);
             return true;
         }
-        std::set<StmtNo> children = GetAffected(curr);
-        AddChildrenAffectsT(children, visited, q);
+        if (!skip_curr) {
+            std::set<StmtNo> children = GetAffected(curr);
+            AddChildrenAffectsT(children, visited, q);
+        }
     }
     affectsT_cache_.Set(first_assign, second_assign, Cache::Indicator::kFalse);
     return false;
