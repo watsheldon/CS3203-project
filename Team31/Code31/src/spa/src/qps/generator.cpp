@@ -136,6 +136,7 @@ void Generator::Reset() noexcept {
     selected_.clear();
     mode_.clear();
     curr_syn_type_ = Synonym::kNone;
+    first_attr_ = Attribute::kNone;
     conditions_.clear();
     expression_.clear();
 }
@@ -147,6 +148,7 @@ void Generator::BeginClause(QueryTokenType token_type) noexcept {
     factory_.SetRelationship(token_type);
     mode_.emplace_back(TokenToClauseMode(token_type));
     if (mode_.back() == Mode::kWith) {
+        is_left_zero_ = false;
         mode_.emplace_back(Mode::kFirst);
     } else {
         mode_.emplace_back(Mode::kZeroth);
@@ -223,15 +225,14 @@ void Generator::Constant(const QueryToken &token) noexcept {
     }
     // with
     if (*++mode_.rbegin() == Mode::kWith && mode_.back() == Mode::kFirst) {
-        is_int_zero_ = std::stoi(val) == 0;
+        is_left_zero_ = std::stoi(val) == 0;
         is_with_num_ = true;
         factory_.SetFirst(val);
         mode_.pop_back();
         return;
     }
     if (*++mode_.rbegin() == Mode::kWith && mode_.back() == Mode::kSecond) {
-        if (std::stoi(val) == 0 && first_with_syn_ != nullptr &&
-            first_attr_ != Attribute::kValue)
+        if (std::stoi(val) == 0 && first_attr_ == Attribute::kStmtNum)
             return SemanticError();
         mode_.resize(mode_.size() - 2);
         if (!is_with_num_) return SemanticError();
@@ -273,15 +274,16 @@ void Generator::Attr(QueryTokenType token_type) noexcept {
         if (UnsuitableAttributeType(first_with_syn_, attribute))
             return SemanticError();
         SetIsWithNum(attribute);
+        first_attr_ = attribute;
         return factory_.SetFirst(attribute);
     }
     if (mode_.back() == Mode::kSecond) {
         mode_.pop_back();
         if (UnsuitableAttributeType(second_with_syn_, attribute))
             return SemanticError();
-        if (is_int_zero_ && attribute != Attribute::kValue)
-            return SemanticError();
         if (is_with_num_ && attribute <= Attribute::kVarName)
+            return SemanticError();
+        if (is_left_zero_ && attribute == Attribute::kStmtNum)
             return SemanticError();
         if (!is_with_num_ && attribute > Attribute::kVarName)
             return SemanticError();

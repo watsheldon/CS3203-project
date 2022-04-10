@@ -59,7 +59,7 @@ class Generator {
     bool semantic_error_;
     bool can_terminate_;
     bool is_with_num_;
-    bool is_int_zero_;
+    bool is_left_zero_;
     SynonymMap synonym_map_;
     VecUniquePtr<Synonym> synonyms_;
     std::vector<SynonymWithAttr> selected_;
@@ -70,7 +70,6 @@ class Generator {
     std::vector<QueryToken> expression_;
     Synonym* pattern_syn_;
     Attribute first_attr_;
-    Attribute second_attr_;
     Synonym* first_with_syn_;
     Synonym* second_with_syn_;
     Factory factory_;
