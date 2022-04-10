@@ -38,12 +38,16 @@ class WithClause : public ConditionClause {
     static ResultTable StmtSyn(KnowledgeBase *pkb, std::string_view value,
                                SynonymWithAttr second) noexcept;
     ResultTable SynSyn(KnowledgeBase *pkb) const noexcept;
+    ResultTable SynSynName(KnowledgeBase *pkb) const noexcept;
     ResultTable SynSynNum(KnowledgeBase *pkb) const noexcept;
     ResultTable ValueStmt(KnowledgeBase *pkb) const noexcept;
     [[nodiscard]] int GetPriority() const noexcept final;
     [[nodiscard]] int GetSynCount() const noexcept final;
 
   private:
+    void ToNames(KnowledgeBase *pkb, SynonymWithAttr syn,
+                 std::vector<int> &indices,
+                 std::list<std::string> &names) const noexcept;
     static constexpr std::array<int, 3> kSynCount{0, 1, 2};
     static constexpr std::array<int, 3> kPriority{4, 4, 11};
 };

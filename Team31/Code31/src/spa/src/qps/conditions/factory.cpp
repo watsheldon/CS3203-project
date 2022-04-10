@@ -55,7 +55,6 @@ void Factory::SetFirst(const std::string& value) noexcept {
 void Factory::SetFirst(Attribute attribute) noexcept {
     assert(first_syn_ != nullptr);
     first_attr = attribute;
-    first_param_type_ = ConditionClause::FirstParamType::kSyn;
 }
 void Factory::SetSecond(int second) noexcept {
     second_int_ = second;
@@ -76,7 +75,6 @@ void Factory::SetSecond(std::vector<QueryToken>&& expr) noexcept {
 void Factory::SetSecond(Attribute attribute) noexcept {
     assert(second_syn_ != nullptr);
     second_attr_ = attribute;
-    second_param_type_ = ConditionClause::SecondParamType::kSyn;
 }
 void Factory::SetTransPartial() noexcept {
     switch (rel_) {
@@ -122,20 +120,28 @@ void Factory::SetPatternSynonym(Synonym* syn) noexcept {
     }
 }
 std::unique_ptr<ConditionClause> Factory::BuildWithClause() noexcept {
-    if (first_syn_ != nullptr && second_syn_ != nullptr) {
+    if (first_param_type_ == ConditionClause::FirstParamType::kSyn &&
+        second_param_type_ == ConditionClause::SecondParamType::kSyn) {
         return std::make_unique<WithClause>(
                 SynonymWithAttr{first_syn_, first_attr},
                 SynonymWithAttr{second_syn_, second_attr_});
     }
-    if (first_syn_ != nullptr) {
+    if (first_param_type_ == ConditionClause::FirstParamType::kSyn &&
+        second_param_type_ == ConditionClause::SecondParamType::kIdent) {
         return std::make_unique<WithClause>(
                 SynonymWithAttr{first_syn_, first_attr}, second_ident_);
     }
-    if (second_syn_ != nullptr) {
+    if (first_param_type_ == ConditionClause::FirstParamType::kIdent &&
+        second_param_type_ == ConditionClause::SecondParamType::kSyn) {
         return std::make_unique<WithClause>(
                 first_ident_, SynonymWithAttr{second_syn_, second_attr_});
     }
-    return std::make_unique<WithClause>(first_ident_, second_ident_);
+    if (first_param_type_ == ConditionClause::FirstParamType::kIdent &&
+        second_param_type_ == ConditionClause::SecondParamType::kIdent) {
+        return std::make_unique<WithClause>(first_ident_, second_ident_);
+    }
+    assert(false);
+    return {};
 }
 std::unique_ptr<ConditionClause> Factory::Build() noexcept {
     switch (rel_) {

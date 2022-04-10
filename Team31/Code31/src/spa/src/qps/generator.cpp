@@ -117,10 +117,12 @@ void Generator::SetIsWithNum(Attribute attr) noexcept {
     switch (attr) {
         case Attribute::kProcName:
         case Attribute::kVarName:
-            is_with_num_ = true;
+            is_with_num_ = false;
+            return;
         case Attribute::kValue:
         case Attribute::kStmtNum:
-            is_with_num_ = false;
+            is_with_num_ = true;
+            return;
         default:
             assert(false);
     }
@@ -231,8 +233,12 @@ void Generator::Constant(const QueryToken &token) noexcept {
         if (std::stoi(val) == 0 && first_with_syn_ != nullptr &&
             first_attr_ != Attribute::kValue)
             return SemanticError();
-        mode_.pop_back();
-        return !is_with_num_ ? SemanticError() : factory_.SetSecond(val);
+        mode_.resize(mode_.size() - 2);
+        if (!is_with_num_) return SemanticError();
+        factory_.SetSecond(val);
+        auto clause = factory_.Build();
+        conditions_.emplace_back(std::move(clause));
+        return;
     }
     // stmt#
     auto value = std::stoi(val);
