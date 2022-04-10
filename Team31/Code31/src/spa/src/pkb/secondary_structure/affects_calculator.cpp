@@ -225,10 +225,7 @@ bool AffectsCalculator::ExistUnmodifiedPath(StmtNo first_assign,
         }
         is_first_node = false;
         StmtType type = type_store_.GetType(curr);
-        bool is_related_type = type == StmtType::kAssign ||
-                               type == StmtType::kRead ||
-                               type == StmtType::kCall;
-        if (curr != first_assign && is_related_type &&
+        if (curr != first_assign && is_related_type(type) &&
             modifies_store_.ExistModifies(curr, var)) {
             continue;
         }

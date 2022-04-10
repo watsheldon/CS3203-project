@@ -3,7 +3,6 @@
 
 #include <queue>
 #include <set>
-#include <stack>
 #include <vector>
 
 #include "cache.h"
@@ -60,6 +59,10 @@ class AffectsCalculator {
     Cache affects_cache_;
     Cache affectsT_cache_;
 
+    static constexpr bool is_related_type(StmtType type) {
+        return type == StmtType::kAssign || type == StmtType::kRead ||
+               type == StmtType::kCall;
+    }
     [[nodiscard]] bool IsSameProcedure(StmtNo first_assign,
                                        StmtNo second_assign) const noexcept;
     [[nodiscard]] bool ExistUnmodifiedPath(StmtNo first_assign,
