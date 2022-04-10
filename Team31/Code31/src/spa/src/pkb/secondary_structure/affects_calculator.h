@@ -58,6 +58,7 @@ class AffectsCalculator {
     const std::vector<StmtNo>& assign_stmts_;
     const size_t stmt_count_;
     Cache affects_cache_;
+    Cache affectsT_cache_;
 
     [[nodiscard]] bool IsSameProcedure(StmtNo first_assign,
                                        StmtNo second_assign) const noexcept;
@@ -67,6 +68,9 @@ class AffectsCalculator {
     static void AddChildrenAffects(const std::set<StmtNo>& children,
                                    BitArray& visited,
                                    std::queue<StmtNo>& q) noexcept;
+    static void AddChildrenAffectsT(const std::set<StmtNo>& children,
+                                    BitArray& visited,
+                                    std::queue<StmtNo>& q) noexcept;
 };
 }  // namespace spa
 

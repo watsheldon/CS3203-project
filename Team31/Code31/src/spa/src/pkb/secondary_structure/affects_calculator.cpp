@@ -21,6 +21,7 @@ AffectsCalculator::AffectsCalculator(Stores stores) noexcept
           next_(stores.next),
           stmt_count_(stores.stmt_count),
           affects_cache_(stmt_count_ + 1),
+          affectsT_cache_(stmt_count_ + 1),
           assign_stmts_(
                   stores.type_statements.GetStatements(StmtType::kAssign)) {}
 bool AffectsCalculator::ExistAffects(StmtNo first_assign,
@@ -64,6 +65,10 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
      *    - Vertices: all assign stmts
      *    - Edges: (a1, a2) is an edge iff Affects(a1, a2) holds, even if a1=a2
      */
+    auto indicator = affectsT_cache_.Get(first_assign, second_assign);
+    if (indicator != Cache::Indicator::kUncalculated) {
+        return indicator == Cache::Indicator::kTrue;
+    }
     std::queue<StmtNo> q;
     BitArray visited(assign_stmts_.size());
     visited.Set(first_assign);
@@ -71,17 +76,20 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
     while (!q.empty()) {
         StmtNo curr = q.front();
         q.pop();
+        auto status = affectsT_cache_.Get(curr, second_assign);
+        if (status != Cache::Indicator::kUncalculated) {
+            affectsT_cache_.Set(first_assign, second_assign, status);
+            return status == Cache::Indicator::kTrue;
+        }
         if (ExistAffects(curr, second_assign)) {
+            affectsT_cache_.Set(first_assign, second_assign,
+                                Cache::Indicator::kTrue);
             return true;
         }
         std::set<StmtNo> children = GetAffected(curr);
-        for (const StmtNo child : children) {
-            if (!visited.Get(child)) {
-                visited.Set(child);
-                q.push(child);
-            }
-        }
+        AddChildrenAffectsT(children, visited, q);
     }
+    affectsT_cache_.Set(first_assign, second_assign, Cache::Indicator::kFalse);
     return false;
 }
 bool AffectsCalculator::HasAffected(StmtNo first_assign) noexcept {
@@ -234,6 +242,16 @@ void AffectsCalculator::AddChildrenAffects(const std::set<StmtNo>& children,
                                            std::queue<StmtNo>& q) noexcept {
     for (const StmtNo child : children) {
         if (child != 0 && !visited.Get(child)) {
+            visited.Set(child);
+            q.push(child);
+        }
+    }
+}
+void AffectsCalculator::AddChildrenAffectsT(const std::set<StmtNo>& children,
+                                            BitArray& visited,
+                                            std::queue<StmtNo>& q) noexcept {
+    for (const StmtNo child : children) {
+        if (!visited.Get(child)) {
             visited.Set(child);
             q.push(child);
         }
