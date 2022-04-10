@@ -10,12 +10,11 @@ class Cache {
   public:
     enum class Indicator { kUncalculated = 0, kTrue, kFalse };
     explicit Cache(size_t max_size) noexcept;
-    void Set(StmtNo stmt1, StmtNo stmt2, Cache::Indicator value) noexcept;
-    [[nodiscard]] Cache::Indicator Get(StmtNo stmt1,
-                                       StmtNo stmt2) const noexcept;
+    void Set(StmtNo stmt1, StmtNo stmt2, Indicator value) noexcept;
+    [[nodiscard]] Indicator Get(StmtNo stmt1, StmtNo stmt2) const noexcept;
 
   private:
-    Vec2D<Cache::Indicator> cache_items_map_;
+    Vec2D<Indicator> cache_items_map_;
 };
 }  // namespace spa
 
