@@ -132,11 +132,13 @@ void WithClause::ToNames(KnowledgeBase *pkb, SynonymWithAttr syn,
     if (type == Synonym::Type::kStmtPrint || type == Synonym::Type::kStmtRead ||
         type == Synonym::Type::kStmtCall) {
         auto stmt_type = SynToPkbType(syn.synonym_);
-        indices = std::move(pkb->GetAllEntityIndices(stmt_type));
+        auto stmts = pkb->GetAllEntityIndices(stmt_type);
+        indices.insert(indices.end(), stmts.begin(), stmts.end());
         pkb->ToAttr(stmt_type, indices, names);
     } else {
         auto query_entity_type = AttrToPkbType(syn.attribute_);
-        indices = std::move(pkb->GetAllEntityIndices(query_entity_type));
+        auto entities = pkb->GetAllEntityIndices(query_entity_type);
+        indices.insert(indices.end(), entities.begin(), entities.end());
         pkb->ToName(query_entity_type, indices, names);
     }
 }
