@@ -152,29 +152,13 @@ ResultTable WithClause::SynSynNum(KnowledgeBase *pkb) const noexcept {
     }
     // constant.value = stmt.stmt#
     if (first.attribute_ == Attribute::kValue) {
-        return ValueStmt(pkb);
+        return ValueStmt(pkb, first, second);
     }
     // print.stmt# = constant.value
     if (second.attribute_ == Attribute::kValue) {
-        return ValueStmt(pkb);
+        return ValueStmt(pkb, second, first);
     }
-    // read.stmt# = print.stmt#
-    if (first.synonym_->type != Synonym::Type::kStmtAny &&
-        second.synonym_->type != Synonym::Type::kStmtAny) {
-        return ResultTable(false);
-    }
-    // stmt.stmt# == read.stmt#
-    if (first.synonym_->type == Synonym::Type::kStmtAny) {
-        auto col_1 = pkb->GetAllEntityIndices(AttrToPkbType(second.attribute_));
-        auto col_2 = col_1;
-        return {first.synonym_, std::move(col_1), second.synonym_,
-                std::move(col_2)};
-    }
-    // print.stmt# = stmt.stmt# || stmt.stmt# = stmt2.stmt#
-    auto col_1 = pkb->GetAllEntityIndices(AttrToPkbType(first.attribute_));
-    auto col_2 = col_1;
-    return {first.synonym_, std::move(col_1), second.synonym_,
-            std::move(col_2)};
+    return StmtStmt(pkb, first, second);
 }
 ResultTable WithClause::ValueValue(KnowledgeBase *pkb, SynonymWithAttr value_1,
                                    SynonymWithAttr value_2) const noexcept {
@@ -183,27 +167,58 @@ ResultTable WithClause::ValueValue(KnowledgeBase *pkb, SynonymWithAttr value_1,
     return {value_1.synonym_, std::move(col_1), value_2.synonym_,
             std::move(col_2)};
 }
-ResultTable WithClause::ValueStmt(KnowledgeBase *pkb) const noexcept {
-    auto first = std::get<SynonymWithAttr>(first_param_);
-    auto second = std::get<SynonymWithAttr>(second_param_);
-    assert(first.attribute_ == Attribute::kValue &&
-           second.attribute_ == Attribute::kStmtNum);
-    auto constants = pkb->GetAllEntityIndices(AttrToPkbType(first.attribute_));
-    auto stmts = pkb->GetAllEntityIndices(AttrToPkbType(second.attribute_));
+ResultTable WithClause::ValueStmt(KnowledgeBase *pkb, SynonymWithAttr value,
+                                  SynonymWithAttr stmt) const noexcept {
+    assert(value.attribute_ == Attribute::kValue &&
+           stmt.attribute_ == Attribute::kStmtNum);
+    // constant.value = stmt.stmt#
+    auto constants = pkb->GetAllEntityIndices(AttrToPkbType(value.attribute_));
+    auto stmts = pkb->GetAllEntityIndices(SynToPkbType(stmt.synonym_));
     std::list<std::string> names;
-    pkb->ToName(AttrToPkbType(first.attribute_), constants, names);
+    pkb->ToName(AttrToPkbType(value.attribute_), constants, names);
     std::vector<int> col_1;
     std::vector<int> col_2;
     for (const auto &name : names) {
-        int value = std::stoi(name);
-        if (std::binary_search(stmts.begin(), stmts.end(), value)) {
+        int val = std::stoi(name);
+        if (std::binary_search(stmts.begin(), stmts.end(), val)) {
             col_1.emplace_back(pkb->IdentToIndexValue(
-                    name, AttrToPkbType(first.attribute_)));
-            col_2.emplace_back(value);
+                    name, AttrToPkbType(value.attribute_)));
+            col_2.emplace_back(val);
         }
     }
-    return {first.synonym_, std::move(col_1), second.synonym_,
-            std::move(col_2)};
+    return {value.synonym_, std::move(col_1), stmt.synonym_, std::move(col_2)};
+}
+ResultTable WithClause::StmtStmt(KnowledgeBase *pkb, SynonymWithAttr stmt_1,
+                                 SynonymWithAttr stmt_2) const noexcept {
+    auto type_1 = stmt_1.synonym_->type;
+    auto type_2 = stmt_2.synonym_->type;
+    if (type_1 == type_2) {
+        auto col_1 = pkb->GetAllEntityIndices(SynToPkbType(stmt_1.synonym_));
+        auto col_2 = col_1;
+        return ResultTable{stmt_1.synonym_, std::move(col_1), stmt_2.synonym_,
+                           std::move(col_2)};
+    }
+    // read.stmt# = print.stmt#
+    if (stmt_1.synonym_->type != Synonym::Type::kStmtAny &&
+        stmt_2.synonym_->type != Synonym::Type::kStmtAny) {
+        return ResultTable(false);
+    }
+    // stmt.stmt# == read.stmt#
+    if (stmt_1.synonym_->type == Synonym::Type::kStmtAny) {
+        auto col_1 = pkb->GetAllEntityIndices(SynToPkbType(stmt_2.synonym_));
+        auto col_2 = col_1;
+        return {stmt_1.synonym_, std::move(col_1), stmt_2.synonym_,
+                std::move(col_2)};
+    }
+    // print.stmt# = stmt.stmt#
+    if (stmt_2.synonym_->type == Synonym::Type::kStmtAny) {
+        auto col_1 = pkb->GetAllEntityIndices(SynToPkbType(stmt_1.synonym_));
+        auto col_2 = col_1;
+        return {stmt_1.synonym_, std::move(col_1), stmt_2.synonym_,
+                std::move(col_2)};
+    }
+    assert(false);
+    return ResultTable{false};
 }
 int WithClause::GetPriority() const noexcept {
     return kPriority[GetSynCount()];

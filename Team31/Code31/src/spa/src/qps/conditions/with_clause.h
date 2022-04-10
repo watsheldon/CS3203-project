@@ -42,7 +42,10 @@ class WithClause : public ConditionClause {
     ResultTable SynSynNum(KnowledgeBase *pkb) const noexcept;
     ResultTable ValueValue(KnowledgeBase *pkb, SynonymWithAttr value_1,
                            SynonymWithAttr value_2) const noexcept;
-    ResultTable ValueStmt(KnowledgeBase *pkb) const noexcept;
+    ResultTable ValueStmt(KnowledgeBase *pkb, SynonymWithAttr value,
+                          SynonymWithAttr stmt) const noexcept;
+    ResultTable StmtStmt(KnowledgeBase *pkb, SynonymWithAttr stmt_1,
+                         SynonymWithAttr stmt_2) const noexcept;
     [[nodiscard]] int GetPriority() const noexcept final;
     [[nodiscard]] int GetSynCount() const noexcept final;
 
