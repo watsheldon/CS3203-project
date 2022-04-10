@@ -1,0 +1,210 @@
+1 - single attrRef: stmt
+stmt s;
+Select <s.stmt#>
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+5000
+2 - single attrRef: read
+read r;
+Select <r.stmt#>
+6, 11 
+5000
+3 - single attrRef: print
+print pn;
+Select <pn.stmt#>
+4, 5, 10
+5000
+4 - single attrRef: call
+call c;
+Select <c>
+14, 17
+5000
+5 - single attrRef: read NAME
+read r;
+Select <r.varName>
+a,b
+5000
+6 - single attrRef: print NAME
+print pn;
+Select <pn.varName>
+a,b
+5000
+7 - single attrRef: call NAME
+call c;
+Select <c.procName>
+tuple
+5000
+8 - single attrRef: while
+while w;
+Select <w.stmt#>
+7
+5000
+9 - single attrRef: if
+if ifs;
+Select <ifs.stmt#>
+8
+5000
+10 - single attrRef: assign
+assign a;
+Select <a.stmt#>
+1, 2, 3, 9, 12, 13, 15, 16
+5000
+11 - single attrRef: constant
+constant c;
+Select <c.value>
+1,2
+5000
+12 - single attrRef: variable
+variable v;
+Select <v.varName>
+a, y, x, b, d, c1, c2
+5000
+13 - single attrRef: procedure
+procedure p;
+Select <p.procName>
+tuple, Tuple
+5000
+14 - single synonym: stmt
+stmt s;
+Select <s>
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+5000
+15 - single synonym: read
+read r;
+Select <r>
+6,11
+5000
+16 - single synonym: print
+print pn;
+Select <pn>
+4,5,10
+5000
+17 - single synonym: call
+call c;
+Select <c>
+14, 17
+5000
+18 - single synonym: while
+while w;
+Select <w>
+7
+5000
+19 - single synonym: if
+if ifs;
+Select <ifs>
+8
+5000
+20 - single synonym: assign
+assign a;
+Select <a>
+1, 2, 3, 9, 12, 13, 15, 16
+5000
+21 - single synonym: constant
+constant c;
+Select <c>
+1,2
+5000
+22 - single synonym: variable
+variable v;
+Select <v>
+a, y, x, b, d, c1, c2
+5000
+23 - single synonym: procedure
+procedure p;
+Select <p>
+tuple, Tuple
+5000
+24 - 2-elem: stmtRef Follows
+stmt s,s1;
+Select <s,s1> such that Follows(s,s1)
+1 2, 2 3, 3 4, 4 5, 5 6, 6 7, 7 12, 9 10, 14 15, 13 14, 15 16, 16 17
+5000
+25 - 2-elem: stmtRef Parent
+stmt s,s1;
+Select <s.stmt#,s1.stmt#> such that Parent(s,s1)
+7 8, 8 10, 8 9, 8 11
+5000
+26 - 2-elem: stmtRef+entRef Uses
+stmt s; variable v;
+Select <s,v.varName> such that Uses(s,v)
+1 b, 2 a, 3 c2, 4 a, 5 b, 7 a,  7 c1, 7 c2,  8 b, 9 b, 10 b, 7 b, 8 a,12 a, 12 c2, 12 y, 12 x, 12 c1,13 b,14 a,14 c2 , 14 c1, 14 b, 14 y, 14 x,  15 b, 16 a, 17 c1, 17 y, 17 x, 17 b, 17 a, 17 c2
+5000
+27 - 2-elem: stmtRef+entRef Modifies
+stmt s; variable v;
+Select <s.stmt#,v> such that Modifies(s,v)
+15 a, 8 a, 11 a, 1 a, 14 d, 14 a, 7 a, 17 x, 17 b, 7 x, 13 a, 2 d, 17 a, 9 x, 16 b, 12 b, 8 x, 14 x, 14 b, 17 d, 6 b, 3 b
+5000
+28 - 2-elem: stmtRef+entRef Calls
+procedure p,p1;
+Select <p,p1.procName> such that Calls(p,p1)
+Tuple tuple
+5000
+29 - 2-elem: stmtRef Next
+stmt s,s1;
+Select <s,s1.stmt#> such that Next(s,s1)
+1 2, 2 3, 3 4, 4 5, 5 6, 6 7, 7 8, 7 12, 8 9, 8 11, 9 10, 10 7, 11 7, 13 14, 14 15, 15 16, 16 17
+5000
+30 - 2-elem: stmtRef Affects
+assign s,s1;
+Select <s,s1.stmt#> such that Affects(s,s1)
+1 2, 1 12, 9 12, 15 16
+5000
+31 - 2-elem: stmtRef+entRef pattern if
+if ifs; variable v;
+Select <ifs, v> pattern ifs (v, _, _)
+8 a, 8 b
+5000
+32 - 2-elem: stmtRef+entRef pattern while
+while w; variable v;
+Select <v.varName, w> pattern w (v, _)
+c1 7, c2 7
+5000
+33 - 2-elem: stmtRef unrelated clause
+read r; if ifs;
+Select <r, ifs> such that Next* (_, _)
+6 8, 11 8
+5000
+34 - 3-elem: 2 related to clause
+if ifs; variable v; print p;
+Select <ifs, v, p.stmt#> pattern ifs (v, _, _)
+8 a 4, 8 a 5, 8 a 10, 8 b 4, 8 b 5, 8 b 10
+5000
+35 - 3-elem: 1 related to clause
+procedure p; call c; variable v;
+Select <p, c, v> with v.varName = "a"
+tuple 14 a, tuple 17 a, Tuple 14 a, Tuple 17 a
+5000
+36 - 3-elem: 3 related to clause
+stmt BOOLEAN, s1, s2;
+Select <BOOLEAN,s1.stmt#,s2> such that Follows(BOOLEAN,s1) and Follows(s1,s2)
+1 2 3,2 3 4, 3 4 5, 4 5 6, 5 6 7, 6 7 12, 13 14 15, 14 15 16, 15 16 17 
+5000
+37 - 4-elem: 2 related to clause 
+if ifs; variable v; assign a; procedure p;
+Select <ifs, v.varName, a, p> pattern a (v, _"a"_)
+8 d 2 tuple, 8 b 12 tuple, 8 b 16 tuple, 8 d 2 Tuple, 8 b 12 Tuple, 8 b 16 Tuple
+5000
+38 - select same synonym: 2 entRef 
+variable v; call c; procedure p;
+Select <v.varName, v> 
+a a, y y, x x, b b, d d, c1 c1, c2 c2
+5000
+39 - select same synonym: 2 entRef
+variable v; call c; procedure p;
+Select <p, p.procName> 
+tuple tuple, Tuple Tuple
+5000
+40 - select same synonym: 2 stmtRef + 1 entRef
+variable v; call c; procedure p;
+Select <c, c.stmt#, c.procName> 
+14 14 tuple, 17 17 tuple
+5000
+41 - select same synonym: 2 stmtRef + 1 entRef
+read r;
+Select <r.varName, r, r.stmt#> 
+b 6 6, a 11 11 
+5000
+42 - select same synonym: 2 stmtRef + 1 entRef
+print pr;
+Select <pr.stmt#, pr,pr.varName> 
+4 4 a, 5 5 b, 10 10 b
+5000

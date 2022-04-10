@@ -1,0 +1,17 @@
+procedure tuple {a = b;
+  d = a;
+  b = c2;
+  print a;
+  print b;
+  read b;
+  while (c1 == c2) {
+    if (a == b) then {
+      x = b;
+      print b; } else {
+      read a; } }
+  b = 1 + 2 * x / y - c1 % c2 % a; }
+procedure Tuple {a = b;
+call tuple;
+  a = b;
+  b = a; 
+  call tuple;}
