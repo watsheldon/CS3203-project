@@ -58,6 +58,8 @@ constexpr bool Generator::UnsuitableFirstSynType(Generator::Mode mode,
             return type > Synonym::kStmtAssign;
         case Mode::kAffects:
             return type != Synonym::kStmtAssign && type != Synonym::kStmtAny;
+        case Mode::kWith:
+            return false;
         default:
             assert(false);
             return false;
@@ -79,6 +81,8 @@ constexpr bool Generator::UnsuitableSecondSynType(Generator::Mode mode,
             return type > Synonym::kStmtAssign;
         case Mode::kAffects:
             return type != Synonym::kStmtAssign && type != Synonym::kStmtAny;
+        case Mode::kWith:
+            return false;
         default:
             assert(false);
             return false;
@@ -523,6 +527,7 @@ void Generator::ParseToken(const QueryToken &token) noexcept {
             return Equal();
         case QueryTokenType::kKeywordThat:
         case QueryTokenType::kDot:
+            return;
         default:
             assert(false);
     }
