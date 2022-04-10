@@ -13,6 +13,7 @@
 #include "common/polish_notation.h"
 #include "common/polish_notation_node.h"
 #include "knowledge_base.h"
+#include "pkb/secondary_structure/affects_calculator.h"
 #include "pkb/secondary_structure/next_calculator.h"
 #include "pkb/store/calls_relationship_store.h"
 #include "pkb/store/follows_relationship_store.h"
@@ -269,6 +270,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     std::unique_ptr<ContainerForest> container_forest_;
     std::unique_ptr<ControlFlowGraph> cfg_;
     std::unique_ptr<NextCalculator> next_;
+    std::unique_ptr<AffectsCalculator> affects_;
     FollowsRelationshipStore follows_store_;
     ParentRelationshipStore parent_store_;
 

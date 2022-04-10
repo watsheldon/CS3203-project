@@ -635,43 +635,51 @@ std::set<StmtNo> ProgramKnowledgeBase::GetNextTSelf(StmtType type) {
 }
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign,
                                         Index<ArgPos::kSecond> second_assign) {
-    return false;
+    return affects_->ExistAffects(first_assign, second_assign);
 }
 bool ProgramKnowledgeBase::ExistAffectsT(Index<ArgPos::kFirst> first_assign,
                                          Index<ArgPos::kSecond> second_assign) {
-    return false;
+    return affects_->ExistAffectsT(first_assign, second_assign);
 }
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kFirst> first_assign) {
-    return false;
+    return affects_->HasAffected(first_assign);
 }
 bool ProgramKnowledgeBase::ExistAffects(Index<ArgPos::kSecond> second_assign) {
-    return false;
+    return affects_->HasAffecter(second_assign);
 }
-bool ProgramKnowledgeBase::ExistAffects() { return false; }
+bool ProgramKnowledgeBase::ExistAffects() { return affects_->ExistAffects(); }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffects(ArgPos return_pos) {
-    return {};
+    return affects_->GetAffects(return_pos);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
         Index<ArgPos::kFirst> assign) {
-    return {};
+    return affects_->GetAffected(assign);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
         Index<ArgPos::kFirst> assign) {
-    return {};
+    return affects_->GetAffectedT(assign);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffects(
         Index<ArgPos::kSecond> assign) {
-    return {};
+    return affects_->GetAffecter(assign);
 }
 std::set<StmtNo> ProgramKnowledgeBase::GetAffectsT(
         Index<ArgPos::kSecond> assign) {
-    return {};
+    return affects_->GetAffecterT(assign);
 }
-PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() { return {}; }
+PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsPairs() {
+    return affects_->GetAffectsPairs();
+}
+PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() {
+    return affects_->GetAffectsTPairs();
+}
+std::set<StmtNo> ProgramKnowledgeBase::GetAffectsSelf() {
+    return affects_->GetAffectsSelf();
+}
+std::set<StmtNo> ProgramKnowledgeBase::GetAffectsTSelf() {
+    return affects_->GetAffectsTSelf();
+}
 
-PairVec<StmtNo> ProgramKnowledgeBase::GetAffectsTPairs() { return {}; }
-std::set<StmtNo> ProgramKnowledgeBase::GetAffectsSelf() { return {}; }
-std::set<StmtNo> ProgramKnowledgeBase::GetAffectsTSelf() { return {}; }
 void ProgramKnowledgeBase::Compile() {
     assert(!compiled);
     container_forest_ = std::make_unique<ContainerForest>(
@@ -690,6 +698,9 @@ void ProgramKnowledgeBase::Compile() {
     next_ = std::make_unique<NextCalculator>(
             NextCalculator::Stores{stmtlst_stmt_, type_stmt_,
                                    *container_forest_, parent_store_, *cfg_});
+    affects_ = std::make_unique<AffectsCalculator>(AffectsCalculator::Stores{
+            stmtlst_stmt_, type_stmt_, *container_forest_, modifies_rel_,
+            uses_rel_, *cfg_, *next_, stmt_count_});
     compiled = true;
 }
 std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(QueryEntityType et) {

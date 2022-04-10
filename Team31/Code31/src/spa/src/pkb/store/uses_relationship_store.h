@@ -23,7 +23,8 @@ class UsesRelationshipStore : public UsesModifiesStoreBase {
     void Set(StmtNo stmt_no, std::vector<VarIndex>&& var_indices);
     [[nodiscard]] const std::vector<VarIndex>& GetVarIndex(
             StmtNo stmt_no) const;
-    [[nodiscard]] bool ExistUses(StmtNo stmt_no, VarIndex var_index);
+    [[nodiscard]] bool ExistUses(StmtNo stmt_no,
+                                 VarIndex var_index) const noexcept;
     [[nodiscard]] std::set<VarIndex> GetUses(StmtNo stmt_no) const noexcept;
     [[nodiscard]] std::set<StmtNo> GetUses(VarIndex var_index, StmtType type,
                                            const TypeStatementsStore& store);

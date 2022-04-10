@@ -424,9 +424,9 @@ class KnowledgeBase {
     virtual std::set<StmtNo> GetAffects(Index<ArgPos::kSecond> assign) = 0;
     // Affects*(a,"")
     virtual std::set<StmtNo> GetAffectsT(Index<ArgPos::kSecond> assign) = 0;
-    // Affects(a,a)
+    // Affects(a1, a2)
     virtual PairVec<StmtNo> GetAffectsPairs() = 0;
-    // Affects*(a,a)
+    // Affects*(a1, a2)
     virtual PairVec<StmtNo> GetAffectsTPairs() = 0;
     // Affects(a, a)
     virtual std::set<StmtNo> GetAffectsSelf() = 0;

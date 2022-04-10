@@ -21,6 +21,7 @@ class ModifiesRelationshipStore : public UsesModifiesStoreBase {
     [[nodiscard]] bool ExistModifies(StmtNo stmt_no,
                                      VarIndex var_index) const noexcept;
     [[nodiscard]] std::set<VarIndex> GetModifies(StmtNo stmt_no) const noexcept;
+    [[nodiscard]] VarIndex GetModifiesSingleVar(StmtNo stmt_no) const noexcept;
     [[nodiscard]] std::set<StmtNo> GetModifies(
             VarIndex var_index, StmtType type,
             const TypeStatementsStore &store) const noexcept;
