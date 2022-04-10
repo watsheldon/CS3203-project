@@ -6261,8 +6261,8 @@ namespace Catch {
             ScopedElement& writeText( std::string const& text, XmlFormatting fmt = XmlFormatting::Newline | XmlFormatting::Indent );
 
             template<typename T>
-            ScopedElement& writeAttribute( std::string const& name, T const& attribute ) {
-                m_writer->writeAttribute( name, attribute );
+            ScopedElement& writeAttribute( std::string const& name, T const& attribute_ ) {
+                m_writer->writeAttribute( name, attribute_ );
                 return *this;
             }
 
@@ -6283,14 +6283,14 @@ namespace Catch {
 
         XmlWriter& endElement(XmlFormatting fmt = XmlFormatting::Newline | XmlFormatting::Indent);
 
-        XmlWriter& writeAttribute( std::string const& name, std::string const& attribute );
+        XmlWriter& writeAttribute( std::string const& name, std::string const& attribute_ );
 
-        XmlWriter& writeAttribute( std::string const& name, bool attribute );
+        XmlWriter& writeAttribute( std::string const& name, bool attribute_ );
 
         template<typename T>
-        XmlWriter& writeAttribute( std::string const& name, T const& attribute ) {
+        XmlWriter& writeAttribute( std::string const& name, T const& attribute_ ) {
             ReusableStringStream rss;
-            rss << attribute;
+            rss << attribute_;
             return writeAttribute( name, rss.str() );
         }
 
@@ -15688,14 +15688,14 @@ namespace {
         return *this;
     }
 
-    XmlWriter& XmlWriter::writeAttribute( std::string const& name, std::string const& attribute ) {
-        if( !name.empty() && !attribute.empty() )
-            m_os << ' ' << name << "=\"" << XmlEncode( attribute, XmlEncode::ForAttributes ) << '"';
+    XmlWriter& XmlWriter::writeAttribute( std::string const& name, std::string const& attribute_ ) {
+        if( !name.empty() && !attribute_.empty() )
+            m_os << ' ' << name << "=\"" << XmlEncode( attribute_, XmlEncode::ForAttributes ) << '"';
         return *this;
     }
 
-    XmlWriter& XmlWriter::writeAttribute( std::string const& name, bool attribute ) {
-        m_os << ' ' << name << "=\"" << ( attribute ? "true" : "false" ) << '"';
+    XmlWriter& XmlWriter::writeAttribute( std::string const& name, bool attribute_ ) {
+        m_os << ' ' << name << "=\"" << ( attribute_ ? "true" : "false" ) << '"';
         return *this;
     }
 
@@ -17963,4 +17963,3 @@ using Catch::Detail::Approx;
 // end catch_reenable_warnings.h
 // end catch.hpp
 #endif // TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
-
