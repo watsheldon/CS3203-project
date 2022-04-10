@@ -9,9 +9,9 @@ struct SynonymWithAttr {
     explicit SynonymWithAttr(Synonym* synonym,
                              Attribute attribute = Attribute::kNone)
             : synonym_(synonym), attribute_(attribute){};
-    explicit SynonymWithAttr() = default;
-    Synonym* synonym_;
-    Attribute attribute_;
+
+    Synonym* const synonym_;
+    const Attribute attribute_;
     bool operator<(const SynonymWithAttr& other) const noexcept {
         return synonym_ < other.synonym_;
     }

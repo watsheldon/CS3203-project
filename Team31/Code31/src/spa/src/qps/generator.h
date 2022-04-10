@@ -69,8 +69,10 @@ class Generator {
     VecUniquePtr<ConditionClause> conditions_;
     std::vector<QueryToken> expression_;
     Synonym* pattern_syn_;
-    SynonymWithAttr first_with_syn_;
-    SynonymWithAttr second_with_syn_;
+    Attribute first_attr_;
+    Attribute second_attr_;
+    Synonym* first_with_syn_;
+    Synonym* second_with_syn_;
     Factory factory_;
 
     inline void SemanticError() noexcept;

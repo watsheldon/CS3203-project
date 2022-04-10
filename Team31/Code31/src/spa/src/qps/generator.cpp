@@ -228,8 +228,8 @@ void Generator::Constant(const QueryToken &token) noexcept {
         return;
     }
     if (*++mode_.rbegin() == Mode::kWith && mode_.back() == Mode::kSecond) {
-        if (std::stoi(val) == 0 && first_with_syn_.synonym_ != nullptr &&
-            first_with_syn_.attribute_ != Attribute::kValue)
+        if (std::stoi(val) == 0 && first_with_syn_ != nullptr &&
+            first_attr_ != Attribute::kValue)
             return SemanticError();
         mode_.pop_back();
         return !is_with_num_ ? SemanticError() : factory_.SetSecond(val);
@@ -264,14 +264,14 @@ void Generator::Attr(QueryTokenType token_type) noexcept {
     Attribute attribute = TokenToAttrType(token_type);
     if (mode_.back() == Mode::kFirst) {
         mode_.pop_back();
-        if (UnsuitableAttributeType(first_with_syn_.synonym_, attribute))
+        if (UnsuitableAttributeType(first_with_syn_, attribute))
             return SemanticError();
         SetIsWithNum(attribute);
         return factory_.SetFirst(attribute);
     }
     if (mode_.back() == Mode::kSecond) {
         mode_.pop_back();
-        if (UnsuitableAttributeType(second_with_syn_.synonym_, attribute))
+        if (UnsuitableAttributeType(second_with_syn_, attribute))
             return SemanticError();
         if (is_int_zero_ && attribute != Attribute::kValue)
             return SemanticError();
@@ -312,7 +312,7 @@ void Generator::SetFirst(std::string_view name) noexcept {
     syn->IncRef();
     factory_.SetFirst(syn);
     if (mode_.back() == Mode::kWith) {
-        first_with_syn_ = SynonymWithAttr(syn);
+        first_with_syn_ = syn;
         mode_.emplace_back(Mode::kFirst);
     }
 }
@@ -327,7 +327,7 @@ void Generator::SetSecond(std::string_view name) noexcept {
     syn->IncRef();
     factory_.SetSecond(syn);
     if (mode_.back() == Mode::kWith) {
-        second_with_syn_ = SynonymWithAttr(syn);
+        second_with_syn_ = syn;
         mode_.emplace_back(Mode::kSecond);
     }
 }
@@ -454,9 +454,9 @@ void Generator::And() noexcept {
     }
 }
 void Generator::Equal() noexcept {
-      assert(mode_.back() == Mode::kWith);
-      mode_.emplace_back(Mode::kSecond);
-      return;
+    assert(mode_.back() == Mode::kWith);
+    mode_.emplace_back(Mode::kSecond);
+    return;
 }
 void Generator::ParseToken(const QueryToken &token) noexcept {
     const auto &[token_type, name] = token;

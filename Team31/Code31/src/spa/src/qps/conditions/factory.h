@@ -22,13 +22,13 @@
 #include "pattern_base.h"
 #include "pattern_expr_base.h"
 #include "pattern_while_if_clause.h"
-#include "with_clause.h"
 #include "qps/query_token.h"
 #include "qps/synonym.h"
 #include "qps/synonym_with_attr.h"
 #include "stmt_stmt_base.h"
 #include "uses_clause.h"
 #include "uses_modifies_base.h"
+#include "with_clause.h"
 
 namespace spa {
 
@@ -78,8 +78,8 @@ class Factory {
     Synonym* syn_;
     Synonym* first_syn_;
     Synonym* second_syn_;
-    SynonymWithAttr first_syn_attr_;
-    SynonymWithAttr second_syn_attr_;
+    Attribute first_attr;
+    Attribute second_attr_;
     std::vector<QueryToken> second_exprs_;
     template <typename T>
     std::unique_ptr<ConditionClause> BuildStmtStmtClause() noexcept {
