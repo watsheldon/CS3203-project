@@ -1,0 +1,60 @@
+1 - procedure + variable related clause
+procedure procedure, p1; variable v; if ifs;
+Select <procedure.procName, v.varName> such that Calls(procedure, "while") and Uses(procedure, v) and Modifies(procedure, v) pattern ifs (v, _, _) with v.varName = p1.procName
+then then, then while, if procedure, procedure if, then if, then procedure, if then, if if, procedure then, procedure procedure, procedure while
+5000
+2 - assign + variable related clause
+assign assign1, assign2; variable v;
+Select <assign1.stmt#, assign2.stmt#, v.varName> such that Modifies(assign1, v) and Uses(assign1, v) and Uses(assign2, v) and Affects(assign1, assign2) pattern assign2(_,_"x"_) and assign1(_,_) 
+34 106 y, 57 74 x, 64 65 x, 73 74 y, 82 85 procedure, 147 148 x, 223 225 z, 237 239 z, 251 253 z, 265 267 z, 279 281 z, 293 295 z, 307 309 z, 321 323 z, 335 337 z, 349 351 z, 363 365 z, 377 379 z
+5000
+3 - stmt + procedure about call/Calls
+call call; procedure p; variable v;
+Select <call.stmt#, p.procName> such that Uses(call, v) and Uses(p, v) and Modifies(call, v) and Modifies(p, v) and Calls(p, _) with call.procName = p.procName
+6 then, 19 if,  76 then, 107 then, 110 if, 124 if, 157 if,189 if
+5000
+4 - container related clauses
+while while; if if; variable v;
+Select while.stmt# such that Modifies(if, v) and Modifies(while, v) and Uses("if",v) pattern while(v, _) and if(v, _,_)
+12, 115, 179, 199, 398, 408
+5000
+5 - NextT + AffectsT + with(stmt#)
+read read; print print; assign assign1, assign2;
+Select <read,print> such that Next*(read, assign1) and Next*(assign2, print) and Affects*(assign1, assign2) and Next*(assign1, assign2) with read.varName = print.varName
+2 41, 8 25, 3 41, 31 29, 56 61, 53 69, 120 156, 139 140, 151 187, 165 175, 177 140
+5000
+6 - Next + NextT with one wildcard and the same synonym + pattern + with 
+assign s; variable v; print print;
+Select s such that Next (_, s) and Next(s,_) and Next*(s,_) and Next(_,s) pattern s(v, _"x-1+ b + c + d+ e +f+g+h+i+j"_) with v.varName = print.varName
+212
+5000
+7 - self-relationship: NextT + Affects + AffectsT
+stmt s;
+Select s such that Next* (s, s) and Affects(s,s) and Affects*(s,s) 
+16, 17, 28, 34, 202, 215, 390, 392, 400, 401, 409
+5000
+8 - Affects + NextT: different synonyms + pattern
+stmt s; assign a;
+Select <s,a> such that Affects (s, a) and Next*(s,a) and Next(s,a) pattern a(_, _"if"_) pattern a("else", _)
+98 99
+5000
+9 - Affects + AffectsT with one wildcard and the same synonym + pattern
+stmt s; 
+Select s such that Affects (s, _) and Affects(_,s) and Affects*(s, _) and Affects*(_,s) 
+14, 16, 17, 27, 28, 34, 40, 47, 63, 64, 65, 73, 79, 82, 83, 90, 98, 126, 127, 130, 141, 146, 147, 148, 152, 153, 155, 158, 160, 161, 173, 185, 190, 200, 202, 206, 208, 210, 211, 215, 220, 222, 223, 225, 234, 236, 237, 239, 248, 250, 251, 253, 262, 264, 265, 267, 276, 278, 279, 281, 290, 292, 293, 295, 304, 306, 307, 309, 318, 320, 321, 323, 332, 334, 335, 337, 346, 348, 349, 351, 360, 362, 363, 365, 374, 376, 377, 379, 387, 388, 390, 392, 397, 400, 401, 403, 404, 405, 407, 409
+5000
+10 - chained Next + with + FollowsT
+stmt s1,s2,s3,s4,s5,s6; constant cn1,cn2;
+Select <s1, s2, s3, s4, s5,s6> such that Next (s1, s2) and Next(s2,s3) and Next(s3, s4) and Next(s4,s5) and Next(s5,s6) with s1.stmt# = cn1.value and s2.stmt# = cn2.value such that Follows*(s1,s6)
+1 2 3 4 5 6, 2 3 4 5 6 7, 8 9 10 11 12 39, 9 10 11 12 39 40
+5000
+11 - chained Next + NextT + AffectsT + with + ParentT
+stmt s1,s2,s3,s4,s5; constant cn; while w;if if;
+Select <s1,s5> such that Next* (s1, s2) and Next(s2,s3) and Affects*(s3, s4) and Affects*(s4,s5) with s1.stmt# = w.stmt# and if.stmt# = s2.stmt# such that Parent*(s1, s5)
+115 127, 115 130, 115 142, 115 143, 115 147, 115 148, 115 152, 115 153, 115 155, 115 158, 115 160, 115 161, 115 172, 115 173, 115 174, 117 127, 117 130 ,117 142, 117 143, 117 147, 117 148, 117 152, 117 153, 117 155, 398 400, 398 401
+5000
+12 - 1 pattern and various such that 
+assign a; variable v; print print;
+Select <a,v.varName,print> pattern a (v, _"x-1"_) such that Parent*(385,401) and Affects*(394,409) and Next*(381,384) and Follows*(402,406) and Modifies(19,"procedure") and Uses(print, "if")
+210 y 135, 210 y 171, 210 y 230, 210 y 244, 210 y 258, 210 y 272, 210 y 286, 210 y 300, 210 y 314, 210 y 328, 210 y 342, 210 y 356, 210 y 370, 210 y 384, 212 a 135, 212 a 171, 212 a 230, 212 a 244, 212 a 258, 212 a 272, 212 a 286, 212 a 300, 212 a 314, 212 a 328, 212 a 342, 212 a 356, 212 a 370, 212 a 384
+5000
