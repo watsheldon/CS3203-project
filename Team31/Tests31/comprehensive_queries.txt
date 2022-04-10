@@ -163,3 +163,23 @@ assign and; procedure Calls;
 Select <                 and.stmt#,Calls.procName> such that Follows*(4, and) and Next*(10, and) and Affects*(5, and) and Parent*(2, and) and Calls*(Calls, "Five5") and Uses(Calls, "One1Two2Three3") and Modifies(Calls, "read") pattern and("read", "(read) -(procedure+while)")
 5 One1, 5 Two2, 5 Four4
 5000
+34 - Tuple Debug: 4 such that (Parent*, Modifies, Uses, Next*) + 2 pattern (assign, if)
+variable v; while w; if ifs; assign s;
+Select <w, ifs, v> such that Parent*(_, s) and Modifies(ifs, v) and Next*(w, s) and Uses(w,v) pattern ifs (v, _, _) and s(v, _)
+3 31 read, 7 31 read, 93 31 read, 52 54 else, 52 33 else
+5000
+35 - Tuple Debug: 4 such that (Parent*, Modifies, Uses, Next*) + 2 pattern (assign, if)
+variable v; while w; if ifs; assign s;
+Select <s, w, ifs, v> such that Parent*(_, s) and Modifies(ifs, v) and Next*(w, s) and Uses(w,v) pattern ifs (v, _, _) and s(v, _)
+5 3 31 read, 5 7 31 read, 94 93 31 read, 56 52 33 else, 56 52 54 else
+5000
+36 - Tuple Debug: 3 such that (Next*) + 3 pattern
+while w; assign a; variable v; if ifs; stmt s;
+Select <w, ifs, a> pattern w(v, _) and a(v, _) and ifs(v, _, _) such that Next*(s, w) and Next*(s, a) and Next*(_, ifs)
+93 31 91, 93 31 94, 97 31 91, 97 31 94, 98 31 91, 98 31 94, 43 33 32
+5000
+37 - Tuple Debug: 6 such that (Modifies, Uses, Parent)
+while w; variable v; if ifs; read r; print pr; procedure p;
+Select <w, ifs> such that Modifies(r,v) and Uses(p,v) such that Parent(w, r) and Modifies(ifs, v) and Modifies("Six6", v) and Uses("Six6", v)
+3 2, 3 31, 3 33, 3 54, 3 82, 37 2, 37 31, 37 33, 43 2, 43 31, 43 33
+5000
