@@ -224,12 +224,14 @@ void Generator::Constant(const QueryToken &token) noexcept {
         is_int_zero_ = std::stoi(val) == 0;
         is_with_num_ = true;
         factory_.SetFirst(val);
+        mode_.pop_back();
         return;
     }
     if (*++mode_.rbegin() == Mode::kWith && mode_.back() == Mode::kSecond) {
         if (std::stoi(val) == 0 && first_with_syn_.synonym_ != nullptr &&
             first_with_syn_.attribute_ != Attribute::kValue)
             return SemanticError();
+        mode_.pop_back();
         return !is_with_num_ ? SemanticError() : factory_.SetSecond(val);
     }
     // stmt#
@@ -452,11 +454,9 @@ void Generator::And() noexcept {
     }
 }
 void Generator::Equal() noexcept {
-    if (mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression) {
-        mode_.emplace_back(Mode::kSecond);
-        return;
-    }
-    assert(false);
+      assert(mode_.back() == Mode::kWith);
+      mode_.emplace_back(Mode::kSecond);
+      return;
 }
 void Generator::ParseToken(const QueryToken &token) noexcept {
     const auto &[token_type, name] = token;
