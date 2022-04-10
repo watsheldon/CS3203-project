@@ -373,13 +373,14 @@ void Generator::Quote() noexcept {
     }
 }
 void Generator::RightQuote() noexcept {
+    mode_.pop_back();
     bool is_second = mode_.back() == Mode::kSecond;
     mode_.pop_back();
     bool is_with = mode_.back() == Mode::kWith;
-    mode_.pop_back();
     if (is_second && is_with) {
         auto clause = factory_.Build();
         if (clause == nullptr) return SemanticError();
+        mode_.pop_back();
         conditions_.emplace_back(std::move(clause));
     }
 }
