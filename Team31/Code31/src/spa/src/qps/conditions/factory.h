@@ -22,6 +22,7 @@
 #include "pattern_base.h"
 #include "pattern_expr_base.h"
 #include "pattern_while_if_clause.h"
+#include "with_clause.h"
 #include "qps/query_token.h"
 #include "qps/synonym.h"
 #include "qps/synonym_with_attr.h"

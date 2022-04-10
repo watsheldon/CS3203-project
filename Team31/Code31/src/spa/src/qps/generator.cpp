@@ -217,11 +217,15 @@ void Generator::Constant(const QueryToken &token) noexcept {
     }
     // with
     if (*++mode_.rbegin() == Mode::kWith && mode_.back() == Mode::kFirst) {
+        is_int_zero_ = std::stoi(val) == 0;
         is_with_num_ = true;
         factory_.SetFirst(val);
         return;
     }
     if (*++mode_.rbegin() == Mode::kWith && mode_.back() == Mode::kSecond) {
+        if (std::stoi(val) == 0 && first_with_syn_.synonym_ != nullptr &&
+            first_with_syn_.attribute_ != Attribute::kValue)
+            return SemanticError();
         return !is_with_num_ ? SemanticError() : factory_.SetSecond(val);
     }
     // stmt#
@@ -254,14 +258,16 @@ void Generator::Attr(QueryTokenType token_type) noexcept {
     Attribute attribute = TokenToAttrType(token_type);
     if (mode_.back() == Mode::kFirst) {
         mode_.pop_back();
-        if (UnsuitableAttributeType(first_with_syn_, attribute))
+        if (UnsuitableAttributeType(first_with_syn_.synonym_, attribute))
             return SemanticError();
         SetIsWithNum(attribute);
         return factory_.SetFirst(attribute);
     }
     if (mode_.back() == Mode::kSecond) {
         mode_.pop_back();
-        if (UnsuitableAttributeType(second_with_syn_, attribute))
+        if (UnsuitableAttributeType(second_with_syn_.synonym_, attribute))
+            return SemanticError();
+        if (is_int_zero_ && attribute != Attribute::kValue)
             return SemanticError();
         if (is_with_num_ && attribute <= Attribute::kVarName)
             return SemanticError();
@@ -299,7 +305,7 @@ void Generator::SetFirst(std::string_view name) noexcept {
     syn->IncRef();
     factory_.SetFirst(syn);
     if (mode_.back() == Mode::kWith) {
-        first_with_syn_ = syn;
+        first_with_syn_ = SynonymWithAttr(syn);
         mode_.emplace_back(Mode::kFirst);
     }
 }
@@ -314,7 +320,7 @@ void Generator::SetSecond(std::string_view name) noexcept {
     syn->IncRef();
     factory_.SetSecond(syn);
     if (mode_.back() == Mode::kWith) {
-        second_with_syn_ = syn;
+        second_with_syn_ = SynonymWithAttr(syn);
         mode_.emplace_back(Mode::kSecond);
     }
 }
