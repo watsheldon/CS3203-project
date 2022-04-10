@@ -28,9 +28,8 @@ ResultTable WithClause::Execute(KnowledgeBase *pkb) const noexcept {
             return RawRaw(pkb, first_param_, second_param_);
         }
         case kRawSyn: {
-            bool isName =
-                    std::get<SynonymWithAttr>(second_param_).attribute_ <=
-                    Attribute::kVarName;
+            bool isName = std::get<SynonymWithAttr>(second_param_).attribute_ <=
+                          Attribute::kVarName;
             return isName ? NameSyn(pkb,
                                     std::get<std::string_view>(first_param_),
                                     std::get<SynonymWithAttr>(second_param_))
@@ -53,8 +52,7 @@ ResultTable WithClause::RawRaw(KnowledgeBase *pkb, WithClause::Param first,
 ResultTable WithClause::IntSyn(KnowledgeBase *pkb, std::string_view value,
                                SynonymWithAttr second) noexcept {
     // 3 = stmt.stmt#
-    int index =
-            pkb->IdentToIndexValue(value, AttrToPkbType(second.attribute_));
+    int index = pkb->IdentToIndexValue(value, AttrToPkbType(second.attribute_));
     return index == 0 ? ResultTable(false)
                       : ResultTable(second.synonym_, std::set<int>{index});
 }
@@ -172,6 +170,9 @@ ResultTable WithClause::ValueStmt(KnowledgeBase *pkb, SynonymWithAttr first,
             std::move(col_2)};
 }
 int WithClause::GetPriority() const noexcept {
-    return type_ == kSynSyn ? 11 : 4;
+    return kPriority[GetSynCount()];
+}
+int WithClause::GetSynCount() const noexcept {
+    return kSynCount[static_cast<int>(type_)];
 }
 }  // namespace spa

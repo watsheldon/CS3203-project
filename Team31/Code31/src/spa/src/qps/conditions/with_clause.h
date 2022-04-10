@@ -44,6 +44,11 @@ class WithClause : public ConditionClause {
     static ResultTable ValueStmt(KnowledgeBase *pkb, SynonymWithAttr first,
                                  SynonymWithAttr second) noexcept;
     [[nodiscard]] int GetPriority() const noexcept final;
+    [[nodiscard]] int GetSynCount() const noexcept final;
+
+  private:
+    static constexpr std::array<int, 3> kSynCount{0, 1, 2};
+    static constexpr std::array<int, 3> kPriority{4, 4, 11};
 };
 }  // namespace spa
 
