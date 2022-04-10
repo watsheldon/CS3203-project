@@ -48,7 +48,6 @@ void Formatter::OutputTuple(
     ExpandConstrainedVarTables();
     PopulateFreeSyns();
     std::vector<int> row;
-    row.reserve(constrained_syns_.size() + free_syns_.size() - 1);
     ExpandOutputColumns(row);
     Export(results, selected);
 }
@@ -70,13 +69,34 @@ void Formatter::ExpandConstrainedVarTables() noexcept {
         }
     }
 }
+bool Formatter::SatisfiableConstraints(std::vector<int> &row) {
+    auto idx = row.size();
+    if (idx == constrained_syns_.size()) return true;
+    for (int v : synonym_domains_.at(constrained_syns_[idx])) {
+        bool compatible = true;
+        for (int j = 0; j < idx; ++j) {
+            if (expanded_results_[j][idx] != nullptr &&
+                !expanded_results_[j][idx]->At(row[j], v)) {
+                compatible = false;
+                break;
+            }
+        }
+        if (!compatible) continue;
+        row.emplace_back(v);
+        bool satisfiable = SatisfiableConstraints(row);
+        row.pop_back();
+        if (satisfiable) return true;
+    }
+    return false;
+}
 void Formatter::ExpandOutputColumns(std::vector<int> &row) noexcept {
     auto idx = row.size();
-    if (idx == constrained_syns_.size()) {
+    if (idx == num_constrained_selected_) {
+        if (!SatisfiableConstraints(row)) return;
         for (int i = 0; i < row.size(); ++i) {
             output_columns_[constrained_syns_[i]].emplace_back(row[i]);
         }
-        AddToOutput(row);
+        AddFreeSynsToOutput(row);
         return;
     }
     for (int v : synonym_domains_.at(constrained_syns_[idx])) {
@@ -130,9 +150,22 @@ void Formatter::ExtractSynonyms(
             ++it;
         }
     }
-    constrained_syns_.insert(constrained_syns_.end(), unique_synonyms.begin(),
-                             unique_synonyms.end());
-    std::sort(constrained_syns_.begin(), constrained_syns_.end(),
+    num_constrained_selected_ = (int)unique_synonyms.size();
+    auto &cs = constrained_syns_;
+    cs.insert(cs.end(), unique_synonyms.begin(), unique_synonyms.end());
+    std::sort(cs.begin(), cs.end(), [this](auto syn_a, auto syn_b) {
+        return synonym_domains_.at(syn_a).size() <
+               synonym_domains_.at(syn_b).size();
+    });
+    for (const auto &entry : vartable_map_) {
+        auto &[syn, related_vartables] = entry;
+        auto end = cs.begin() + num_constrained_selected_;
+        auto it = std::find(cs.begin(), end, syn);
+        if (it == end && !related_vartables.empty()) {
+            cs.emplace_back(syn);
+        }
+    }
+    std::sort(cs.begin() + num_constrained_selected_, cs.end(),
               [this](auto syn_a, auto syn_b) {
                   return synonym_domains_.at(syn_a).size() <
                          synonym_domains_.at(syn_b).size();
@@ -160,26 +193,26 @@ void Formatter::PopulateFreeSyns() noexcept {
                          free_values_.at(syn_b).size();
               });
 }
-void Formatter::AddToOutput(std::vector<int> &row) noexcept {
-    auto idx = row.size() - constrained_syns_.size();
+void Formatter::AddFreeSynsToOutput(std::vector<int> &row) noexcept {
+    auto idx = row.size() - num_constrained_selected_;
     if (idx + 1 > free_syns_.size()) return;
     if (idx + 1 == free_syns_.size()) {
         const auto &values = free_values_.at(free_syns_[idx]);
         auto &target_column = output_columns_[free_syns_[idx]];
         target_column.insert(target_column.end(), values.begin(), values.end());
-        for (int i = 0; i < constrained_syns_.size(); ++i) {
+        for (int i = 0; i < num_constrained_selected_; ++i) {
             output_columns_[constrained_syns_[i]].resize(target_column.size(),
                                                          row[i]);
         }
         for (int i = 0; i < idx; ++i) {
             output_columns_[free_syns_[i]].resize(
-                    target_column.size(), row[constrained_syns_.size() + i]);
+                    target_column.size(), row[num_constrained_selected_ + i]);
         }
         return;
     }
     for (int val : free_values_.at(free_syns_[idx])) {
         row.emplace_back(val);
-        AddToOutput(row);
+        AddFreeSynsToOutput(row);
         row.pop_back();
     }
 }

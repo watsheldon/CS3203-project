@@ -47,6 +47,7 @@ class Formatter {
     const QueryEvaluator::SynonymDomains& synonym_domains_;
     const QueryEvaluator::ResultTables& result_tables_;
     const QueryEvaluator::VarTableMap& vartable_map_;
+    int num_constrained_selected_ = 0;
     std::vector<const Synonym*> constrained_syns_;
     std::vector<const Synonym*> free_syns_;
     std::vector<VecUniquePtr<BitVec2D>> expanded_results_;
@@ -65,7 +66,7 @@ class Formatter {
     void ExpandResultTable(PairOf<size_t> positions, int table_idx) noexcept;
     void ExpandOutputColumns(std::vector<int>& row) noexcept;
     void PopulateFreeSyns() noexcept;
-    void AddToOutput(std::vector<int>& row) noexcept;
+    void AddFreeSynsToOutput(std::vector<int>& row) noexcept;
     void Export(std::list<std::string>& results,
                 const std::vector<SynonymWithAttr>& selected) const noexcept;
     void ExportColumn(std::list<std::string>& results,
@@ -74,6 +75,7 @@ class Formatter {
                        const std::vector<int>& indices) noexcept;
     static void Append(std::list<std::string>& results,
                        const std::vector<std::string_view>& names);
+    bool SatisfiableConstraints(std::vector<int>& row);
 };
 }  // namespace spa
 
