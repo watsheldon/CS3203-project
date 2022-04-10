@@ -856,8 +856,4 @@ std::vector<std::string_view> ProgramKnowledgeBase::GetAttr(
     }
     return {};
 }
-void ProgramKnowledgeBase::ClearCache() {
-    assert(compiled);
-    affects_->ClearCache();
-}
 }  // namespace spa

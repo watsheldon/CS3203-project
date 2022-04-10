@@ -19,42 +19,26 @@ AffectsCalculator::AffectsCalculator(Stores stores) noexcept
           uses_store_(stores.uses_store),
           cfg_(stores.cfg),
           next_(stores.next),
-          stmt_count_(stores.stmt_count),
-          affects_cache_(stmt_count_ + 1),
-          affectsT_cache_(stmt_count_ + 1),
           assign_stmts_(
                   stores.type_statements.GetStatements(StmtType::kAssign)) {}
 bool AffectsCalculator::ExistAffects(StmtNo first_assign,
                                      StmtNo second_assign) noexcept {
-    auto indicator = affects_cache_.Get(first_assign, second_assign);
-    if (indicator != Cache::Indicator::kUncalculated) {
-        return indicator == Cache::Indicator::kTrue;
-    }
     StmtType first_type = type_store_.GetType(first_assign);
     StmtType second_type = type_store_.GetType(second_assign);
     if (first_type != StmtType::kAssign || second_type != StmtType::kAssign) {
-        affects_cache_.Set(first_assign, second_assign,
-                           Cache::Indicator::kFalse);
         return false;
     }
     if (!IsSameProcedure(first_assign, second_assign)) {
-        affects_cache_.Set(first_assign, second_assign,
-                           Cache::Indicator::kFalse);
         return false;
     }
     VarIndex modified_var = modifies_store_.GetModifiesSingleVar(first_assign);
     if (!uses_store_.ExistUses(second_assign, modified_var)) {
-        affects_cache_.Set(first_assign, second_assign,
-                           Cache::Indicator::kFalse);
         return false;
     }
 
     if (ExistUnmodifiedPath(first_assign, second_assign, modified_var)) {
-        affects_cache_.Set(first_assign, second_assign,
-                           Cache::Indicator::kTrue);
         return true;
     }
-    affects_cache_.Set(first_assign, second_assign, Cache::Indicator::kFalse);
     return false;
 }
 bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
@@ -63,11 +47,10 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
      * BFS on the AffectsGraph.
      * AffectsGraph:
      *    - Vertices: all assign stmts
-     *    - Edges: (a1, a2) is an edge iff Affects(a1, a2) holds, even if a1=a2
+     *    - Edges: (a1, a2) is an edge iff Affects(a1, a2) holds
      */
-    auto indicator = affectsT_cache_.Get(first_assign, second_assign);
-    if (indicator != Cache::Indicator::kUncalculated) {
-        return indicator == Cache::Indicator::kTrue;
+    if (ExistAffects(first_assign, second_assign)) {
+        return true;
     }
     std::queue<StmtNo> q;
     BitArray visited(assign_stmts_.size());
@@ -76,27 +59,12 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
     while (!q.empty()) {
         StmtNo curr = q.front();
         q.pop();
-        bool skip_curr = false;
-        auto status = affectsT_cache_.Get(curr, second_assign);
-        if (status != Cache::Indicator::kUncalculated) {
-            if (status == Cache::Indicator::kTrue) {
-                affectsT_cache_.Set(first_assign, second_assign, status);
-                return true;
-            } else {
-                skip_curr = true;
-            }
-        }
-        if (!skip_curr && ExistAffects(curr, second_assign)) {
-            affectsT_cache_.Set(first_assign, second_assign,
-                                Cache::Indicator::kTrue);
+        if (ExistAffects(curr, second_assign)) {
             return true;
         }
-        if (!skip_curr) {
-            std::set<StmtNo> children = GetAffected(curr);
-            AddChildrenAffectsT(children, visited, q);
-        }
+        std::set<StmtNo> children = GetAffected(curr);
+        AddChildrenAffectsT(children, visited, q);
     }
-    affectsT_cache_.Set(first_assign, second_assign, Cache::Indicator::kFalse);
     return false;
 }
 bool AffectsCalculator::HasAffected(StmtNo first_assign) noexcept {
@@ -262,9 +230,5 @@ void AffectsCalculator::AddChildrenAffectsT(const std::set<StmtNo>& children,
             q.push(child);
         }
     }
-}
-void AffectsCalculator::ClearCache() noexcept {
-    affects_cache_.Clear();
-    affectsT_cache_.Clear();
 }
 }  // namespace spa

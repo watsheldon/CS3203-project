@@ -457,11 +457,6 @@ class KnowledgeBase {
                                   QueryEntityType et) = 0;
 
     /**
-     * Clears the cache at the start of each query.
-     */
-    virtual void ClearCache() = 0;
-
-    /**
      * Prevents any further updates to the KnowledgeBase and compile all
      * indirect relationships for faster lookup.
      */

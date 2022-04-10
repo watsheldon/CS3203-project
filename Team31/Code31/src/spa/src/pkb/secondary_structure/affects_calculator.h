@@ -5,7 +5,6 @@
 #include <set>
 #include <vector>
 
-#include "cache.h"
 #include "common/aliases.h"
 #include "common/entity_type_enum.h"
 #include "container_forest.h"
@@ -45,7 +44,6 @@ class AffectsCalculator {
     [[nodiscard]] PairVec<StmtNo> GetAffectsTPairs() noexcept;
     [[nodiscard]] std::set<StmtNo> GetAffectsSelf() noexcept;
     [[nodiscard]] std::set<StmtNo> GetAffectsTSelf() noexcept;
-    void ClearCache() noexcept;
 
   private:
     const StmtlstStatementsStore& stmtlst_stmt_;
@@ -56,9 +54,6 @@ class AffectsCalculator {
     const ControlFlowGraph& cfg_;
     const NextCalculator& next_;
     const std::vector<StmtNo>& assign_stmts_;
-    const size_t stmt_count_;
-    Cache affects_cache_;
-    Cache affectsT_cache_;
 
     static constexpr bool is_related_type(StmtType type) {
         return type == StmtType::kAssign || type == StmtType::kRead ||
