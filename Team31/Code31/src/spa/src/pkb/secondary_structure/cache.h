@@ -11,6 +11,7 @@ class Cache {
     enum class Indicator { kUncalculated = 0, kTrue, kFalse };
     explicit Cache(size_t max_size) noexcept;
     void Set(StmtNo stmt1, StmtNo stmt2, Indicator value) noexcept;
+    void Clear() noexcept;
     [[nodiscard]] Indicator Get(StmtNo stmt1, StmtNo stmt2) const noexcept;
 
   private:

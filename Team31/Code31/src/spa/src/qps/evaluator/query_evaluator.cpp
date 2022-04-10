@@ -17,6 +17,7 @@ QueryEvaluator::ResultsView QueryEvaluator::GetResultsView() noexcept {
 void QueryEvaluator::Evaluate(const QueryObject& query,
                               std::list<std::string>& list) noexcept {
     Clear();
+    pkb_->ClearCache();
     std::list<const ConditionClause*> queue;
     const auto& clauses = query.clauses;
     std::for_each(clauses.begin(), clauses.end(),

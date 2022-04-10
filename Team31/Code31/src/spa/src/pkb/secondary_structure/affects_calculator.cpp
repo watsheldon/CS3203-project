@@ -256,4 +256,8 @@ void AffectsCalculator::AddChildrenAffectsT(const std::set<StmtNo>& children,
         }
     }
 }
+void AffectsCalculator::ClearCache() noexcept {
+    affects_cache_.Clear();
+    affectsT_cache_.Clear();
+}
 }  // namespace spa

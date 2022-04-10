@@ -251,6 +251,8 @@ class ProgramKnowledgeBase : public KnowledgeBase {
 
     // mark the end of source processor
     void Compile() override;
+    // Clear cache at the start of each query.
+    void ClearCache() override;
 
   private:
     bool compiled = false;
