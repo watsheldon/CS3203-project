@@ -94,19 +94,19 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
 }
 bool AffectsCalculator::HasAffected(StmtNo first_assign) noexcept {
     return std::any_of(assign_stmts_.begin(), assign_stmts_.end(),
-                       [&](const StmtNo stmt) {
+                       [this, first_assign](const StmtNo stmt) {
                            return ExistAffects(first_assign, stmt);
                        });
 }
 bool AffectsCalculator::HasAffecter(StmtNo second_assign) noexcept {
     return std::any_of(assign_stmts_.begin(), assign_stmts_.end(),
-                       [&](const StmtNo stmt) {
+                       [this, second_assign](const StmtNo stmt) {
                            return ExistAffects(stmt, second_assign);
                        });
 }
 bool AffectsCalculator::ExistAffects() noexcept {
     return std::any_of(assign_stmts_.begin(), assign_stmts_.end(),
-                       [&](const StmtNo stmt) {
+                       [this](const StmtNo stmt) {
                            return HasAffected(stmt) || HasAffecter(stmt);
                        });
 }
@@ -115,11 +115,11 @@ std::set<StmtNo> AffectsCalculator::GetAffects(ArgPos return_pos) noexcept {
     if (return_pos == ArgPos::kFirst) {
         std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
                      std::inserter(affected, affected.end()),
-                     [&](const StmtNo stmt) { return HasAffected(stmt); });
+                     [this](const StmtNo stmt) { return HasAffected(stmt); });
     } else {
         std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
                      std::inserter(affected, affected.end()),
-                     [&](const StmtNo stmt) { return HasAffecter(stmt); });
+                     [this](const StmtNo stmt) { return HasAffecter(stmt); });
     }
     return affected;
 }
@@ -127,7 +127,7 @@ std::set<StmtNo> AffectsCalculator::GetAffected(StmtNo first_assign) noexcept {
     std::set<StmtNo> affected;
     std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
                  std::inserter(affected, affected.end()),
-                 [&](const StmtNo stmt) {
+                 [this, first_assign](const StmtNo stmt) {
                      return ExistAffects(first_assign, stmt);
                  });
     return affected;
@@ -136,7 +136,7 @@ std::set<StmtNo> AffectsCalculator::GetAffectedT(StmtNo first_assign) noexcept {
     std::set<StmtNo> affected;
     std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
                  std::inserter(affected, affected.end()),
-                 [&](const StmtNo stmt) {
+                 [this, first_assign](const StmtNo stmt) {
                      return ExistAffectsT(first_assign, stmt);
                  });
     return affected;
@@ -145,7 +145,7 @@ std::set<StmtNo> AffectsCalculator::GetAffecter(StmtNo second_assign) noexcept {
     std::set<StmtNo> affecter;
     std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
                  std::inserter(affecter, affecter.end()),
-                 [&](const StmtNo stmt) {
+                 [this, second_assign](const StmtNo stmt) {
                      return ExistAffects(stmt, second_assign);
                  });
     return affecter;
@@ -155,7 +155,7 @@ std::set<StmtNo> AffectsCalculator::GetAffecterT(
     std::set<StmtNo> affecter;
     std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
                  std::inserter(affecter, affecter.end()),
-                 [&](const StmtNo stmt) {
+                 [this, second_assign](const StmtNo stmt) {
                      return ExistAffectsT(stmt, second_assign);
                  });
     return affecter;
@@ -187,16 +187,18 @@ PairVec<StmtNo> AffectsCalculator::GetAffectsTPairs() noexcept {
 }
 std::set<StmtNo> AffectsCalculator::GetAffectsSelf() noexcept {
     std::set<StmtNo> results;
-    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
-                 std::inserter(results, results.end()),
-                 [&](const StmtNo stmt) { return ExistAffects(stmt, stmt); });
+    std::copy_if(
+            assign_stmts_.begin(), assign_stmts_.end(),
+            std::inserter(results, results.end()),
+            [this](const StmtNo stmt) { return ExistAffects(stmt, stmt); });
     return results;
 }
 std::set<StmtNo> AffectsCalculator::GetAffectsTSelf() noexcept {
     std::set<StmtNo> results;
-    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
-                 std::inserter(results, results.end()),
-                 [&](const StmtNo stmt) { return ExistAffectsT(stmt, stmt); });
+    std::copy_if(
+            assign_stmts_.begin(), assign_stmts_.end(),
+            std::inserter(results, results.end()),
+            [this](const StmtNo stmt) { return ExistAffectsT(stmt, stmt); });
     return results;
 }
 bool AffectsCalculator::IsSameProcedure(StmtNo first_assign,
