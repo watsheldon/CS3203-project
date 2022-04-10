@@ -29,13 +29,13 @@ ResultTable WithClause::Execute(KnowledgeBase *pkb) const noexcept {
         }
         case kRawSyn: {
             bool isName = std::get<SynonymWithAttr>(second_param_).attribute_ <=
-                          Attribute::kVarName;
+                          Attribute::kValue;
             return isName ? NameSyn(pkb,
                                     std::get<std::string_view>(first_param_),
                                     std::get<SynonymWithAttr>(second_param_))
-                          : IntSyn(pkb,
-                                   std::get<std::string_view>(first_param_),
-                                   std::get<SynonymWithAttr>(second_param_));
+                          : StmtSyn(pkb,
+                                    std::get<std::string_view>(first_param_),
+                                    std::get<SynonymWithAttr>(second_param_));
         }
         case kSynSyn: {
             return SynSyn(pkb);
@@ -48,15 +48,18 @@ ResultTable WithClause::RawRaw(KnowledgeBase *pkb, WithClause::Param first,
                                WithClause::Param second) noexcept {
     return ResultTable(first == second);
 }
-ResultTable WithClause::IntSyn(KnowledgeBase *pkb, std::string_view value,
-                               SynonymWithAttr second) noexcept {
-    // 3 = stmt.stmt#
-    int index = pkb->IdentToIndexValue(value, AttrToPkbType(second.attribute_));
-    return index == 0 ? ResultTable(false)
-                      : ResultTable(second.synonym_, std::set<int>{index});
+ResultTable WithClause::StmtSyn(KnowledgeBase *pkb, std::string_view value,
+                                SynonymWithAttr second) noexcept {
+    // 4 = print.stmt#
+    auto domain = pkb->GetAllEntityIndices(SynToPkbType(second.synonym_));
+    auto index = std::stoi(value.data());
+    auto result = std::binary_search(domain.begin(), domain.end(), index);
+    return result ? ResultTable(second.synonym_, std::set<int>{index})
+                  : ResultTable{false};
 }
 ResultTable WithClause::NameSyn(KnowledgeBase *pkb, std::string_view name,
                                 SynonymWithAttr synonym_with_attr) noexcept {
+    assert(synonym_with_attr.attribute_ != Attribute::kStmtNum);
     switch (synonym_with_attr.synonym_->type) {
         case Synonym::kStmtCall: {
             auto result = pkb->GetCalls(Name<ArgPos::kSecond>(name));

@@ -35,8 +35,8 @@ class WithClause : public ConditionClause {
                               Param second) noexcept;
     static ResultTable NameSyn(KnowledgeBase *pkb, std::string_view first,
                                SynonymWithAttr second) noexcept;
-    static ResultTable IntSyn(KnowledgeBase *pkb, std::string_view value,
-                              SynonymWithAttr second) noexcept;
+    static ResultTable StmtSyn(KnowledgeBase *pkb, std::string_view value,
+                               SynonymWithAttr second) noexcept;
     ResultTable SynSyn(KnowledgeBase *pkb) const noexcept;
     ResultTable SynSynNum(KnowledgeBase *pkb) const noexcept;
     ResultTable ValueStmt(KnowledgeBase *pkb) const noexcept;
