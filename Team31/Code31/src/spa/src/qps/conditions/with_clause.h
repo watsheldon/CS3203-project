@@ -37,12 +37,9 @@ class WithClause : public ConditionClause {
                                SynonymWithAttr second) noexcept;
     static ResultTable IntSyn(KnowledgeBase *pkb, std::string_view value,
                               SynonymWithAttr second) noexcept;
-    static ResultTable SynSyn(KnowledgeBase *pkb, SynonymWithAttr first,
-                              SynonymWithAttr second) noexcept;
-    static ResultTable SynSynNum(KnowledgeBase *pkb, SynonymWithAttr first,
-                                 SynonymWithAttr second) noexcept;
-    static ResultTable ValueStmt(KnowledgeBase *pkb, SynonymWithAttr first,
-                                 SynonymWithAttr second) noexcept;
+    ResultTable SynSyn(KnowledgeBase *pkb) const noexcept;
+    ResultTable SynSynNum(KnowledgeBase *pkb) const noexcept;
+    ResultTable ValueStmt(KnowledgeBase *pkb) const noexcept;
     [[nodiscard]] int GetPriority() const noexcept final;
     [[nodiscard]] int GetSynCount() const noexcept final;
 

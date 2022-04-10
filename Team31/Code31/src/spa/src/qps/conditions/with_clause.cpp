@@ -38,8 +38,7 @@ ResultTable WithClause::Execute(KnowledgeBase *pkb) const noexcept {
                                    std::get<SynonymWithAttr>(second_param_));
         }
         case kSynSyn: {
-            return SynSyn(pkb, std::get<SynonymWithAttr>(first_param_),
-                          std::get<SynonymWithAttr>(second_param_));
+            return SynSyn(pkb);
         }
     }
     assert(false);
@@ -89,11 +88,12 @@ ResultTable WithClause::NameSyn(KnowledgeBase *pkb, std::string_view name,
             return ResultTable{false};
     }
 }
-ResultTable WithClause::SynSyn(KnowledgeBase *pkb, SynonymWithAttr first,
-                               SynonymWithAttr second) noexcept {
+ResultTable WithClause::SynSyn(KnowledgeBase *pkb) const noexcept {
+    auto first = std::get<SynonymWithAttr>(first_param_);
+    auto second = std::get<SynonymWithAttr>(second_param_);
     if (first.attribute_ == Attribute::kValue ||
         first.attribute_ == Attribute::kStmtNum) {
-        return SynSynNum(pkb, first, second);
+        return SynSynNum(pkb);
     }
     std::vector<int> col_1;
     std::vector<int> col_2;
@@ -112,8 +112,9 @@ ResultTable WithClause::SynSyn(KnowledgeBase *pkb, SynonymWithAttr first,
     return {first.synonym_, std::move(col_1), second.synonym_,
             std::move(col_2)};
 }
-ResultTable WithClause::SynSynNum(KnowledgeBase *pkb, SynonymWithAttr first,
-                                  SynonymWithAttr second) noexcept {
+ResultTable WithClause::SynSynNum(KnowledgeBase *pkb) const noexcept {
+    auto first = std::get<SynonymWithAttr>(first_param_);
+    auto second = std::get<SynonymWithAttr>(second_param_);
     // constant.value = constant2.value
     if (first.attribute_ == Attribute::kValue &&
         second.attribute_ == Attribute::kValue) {
@@ -124,11 +125,11 @@ ResultTable WithClause::SynSynNum(KnowledgeBase *pkb, SynonymWithAttr first,
     }
     // constant.value = stmt.stmt#
     if (first.attribute_ == Attribute::kValue) {
-        return ValueStmt(pkb, first, second);
+        return ValueStmt(pkb);
     }
     // print.stmt# = constant.value
     if (second.attribute_ == Attribute::kValue) {
-        return ValueStmt(pkb, second, first);
+        return ValueStmt(pkb);
     }
     // read.stmt# = print.stmt#
     if (first.synonym_->type != Synonym::Type::kStmtAny &&
@@ -148,8 +149,9 @@ ResultTable WithClause::SynSynNum(KnowledgeBase *pkb, SynonymWithAttr first,
     return {first.synonym_, std::move(col_1), second.synonym_,
             std::move(col_2)};
 }
-ResultTable WithClause::ValueStmt(KnowledgeBase *pkb, SynonymWithAttr first,
-                                  SynonymWithAttr second) noexcept {
+ResultTable WithClause::ValueStmt(KnowledgeBase *pkb) const noexcept {
+    auto first = std::get<SynonymWithAttr>(first_param_);
+    auto second = std::get<SynonymWithAttr>(second_param_);
     assert(first.attribute_ == Attribute::kValue &&
            second.attribute_ == Attribute::kStmtNum);
     auto constants = pkb->GetAllEntityIndices(AttrToPkbType(first.attribute_));
