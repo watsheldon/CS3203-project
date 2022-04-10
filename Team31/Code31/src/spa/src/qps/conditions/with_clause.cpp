@@ -148,10 +148,7 @@ ResultTable WithClause::SynSynNum(KnowledgeBase *pkb) const noexcept {
     // constant.value = constant2.value
     if (first.attribute_ == Attribute::kValue &&
         second.attribute_ == Attribute::kValue) {
-        auto col_1 = pkb->GetAllEntityIndices(AttrToPkbType(first.attribute_));
-        auto col_2 = col_1;
-        return {first.synonym_, std::move(col_1), second.synonym_,
-                std::move(col_2)};
+        return ValueValue(pkb, first, second);
     }
     // constant.value = stmt.stmt#
     if (first.attribute_ == Attribute::kValue) {
@@ -177,6 +174,13 @@ ResultTable WithClause::SynSynNum(KnowledgeBase *pkb) const noexcept {
     auto col_1 = pkb->GetAllEntityIndices(AttrToPkbType(first.attribute_));
     auto col_2 = col_1;
     return {first.synonym_, std::move(col_1), second.synonym_,
+            std::move(col_2)};
+}
+ResultTable WithClause::ValueValue(KnowledgeBase *pkb, SynonymWithAttr value_1,
+                                   SynonymWithAttr value_2) const noexcept {
+    auto col_1 = pkb->GetAllEntityIndices(AttrToPkbType(value_1.attribute_));
+    auto col_2 = col_1;
+    return {value_1.synonym_, std::move(col_1), value_2.synonym_,
             std::move(col_2)};
 }
 ResultTable WithClause::ValueStmt(KnowledgeBase *pkb) const noexcept {
