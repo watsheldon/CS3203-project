@@ -35,7 +35,6 @@ bool AffectsCalculator::ExistAffects(StmtNo first_assign,
     if (!uses_store_.ExistUses(second_assign, modified_var)) {
         return false;
     }
-
     if (ExistUnmodifiedPath(first_assign, second_assign, modified_var)) {
         return true;
     }
@@ -62,8 +61,7 @@ bool AffectsCalculator::ExistAffectsT(StmtNo first_assign,
         if (ExistAffects(curr, second_assign)) {
             return true;
         }
-        std::set<StmtNo> children = GetAffected(curr);
-        AddChildrenAffectsT(children, visited, q);
+        AddChildrenAffectsT(curr, visited, q);
     }
     return false;
 }
@@ -189,31 +187,29 @@ bool AffectsCalculator::ExistUnmodifiedPath(StmtNo first_assign,
     // The case Affects(a, a) requires some special handling.
     std::queue<StmtNo> q;
     BitArray visited(cfg_.stmt_node_index.size());
-    bool is_first_node = true;
+    //    bool is_first_node = true;
     if (first_assign != second_assign) {
         visited.Set(first_assign);
     }
-    q.push(first_assign);
+    AddChildrenAffects(first_assign, visited, q);
     while (!q.empty()) {
         StmtNo curr = q.front();
         q.pop();
-        if (curr == second_assign && !is_first_node) {
+        if (curr == second_assign) {
             return true;
         }
-        is_first_node = false;
         StmtType type = type_store_.GetType(curr);
         if (curr != first_assign && is_related_type(type) &&
             modifies_store_.ExistModifies(curr, var)) {
             continue;
         }
-        std::set<StmtNo> children = next_.GetNext(curr, StmtType::kAll);
-        AddChildrenAffects(children, visited, q);
+        AddChildrenAffects(curr, visited, q);
     }
     return false;
 }
-void AffectsCalculator::AddChildrenAffects(const std::set<StmtNo>& children,
-                                           BitArray& visited,
+void AffectsCalculator::AddChildrenAffects(StmtNo stmt, BitArray& visited,
                                            std::queue<StmtNo>& q) noexcept {
+    std::set<StmtNo> children = next_.GetNext(stmt, StmtType::kAll);
     for (const StmtNo child : children) {
         if (child != 0 && !visited.Get(child)) {
             visited.Set(child);
@@ -221,9 +217,9 @@ void AffectsCalculator::AddChildrenAffects(const std::set<StmtNo>& children,
         }
     }
 }
-void AffectsCalculator::AddChildrenAffectsT(const std::set<StmtNo>& children,
-                                            BitArray& visited,
+void AffectsCalculator::AddChildrenAffectsT(StmtNo assign, BitArray& visited,
                                             std::queue<StmtNo>& q) noexcept {
+    std::set<StmtNo> children = GetAffected(assign);
     for (const StmtNo child : children) {
         if (!visited.Get(child)) {
             visited.Set(child);

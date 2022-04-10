@@ -64,12 +64,10 @@ class AffectsCalculator {
     [[nodiscard]] bool ExistUnmodifiedPath(StmtNo first_assign,
                                            StmtNo second_assign,
                                            VarIndex var) noexcept;
-    static void AddChildrenAffects(const std::set<StmtNo>& children,
-                                   BitArray& visited,
-                                   std::queue<StmtNo>& q) noexcept;
-    static void AddChildrenAffectsT(const std::set<StmtNo>& children,
-                                    BitArray& visited,
-                                    std::queue<StmtNo>& q) noexcept;
+    void AddChildrenAffects(StmtNo stmt, BitArray& visited,
+                            std::queue<StmtNo>& q) noexcept;
+    void AddChildrenAffectsT(StmtNo assign, BitArray& visited,
+                             std::queue<StmtNo>& q) noexcept;
 };
 }  // namespace spa
 
