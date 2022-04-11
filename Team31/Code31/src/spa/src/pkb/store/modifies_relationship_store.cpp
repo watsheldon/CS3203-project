@@ -1,7 +1,7 @@
 #include "modifies_relationship_store.h"
 
-#include <vector>
 #include <cassert>
+#include <vector>
 
 #include "type_statements_store.h"
 
