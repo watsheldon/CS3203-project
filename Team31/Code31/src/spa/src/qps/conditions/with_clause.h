@@ -28,11 +28,14 @@ class WithClause : public ConditionClause {
     ResultTable Execute(KnowledgeBase *pkb) const noexcept final;
 
   protected:
+    [[nodiscard]] int GetPriority() const noexcept final;
+    [[nodiscard]] int GetSynCount() const noexcept final;
+
+  private:
     Type type_;
     Param first_param_;
     Param second_param_;
-    static ResultTable RawRaw(KnowledgeBase *pkb, Param first,
-                              Param second) noexcept;
+    [[nodiscard]] ResultTable RawRaw() const noexcept;
     static ResultTable NameSyn(KnowledgeBase *pkb, std::string_view first,
                                SynonymWithAttr second) noexcept;
     static ResultTable StmtSyn(KnowledgeBase *pkb, std::string_view value,
@@ -40,19 +43,14 @@ class WithClause : public ConditionClause {
     ResultTable SynSyn(KnowledgeBase *pkb) const noexcept;
     ResultTable SynSynName(KnowledgeBase *pkb) const noexcept;
     ResultTable SynSynNum(KnowledgeBase *pkb) const noexcept;
-    ResultTable ValueValue(KnowledgeBase *pkb, SynonymWithAttr value_1,
-                           SynonymWithAttr value_2) const noexcept;
-    ResultTable ValueStmt(KnowledgeBase *pkb, SynonymWithAttr value,
-                          SynonymWithAttr stmt) const noexcept;
-    ResultTable StmtStmt(KnowledgeBase *pkb, SynonymWithAttr stmt_1,
-                         SynonymWithAttr stmt_2) const noexcept;
-    [[nodiscard]] int GetPriority() const noexcept final;
-    [[nodiscard]] int GetSynCount() const noexcept final;
-
-  private:
-    void ToNames(KnowledgeBase *pkb, SynonymWithAttr syn,
-                 std::vector<int> &indices,
-                 std::list<std::string> &names) const noexcept;
+    static ResultTable ValueValue(KnowledgeBase *pkb, SynonymWithAttr value_1,
+                                  SynonymWithAttr value_2) noexcept;
+    static ResultTable ValueStmt(KnowledgeBase *pkb, SynonymWithAttr value,
+                                 SynonymWithAttr stmt) noexcept;
+    static ResultTable StmtStmt(KnowledgeBase *pkb, SynonymWithAttr stmt_1,
+                                SynonymWithAttr stmt_2) noexcept;
+    static PairVec<int, std::string_view> ToNames(KnowledgeBase *pkb,
+                                                  SynonymWithAttr syn) noexcept;
     static constexpr std::array<int, 3> kSynCount{0, 1, 2};
     static constexpr std::array<int, 3> kPriority{4, 4, 11};
 };
