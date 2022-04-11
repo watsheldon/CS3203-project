@@ -150,8 +150,11 @@ Validator::CondExprSubTypes Validator::CondGroup() noexcept {
     if (prefix_type == kInvalid || prefix_type == kBracketed && !CondInfix()) {
         return kInvalid;
     }
-    if (Accept(SourceTokenType::kBracketR))
-        return prefix_type == kSingular ? kBracketed : prefix_type;
+    if (Accept(SourceTokenType::kBracketR)) {
+        if (prefix_type == kSingular) return kBracketed;
+        if (prefix_type == kArithmetic) return RelationalExpr();
+        return prefix_type;
+    }
     return kInvalid;
 }
 Validator::CondExprSubTypes Validator::RelationalExpr() noexcept {
