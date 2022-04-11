@@ -28,7 +28,7 @@ bool UsesModifiesStoreBase::ExistRel(StmtNo stmt_no,
     if (stmt_no > num_stmts_) {
         return false;
     }
-    auto vars = GetAllVar(stmt_no);
+    const auto& vars = GetAllVar(stmt_no);
     return var_index == 0 ? !vars.empty() : vars.find(var_index) != vars.end();
 }
 bool UsesModifiesStoreBase::ExistRelP(ProcIndex proc_index) const noexcept {

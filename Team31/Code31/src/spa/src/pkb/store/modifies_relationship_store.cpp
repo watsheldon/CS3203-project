@@ -1,6 +1,7 @@
 #include "modifies_relationship_store.h"
 
 #include <vector>
+#include <cassert>
 
 #include "type_statements_store.h"
 
@@ -40,6 +41,8 @@ bool ModifiesRelationshipStore::ExistModifiesP(
 }
 VarIndex ModifiesRelationshipStore::GetModifiesSingleVar(
         StmtNo stmt_no) const noexcept {
-    return *GetModifies(stmt_no).begin();
+    const auto& modifies = complete_stmt_var_.GetVals(stmt_no);
+    assert(!modifies.empty());
+    return *modifies.begin();
 }
 }  // namespace spa

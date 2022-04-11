@@ -107,11 +107,11 @@ std::set<StmtNo> AffectsCalculator::GetAffected(StmtNo first_assign) noexcept {
 }
 std::set<StmtNo> AffectsCalculator::GetAffectedT(StmtNo first_assign) noexcept {
     std::set<StmtNo> affected;
-    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
-                 std::inserter(affected, affected.end()),
-                 [this, first_assign](const StmtNo stmt) {
-                     return ExistAffectsT(first_assign, stmt);
-                 });
+    for (const StmtNo a : assign_stmts_) {
+        if (ExistAffectsT(first_assign, a)) {
+            affected.emplace(a);
+        }
+    }
     return affected;
 }
 std::set<StmtNo> AffectsCalculator::GetAffecter(StmtNo second_assign) noexcept {
@@ -152,8 +152,8 @@ PairVec<StmtNo> AffectsCalculator::GetAffectsTPairs() noexcept {
     for (const StmtNo stmt : assign_stmts_) {
         affecter.emplace_back(stmt);
         std::set<StmtNo> affected_stmts = GetAffectedT(stmt);
-        std::copy(affected_stmts.begin(), affected_stmts.end(),
-                  std::back_inserter(affected));
+        affected.insert(affected.end(), affected_stmts.begin(),
+                        affected_stmts.end());
         affecter.resize(affected.size(), stmt);
     }
     return {affecter, affected};
@@ -219,8 +219,7 @@ void AffectsCalculator::AddChildrenAffects(StmtNo stmt, BitArray& visited,
 }
 void AffectsCalculator::AddChildrenAffectsT(StmtNo assign, BitArray& visited,
                                             std::queue<StmtNo>& q) noexcept {
-    std::set<StmtNo> children = GetAffected(assign);
-    for (const StmtNo child : children) {
+    for (const auto& child : GetAffected(assign)) {
         if (!visited.Get(child)) {
             visited.Set(child);
             q.push(child);
