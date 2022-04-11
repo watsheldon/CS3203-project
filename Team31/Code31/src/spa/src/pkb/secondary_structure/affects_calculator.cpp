@@ -98,11 +98,11 @@ std::set<StmtNo> AffectsCalculator::GetAffects(ArgPos return_pos) noexcept {
 }
 std::set<StmtNo> AffectsCalculator::GetAffected(StmtNo first_assign) noexcept {
     std::set<StmtNo> affected;
-    std::copy_if(assign_stmts_.begin(), assign_stmts_.end(),
-                 std::inserter(affected, affected.end()),
-                 [this, first_assign](const StmtNo stmt) {
-                     return ExistAffects(first_assign, stmt);
-                 });
+    for (const auto a : assign_stmts_) {
+        if (ExistAffects(first_assign, a)) {
+            affected.emplace(a);
+        }
+    }
     return affected;
 }
 std::set<StmtNo> AffectsCalculator::GetAffectedT(StmtNo first_assign) noexcept {
