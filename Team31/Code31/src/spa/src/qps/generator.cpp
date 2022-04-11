@@ -288,6 +288,9 @@ void Generator::Comma() noexcept {
         mode_.back() = Mode::kThird;
         return;
     }
+    if (mode_.back() == Mode::kSecond) {
+        return SemanticError();
+    }
     if (mode_.back() > Mode::kSelect && mode_.back() < Mode::kExpression) {
         mode_.emplace_back(Mode::kSecond);
         return;
