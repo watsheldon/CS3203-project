@@ -295,8 +295,8 @@ void Generator::Attr(QueryTokenType token_type) noexcept {
         return;
     }
     assert(!selected_.empty() &&
-           selected_.back().attribute_ == Attribute::kNone);
-    auto syn = selected_.back().synonym_;
+           selected_.back().attribute == Attribute::kNone);
+    auto syn = selected_.back().synonym;
     if (UnsuitableAttributeType(syn, TokenToAttrType(token_type)))
         return SemanticError();
     selected_.pop_back();

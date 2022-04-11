@@ -23,7 +23,7 @@ void Formatter::Use(KnowledgeBase *pkb) noexcept { pkb_ = pkb; }
 void Formatter::OutputResults(
         std::list<std::string> &results,
         const std::vector<SynonymWithAttr> &selected) noexcept {
-    if (selected.front().synonym_ == nullptr) {
+    if (selected.front().synonym == nullptr) {
         results.emplace_back(results_valid_ ? kTrue : kFalse);
         return;
     }
@@ -34,10 +34,10 @@ void Formatter::OutputResults(
 }
 void Formatter::OutputSingle(std::list<std::string> &results,
                              const SynonymWithAttr &syn_attr) noexcept {
-    free_syns_.emplace_back(syn_attr.synonym_);
+    free_syns_.emplace_back(syn_attr.synonym);
     PopulateFreeSyns();
-    output_columns_.emplace(syn_attr.synonym_,
-                            std::move(free_values_[syn_attr.synonym_]));
+    output_columns_.emplace(syn_attr.synonym,
+                            std::move(free_values_[syn_attr.synonym]));
     results.resize(output_columns_.begin()->second.size());
     ExportColumn(results, syn_attr);
 }
@@ -138,7 +138,7 @@ void Formatter::ExtractSynonyms(
     std::list<const Synonym *> unique_synonyms;
     std::transform(selected.begin(), selected.end(),
                    std::back_inserter(unique_synonyms),
-                   [](const SynonymWithAttr &s) { return s.synonym_; });
+                   [](const SynonymWithAttr &s) { return s.synonym; });
     unique_synonyms.sort();
     unique_synonyms.unique();
     for (auto it = unique_synonyms.begin(); it != unique_synonyms.end();) {

@@ -27,7 +27,7 @@ class Formatter {
     static inline void OutputInvalid(
             std::list<std::string>& results,
             const std::vector<SynonymWithAttr>& selected) noexcept {
-        if (selected.size() == 1 && selected.front().synonym_ == nullptr)
+        if (selected.size() == 1 && selected.front().synonym == nullptr)
             results.emplace_back(kFalse);
     }
 
