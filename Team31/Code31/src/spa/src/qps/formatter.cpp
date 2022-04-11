@@ -29,17 +29,7 @@ void Formatter::OutputResults(
     }
     if (!results_valid_) return;
     Reset();
-    return selected.size() > 1 ? OutputTuple(results, selected)
-                               : OutputSingle(results, selected.front());
-}
-void Formatter::OutputSingle(std::list<std::string> &results,
-                             const SynonymWithAttr &syn_attr) noexcept {
-    free_syns_.emplace_back(syn_attr.synonym);
-    PopulateFreeSyns();
-    output_columns_.emplace(syn_attr.synonym,
-                            std::move(free_values_[syn_attr.synonym]));
-    results.resize(output_columns_.begin()->second.size());
-    ExportColumn(results, syn_attr);
+    return OutputTuple(results, selected);
 }
 void Formatter::OutputTuple(
         std::list<std::string> &results,

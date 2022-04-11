@@ -56,8 +56,6 @@ class Formatter {
 
     [[nodiscard]] std::vector<int> GetAllIndices(
             Synonym::Type type) const noexcept;
-    void OutputSingle(std::list<std::string>& results,
-                      const SynonymWithAttr& syn_attr) noexcept;
     void OutputTuple(std::list<std::string>& results,
                      const std::vector<SynonymWithAttr>& selected) noexcept;
     void Reset() noexcept;
