@@ -140,11 +140,9 @@ bool PQLValidator::Calls() {
            Accept(QueryTokenType::kComma) && EntRef() &&
            Accept(QueryTokenType::kBracketR);
 }
-// The first argument for Modifies and Uses cannot be UNDERSCORE
-// as it is unclear whether _ refers to a statement or procedure
 bool PQLValidator::UsesModifiesStmtEntRef() {
     return Accept(QueryTokenType::kWord) || Accept(QueryTokenType::kInteger) ||
-           Identifier();
+           Accept(QueryTokenType::kUnderscore) || Identifier();
 }
 bool PQLValidator::PatternCond() {
     bool valid;
