@@ -776,6 +776,14 @@ int ProgramKnowledgeBase::IdentToIndexValue(std::string_view name,
     assert(et != QueryEntityType::kStmt);
     return name_value_.GetIndex(name.data(), et);
 }
+std::set<StmtNo> ProgramKnowledgeBase::GetCallStmts(std::string_view name) {
+    ProcIndex proc_index = IdentToIndexValue(name, QueryEntityType::kProc);
+    if (proc_index == 0) {
+        return {};
+    }
+    auto call_stmts = call_proc_.GetStmts(proc_index);
+    return {call_stmts.begin(), call_stmts.end()};
+}
 void ProgramKnowledgeBase::ExtractReadModifies(
         const std::vector<int> &read_stmts,
         std::list<std::string> &output) const noexcept {

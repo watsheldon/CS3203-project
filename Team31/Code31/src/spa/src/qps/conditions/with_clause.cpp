@@ -62,7 +62,7 @@ ResultTable WithClause::NameSyn(KnowledgeBase *pkb, std::string_view name,
     assert(synonym_with_attr.attribute_ != Attribute::kStmtNum);
     switch (synonym_with_attr.synonym_->type) {
         case Synonym::kStmtCall: {
-            auto result = pkb->GetCalls(Name<ArgPos::kSecond>(name));
+            auto result = pkb->GetCallStmts(name);
             return {synonym_with_attr.synonym_, std::move(result)};
         }
         case Synonym::kStmtRead: {

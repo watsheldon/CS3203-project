@@ -456,6 +456,9 @@ class KnowledgeBase {
     virtual int IdentToIndexValue(std::string_view name,
                                   QueryEntityType et) = 0;
 
+    // Get set of StmtNo that calls the given procedure name.
+    virtual std::set<StmtNo> GetCallStmts(std::string_view name) = 0;
+
     /**
      * Prevents any further updates to the KnowledgeBase and compile all
      * indirect relationships for faster lookup.

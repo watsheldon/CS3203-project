@@ -248,6 +248,7 @@ class ProgramKnowledgeBase : public KnowledgeBase {
     void ToAttr(StmtType et, const std::vector<StmtNo> &index_list,
                 std::list<std::string> &names) override;
     int IdentToIndexValue(std::string_view name, QueryEntityType et) override;
+    std::set<StmtNo> GetCallStmts(std::string_view name) override;
 
     // mark the end of source processor
     void Compile() override;
