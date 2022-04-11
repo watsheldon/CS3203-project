@@ -734,42 +734,6 @@ std::vector<int> ProgramKnowledgeBase::GetAllEntityIndices(StmtType st) {
     }
     return type_stmt_.GetStatements(st);
 }
-void ProgramKnowledgeBase::ToName(QueryEntityType et,
-                                  const std::vector<int> &index_list,
-                                  std::list<std::string> &names) {
-    assert(compiled);
-    switch (et) {
-        case QueryEntityType::kProc:
-        case QueryEntityType::kVar:
-        case QueryEntityType::kConst:
-            std::for_each(
-                    index_list.begin(), index_list.end(),
-                    [this, et, &names](int i) {
-                        names.emplace_back(name_value_.GetNameValue(i, et));
-                    });
-            return;
-        case QueryEntityType::kStmt:
-            std::transform(index_list.begin(), index_list.end(),
-                           std::back_inserter(names),
-                           [](int i) { return std::to_string(i); });
-            return;
-    }
-    assert(false);
-}
-void ProgramKnowledgeBase::ToAttr(StmtType et,
-                                  const std::vector<StmtNo> &index_list,
-                                  std::list<std::string> &names) {
-    switch (et) {
-        case StmtType::kRead:
-            return ExtractReadModifies(index_list, names);
-        case StmtType::kPrint:
-            return ExtractPrintUses(index_list, names);
-        case StmtType::kCall:
-            return ExtractCallProcNames(index_list, names);
-        default:
-            assert(false);
-    }
-}
 int ProgramKnowledgeBase::IdentToIndexValue(std::string_view name,
                                             QueryEntityType et) {
     assert(compiled);

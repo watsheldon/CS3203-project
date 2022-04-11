@@ -449,10 +449,6 @@ class KnowledgeBase {
             const std::vector<int> &indices, QueryEntityType entity_type) = 0;
     virtual std::vector<std::string_view> GetAttr(
             const std::vector<int> &indices, StmtType et) = 0;
-    virtual void ToName(QueryEntityType et, const std::vector<int> &index_list,
-                        std::list<std::string> &names) = 0;
-    virtual void ToAttr(StmtType et, const std::vector<int> &index_list,
-                        std::list<std::string> &names) = 0;
     virtual int IdentToIndexValue(std::string_view name,
                                   QueryEntityType et) = 0;
 

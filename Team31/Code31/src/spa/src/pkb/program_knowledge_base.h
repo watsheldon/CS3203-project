@@ -243,10 +243,6 @@ class ProgramKnowledgeBase : public KnowledgeBase {
             QueryEntityType entity_type) override;
     std::vector<std::string_view> GetAttr(const std::vector<int> &indices,
                                           StmtType stmt_type) override;
-    void ToName(QueryEntityType et, const std::vector<int> &index_list,
-                std::list<std::string> &names) override;
-    void ToAttr(StmtType et, const std::vector<StmtNo> &index_list,
-                std::list<std::string> &names) override;
     int IdentToIndexValue(std::string_view name, QueryEntityType et) override;
     std::set<StmtNo> GetCallStmts(std::string_view name) override;
 
