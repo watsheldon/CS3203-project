@@ -192,6 +192,7 @@ class Factory {
                 CallsBase::GetType(first_param_type_, second_param_type_);
         switch (type) {
             case CallsBase::Type::kSynSyn:
+                if (first_syn_ == second_syn_) return nullptr;
                 return std::make_unique<T>(first_syn_, second_syn_);
             case CallsBase::Type::kSynWild:
                 return std::make_unique<T>(first_syn_,
