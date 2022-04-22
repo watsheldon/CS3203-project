@@ -50,8 +50,7 @@ bool PolishNotation::Contains(const PolishNotation& other) const noexcept {
     // Use KMP algorithm for pattern matching
     auto lps = ComputeLps(other);
     auto pattern = other.expr_;
-    size_t i = 0;
-    size_t j = 0;
+    std::size_t i = 0, j = 0;
     while (i < expr_.size()) {
         if (expr_[i] == pattern[j]) {
             i++;
