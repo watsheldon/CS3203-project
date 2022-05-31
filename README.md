@@ -1,23 +1,9 @@
-# CS3203 Team 31
+# CS3203 Project
+C++ implementation of a static program analyzer for a fictitious programming language designed for pedagogical purpose. Detailed description of the project can be found in this [wiki](https://github.com/sharadhr/CS3203-Survival-Guide/wiki).
 
 ## Target Environment
-
 Item | Version
 -|-
 OS | macOS Monterey x86
 Toolchain | Apple Clang
 C++ Standard | C++17
-
-### Additional Build Instructions
-
-No additional instructions required.
-
-# Team Members
-
-Name | Mobile | Email | Development OS/Toolchain
--:|:-:|:-|-|
-Chen Jiangwei | 83702583 | e0148760@u.nus.edu | Windows/MSVC 142
-Gu Yichen | 88330799 | e0424658@u.nus.edu | macOS/AppleClang 13.1.6
-Kou Yong Kang | 88837448 | kou.yongkang@u.nus.edu | Linux/Clang 13.0.0
-Shum Shang Hui Naoki | 90696521 | e0445462@u.nus.edu | Windows/MSVC 142
-Zhang Guangzesheng | 87100482 | e0425628@u.nus.edu | macOS/AppleClang 12.0.5
